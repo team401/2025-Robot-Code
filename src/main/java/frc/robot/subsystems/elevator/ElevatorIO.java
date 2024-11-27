@@ -43,27 +43,17 @@ public interface ElevatorIO {
 
     public default void applyOutputs(ElevatorOutputs outputs) {}
 
-    /** Set the goal angle which the elevator will control to when it is not in override mode */
-    public default void setGoalAngle(Angle newGoalAngle) {}
+    /** Seed the elevator's position using Chinese Remainder Theorem. */
+    public default void seedWithCRT() {}
+
+    /** Set the goal height which the elevator will control to when it is not in override mode */
+    public default void setGoalHeight(Distance goalHeight) {}
 
     /** Set the static voltage that will be applied when the elevator is in override mode. */
     public default void setOverrideVolts(Voltage volts) {}
 
     /** Set whether the override voltage should be applied or whether the elevator should control to its position */
     public default void setOverrideMode(boolean override) {}
-
-    /**
-     * Set the allowed range of motion for the elevator.
-     * 
-     * <p>When not in override mode, the elevator will clamp its goal height
-     * to be within these bounds. If the elevator is outside of these bounds,
-     * it will update its goal position and control to be back within these bounds
-     * as soon as it can.
-     * This can be used to restrict the allowed positions of the elevator,
-     * for instance to stop it from destroying a mechanism attached to the elevator
-     * when that mechanism is in a certain position.
-     */
-    public default void setAllowedRangeOfMotion(Distance minHeight, Distance maxHeight) {}
 
     /** Update PID gains for the elevator */
     public default void setPID(double p, double i, double d) {}
@@ -76,6 +66,9 @@ public interface ElevatorIO {
 
     /** Set whether or not the motors should brake while idle */
     public default void setBrakeMode(boolean brakeMode) {}
+
+    /** Set the stator current limit for both elevator motors */
+    public default void setStatorCurrentLimit(Current currentLimit) {}
 
     /** Set whether or not the motors on the elevator should be disabled. */
     public default void setMotorsDisabled(boolean disabled) {}
