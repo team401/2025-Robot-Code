@@ -1,4 +1,4 @@
-package frc.robot.subsystems.scoring;
+package frc.robot.subsystems;
 
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
@@ -17,24 +17,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants;
-import frc.robot.Constants.Mode;
-import frc.robot.Constants.ScoringConstants;
-import frc.robot.utils.AllianceUtil;
-import frc.robot.utils.FieldFinder;
-import frc.robot.utils.FieldFinder.FieldLocations;
-import frc.robot.utils.InterpolateDouble;
-import frc.robot.utils.Tunable;
+
 import frc.robot.utils.monitors.Monitor;
 import frc.robot.utils.monitors.MonitoredSubsystem;
-import frc.robot.utils.notesimulator.NoteManager;
+
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-import org.littletonrobotics.junction.Logger;
-
-public class ScoringSubsystem extends MonitoredSubsystem implements Tunable {
 
 
-        addMonitor(
+public class BatterySubsystem extends MonitoredSubsystem {
+
+        /*addMonitor(
                 new Monitor(
                         "armEncoderUnplugged", // Name to log callback under
                         true, // Sticky fault (remain faulted even after conditions become
@@ -59,4 +52,5 @@ public class ScoringSubsystem extends MonitoredSubsystem implements Tunable {
                             aimerIo.setOverrideMode(true);
                             aimerIo.setOverrideVolts(0.0);
                         })));
-    
+    */
+}
