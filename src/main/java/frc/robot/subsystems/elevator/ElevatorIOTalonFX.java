@@ -8,7 +8,10 @@ import static edu.wpi.first.units.Units.VoltsPerMeterPerSecondSquared;
 import java.util.concurrent.CancellationException;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
@@ -42,7 +45,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     CANcoder canCoder19;
     CANcoder canCoder17;
 
-    TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration();
+    TalonFXConfiguration talonFXConfigs;
 
     public ElevatorIOTalonFX() {
         leadMotor = new TalonFX(ElevatorConstants.leadElevatorMotorId);
@@ -62,32 +65,34 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         cancoderConfiguration.MagnetSensor.SensorDirection = ElevatorConstants.elevatorCANCoder17Direction;
         canCoder17.getConfigurator().apply(cancoderConfiguration);
 
-        talonFXConfigs.Feedback.FeedbackRemoteSensorID = canCoder17.getDeviceID();
-        talonFXConfigs.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
-        talonFXConfigs.Feedback.SensorToMechanismRatio = ElevatorConstants.CANCoder17ToMechanismRatio;
-        talonFXConfigs.Feedback.RotorToSensorRatio = ElevatorConstants.RotorToCANCoder17Ratio;
-        talonFXConfigs.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        talonFXConfigs.CurrentLimits.StatorCurrentLimitEnable = true;
-        talonFXConfigs.CurrentLimits.StatorCurrentLimit = ElevatorConstants.elevatorStatorCurrentLimit.in(Amps);
+        talonFXConfigs = new TalonFXConfiguration()
+            .withFeedback(new FeedbackConfigs()
+                .withFeedbackRemoteSensorID(canCoder19.getDeviceID())
+                .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
+                .withSensorToMechanismRatio(ElevatorConstants.CANCoder19ToMechanismRatio)
+                .withRotorToSensorRatio(ElevatorConstants.RotorToCANCoder19Ratio))
+            .withMotorOutput(new MotorOutputConfigs()
+                .withNeutralMode(NeutralModeValue.Brake))
+            .withCurrentLimits(new CurrentLimitsConfigs()
+                .withStatorCurrentLimitEnable(true)
+                .withStatorCurrentLimit(ElevatorConstants.elevatorStatorCurrentLimit))
+            .withSlot0(new Slot0Configs()
+                .withGravityType(GravityTypeValue.Elevator_Static)
+                .withKS(ElevatorConstants.elevatorkS)
+                .withKV(ElevatorConstants.elevatorkV)
+                .withKA(ElevatorConstants.elevatorkA)
+                .withKG(ElevatorConstants.elevatorkG)
 
-        Slot0Configs slot0Configs = talonFXConfigs.Slot0;
-        slot0Configs.GravityType = GravityTypeValue.Elevator_Static;
-
-        slot0Configs.kS = ElevatorConstants.elevatorkS;
-        slot0Configs.kV = ElevatorConstants.elevatorkV;
-        slot0Configs.kA = ElevatorConstants.elevatorkA;
-        slot0Configs.kG = ElevatorConstants.elevatorkG;
-
-        slot0Configs.kP = ElevatorConstants.elevatorkP;
-        slot0Configs.kI = ElevatorConstants.elevatorkI;
-        slot0Configs.kD = ElevatorConstants.elevatorkD;
-
-        MotionMagicConfigs motionMagicConfigs = talonFXConfigs.MotionMagic;
-        motionMagicConfigs.MotionMagicCruiseVelocity = ElevatorConstants.elevatorCruiseVelocity.in(MetersPerSecond);
-        motionMagicConfigs.MotionMagicExpo_kA = ElevatorConstants.elevatorExpo_kA.in(VoltsPerMeterPerSecondSquared);
-        motionMagicConfigs.MotionMagicExpo_kV = ElevatorConstants.elevatorExpo_kV.in(VoltsPerMeterPerSecond);
+                .withKP(ElevatorConstants.elevatorkP)
+                .withKI(ElevatorConstants.elevatorkI)
+                .withKD(ElevatorConstants.elevatorkD))
+            .withMotionMagic(new MotionMagicConfigs()
+                .withMotionMagicCruiseVelocity(ElevatorConstants.elevatorAngularCruiseVelocity)
+                .withMotionMagicExpo_kA(ElevatorConstants.elevatorExpo_kA)
+                .withMotionMagicExpo_kV(ElevatorConstants.elevatorExpo_kV));
 
         leadMotor.getConfigurator().apply(talonFXConfigs);
+        followerMotor.getConfigurator().apply(talonFXConfigs);
 
         followerMotor.setControl(new Follower(leadMotor.getDeviceID(), ElevatorConstants.invertFollowerElevatorMotor));
     }
