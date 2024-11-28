@@ -3,6 +3,7 @@ package frc.robot.subsystems.elevator;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.AutoLog;
 
@@ -12,31 +13,35 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutCurrent;
+import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 
 public interface ElevatorIO {
     @AutoLog
     public static class ElevatorInputs {
         /** The angle of the 19 tooth-gear-encoder */
-        Angle encoder19Angle = Rotations.of(0.0);
+        MutAngle encoder19Angle = Rotations.mutable(0.0);
         /** The angle of the 17 tooth-gear-encoder */
-        Angle encoder17Angle = Rotations.of(0.0);
+        MutAngle encoder17Angle = Rotations.mutable(0.0);
 
         /** Goal position of the elevator */
-        Distance elevatorGoalHeight = Meters.of(0.0);
+        MutDistance elevatorGoalHeight = Meters.mutable(0.0);
         /** Actual position of the elevator */
-        Distance elevatorHeight = Meters.of(0.0);
+        MutDistance elevatorHeight = Meters.mutable(0.0);
 
         /** Stator current of the elevator motor */
-        Current elevatorStatorCurrent = Amps.of(0.0);
+        MutCurrent elevatorStatorCurrent = Amps.mutable(0.0);
         /** Supply current of the elevator motor */
-        Current elevatorSupplyCurrent = Amps.of(0.0);
+        MutCurrent elevatorSupplyCurrent = Amps.mutable(0.0);
     }
 
     @AutoLog
     public static class ElevatorOutputs {
         /** The voltage applied to the elevator motor */
-        Voltage elevatorAppliedVolts;
+        MutVoltage elevatorAppliedVolts = Volts.mutable(0.0);
     }
 
     public default void updateInputs(ElevatorInputs inputs) {}
