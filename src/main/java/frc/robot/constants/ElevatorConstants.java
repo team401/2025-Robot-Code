@@ -79,4 +79,6 @@ public final class ElevatorConstants {
 
     // TODO: Tune this value
     public static final Current elevatorStatorCurrentLimit = Amps.of(10.0);
+
+    public static final int CRTticksPerRotation = 4096; // CANCoders have a resolution of 4096 ticks/rotation
 }
