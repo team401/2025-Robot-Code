@@ -7,8 +7,12 @@ import static edu.wpi.first.units.Units.Volts;
 
 import org.littletonrobotics.junction.AutoLog;
 
+import edu.wpi.first.units.AngularAccelerationUnit;
+import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
@@ -17,6 +21,7 @@ import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Voltage;
 
 public interface ElevatorIO {
@@ -83,7 +88,7 @@ public interface ElevatorIO {
     public default void setPID(double p, double i, double d) {}
 
     /** Set profile constraints to be sent to Motion Magic Expo */
-    public default void setMaxProfile(LinearVelocity maxVelocity, LinearAcceleration maxAcceleration) {}
+    public default void setMaxProfile(AngularVelocity maxVelocity, Per<VoltageUnit, AngularAccelerationUnit> expo_kA, Per<VoltageUnit, AngularVelocityUnit> expo_kV) {}
 
     /** Set feedforward gains for closed-loop control */
     public default void setFF(double kS, double kV, double kA, double kG) {}

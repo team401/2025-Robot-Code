@@ -1,8 +1,10 @@
 package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.InchesPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.VoltsPerMeterPerSecond;
 import static edu.wpi.first.units.Units.VoltsPerMeterPerSecondSquared;
 
@@ -24,12 +26,18 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.units.AngleUnit;
+import edu.wpi.first.units.AngularAccelerationUnit;
+import edu.wpi.first.units.AngularVelocityUnit;
+import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.ElevatorConstants;
 
@@ -49,6 +57,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     CANcoder canCoder17;
 
     TalonFXConfiguration talonFXConfigs;
+
+    boolean motorDisabled = false;
 
     public ElevatorIOTalonFX() {
         leadMotor = new TalonFX(ElevatorConstants.leadElevatorMotorId);
@@ -122,39 +132,90 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         // TODO: Control to a position
     }
 
-
+    @Override
     public void setGoalHeight(Distance goalHeight) {}
 
+    @Override
     public Angle getCANCoder19AbsPos() { return canCoder19.getAbsolutePosition().getValue(); }
 
+    @Override
     public Angle getCANCoder17AbsPos() { return canCoder17.getAbsolutePosition().getValue(); }
 
+
+    @Override
     public void setCANCoder19Position(Angle newAngle) {
         canCoder19.setPosition(newAngle);
     }
 
+    @Override
     public void setCANCoder17Position(Angle newAngle) {
         canCoder17.setPosition(newAngle);
     }
 
+    @Override
     public void setOverrideVolts(Voltage volts) {
         overrideVolts = volts;
     }
 
+    @Override
     public void setOverrideMode(boolean override) {
         isOverriding = override;
     }
 
-    public void setPID(double p, double i, double d) {}
+    @Override
+    public void setPID(double p, double i, double d) {
+        Slot0Configs configs = talonFXConfigs.Slot0;
 
-    public void setMaxProfile(LinearVelocity maxVelocity, LinearAcceleration maxAcceleration) {}
+        configs.kP = p;
+        configs.kI = i;
+        configs.kD = d;
 
-    public void setFF(double kS, double kV, double kA, double kG) {}
+        leadMotor.getConfigurator().apply(configs);
+        followerMotor.getConfigurator().apply(configs);
+    }
 
-    public void setBrakeMode(boolean brakeMode) {}
+    @Override
+    public void setMaxProfile(AngularVelocity maxVelocity, Per<VoltageUnit, AngularAccelerationUnit> expo_kA, Per<VoltageUnit, AngularVelocityUnit> expo_kV) {
+        // TODO: Figure out how to handle maximum velocity for the elevator
+        MotionMagicConfigs configs = talonFXConfigs.MotionMagic
+            .withMotionMagicCruiseVelocity(maxVelocity)
+            .withMotionMagicExpo_kA(expo_kA)
+            .withMotionMagicExpo_kV(expo_kV);
 
-    /** Set the stator current limit for both elevator motors */
-    public void setStatorCurrentLimit(Current currentLimit) {}
+        leadMotor.getConfigurator().apply(configs);
+        followerMotor.getConfigurator().apply(configs);
+    }
 
-    public void setMotorsDisabled(boolean disabled) {}
+    @Override
+    public void setFF(double kS, double kV, double kA, double kG) {
+        Slot0Configs configs = talonFXConfigs.Slot0;
+
+        configs.kS = kS;
+        configs.kV = kV;
+        configs.kA = kA;
+        configs.kG = kG;
+
+        leadMotor.getConfigurator().apply(configs);
+        followerMotor.getConfigurator().apply(configs);
+    }
+
+    @Override
+    public void setBrakeMode(boolean brakeMode) {
+        leadMotor.setNeutralMode(brakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+        followerMotor.setNeutralMode(brakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+    }
+
+    @Override
+    public void setStatorCurrentLimit(Current currentLimit) {
+        talonFXConfigs.CurrentLimits.withStatorCurrentLimit(currentLimit);
+
+        // Only apply current limit configs to avoid overwriting PID and FF values from tuning
+        leadMotor.getConfigurator().apply(talonFXConfigs.CurrentLimits);
+        followerMotor.getConfigurator().apply(talonFXConfigs.CurrentLimits);
+    }
+
+    @Override
+    public void setMotorsDisabled(boolean disabled) {
+        motorDisabled = disabled;
+    }
 }
