@@ -22,20 +22,30 @@ import edu.wpi.first.units.measure.Voltage;
 public interface ElevatorIO {
     @AutoLog
     public static class ElevatorInputs {
-        /** The angle of the 19 tooth-gear-encoder */
-        MutAngle encoder19Angle = Rotations.mutable(0.0);
-        /** The angle of the 17 tooth-gear-encoder */
-        MutAngle encoder17Angle = Rotations.mutable(0.0);
+        /** The angle of the 19 tooth-gear-encoder. Counts total rotations, not absolute position. */
+        MutAngle encoder19Pos = Rotations.mutable(0.0);
+        /** The angle of the 17 tooth-gear-encoder. Counts total rotations, not absolute position. */
+        MutAngle encoder17Pos = Rotations.mutable(0.0);
+
+        /** Absolute position of the 19 tooth-gear-encocer. Wraps around after 1 rotation */
+        MutAngle encoder19AbsolutePos = Rotations.mutable(0.0);
+        /** Absolute position of the 17 tooth-gear-encocer. Wraps around after 1 rotation */
+        MutAngle encoder17AbsolutePos = Rotations.mutable(0.0);
 
         /** Goal position of the elevator */
         MutDistance elevatorGoalHeight = Meters.mutable(0.0);
         /** Actual position of the elevator */
         MutDistance elevatorHeight = Meters.mutable(0.0);
 
-        /** Stator current of the elevator motor */
-        MutCurrent elevatorStatorCurrent = Amps.mutable(0.0);
-        /** Supply current of the elevator motor */
-        MutCurrent elevatorSupplyCurrent = Amps.mutable(0.0);
+        /** Stator current of the lead elevator motor */
+        MutCurrent elevatorLeadMotorStatorCurrent = Amps.mutable(0.0);
+        /** Supply current of the lead elevator motor */
+        MutCurrent elevatorLeadMotorSupplyCurrent = Amps.mutable(0.0);
+
+        /** Stator current of the follower elevator motor */
+        MutCurrent elevatorFollowerMotorStatorCurrent = Amps.mutable(0.0);
+        /** Supply current of the follower elevator motor */
+        MutCurrent elevatorFollowerMotorSupplyCurrent = Amps.mutable(0.0);
     }
 
     @AutoLog
@@ -48,11 +58,20 @@ public interface ElevatorIO {
 
     public default void applyOutputs(ElevatorOutputs outputs) {}
 
-    /** Seed the elevator's position using Chinese Remainder Theorem. */
-    public default void seedWithCRT() {}
-
     /** Set the goal height which the elevator will control to when it is not in override mode */
     public default void setGoalHeight(Distance goalHeight) {}
+
+    /** Get the absolute position of the 19 tooth CANCoder. */
+    public default Angle getCANCoder19AbsPos() { return Rotations.of(0.0); }
+
+    /** Get the absolute position of the 17 tooth CANCoder. */
+    public default Angle getCANCoder17AbsPos() { return Rotations.of(0.0); }
+
+    /** Set the position of the 19 tooth CANCoder. This position is separate from absolute position and can track multiple rotations. */
+    public default void setCANCoder19Position(Angle newAngle) {}
+
+    /** Set the position of the 17 tooth CANCoder. This position is separate from absolute position and can track multiple rotations. */
+    public default void setCANCoder17Position(Angle newAngle) {}
 
     /** Set the static voltage that will be applied when the elevator is in override mode. */
     public default void setOverrideVolts(Voltage volts) {}

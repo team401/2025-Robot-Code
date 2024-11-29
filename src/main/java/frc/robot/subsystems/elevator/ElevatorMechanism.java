@@ -2,8 +2,10 @@ package frc.robot.subsystems.elevator;
 
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Rotations;
 
 import edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.ElevatorConstants;
@@ -16,18 +18,68 @@ public class ElevatorMechanism {
    Distance minHeight = ElevatorConstants.minElevatorHeight;
    Distance maxHeight = ElevatorConstants.maxElevatorHeight;
 
+    // Has the elevator been seeded with CRT yet?
+    // This exists in case we fail to seed with CRT the first try, it will try again each tick until it succeeds.
+    private boolean hasBeenSeeded = false;
+
+
    public ElevatorMechanism(ElevatorIO io) {
        this.io = io;
 
        // Seed elevator height using CRT on initialize
-       io.seedWithCRT();
+       seedWithCRT();
    }
 
    public void periodic() {
        io.updateInputs(inputs);
        io.applyOutputs(outputs);
    }
-   
+
+   public void seedWithCRT() {
+       final int ticks = ElevatorConstants.CRTticksPerRotation;
+       // Find the number of ticks of each encoder, but in terms of the spool.
+       // These should be multiplied by 19/18 or 17/18 (the gear ratios of the CANCoders to the spool), but since the resulting numbers
+       // aren't divisible by 18, this would result in rounding losing precision.
+       // Therefore, we just multiply by 19 or 17 and then divide the final result by
+       // 18.
+       long ticks17 = Math.round(io.getCANCoder17AbsPos().in(Rotations) * ticks * 19.0);
+       long ticks19 = Math.round(io.getCANCoder19AbsPos().in(Rotations) * ticks * 17.0);
+
+       long solutionTicks = -1;
+
+       for (int i = 0; i < 17; i++) {
+           // Try the offset of each multiple of 19 * ticks
+           long potentialPosition = i * 19 * ticks + ticks19;
+           // Check whether that potential position is encoder 17's remainder away from a
+           // multiple of 17
+           if ((potentialPosition - ticks17) % (17 * ticks) == 0) {
+               // If both conditions are met, we have a solution.
+               solutionTicks = potentialPosition;
+               break;
+           }
+       }
+
+       if (solutionTicks != -1) {
+           // Factor out the 18 from earlier.
+           Angle solutionSpoolAngle = Rotations.of((double) solutionTicks / (double) ticks / 18.0);
+           // The 19 tooth encoder will have turned 18/19 of a rotation for each rotation
+           // of the spool
+           Angle solutionEnc19Angle = solutionSpoolAngle.times(18.0 / 19.0);
+           // The 17 tooth encoder will have turned 18/17 of a rotation for each rotation
+           // of the spool
+           Angle solutionEnc17Angle = solutionSpoolAngle.times(18.0 / 17.0);
+
+           // Seed the encoder positions so that they are now accurate
+           io.setCANCoder19Position(solutionEnc19Angle);
+           io.setCANCoder17Position(solutionEnc17Angle);
+
+           hasBeenSeeded = true;
+       } else {
+           System.out.println("ERROR: Couldn't find solution to seed elevator with CRT");
+       }
+
+   }
+
    /**
     * Set the allowed range of motion for the elevator.
     * 
