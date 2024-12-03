@@ -14,6 +14,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -21,16 +22,18 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.DriveTemplate;
 import java.util.function.Supplier;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements Subsystem so it can easily
  * be used in command-based projects.
  */
-public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsystem {
+public class CommandSwerveDrivetrain extends SwerveDrivetrain implements DriveTemplate {
     private static final double kSimLoopPeriod = 0.005; // 5 ms
+    private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
+    private boolean fieldCentric = true;
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
 
@@ -132,6 +135,11 @@ public class CommandSwerveDrivetrain extends SwerveDrivetrain implements Subsyst
             startSimThread();
         }
         configureAutoBuilder();
+    }
+
+    public void setGoalSpeeds(ChassisSpeeds goalSpeeds, boolean fieldCentric) {
+        this.goalSpeeds = goalSpeeds;
+        this.fieldCentric = fieldCentric;
     }
 
     /**
