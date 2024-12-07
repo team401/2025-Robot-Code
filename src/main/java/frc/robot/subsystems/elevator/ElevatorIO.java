@@ -1,7 +1,6 @@
 package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -9,17 +8,12 @@ import org.littletonrobotics.junction.AutoLog;
 
 import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
-import edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearAcceleration;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutCurrent;
-import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Voltage;

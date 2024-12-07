@@ -70,6 +70,7 @@ public final class ElevatorConstants {
     public static final LinearVelocity elevatorCruiseVelocity = MetersPerSecond.of(0.1);
     // TODO: Factor in gearbox ratios and actual calculations into this constant
     public static final AngularVelocity elevatorAngularCruiseVelocity = RadiansPerSecond.of(elevatorCruiseVelocity.in(MetersPerSecond) / elevatorToSpool.in(PerUnit.combine(Meters, Radians)));
+
     /**
      * The kV used by Motion Magic Expo to generate a motion profile.
      * Dividing the supply voltage by kV results in the maximum velocity of the system.

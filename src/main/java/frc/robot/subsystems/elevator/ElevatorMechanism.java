@@ -1,6 +1,7 @@
 package frc.robot.subsystems.elevator;
 
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 
@@ -15,6 +16,9 @@ public class ElevatorMechanism {
    ElevatorIO io;
    ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
    ElevatorOutputsAutoLogged outputs = new ElevatorOutputsAutoLogged();
+
+   MutDistance goalHeight = Meters.mutable(0.0);
+   MutDistance clampedGoalHeight = Meters.mutable(0.0);
 
    Distance minHeight = ElevatorConstants.minElevatorHeight;
    Distance maxHeight = ElevatorConstants.maxElevatorHeight;
@@ -32,6 +36,12 @@ public class ElevatorMechanism {
    }
 
    public void periodic() {
+       if (!hasBeenSeeded) {
+        seedWithCRT();
+       }
+
+       sendGoalHeightToIO();
+
        io.updateInputs(inputs);
        io.applyOutputs(outputs);
    }
@@ -115,16 +125,38 @@ public class ElevatorMechanism {
      * <p> This goal height will be clamped by the allowed range of motion set by setAllowedRangeOfMotion before
      * it is sent to the elevator io.
      */
-    public void setGoalHeight(MutDistance goalHeight) {
+    public void setGoalHeight(Distance goalHeight) {
         // TODO: 2025 coppercore solution for easy value clamping https://github.com/team401/coppercore/issues/64
-        MutDistance clampedOutput = goalHeight;
-        if (goalHeight.lt(minHeight)) {
-            clampedOutput.mut_replace(minHeight);
-        } else if (goalHeight.gt(maxHeight)) {
-            clampedOutput.mut_replace(maxHeight);
-        }
+        this.goalHeight.mut_replace(goalHeight);
 
-        // TODO: Convert height to cancoder rotations and send it to the IO.
+        sendGoalHeightToIO();
+    }
+
+    /**
+     * Based on the previously set goal height, update the clamped goal height to be within the current bounds.
+     */
+    public void updateClampedGoalHeight() {
+        if (goalHeight.lt(minHeight)) {
+            clampedGoalHeight.mut_replace(minHeight);
+        } else if (goalHeight.gt(maxHeight)) {
+            clampedGoalHeight.mut_replace(maxHeight);
+        } else if (!clampedGoalHeight.equals(goalHeight)) {
+            clampedGoalHeight.mut_replace(goalHeight);
+        }
+    }
+
+    /**
+     * Clamp the goal height, then convert it to rotations of the large encoder and send the goal rotations to the IO.
+     */
+    public void sendGoalHeightToIO() {
+        updateClampedGoalHeight();
+
+        // TODO: Use coppercore gear math after https://github.com/team401/coppercore/issues/52 is done.
+
+        Angle spoolRotations = Rotations.of(clampedGoalHeight.divide(Inches.of(4.724)).magnitude());
+        Angle largeEncoderRotations = spoolRotations.divide((double) ElevatorConstants.spoolTeeth / (double) ElevatorConstants.largeCANCoderTeeth);
+
+        io.setLargeCANCoderGoalPos(largeEncoderRotations);
     }
 
     /** Set whether the override voltage should be applied or whether the elevator should control to its position */
