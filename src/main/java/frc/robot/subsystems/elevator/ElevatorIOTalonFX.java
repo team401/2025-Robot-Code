@@ -36,13 +36,14 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.ElevatorConstants;
 
 public class ElevatorIOTalonFX implements ElevatorIO {
-    MutDistance elevatorGoalHeight;
+    MutAngle largeEncoderGoalAngle;
     Voltage overrideVolts;
     boolean isOverriding;
 
@@ -53,8 +54,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     TalonFX leadMotor;
     TalonFX followerMotor;
 
-    CANcoder canCoder19;
-    CANcoder canCoder17;
+    CANcoder largeCANCoder;
+    CANcoder smallCANCoder;
 
     TalonFXConfiguration talonFXConfigs;
 
@@ -64,26 +65,26 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         leadMotor = new TalonFX(ElevatorConstants.leadElevatorMotorId);
         followerMotor = new TalonFX(ElevatorConstants.followerElevatorMotorId);
 
-        canCoder19 = new CANcoder(ElevatorConstants.elevatorCANCoder19ID);
-        canCoder17 = new CANcoder(ElevatorConstants.elevatorCANCoder17ID);
+        largeCANCoder = new CANcoder(ElevatorConstants.elevatorLargeCANCoderID);
+        smallCANCoder = new CANcoder(ElevatorConstants.elevatorSmallCANCoderID);
 
         setStatorCurrentLimit(ElevatorConstants.elevatorStatorCurrentLimit);
 
         CANcoderConfiguration cancoderConfiguration = new CANcoderConfiguration();
         cancoderConfiguration.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
 
-        cancoderConfiguration.MagnetSensor.SensorDirection = ElevatorConstants.elevatorCANCoder19Direction;
-        canCoder19.getConfigurator().apply(cancoderConfiguration);
+        cancoderConfiguration.MagnetSensor.SensorDirection = ElevatorConstants.elevatorLargeCANCoderDirection;
+        largeCANCoder.getConfigurator().apply(cancoderConfiguration);
 
-        cancoderConfiguration.MagnetSensor.SensorDirection = ElevatorConstants.elevatorCANCoder17Direction;
-        canCoder17.getConfigurator().apply(cancoderConfiguration);
+        cancoderConfiguration.MagnetSensor.SensorDirection = ElevatorConstants.elevatorSmallCANCoderDirection;
+        smallCANCoder.getConfigurator().apply(cancoderConfiguration);
 
         talonFXConfigs = new TalonFXConfiguration()
             .withFeedback(new FeedbackConfigs()
-                .withFeedbackRemoteSensorID(canCoder19.getDeviceID())
+                .withFeedbackRemoteSensorID(largeCANCoder.getDeviceID())
                 .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
-                .withSensorToMechanismRatio(ElevatorConstants.CANCoder19ToMechanismRatio)
-                .withRotorToSensorRatio(ElevatorConstants.RotorToCANCoder19Ratio))
+                .withSensorToMechanismRatio(ElevatorConstants.largeCANCoderToMechanismRatio)
+                .withRotorToSensorRatio(ElevatorConstants.rotorToLargeCANCoderRatio))
             .withMotorOutput(new MotorOutputConfigs()
                 .withNeutralMode(NeutralModeValue.Brake))
             .withCurrentLimits(new CurrentLimitsConfigs()
@@ -112,13 +113,13 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
     @Override
     public void updateInputs(ElevatorInputs inputs) {
-        inputs.encoder19Pos.mut_replace(canCoder19.getPosition().getValue());
-        inputs.encoder17Pos.mut_replace(canCoder17.getPosition().getValue());
+        inputs.largeEncoderPos.mut_replace(largeCANCoder.getPosition().getValue());
+        inputs.smallEncoderPos.mut_replace(smallCANCoder.getPosition().getValue());
 
-        inputs.encoder19AbsolutePos.mut_replace(canCoder19.getAbsolutePosition().getValue());
-        inputs.encoder17AbsolutePos.mut_replace(canCoder17.getAbsolutePosition().getValue());
+        inputs.largeEncoderAbsolutePos.mut_replace(largeCANCoder.getAbsolutePosition().getValue());
+        inputs.smallEncoderAbsolutePos.mut_replace(smallCANCoder.getAbsolutePosition().getValue());
 
-        inputs.elevatorGoalHeight.mut_replace(elevatorGoalHeight);
+        inputs.largeEncoderGoalPos.mut_replace(largeEncoderGoalAngle);
 
         inputs.elevatorLeadMotorStatorCurrent.mut_replace(leadMotor.getStatorCurrent().getValue());
         inputs.elevatorLeadMotorSupplyCurrent.mut_replace(leadMotor.getSupplyCurrent().getValue());
@@ -133,23 +134,20 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     }
 
     @Override
-    public void setGoalHeight(Distance goalHeight) {}
+    public Angle getLargeCANCoderAbsPos() { return largeCANCoder.getAbsolutePosition().getValue(); }
 
     @Override
-    public Angle getCANCoder19AbsPos() { return canCoder19.getAbsolutePosition().getValue(); }
-
-    @Override
-    public Angle getCANCoder17AbsPos() { return canCoder17.getAbsolutePosition().getValue(); }
+    public Angle getSmallCANCoderAbsPos() { return smallCANCoder.getAbsolutePosition().getValue(); }
 
 
     @Override
-    public void setCANCoder19Position(Angle newAngle) {
-        canCoder19.setPosition(newAngle);
+    public void setLargeCANCoderPosition(Angle newAngle) {
+        largeCANCoder.setPosition(newAngle);
     }
 
     @Override
-    public void setCANCoder17Position(Angle newAngle) {
-        canCoder17.setPosition(newAngle);
+    public void setSmallCANCoderPosition(Angle newAngle) {
+        smallCANCoder.setPosition(newAngle);
     }
 
     @Override

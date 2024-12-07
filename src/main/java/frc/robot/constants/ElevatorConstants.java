@@ -40,15 +40,19 @@ public final class ElevatorConstants {
     public static final int followerElevatorMotorId = 10;
     public static final boolean invertFollowerElevatorMotor = false;
 
+    public static final int smallCANCoderTeeth = 17;
+    public static final int largeCANCoderTeeth = 19;
+    public static final int spoolTeeth = 18;
+
     // TODO: Tune encoder directions!
-    public static final int elevatorCANCoder19ID = 11;
-    public static final SensorDirectionValue elevatorCANCoder19Direction = SensorDirectionValue.CounterClockwise_Positive;
-    public static final int elevatorCANCoder17ID = 12;
-    public static final SensorDirectionValue elevatorCANCoder17Direction = SensorDirectionValue.CounterClockwise_Positive;
+    public static final int elevatorLargeCANCoderID = 11;
+    public static final SensorDirectionValue elevatorLargeCANCoderDirection = SensorDirectionValue.CounterClockwise_Positive;
+    public static final int elevatorSmallCANCoderID = 12;
+    public static final SensorDirectionValue elevatorSmallCANCoderDirection = SensorDirectionValue.CounterClockwise_Positive;
 
     // TODO: Calculate these ratios for real
-    public static final double CANCoder19ToMechanismRatio = 19.0 / 18.0;
-    public static final double RotorToCANCoder19Ratio = 18.0 / 19.0;
+    public static final double largeCANCoderToMechanismRatio = (double) largeCANCoderTeeth / (double) spoolTeeth;
+    public static final double rotorToLargeCANCoderRatio = (double) spoolTeeth / (double) largeCANCoderTeeth;
 
     // TODO: Tune elevator
     public static final double elevatorkP = 1.0;

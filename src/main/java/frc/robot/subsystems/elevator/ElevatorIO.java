@@ -28,19 +28,17 @@ public interface ElevatorIO {
     @AutoLog
     public static class ElevatorInputs {
         /** The angle of the 19 tooth-gear-encoder. Counts total rotations, not absolute position. */
-        MutAngle encoder19Pos = Rotations.mutable(0.0);
+        MutAngle largeEncoderPos = Rotations.mutable(0.0);
         /** The angle of the 17 tooth-gear-encoder. Counts total rotations, not absolute position. */
-        MutAngle encoder17Pos = Rotations.mutable(0.0);
+        MutAngle smallEncoderPos = Rotations.mutable(0.0);
 
         /** Absolute position of the 19 tooth-gear-encocer. Wraps around after 1 rotation */
-        MutAngle encoder19AbsolutePos = Rotations.mutable(0.0);
+        MutAngle largeEncoderAbsolutePos = Rotations.mutable(0.0);
         /** Absolute position of the 17 tooth-gear-encocer. Wraps around after 1 rotation */
-        MutAngle encoder17AbsolutePos = Rotations.mutable(0.0);
+        MutAngle smallEncoderAbsolutePos = Rotations.mutable(0.0);
 
         /** Goal position of the elevator */
-        MutDistance elevatorGoalHeight = Meters.mutable(0.0);
-        /** Actual position of the elevator */
-        MutDistance elevatorHeight = Meters.mutable(0.0);
+        MutAngle largeEncoderGoalPos = Rotations.mutable(0.0);
 
         /** Stator current of the lead elevator motor */
         MutCurrent elevatorLeadMotorStatorCurrent = Amps.mutable(0.0);
@@ -63,20 +61,20 @@ public interface ElevatorIO {
 
     public default void applyOutputs(ElevatorOutputs outputs) {}
 
-    /** Set the goal height which the elevator will control to when it is not in override mode */
-    public default void setGoalHeight(Distance goalHeight) {}
+    /** Set the goal position of CANCoder 19 which the elevator will control to when it is not in override mode */
+    public default void setLargeCANCoderGoalPos(Angle goalPos) {}
 
     /** Get the absolute position of the 19 tooth CANCoder. */
-    public default Angle getCANCoder19AbsPos() { return Rotations.of(0.0); }
+    public default Angle getLargeCANCoderAbsPos() { return Rotations.of(0.0); }
 
     /** Get the absolute position of the 17 tooth CANCoder. */
-    public default Angle getCANCoder17AbsPos() { return Rotations.of(0.0); }
+    public default Angle getSmallCANCoderAbsPos() { return Rotations.of(0.0); }
 
     /** Set the position of the 19 tooth CANCoder. This position is separate from absolute position and can track multiple rotations. */
-    public default void setCANCoder19Position(Angle newAngle) {}
+    public default void setLargeCANCoderPosition(Angle newAngle) {}
 
     /** Set the position of the 17 tooth CANCoder. This position is separate from absolute position and can track multiple rotations. */
-    public default void setCANCoder17Position(Angle newAngle) {}
+    public default void setSmallCANCoderPosition(Angle newAngle) {}
 
     /** Set the static voltage that will be applied when the elevator is in override mode. */
     public default void setOverrideVolts(Voltage volts) {}
