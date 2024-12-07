@@ -39,6 +39,8 @@ public interface ElevatorIO {
 
         /** Goal position of the elevator */
         MutAngle largeEncoderGoalPos = Rotations.mutable(0.0);
+        /** Profile setpoint goal position of the elevator */
+        MutAngle largeEncoderSetpointPos = Rotations.mutable(0.0);
 
         /** Stator current of the lead elevator motor */
         MutCurrent elevatorLeadMotorStatorCurrent = Amps.mutable(0.0);

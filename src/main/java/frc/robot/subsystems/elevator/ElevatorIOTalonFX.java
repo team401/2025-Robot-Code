@@ -1,14 +1,6 @@
 package frc.robot.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.InchesPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.VoltsPerMeterPerSecond;
-import static edu.wpi.first.units.Units.VoltsPerMeterPerSecondSquared;
-
-import java.util.concurrent.CancellationException;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -18,32 +10,30 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
+import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
-import com.ctre.phoenix6.signals.ControlModeValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearAcceleration;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MutAngle;
-import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.ElevatorConstants;
 
 public class ElevatorIOTalonFX implements ElevatorIO {
     MutAngle largeEncoderGoalAngle;
+    MutAngle largeEncoderSetpointPosition = Rotations.mutable(0.0);
+
     Voltage overrideVolts;
     boolean isOverriding;
 
@@ -60,6 +50,10 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     TalonFXConfiguration talonFXConfigs;
 
     boolean motorDisabled = false;
+
+    // Reuse the same motion magic request to avoid garbage collector having to clean them up.
+    MotionMagicExpoTorqueCurrentFOC motionMagicExpoTorqueCurrentFOC = new MotionMagicExpoTorqueCurrentFOC(0.0);
+    VoltageOut voltageOut = new VoltageOut(0.0);
 
     public ElevatorIOTalonFX() {
         leadMotor = new TalonFX(ElevatorConstants.leadElevatorMotorId);
@@ -120,6 +114,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         inputs.smallEncoderAbsolutePos.mut_replace(smallCANCoder.getAbsolutePosition().getValue());
 
         inputs.largeEncoderGoalPos.mut_replace(largeEncoderGoalAngle);
+        inputs.largeEncoderSetpointPos.mut_replace(largeEncoderSetpointPosition);
 
         inputs.elevatorLeadMotorStatorCurrent.mut_replace(leadMotor.getStatorCurrent().getValue());
         inputs.elevatorLeadMotorSupplyCurrent.mut_replace(leadMotor.getSupplyCurrent().getValue());
@@ -130,7 +125,16 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
     @Override
     public void applyOutputs(ElevatorOutputs outputs) {
-        // TODO: Control to a position
+        motionMagicExpoTorqueCurrentFOC.withPosition(largeEncoderGoalAngle);
+
+        if (motorDisabled) {
+            leadMotor.setControl(voltageOut.withOutput(0.0));
+        } else if (isOverriding) {
+            leadMotor.setControl(voltageOut.withOutput(overrideVolts));
+        } else {
+            leadMotor.setControl(motionMagicExpoTorqueCurrentFOC);
+            largeEncoderSetpointPosition.mut_setMagnitude((leadMotor.getClosedLoopReference().getValue()));
+        }
     }
 
     @Override
