@@ -6,8 +6,6 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix6.sim.TalonFXSimState;
-
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
@@ -16,18 +14,18 @@ import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.constants.ElevatorConstants;
 
 public class ElevatorIOSim extends ElevatorIOTalonFX {
-   private final ElevatorSim elevatorSim = 
-      new ElevatorSim(
-          DCMotor.getKrakenX60Foc(4),
-          ElevatorConstants.elevatorReduction,
-          ElevatorConstants.carriageMass.in(Kilograms),
-          ElevatorConstants.drumRadius.in(Meters),
-          0.0,
-          2.0,
-          true,
-          // Seed to a random position to test CRT
-          Math.random() * 2.0);
-    
+    private final ElevatorSim elevatorSim =
+            new ElevatorSim(
+                    DCMotor.getKrakenX60Foc(4),
+                    ElevatorConstants.elevatorReduction,
+                    ElevatorConstants.carriageMass.in(Kilograms),
+                    ElevatorConstants.drumRadius.in(Meters),
+                    0.0,
+                    2.0,
+                    true,
+                    // Seed to a random position to test CRT
+                    Math.random() * 2.0);
+
     public ElevatorIOSim() {
         super();
 
@@ -38,11 +36,18 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
     private void updateSimState() {
         Distance elevatorHeight = Meters.of(elevatorSim.getPositionMeters());
 
-        // TODO: Use coppercore gear math after https://github.com/team401/coppercore/issues/52 is done.
+        // TODO: Use coppercore gear math after https://github.com/team401/coppercore/issues/52 is
+        // done.
 
         Angle spoolRotations = Rotations.of(elevatorHeight.divide(Inches.of(4.724)).magnitude());
-        Angle largeEncoderRotations = spoolRotations.divide((double) ElevatorConstants.spoolTeeth / (double) ElevatorConstants.largeCANCoderTeeth);
-        Angle smallEncoderRotations = spoolRotations.divide((double) ElevatorConstants.spoolTeeth / (double) ElevatorConstants.smallCANCoderTeeth);
+        Angle largeEncoderRotations =
+                spoolRotations.divide(
+                        (double) ElevatorConstants.spoolTeeth
+                                / (double) ElevatorConstants.largeCANCoderTeeth);
+        Angle smallEncoderRotations =
+                spoolRotations.divide(
+                        (double) ElevatorConstants.spoolTeeth
+                                / (double) ElevatorConstants.smallCANCoderTeeth);
 
         Angle motorRotations = spoolRotations.times(ElevatorConstants.elevatorReduction);
 

@@ -18,7 +18,6 @@ import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.VoltageUnit;
@@ -31,7 +30,7 @@ import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.ElevatorConstants;
 
 public class ElevatorIOTalonFX implements ElevatorIO {
-    MutAngle largeEncoderGoalAngle;
+    MutAngle largeEncoderGoalAngle = Rotations.mutable(0.0);
     MutAngle largeEncoderSetpointPosition = Rotations.mutable(0.0);
 
     Voltage overrideVolts;
@@ -52,7 +51,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     boolean motorDisabled = false;
 
     // Reuse the same motion magic request to avoid garbage collector having to clean them up.
-    MotionMagicExpoTorqueCurrentFOC motionMagicExpoTorqueCurrentFOC = new MotionMagicExpoTorqueCurrentFOC(0.0);
+    MotionMagicExpoTorqueCurrentFOC motionMagicExpoTorqueCurrentFOC =
+            new MotionMagicExpoTorqueCurrentFOC(0.0);
     VoltageOut voltageOut = new VoltageOut(0.0);
 
     public ElevatorIOTalonFX() {
@@ -62,47 +62,59 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         largeCANCoder = new CANcoder(ElevatorConstants.elevatorLargeCANCoderID);
         smallCANCoder = new CANcoder(ElevatorConstants.elevatorSmallCANCoderID);
 
-        setStatorCurrentLimit(ElevatorConstants.elevatorStatorCurrentLimit);
-
         CANcoderConfiguration cancoderConfiguration = new CANcoderConfiguration();
-        cancoderConfiguration.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
+        cancoderConfiguration.MagnetSensor.AbsoluteSensorRange =
+                AbsoluteSensorRangeValue.Unsigned_0To1;
 
-        cancoderConfiguration.MagnetSensor.SensorDirection = ElevatorConstants.elevatorLargeCANCoderDirection;
+        cancoderConfiguration.MagnetSensor.SensorDirection =
+                ElevatorConstants.elevatorLargeCANCoderDirection;
         largeCANCoder.getConfigurator().apply(cancoderConfiguration);
 
-        cancoderConfiguration.MagnetSensor.SensorDirection = ElevatorConstants.elevatorSmallCANCoderDirection;
+        cancoderConfiguration.MagnetSensor.SensorDirection =
+                ElevatorConstants.elevatorSmallCANCoderDirection;
         smallCANCoder.getConfigurator().apply(cancoderConfiguration);
 
-        talonFXConfigs = new TalonFXConfiguration()
-            .withFeedback(new FeedbackConfigs()
-                .withFeedbackRemoteSensorID(largeCANCoder.getDeviceID())
-                .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
-                .withSensorToMechanismRatio(ElevatorConstants.largeCANCoderToMechanismRatio)
-                .withRotorToSensorRatio(ElevatorConstants.rotorToLargeCANCoderRatio))
-            .withMotorOutput(new MotorOutputConfigs()
-                .withNeutralMode(NeutralModeValue.Brake))
-            .withCurrentLimits(new CurrentLimitsConfigs()
-                .withStatorCurrentLimitEnable(true)
-                .withStatorCurrentLimit(ElevatorConstants.elevatorStatorCurrentLimit))
-            .withSlot0(new Slot0Configs()
-                .withGravityType(GravityTypeValue.Elevator_Static)
-                .withKS(ElevatorConstants.elevatorkS)
-                .withKV(ElevatorConstants.elevatorkV)
-                .withKA(ElevatorConstants.elevatorkA)
-                .withKG(ElevatorConstants.elevatorkG)
-
-                .withKP(ElevatorConstants.elevatorkP)
-                .withKI(ElevatorConstants.elevatorkI)
-                .withKD(ElevatorConstants.elevatorkD))
-            .withMotionMagic(new MotionMagicConfigs()
-                .withMotionMagicCruiseVelocity(ElevatorConstants.elevatorAngularCruiseVelocity)
-                .withMotionMagicExpo_kA(ElevatorConstants.elevatorExpo_kA)
-                .withMotionMagicExpo_kV(ElevatorConstants.elevatorExpo_kV));
+        talonFXConfigs =
+                new TalonFXConfiguration()
+                        .withFeedback(
+                                new FeedbackConfigs()
+                                        .withFeedbackRemoteSensorID(largeCANCoder.getDeviceID())
+                                        .withFeedbackSensorSource(
+                                                FeedbackSensorSourceValue.FusedCANcoder)
+                                        .withSensorToMechanismRatio(
+                                                ElevatorConstants.largeCANCoderToMechanismRatio)
+                                        .withRotorToSensorRatio(
+                                                ElevatorConstants.rotorToLargeCANCoderRatio))
+                        .withMotorOutput(
+                                new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
+                        .withCurrentLimits(
+                                new CurrentLimitsConfigs()
+                                        .withStatorCurrentLimitEnable(true)
+                                        .withStatorCurrentLimit(
+                                                ElevatorConstants.elevatorStatorCurrentLimit))
+                        .withSlot0(
+                                new Slot0Configs()
+                                        .withGravityType(GravityTypeValue.Elevator_Static)
+                                        .withKS(ElevatorConstants.elevatorkS)
+                                        .withKV(ElevatorConstants.elevatorkV)
+                                        .withKA(ElevatorConstants.elevatorkA)
+                                        .withKG(ElevatorConstants.elevatorkG)
+                                        .withKP(ElevatorConstants.elevatorkP)
+                                        .withKI(ElevatorConstants.elevatorkI)
+                                        .withKD(ElevatorConstants.elevatorkD))
+                        .withMotionMagic(
+                                new MotionMagicConfigs()
+                                        .withMotionMagicCruiseVelocity(
+                                                ElevatorConstants.elevatorAngularCruiseVelocity)
+                                        .withMotionMagicExpo_kA(ElevatorConstants.elevatorExpo_kA)
+                                        .withMotionMagicExpo_kV(ElevatorConstants.elevatorExpo_kV));
 
         leadMotor.getConfigurator().apply(talonFXConfigs);
         followerMotor.getConfigurator().apply(talonFXConfigs);
 
-        followerMotor.setControl(new Follower(leadMotor.getDeviceID(), ElevatorConstants.invertFollowerElevatorMotor));
+        followerMotor.setControl(
+                new Follower(
+                        leadMotor.getDeviceID(), ElevatorConstants.invertFollowerElevatorMotor));
     }
 
     @Override
@@ -119,8 +131,10 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         inputs.elevatorLeadMotorStatorCurrent.mut_replace(leadMotor.getStatorCurrent().getValue());
         inputs.elevatorLeadMotorSupplyCurrent.mut_replace(leadMotor.getSupplyCurrent().getValue());
 
-        inputs.elevatorFollowerMotorStatorCurrent.mut_replace(followerMotor.getStatorCurrent().getValue());
-        inputs.elevatorFollowerMotorSupplyCurrent.mut_replace(followerMotor.getSupplyCurrent().getValue());
+        inputs.elevatorFollowerMotorStatorCurrent.mut_replace(
+                followerMotor.getStatorCurrent().getValue());
+        inputs.elevatorFollowerMotorSupplyCurrent.mut_replace(
+                followerMotor.getSupplyCurrent().getValue());
     }
 
     @Override
@@ -133,16 +147,25 @@ public class ElevatorIOTalonFX implements ElevatorIO {
             leadMotor.setControl(voltageOut.withOutput(overrideVolts));
         } else {
             leadMotor.setControl(motionMagicExpoTorqueCurrentFOC);
-            largeEncoderSetpointPosition.mut_setMagnitude((leadMotor.getClosedLoopReference().getValue()));
+            largeEncoderSetpointPosition.mut_setMagnitude(
+                    (leadMotor.getClosedLoopReference().getValue()));
         }
     }
 
     @Override
-    public Angle getLargeCANCoderAbsPos() { return largeCANCoder.getAbsolutePosition().getValue(); }
+    public void setLargeCANCoderGoalPos(Angle goalPos) {
+        largeEncoderGoalAngle.mut_replace(goalPos);
+    }
 
     @Override
-    public Angle getSmallCANCoderAbsPos() { return smallCANCoder.getAbsolutePosition().getValue(); }
+    public Angle getLargeCANCoderAbsPos() {
+        return largeCANCoder.getAbsolutePosition().getValue();
+    }
 
+    @Override
+    public Angle getSmallCANCoderAbsPos() {
+        return smallCANCoder.getAbsolutePosition().getValue();
+    }
 
     @Override
     public void setLargeCANCoderPosition(Angle newAngle) {
@@ -177,12 +200,17 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     }
 
     @Override
-    public void setMaxProfile(AngularVelocity maxVelocity, Per<VoltageUnit, AngularAccelerationUnit> expo_kA, Per<VoltageUnit, AngularVelocityUnit> expo_kV) {
+    public void setMaxProfile(
+            AngularVelocity maxVelocity,
+            Per<VoltageUnit, AngularAccelerationUnit> expo_kA,
+            Per<VoltageUnit, AngularVelocityUnit> expo_kV) {
         // TODO: Figure out how to handle maximum velocity for the elevator
-        MotionMagicConfigs configs = talonFXConfigs.MotionMagic
-            .withMotionMagicCruiseVelocity(maxVelocity)
-            .withMotionMagicExpo_kA(expo_kA)
-            .withMotionMagicExpo_kV(expo_kV);
+        MotionMagicConfigs configs =
+                talonFXConfigs
+                        .MotionMagic
+                        .withMotionMagicCruiseVelocity(maxVelocity)
+                        .withMotionMagicExpo_kA(expo_kA)
+                        .withMotionMagicExpo_kV(expo_kV);
 
         leadMotor.getConfigurator().apply(configs);
         followerMotor.getConfigurator().apply(configs);
