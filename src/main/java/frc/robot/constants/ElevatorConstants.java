@@ -4,13 +4,16 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.units.measure.Voltage;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
@@ -43,6 +46,13 @@ public final class ElevatorConstants {
     public static final int smallCANCoderTeeth = 17;
     public static final int largeCANCoderTeeth = 19;
     public static final int spoolTeeth = 18;
+
+    /** 5 motor rotations to 1 spool rotation */
+    public static final double elevatorReduction = 5.0;
+
+    // TODO: Actual values
+    public static final Mass carriageMass = Pounds.of(20);
+    public static final Distance drumRadius = Inches.of(1.503);
 
     // TODO: Tune encoder directions!
     public static final int elevatorLargeCANCoderID = 11;
