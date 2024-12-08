@@ -59,7 +59,7 @@ public final class ElevatorConstants {
             (double) spoolTeeth / (double) largeCANCoderTeeth;
 
     // TODO: Tune elevator
-    public static final double elevatorkP = 1.0;
+    public static final double elevatorkP = 12.0;
     public static final double elevatorkI = 0.0;
     public static final double elevatorkD = 0.0;
 

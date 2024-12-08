@@ -50,6 +50,8 @@ public class ElevatorMechanism {
     }
 
     public void seedWithCRT() {
+        Logger.recordOutput("elevator/CRTSolutionSpoolAngle", Rotations.of(-1.0));
+
         final int ticks = ElevatorConstants.CRTticksPerRotation;
         final int smallTeeth = ElevatorConstants.smallCANCoderTeeth;
         final int largeTeeth = ElevatorConstants.largeCANCoderTeeth;
@@ -97,6 +99,8 @@ public class ElevatorMechanism {
             io.setSmallCANCoderPosition(solutionSmallEncAngle);
 
             hasBeenSeeded = true;
+
+            Logger.recordOutput("elevator/CRTSolutionSpoolAngle", solutionSpoolAngle);
         } else {
             System.out.println("ERROR: Couldn't find solution to seed elevator with CRT");
         }

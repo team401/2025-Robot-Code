@@ -12,6 +12,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.constants.ElevatorConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class ElevatorIOSim extends ElevatorIOTalonFX {
     private final ElevatorSim elevatorSim =
@@ -24,7 +25,7 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
                     2.0,
                     true,
                     // Seed to a random position to test CRT
-                    Math.random() * 2.0);
+                    2.0);
 
     public ElevatorIOSim() {
         super();
@@ -35,17 +36,18 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
 
     private void updateSimState() {
         Distance elevatorHeight = Meters.of(elevatorSim.getPositionMeters());
+        Logger.recordOutput("elevator/simElevatorHeightMeters", elevatorHeight.in(Meters));
 
         // TODO: Use coppercore gear math after https://github.com/team401/coppercore/issues/52 is
         // done.
 
         Angle spoolRotations = Rotations.of(elevatorHeight.divide(Inches.of(4.724)).magnitude());
         Angle largeEncoderRotations =
-                spoolRotations.divide(
+                spoolRotations.times(
                         (double) ElevatorConstants.spoolTeeth
                                 / (double) ElevatorConstants.largeCANCoderTeeth);
         Angle smallEncoderRotations =
-                spoolRotations.divide(
+                spoolRotations.times(
                         (double) ElevatorConstants.spoolTeeth
                                 / (double) ElevatorConstants.smallCANCoderTeeth);
 

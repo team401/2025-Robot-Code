@@ -9,7 +9,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public ElevatorSubsystem(ElevatorMechanism elevatorMechanism) {
         this.elevatorMechanism = elevatorMechanism;
-        elevatorMechanism.setGoalHeight(Meters.of(0.0));
+        elevatorMechanism.setGoalHeight(Meters.of(1.0));
     }
 
     @Override
