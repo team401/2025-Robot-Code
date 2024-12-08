@@ -61,7 +61,7 @@ public class ElevatorMechanism {
 
        long solutionTicks = -1;
 
-       for (int i = 0; i < 17; i++) {
+       for (int i = 0; i < ticksSmall; i++) {
            // Try the offset of each multiple of 19 * ticks
            long potentialPosition = i * largeTeeth * ticks + ticksLarge;
            // Check whether that potential position is encoder 17's remainder away from a
