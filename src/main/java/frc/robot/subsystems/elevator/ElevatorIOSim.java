@@ -34,8 +34,8 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
                     ElevatorConstants.drumRadius.in(Meters),
                     0.0,
                     3.0,
-                    false,
-                    0.0,
+                    true,
+                    1.0,
                     0.0,
                     0.0);
 

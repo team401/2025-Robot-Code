@@ -85,10 +85,10 @@ public final class ElevatorConstants {
      * lower profile velocity.
      */
     public static final Per<VoltageUnit, AngularVelocityUnit> elevatorExpo_kV =
-            VoltsPerRadianPerSecond.ofNative(1.0);
+            VoltsPerRadianPerSecond.ofNative(0.1);
 
     public static final Per<VoltageUnit, AngularAccelerationUnit> elevatorExpo_kA =
-            VoltsPerRadianPerSecondSquared.ofNative(0.2);
+            VoltsPerRadianPerSecondSquared.ofNative(8.2);
 
     // TODO: Find actual values for these!
     public static final Distance minElevatorHeight = Meters.of(0.0);
