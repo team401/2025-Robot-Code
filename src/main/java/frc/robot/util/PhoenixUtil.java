@@ -11,24 +11,17 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
-package frc.robot;
+package frc.robot.util;
 
-import edu.wpi.first.wpilibj.RobotBase;
+import com.ctre.phoenix6.StatusCode;
+import java.util.function.Supplier;
 
-/**
- * Do NOT add any static variables to this class, or any initialization at all. Unless you know what
- * you are doing, do not modify this file except to change the parameter class to the startRobot
- * call.
- */
-public final class Main {
-  private Main() {}
-
-  /**
-   * Main initialization function. Do not perform any initialization here.
-   *
-   * <p>If you change your main robot class, change the parameter type.
-   */
-  public static void main(String... args) {
-    RobotBase.startRobot(Robot::new);
+public class PhoenixUtil {
+  /** Attempts to run the command until no error is produced. */
+  public static void tryUntilOk(int maxAttempts, Supplier<StatusCode> command) {
+    for (int i = 0; i < maxAttempts; i++) {
+      var error = command.get();
+      if (error.isOK()) break;
+    }
   }
 }
