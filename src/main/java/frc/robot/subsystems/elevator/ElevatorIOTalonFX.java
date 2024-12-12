@@ -1,6 +1,7 @@
 package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -28,10 +29,12 @@ import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.ElevatorConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class ElevatorIOTalonFX implements ElevatorIO {
     MutAngle largeEncoderGoalAngle = Rotations.mutable(0.0);
     MutAngle largeEncoderSetpointPosition = Rotations.mutable(0.0);
+    MutAngle spoolGoalAngle = Rotations.mutable(0.0);
 
     Voltage overrideVolts;
     boolean isOverriding;
@@ -78,6 +81,9 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                 new TalonFXConfiguration()
                         .withFeedback(
                                 new FeedbackConfigs()
+                                        // .withFeedbackSensorSource(
+                                        //         FeedbackSensorSourceValue.RemoteCANcoder)
+                                        // .withFeedbackRemoteSensorID(largeCANCoder.getDeviceID()))
                                         .withFeedbackRemoteSensorID(largeCANCoder.getDeviceID())
                                         .withFeedbackSensorSource(
                                                 FeedbackSensorSourceValue.FusedCANcoder)
@@ -135,6 +141,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                 followerMotor.getStatorCurrent().getValue());
         inputs.elevatorFollowerMotorSupplyCurrent.mut_replace(
                 followerMotor.getSupplyCurrent().getValue());
+
+        inputs.motionMagicError = leadMotor.getClosedLoopError().getValueAsDouble();
     }
 
     @Override
@@ -143,18 +151,29 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
         if (motorDisabled) {
             leadMotor.setControl(voltageOut.withOutput(0.0));
+            outputs.elevatorAppliedVolts.mut_replace(Volts.of(0.0));
         } else if (isOverriding) {
             leadMotor.setControl(voltageOut.withOutput(overrideVolts));
+            outputs.elevatorAppliedVolts.mut_replace(overrideVolts);
         } else {
             leadMotor.setControl(motionMagicExpoTorqueCurrentFOC);
+            //     leadMotor.setControl(new PositionTorqueCurrentFOC(largeEncoderGoalAngle));
+            //     leadMotor.setControl(new PositionTorqueCurrentFOC(largeEncoderGoalAngle));
             largeEncoderSetpointPosition.mut_setMagnitude(
                     (leadMotor.getClosedLoopReference().getValue()));
+
+            Logger.recordOutput(
+                    "elevator/referenceSlope",
+                    leadMotor.getClosedLoopReferenceSlope().getValueAsDouble());
+            outputs.elevatorAppliedVolts.mut_replace(
+                    Volts.of(leadMotor.getClosedLoopOutput().getValueAsDouble()));
         }
     }
 
     @Override
     public void setLargeCANCoderGoalPos(Angle goalPos) {
         largeEncoderGoalAngle.mut_replace(goalPos);
+        spoolGoalAngle.mut_replace(goalPos.divide(ElevatorConstants.largeCANCoderToMechanismRatio));
     }
 
     @Override

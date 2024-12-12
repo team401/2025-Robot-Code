@@ -53,14 +53,14 @@ public final class ElevatorConstants {
             SensorDirectionValue.CounterClockwise_Positive;
 
     // TODO: Calculate these ratios for real
-    public static final double largeCANCoderToMechanismRatio =
-            (double) largeCANCoderTeeth / (double) spoolTeeth;
+    public static final double largeCANCoderToMechanismRatio = 1.0;
+    //     (double) largeCANCoderTeeth / (double) spoolTeeth;
     public static final double rotorToLargeCANCoderRatio =
-            (double) spoolTeeth / (double) largeCANCoderTeeth;
+            elevatorReduction * (double) largeCANCoderTeeth / (double) spoolTeeth;
 
     // TODO: Tune elevator
-    public static final double elevatorkP = 12.0;
-    public static final double elevatorkI = 0.0;
+    public static final double elevatorkP = 20.0;
+    public static final double elevatorkI = 0.2;
     public static final double elevatorkD = 0.0;
 
     public static final double elevatorkS = 0.0;
@@ -70,7 +70,7 @@ public final class ElevatorConstants {
 
     // TODO: Actual ratios
     public static final Per<DistanceUnit, AngleUnit> elevatorToSpool =
-            Meters.of(1.0).divide(Rotations.of(10.0));
+            Inches.of(4.724).divide(Rotations.of(1));
 
     public static final LinearVelocity elevatorCruiseVelocity = MetersPerSecond.of(0.1);
     // TODO: Factor in gearbox ratios and actual calculations into this constant
@@ -85,14 +85,14 @@ public final class ElevatorConstants {
      * lower profile velocity.
      */
     public static final Per<VoltageUnit, AngularVelocityUnit> elevatorExpo_kV =
-            VoltsPerRadianPerSecond.ofNative(12.0);
+            VoltsPerRadianPerSecond.ofNative(1.0);
 
     public static final Per<VoltageUnit, AngularAccelerationUnit> elevatorExpo_kA =
-            VoltsPerRadianPerSecondSquared.ofNative(0.1);
+            VoltsPerRadianPerSecondSquared.ofNative(0.2);
 
     // TODO: Find actual values for these!
     public static final Distance minElevatorHeight = Meters.of(0.0);
-    public static final Distance maxElevatorHeight = Meters.of(1.0);
+    public static final Distance maxElevatorHeight = Meters.of(3.0);
 
     // TODO: Tune this value
     public static final Current elevatorStatorCurrentLimit = Amps.of(10.0);

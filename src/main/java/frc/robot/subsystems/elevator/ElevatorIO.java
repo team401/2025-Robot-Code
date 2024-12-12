@@ -53,6 +53,8 @@ public interface ElevatorIO {
 
         /** Supply current of the follower elevator motor */
         MutCurrent elevatorFollowerMotorSupplyCurrent = Amps.mutable(0.0);
+
+        double motionMagicError = 0.0;
     }
 
     @AutoLog

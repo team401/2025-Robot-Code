@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 
-import edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutDistance;
@@ -101,6 +100,9 @@ public class ElevatorMechanism {
             hasBeenSeeded = true;
 
             Logger.recordOutput("elevator/CRTSolutionSpoolAngle", solutionSpoolAngle);
+            Logger.recordOutput(
+                    "elevator/CRTSolutionHeight",
+                    Inches.of(solutionSpoolAngle.in(Rotations) * 4.724).in(Meters));
         } else {
             System.out.println("ERROR: Couldn't find solution to seed elevator with CRT");
         }
@@ -168,7 +170,7 @@ public class ElevatorMechanism {
 
         Angle spoolRotations = Rotations.of(clampedGoalHeight.divide(Inches.of(4.724)).magnitude());
         Angle largeEncoderRotations =
-                spoolRotations.divide(
+                spoolRotations.times(
                         (double) ElevatorConstants.spoolTeeth
                                 / (double) ElevatorConstants.largeCANCoderTeeth);
 
