@@ -81,9 +81,6 @@ hs_err_pid*
 .AppleDouble
 .LSOverride
 
-# Icon must end with two \r
-Icon
-
 # Thumbnails
 ._*
 
@@ -170,7 +167,7 @@ out/
 
 # Simulation GUI and other tools window save file
 networktables.json
-simgui.json
+simgui*.json
 *-window.json
 
 # Simulation data log directory
@@ -182,3 +179,6 @@ ctre_sim/
 # clangd
 /.cache
 compile_commands.json
+
+# Version file
+src/main/java/frc/robot/BuildConstants.java
