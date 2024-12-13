@@ -8,11 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.FeatureFlags;
-import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
-import frc.robot.subsystems.elevator.ElevatorIOSim;
-import frc.robot.subsystems.elevator.ElevatorIOTalonFX;
-import frc.robot.subsystems.elevator.ElevatorMechanism;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
 /**
@@ -38,22 +34,7 @@ public class RobotContainer {
 
     public void configureSubsystems() {
         if (FeatureFlags.runElevator) {
-            initElevator();
-        }
-    }
-
-    public void initElevator() {
-        switch (ModeConstants.currentMode) {
-            case REAL:
-                elevatorSubsystem =
-                        new ElevatorSubsystem(new ElevatorMechanism(new ElevatorIOTalonFX()));
-                break;
-            case SIM:
-                elevatorSubsystem =
-                        new ElevatorSubsystem(new ElevatorMechanism(new ElevatorIOSim()));
-                break;
-            case REPLAY:
-                throw new UnsupportedOperationException("Elevator replay is not yet implemented.");
+            elevatorSubsystem = InitSubsystems.initElevatorSubsystem();
         }
     }
 
