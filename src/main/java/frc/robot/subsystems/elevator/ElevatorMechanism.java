@@ -2,13 +2,18 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
+import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.utils.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorMechanism {
@@ -22,12 +27,64 @@ public class ElevatorMechanism {
     Distance minHeight = ElevatorConstants.minElevatorHeight;
     Distance maxHeight = ElevatorConstants.maxElevatorHeight;
 
+    LoggedTunableNumber elevatorkP;
+    LoggedTunableNumber elevatorkI;
+    LoggedTunableNumber elevatorkD;
+
+    LoggedTunableNumber elevatorkS;
+    LoggedTunableNumber elevatorkV;
+    LoggedTunableNumber elevatorkA;
+    LoggedTunableNumber elevatorkG;
+
+    LoggedTunableNumber elevatorExpokV;
+    LoggedTunableNumber elevatorExpokA;
+
+    LoggedTunableNumber elevatorTuningSetpointMeters;
+    LoggedTunableNumber elevatorTuningOverrideVolts;
+
     // Has the elevator been seeded with CRT yet?
     // This exists in case we fail to seed with CRT the first try, it will try again each tick until
     // it succeeds.
     private boolean hasBeenSeeded = false;
 
     public ElevatorMechanism(ElevatorIO io) {
+        elevatorkP =
+                new LoggedTunableNumber(
+                        "ElevatorTunables/elevatorkP", ElevatorConstants.elevatorkP);
+        elevatorkI =
+                new LoggedTunableNumber(
+                        "ElevatorTunables/elevatorkI", ElevatorConstants.elevatorkI);
+        elevatorkD =
+                new LoggedTunableNumber(
+                        "ElevatorTunables/elevatorkD", ElevatorConstants.elevatorkD);
+
+        elevatorkS =
+                new LoggedTunableNumber(
+                        "ElevatorTunables/elevatorkS", ElevatorConstants.elevatorkS);
+        elevatorkV =
+                new LoggedTunableNumber(
+                        "ElevatorTunables/elevatorkV", ElevatorConstants.elevatorkV);
+        elevatorkA =
+                new LoggedTunableNumber(
+                        "ElevatorTunables/elevatorkA", ElevatorConstants.elevatorkA);
+        elevatorkG =
+                new LoggedTunableNumber(
+                        "ElevatorTunables/elevatorkG", ElevatorConstants.elevatorkG);
+
+        elevatorExpokV =
+                new LoggedTunableNumber(
+                        "ElevatorTunables/elevatorExpokV",
+                        ElevatorConstants.elevatorExpo_kV.magnitude());
+        elevatorExpokA =
+                new LoggedTunableNumber(
+                        "ElevatorTunables/elevatorExpokA",
+                        ElevatorConstants.elevatorExpo_kA.magnitude());
+
+        elevatorTuningSetpointMeters =
+                new LoggedTunableNumber("ElevatorTunables/elevatorTuningSetpointMeters", 0.0);
+        elevatorTuningOverrideVolts =
+                new LoggedTunableNumber("ElevatorTunables/elevatorTuningOverrideVolts", 0.0);
+
         this.io = io;
 
         // Seed elevator height using CRT on initialize
@@ -46,6 +103,53 @@ public class ElevatorMechanism {
 
         Logger.processInputs("elevator/inputs", inputs);
         Logger.processInputs("elevator/outputs", outputs);
+    }
+
+    /** This method must be called from the subsystem's test periodic! */
+    public void testPeriodic() {
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                (pid) -> {
+                    io.setPID(pid[0], pid[1], pid[2]);
+                },
+                elevatorkP,
+                elevatorkI,
+                elevatorkD);
+
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                (ff) -> {
+                    io.setFF(ff[0], ff[1], ff[2], ff[3]);
+                },
+                elevatorkS,
+                elevatorkV,
+                elevatorkA,
+                elevatorkG);
+
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                (maxProfile) -> {
+                    io.setMaxProfile(
+                            RadiansPerSecond.of(0.0),
+                            VoltsPerRadianPerSecondSquared.ofNative(maxProfile[0]),
+                            VoltsPerRadianPerSecond.ofNative(maxProfile[1]));
+                },
+                elevatorExpokA,
+                elevatorExpokV);
+
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                (setpoint) -> {
+                    setGoalHeight(Meters.of(setpoint[0]));
+                },
+                elevatorTuningSetpointMeters);
+
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                (setpoint) -> {
+                    io.setOverrideVolts(Volts.of(setpoint[0]));
+                },
+                elevatorTuningOverrideVolts);
     }
 
     public void seedWithCRT() {
@@ -140,6 +244,8 @@ public class ElevatorMechanism {
         // TODO: 2025 coppercore solution for easy value clamping
         // https://github.com/team401/coppercore/issues/64
         this.goalHeight.mut_replace(goalHeight);
+
+        Logger.recordOutput("elevator/goalHeight", goalHeight);
 
         sendGoalHeightToIO();
     }

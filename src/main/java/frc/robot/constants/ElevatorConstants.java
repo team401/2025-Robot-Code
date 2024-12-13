@@ -52,9 +52,11 @@ public final class ElevatorConstants {
     public static final SensorDirectionValue elevatorSmallCANCoderDirection =
             SensorDirectionValue.CounterClockwise_Positive;
 
-    // TODO: Calculate these ratios for real
+    /*
+     * The large CANCoder is represented as the mechanism in our Phoenix configs.
+     * This means that we are controlling to a goal in terms of large CANCoder angle.
+     */
     public static final double largeCANCoderToMechanismRatio = 1.0;
-    //     (double) largeCANCoderTeeth / (double) spoolTeeth;
     public static final double rotorToLargeCANCoderRatio =
             elevatorReduction * (double) largeCANCoderTeeth / (double) spoolTeeth;
 
@@ -66,7 +68,7 @@ public final class ElevatorConstants {
     public static final double elevatorkS = 0.0;
     public static final double elevatorkV = 0.0;
     public static final double elevatorkA = 0.0;
-    public static final double elevatorkG = 0.0;
+    public static final double elevatorkG = 8.7;
 
     // TODO: Actual ratios
     public static final Per<DistanceUnit, AngleUnit> elevatorToSpool =
@@ -85,10 +87,10 @@ public final class ElevatorConstants {
      * lower profile velocity.
      */
     public static final Per<VoltageUnit, AngularVelocityUnit> elevatorExpo_kV =
-            VoltsPerRadianPerSecond.ofNative(0.1);
+            VoltsPerRadianPerSecond.ofNative(0.0);
 
     public static final Per<VoltageUnit, AngularAccelerationUnit> elevatorExpo_kA =
-            VoltsPerRadianPerSecondSquared.ofNative(8.2);
+            VoltsPerRadianPerSecondSquared.ofNative(0.1);
 
     // TODO: Find actual values for these!
     public static final Distance minElevatorHeight = Meters.of(0.0);

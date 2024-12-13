@@ -90,4 +90,9 @@ public class RobotContainer {
         // An example command will be run in autonomous
         return Autos.exampleAuto(m_exampleSubsystem);
     }
+
+    /** This method must be called from the robot, as it isn't called automatically. */
+    public void testPeriodic() {
+        elevatorSubsystem.testPeriodic();
+    }
 }
