@@ -6,10 +6,12 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.PerUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
@@ -17,6 +19,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.SimConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorIOSim extends ElevatorIOTalonFX {
@@ -32,12 +35,12 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
                     ElevatorConstants.elevatorReduction,
                     ElevatorConstants.carriageMass.in(Kilograms),
                     ElevatorConstants.drumRadius.in(Meters),
-                    0.0,
-                    3.0,
+                    ElevatorConstants.minElevatorHeight.in(Meters),
+                    ElevatorConstants.maxElevatorHeight.in(Meters),
                     true,
-                    1.0,
-                    0.0,
-                    0.0);
+                    ElevatorConstants.Sim.elevatorStartingHeight.in(Meters),
+                    ElevatorConstants.Sim.positionStdDev,
+                    ElevatorConstants.Sim.velocityStdDev);
 
     public ElevatorIOSim() {
         super();
@@ -52,6 +55,8 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
                 MetersPerSecond.of(elevatorSim.getVelocityMetersPerSecond());
 
         Logger.recordOutput("elevator/simElevatorHeightMeters", elevatorHeight.in(Meters));
+        Logger.recordOutput(
+                "elevator/simElevatorVelocityMetersPerSec", elevatorVelocity.in(MetersPerSecond));
 
         // TODO: Use coppercore gear math after https://github.com/team401/coppercore/issues/52 is
         // done.
@@ -67,21 +72,25 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
                                 / (double) ElevatorConstants.smallCANCoderTeeth);
 
         Angle motorRotations = spoolRotations.times(ElevatorConstants.elevatorReduction);
+        // Convert elevator velocity (m/s) into angular velocity of spool by dividing by elevator to
+        // spool (m/rot) to obtain rot/s, then multiply by elevator reduction, because the motors
+        // will spin [reduction] times as many times as spool.
         AngularVelocity motorVelocity =
                 RotationsPerSecond.of(
-                        Meters.of(elevatorSim.getVelocityMetersPerSecond())
-                                .divide(Inches.of(4.724))
-                                .magnitude());
+                                elevatorVelocity.in(MetersPerSecond)
+                                        / ElevatorConstants.elevatorToSpool.in(
+                                                PerUnit.combine(Meters, Rotations)))
+                        .times(ElevatorConstants.elevatorReduction);
 
         largeCANcoderSimState.setRawPosition(largeEncoderRotations);
         smallCANcoderSimState.setRawPosition(smallEncoderRotations);
 
         leadMotorSimState.setRawRotorPosition(motorRotations);
         leadMotorSimState.setRotorVelocity(motorVelocity);
+        leadMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
+
         followerMotorSimState.setRawRotorPosition(motorRotations);
         followerMotorSimState.setRotorVelocity(motorVelocity);
-
-        leadMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
         followerMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
 
         elevatorSim.setInputVoltage(leadMotorSimState.getMotorVoltage());
@@ -92,7 +101,7 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
         updateSimState();
 
         // Assume 50hz
-        elevatorSim.update(0.020);
+        elevatorSim.update(SimConstants.simDeltaTime.in(Seconds));
         super.updateInputs(inputs);
     }
 }

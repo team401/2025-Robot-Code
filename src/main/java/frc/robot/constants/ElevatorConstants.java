@@ -101,4 +101,14 @@ public final class ElevatorConstants {
 
     public static final int CRTticksPerRotation =
             4096; // CANCoders have a resolution of 4096 ticks/rotation
+
+    public static final class Sim {
+        /** Standard deviation passed to sim for the position measurement */
+        public static final double positionStdDev = 0.0;
+
+        /** Standard deviation passed to sim for the velocity measurement */
+        public static final double velocityStdDev = 0.0;
+
+        public static final Distance elevatorStartingHeight = Meters.of(1.0);
+    }
 }
