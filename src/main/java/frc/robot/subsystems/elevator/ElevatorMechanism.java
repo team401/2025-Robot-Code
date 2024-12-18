@@ -246,8 +246,6 @@ public class ElevatorMechanism {
         this.goalHeight.mut_replace(goalHeight);
 
         Logger.recordOutput("elevator/goalHeight", goalHeight);
-
-        sendGoalHeightToIO();
     }
 
     /**
