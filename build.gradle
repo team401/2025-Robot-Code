@@ -57,6 +57,7 @@ repositories {
 		}
 	}
 	mavenLocal()
+	mavenCentral()
 }
 
 spotless {
@@ -123,6 +124,9 @@ dependencies {
 	// Advantagekit annotation processor!
 	def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
 	annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
+
+	def coppercoreVersion = "2025.0.0-beta"
+	implementation "io.github.team401.coppercore:wpilib_interface:$coppercoreVersion"
 }
 
 test {

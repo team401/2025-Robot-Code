@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
 
+import coppercore.wpilib_interface.UnitUtils;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutDistance;
@@ -241,8 +242,6 @@ public class ElevatorMechanism {
      * setAllowedRangeOfMotion before it is sent to the elevator io.
      */
     public void setGoalHeight(Distance goalHeight) {
-        // TODO: 2025 coppercore solution for easy value clamping
-        // https://github.com/team401/coppercore/issues/64
         this.goalHeight.mut_replace(goalHeight);
 
         Logger.recordOutput("elevator/goalHeight", goalHeight);
@@ -253,13 +252,7 @@ public class ElevatorMechanism {
      * current bounds.
      */
     public void updateClampedGoalHeight() {
-        if (goalHeight.lt(minHeight)) {
-            clampedGoalHeight.mut_replace(minHeight);
-        } else if (goalHeight.gt(maxHeight)) {
-            clampedGoalHeight.mut_replace(maxHeight);
-        } else if (!clampedGoalHeight.equals(goalHeight)) {
-            clampedGoalHeight.mut_replace(goalHeight);
-        }
+        clampedGoalHeight.mut_replace(UnitUtils.clampMeasure(goalHeight, minHeight, maxHeight));
     }
 
     /**
