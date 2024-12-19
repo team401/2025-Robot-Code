@@ -54,6 +54,10 @@ public interface ElevatorIO {
         /** Supply current of the follower elevator motor */
         MutCurrent elevatorFollowerMotorSupplyCurrent = Amps.mutable(0.0);
 
+        /**
+         * Current closed-loop error (distance from setpoint position) as reported by the lead motor
+         * TalonFX, in rotations.
+         */
         double motionMagicError = 0.0;
     }
 
@@ -63,8 +67,20 @@ public interface ElevatorIO {
         MutVoltage elevatorAppliedVolts = Volts.mutable(0.0);
     }
 
+    /**
+     * Updates an ElevatorInputs with the current information from sensors readings and from the
+     * motors.
+     *
+     * @param inputs ElevatorInputs object to update with latest information
+     */
     public default void updateInputs(ElevatorInputs inputs) {}
 
+    /**
+     * Applies requests to motors and updates an ElevatorOutputs object with information about motor
+     * output.
+     *
+     * @param outputs ElevatorOutputs update with latest applied voltage
+     */
     public default void applyOutputs(ElevatorOutputs outputs) {}
 
     /**
