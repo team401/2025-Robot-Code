@@ -49,6 +49,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     CANcoder largeCANCoder;
     CANcoder smallCANCoder;
 
+    // Reuse the same talonFXConfiguration instead of making a new one each time.
     TalonFXConfiguration talonFXConfigs;
 
     boolean motorDisabled = false;
@@ -59,31 +60,35 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     VoltageOut voltageOut = new VoltageOut(0.0);
 
     public ElevatorIOTalonFX() {
+        // Initialize TalonFXs  and CANcoders with their correct IDs
         leadMotor = new TalonFX(ElevatorConstants.leadElevatorMotorId);
         followerMotor = new TalonFX(ElevatorConstants.followerElevatorMotorId);
 
         largeCANCoder = new CANcoder(ElevatorConstants.elevatorLargeCANCoderID);
         smallCANCoder = new CANcoder(ElevatorConstants.elevatorSmallCANCoderID);
 
+        // Create one CANcoder configuration that will be modified slightly and applied to both
+        // CANcoders
         CANcoderConfiguration cancoderConfiguration = new CANcoderConfiguration();
         cancoderConfiguration.MagnetSensor.AbsoluteSensorRange =
                 AbsoluteSensorRangeValue.Unsigned_0To1;
 
+        // Update with large CANcoder direction and apply
         cancoderConfiguration.MagnetSensor.SensorDirection =
                 ElevatorConstants.elevatorLargeCANCoderDirection;
         largeCANCoder.getConfigurator().apply(cancoderConfiguration);
 
+        // Update with small CANcoder direction and apply
         cancoderConfiguration.MagnetSensor.SensorDirection =
                 ElevatorConstants.elevatorSmallCANCoderDirection;
         smallCANCoder.getConfigurator().apply(cancoderConfiguration);
 
+        // Initialize talonFXConfigs to use FusedCANCoder and Motion Magic Expo and have correct PID
+        // gains and current limits.
         talonFXConfigs =
                 new TalonFXConfiguration()
                         .withFeedback(
                                 new FeedbackConfigs()
-                                        // .withFeedbackSensorSource(
-                                        //         FeedbackSensorSourceValue.RemoteCANcoder)
-                                        // .withFeedbackRemoteSensorID(largeCANCoder.getDeviceID()))
                                         .withFeedbackRemoteSensorID(largeCANCoder.getDeviceID())
                                         .withFeedbackSensorSource(
                                                 FeedbackSensorSourceValue.FusedCANcoder)
@@ -115,9 +120,11 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                                         .withMotionMagicExpo_kA(ElevatorConstants.elevatorExpo_kA)
                                         .withMotionMagicExpo_kV(ElevatorConstants.elevatorExpo_kV));
 
+        // Apply talonFX config to both motors
         leadMotor.getConfigurator().apply(talonFXConfigs);
         followerMotor.getConfigurator().apply(talonFXConfigs);
 
+        // Make follower motor permanently follow lead motor.
         followerMotor.setControl(
                 new Follower(
                         leadMotor.getDeviceID(), ElevatorConstants.invertFollowerElevatorMotor));
@@ -157,8 +164,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
             outputs.elevatorAppliedVolts.mut_replace(overrideVolts);
         } else {
             leadMotor.setControl(motionMagicExpoTorqueCurrentFOC);
-            //     leadMotor.setControl(new PositionTorqueCurrentFOC(largeEncoderGoalAngle));
-            //     leadMotor.setControl(new PositionTorqueCurrentFOC(largeEncoderGoalAngle));
+
             largeEncoderSetpointPosition.mut_setMagnitude(
                     (leadMotor.getClosedLoopReference().getValue()));
 
