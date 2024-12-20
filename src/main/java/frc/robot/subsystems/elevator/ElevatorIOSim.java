@@ -6,7 +6,6 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -19,7 +18,6 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.constants.ElevatorConstants;
-import frc.robot.constants.SimConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorIOSim extends ElevatorIOTalonFX {
@@ -101,7 +99,7 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
         updateSimState();
 
         // Assume 50hz
-        elevatorSim.update(SimConstants.simDeltaTime.in(Seconds));
+        elevatorSim.update(0.020);
         super.updateInputs(inputs);
     }
 }

@@ -44,6 +44,11 @@ public final class ElevatorConstants {
     public static final Mass carriageMass = Pounds.of(20);
     public static final Distance drumRadius = Inches.of(1.503);
 
+    // TODO: Use coppercore gear math after
+    // https://github.com/team401/coppercore/issues/52 is
+    // done.
+    public static final Distance elevatorHeightPerSpoolRotation = Inches.of(4.724);
+
     // TODO: Tune encoder directions!
     public static final int elevatorLargeCANCoderID = 11;
     public static final SensorDirectionValue elevatorLargeCANCoderDirection =
@@ -61,8 +66,8 @@ public final class ElevatorConstants {
             elevatorReduction * (double) largeCANCoderTeeth / (double) spoolTeeth;
 
     // TODO: Tune elevator
-    public static final double elevatorkP = 20.0;
-    public static final double elevatorkI = 0.2;
+    public static final double elevatorkP = 0.1;
+    public static final double elevatorkI = 0.0;
     public static final double elevatorkD = 0.0;
 
     public static final double elevatorkS = 0.0;

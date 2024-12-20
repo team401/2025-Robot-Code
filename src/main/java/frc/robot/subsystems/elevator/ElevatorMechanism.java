@@ -102,6 +102,9 @@ public class ElevatorMechanism {
         io.updateInputs(inputs);
         io.applyOutputs(outputs);
 
+        Logger.recordOutput("elevator/goalHeight", goalHeight);
+        Logger.recordOutput("elevator/clampedGoalHeight", clampedGoalHeight);
+
         Logger.processInputs("elevator/inputs", inputs);
         Logger.processInputs("elevator/outputs", outputs);
     }
@@ -251,7 +254,7 @@ public class ElevatorMechanism {
      * Based on the previously set goal height, update the clamped goal height to be within the
      * current bounds.
      */
-    public void updateClampedGoalHeight() {
+    private void updateClampedGoalHeight() {
         clampedGoalHeight.mut_replace(UnitUtils.clampMeasure(goalHeight, minHeight, maxHeight));
     }
 
@@ -259,19 +262,49 @@ public class ElevatorMechanism {
      * Clamp the goal height, then convert it to rotations of the large encoder and send the goal
      * rotations to the IO.
      */
-    public void sendGoalHeightToIO() {
+    private void sendGoalHeightToIO() {
         updateClampedGoalHeight();
 
         // TODO: Use coppercore gear math after https://github.com/team401/coppercore/issues/52 is
         // done.
 
-        Angle spoolRotations = Rotations.of(clampedGoalHeight.divide(Inches.of(4.724)).magnitude());
+        Angle spoolRotations =
+                Rotations.of(
+                        clampedGoalHeight
+                                .divide(ElevatorConstants.elevatorHeightPerSpoolRotation)
+                                .magnitude());
         Angle largeEncoderRotations =
                 spoolRotations.times(
                         (double) ElevatorConstants.spoolTeeth
                                 / (double) ElevatorConstants.largeCANCoderTeeth);
 
         io.setLargeCANCoderGoalPos(largeEncoderRotations);
+    }
+
+    /**
+     * Get the current height of the elevator
+     *
+     * <p>This value is calculated by the current position of the large CANcoder, converted using
+     * necessary ratios back into rotations of the spool and then height of the elevator. This means
+     * that this value is affected by any error in CRT seed and backlash causing error in large
+     * CANcoder position.
+     *
+     * @return Inferred estimate of the elevator height
+     */
+    public Distance getElevatorHeight() {
+        // Calculate spool rotations by: (largeEncoderPos * largeEncoderTeeth / spoolTeeth)
+        Angle spoolAngle =
+                inputs.largeEncoderPos.times(
+                        (double) ElevatorConstants.largeCANCoderTeeth
+                                / (double) ElevatorConstants.spoolTeeth);
+
+        // TODO: Use coppercore gear math after https://github.com/team401/coppercore/issues/52 is
+        // done.
+
+        // Convert spool rotations to height by multiplying by height per rotation
+        return Meters.of(
+                spoolAngle.in(Rotations)
+                        * ElevatorConstants.elevatorHeightPerSpoolRotation.in(Meters));
     }
 
     /**
