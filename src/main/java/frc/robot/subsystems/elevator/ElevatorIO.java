@@ -2,6 +2,7 @@ package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.AngularAccelerationUnit;
@@ -11,6 +12,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Per;
@@ -59,12 +61,24 @@ public interface ElevatorIO {
          * TalonFX, in rotations.
          */
         double motionMagicError = 0.0;
+
+        /** Velocity of the mechanism, as reported by the lead motor TalonFX */
+        MutAngularVelocity elevatorMechanismVelocity = RotationsPerSecond.mutable(0.0);
     }
 
     @AutoLog
     public static class ElevatorOutputs {
         /** The voltage applied to the elevator motor */
         MutVoltage elevatorAppliedVolts = Volts.mutable(0.0);
+
+        /** Contribution of the p-term to motor output */
+        MutVoltage pContrib = Volts.mutable(0.0);
+
+        /** Contribution of the i-term to motor output */
+        MutVoltage iContrib = Volts.mutable(0.0);
+
+        /** Contribution of the d-term to motor outdut */
+        MutVoltage dContrib = Volts.mutable(0.0);
     }
 
     /**

@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
@@ -18,6 +19,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.SimConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorIOSim extends ElevatorIOTalonFX {
@@ -29,7 +31,7 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
 
     private final ElevatorSim elevatorSim =
             new ElevatorSim(
-                    DCMotor.getKrakenX60Foc(4),
+                    DCMotor.getKrakenX60Foc(2),
                     ElevatorConstants.elevatorReduction,
                     ElevatorConstants.carriageMass.in(Kilograms),
                     ElevatorConstants.drumRadius.in(Meters),
@@ -75,13 +77,31 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
         // will spin [reduction] times as many times as spool.
         AngularVelocity motorVelocity =
                 RotationsPerSecond.of(
-                                elevatorVelocity.in(MetersPerSecond)
-                                        / ElevatorConstants.elevatorToSpool.in(
-                                                PerUnit.combine(Meters, Rotations)))
-                        .times(ElevatorConstants.elevatorReduction);
+                        elevatorVelocity.in(MetersPerSecond)
+                                / ElevatorConstants.elevatorToSpool.in(
+                                        PerUnit.combine(Meters, Rotations)));
+        // .times(ElevatorConstants.elevatorReduction);
+        // TODO: Find out why sim breaks when multiplying motor velocity by motor reduction
+
+        AngularVelocity spoolVelocity =
+                RotationsPerSecond.of(
+                        elevatorVelocity.in(MetersPerSecond)
+                                / ElevatorConstants.elevatorToSpool.in(
+                                        PerUnit.combine(Meters, Rotations)));
+
+        AngularVelocity largeEncoderVelocity =
+                spoolVelocity.times(
+                        (double) ElevatorConstants.spoolTeeth
+                                / (double) ElevatorConstants.largeCANCoderTeeth);
+        AngularVelocity smallEncoderVelocity =
+                spoolVelocity.times(
+                        (double) ElevatorConstants.spoolTeeth
+                                / (double) ElevatorConstants.smallCANCoderTeeth);
 
         largeCANcoderSimState.setRawPosition(largeEncoderRotations);
+        largeCANcoderSimState.setVelocity(largeEncoderVelocity);
         smallCANcoderSimState.setRawPosition(smallEncoderRotations);
+        smallCANcoderSimState.setVelocity(smallEncoderVelocity);
 
         leadMotorSimState.setRawRotorPosition(motorRotations);
         leadMotorSimState.setRotorVelocity(motorVelocity);
@@ -92,6 +112,8 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
         followerMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
 
         elevatorSim.setInputVoltage(leadMotorSimState.getMotorVoltage());
+
+        Logger.recordOutput("elevatorSim/largeEncoderPos", largeEncoderRotations);
     }
 
     @Override
@@ -99,7 +121,7 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
         updateSimState();
 
         // Assume 50hz
-        elevatorSim.update(0.020);
+        elevatorSim.update(SimConstants.simDeltaTime.in(Seconds));
         super.updateInputs(inputs);
     }
 }

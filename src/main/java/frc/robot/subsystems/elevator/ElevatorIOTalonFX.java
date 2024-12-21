@@ -150,6 +150,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                 followerMotor.getSupplyCurrent().getValue());
 
         inputs.motionMagicError = leadMotor.getClosedLoopError().getValueAsDouble();
+
+        inputs.elevatorMechanismVelocity.mut_replace(largeCANCoder.getVelocity().getValue());
     }
 
     @Override
@@ -173,6 +175,12 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                     leadMotor.getClosedLoopReferenceSlope().getValueAsDouble());
             outputs.elevatorAppliedVolts.mut_replace(
                     Volts.of(leadMotor.getClosedLoopOutput().getValueAsDouble()));
+            outputs.pContrib.mut_replace(
+                    Volts.of(leadMotor.getClosedLoopProportionalOutput().getValueAsDouble()));
+            outputs.iContrib.mut_replace(
+                    Volts.of(leadMotor.getClosedLoopIntegratedOutput().getValueAsDouble()));
+            outputs.dContrib.mut_replace(
+                    Volts.of(leadMotor.getClosedLoopDerivativeOutput().getValueAsDouble()));
         }
     }
 

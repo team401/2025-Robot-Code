@@ -42,7 +42,8 @@ public final class ElevatorConstants {
 
     // TODO: Actual values
     public static final Mass carriageMass = Pounds.of(20);
-    public static final Distance drumRadius = Inches.of(1.503);
+    public static final Distance drumRadius =
+            Inches.of(1.503).divide(2.0); // 1.503 inch diameter, 1.503/2 radius
 
     // TODO: Use coppercore gear math after
     // https://github.com/team401/coppercore/issues/52 is
@@ -66,8 +67,8 @@ public final class ElevatorConstants {
             elevatorReduction * (double) largeCANCoderTeeth / (double) spoolTeeth;
 
     // TODO: Tune elevator
-    public static final double elevatorkP = 0.1;
-    public static final double elevatorkI = 0.0;
+    public static final double elevatorkP = 20.0;
+    public static final double elevatorkI = 1.0;
     public static final double elevatorkD = 0.0;
 
     public static final double elevatorkS = 0.0;
@@ -79,7 +80,7 @@ public final class ElevatorConstants {
     public static final Per<DistanceUnit, AngleUnit> elevatorToSpool =
             Inches.of(4.724).divide(Rotations.of(1));
 
-    public static final LinearVelocity elevatorCruiseVelocity = MetersPerSecond.of(0.1);
+    public static final LinearVelocity elevatorCruiseVelocity = MetersPerSecond.of(3.0);
     // TODO: Factor in gearbox ratios and actual calculations into this constant
     public static final AngularVelocity elevatorAngularCruiseVelocity =
             RadiansPerSecond.of(
@@ -102,7 +103,7 @@ public final class ElevatorConstants {
     public static final Distance maxElevatorHeight = Meters.of(3.0);
 
     // TODO: Tune this value
-    public static final Current elevatorStatorCurrentLimit = Amps.of(10.0);
+    public static final Current elevatorStatorCurrentLimit = Amps.of(80.0);
 
     public static final int CRTticksPerRotation =
             4096; // CANCoders have a resolution of 4096 ticks/rotation
