@@ -27,13 +27,18 @@ public class RobotContainer {
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
+        loadConstants();
         configureSubsystems();
         // Configure the trigger bindings
         configureBindings();
     }
 
+    public void loadConstants() {
+        FeatureFlags.synced.loadData();
+    }
+
     public void configureSubsystems() {
-        if (FeatureFlags.runElevator) {
+        if (FeatureFlags.synced.getObject().runElevator) {
             elevatorSubsystem = InitSubsystems.initElevatorSubsystem();
         }
     }
@@ -61,6 +66,8 @@ public class RobotContainer {
 
     /** This method must be called from the robot, as it isn't called automatically. */
     public void testPeriodic() {
-        elevatorSubsystem.testPeriodic();
+        if (FeatureFlags.synced.getObject().runElevator) {
+            elevatorSubsystem.testPeriodic();
+        }
     }
 }
