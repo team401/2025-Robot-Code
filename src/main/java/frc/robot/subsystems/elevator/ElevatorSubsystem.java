@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.ExampleElevatorCommand;
 
 public class ElevatorSubsystem extends SubsystemBase {
     private ElevatorMechanism elevatorMechanism;
@@ -12,7 +13,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         this.elevatorMechanism = elevatorMechanism;
         elevatorMechanism.setGoalHeight(Meters.of(0.75));
 
-        // setDefaultCommand(new ExampleElevatorCommand(this));
+        setDefaultCommand(new ExampleElevatorCommand(this));
     }
 
     /**
