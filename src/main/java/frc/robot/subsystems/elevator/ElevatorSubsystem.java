@@ -11,7 +11,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public ElevatorSubsystem(ElevatorMechanism elevatorMechanism) {
         this.elevatorMechanism = elevatorMechanism;
-        elevatorMechanism.setGoalHeight(Meters.of(0.75));
 
         setDefaultCommand(new ExampleElevatorCommand(this));
     }
