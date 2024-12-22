@@ -13,6 +13,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.TestModeManager;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.utils.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
@@ -118,49 +119,55 @@ public class ElevatorMechanism {
 
     /** This method must be called from the subsystem's test periodic! */
     public void testPeriodic() {
-        LoggedTunableNumber.ifChanged(
-                hashCode(),
-                (pid) -> {
-                    io.setPID(pid[0], pid[1], pid[2]);
-                },
-                elevatorkP,
-                elevatorkI,
-                elevatorkD);
+        switch (TestModeManager.getTestMode()) {
+            case ElevatorTuning:
+                LoggedTunableNumber.ifChanged(
+                        hashCode(),
+                        (pid) -> {
+                            io.setPID(pid[0], pid[1], pid[2]);
+                        },
+                        elevatorkP,
+                        elevatorkI,
+                        elevatorkD);
 
-        LoggedTunableNumber.ifChanged(
-                hashCode(),
-                (ff) -> {
-                    io.setFF(ff[0], ff[1], ff[2], ff[3]);
-                },
-                elevatorkS,
-                elevatorkV,
-                elevatorkA,
-                elevatorkG);
+                LoggedTunableNumber.ifChanged(
+                        hashCode(),
+                        (ff) -> {
+                            io.setFF(ff[0], ff[1], ff[2], ff[3]);
+                        },
+                        elevatorkS,
+                        elevatorkV,
+                        elevatorkA,
+                        elevatorkG);
 
-        LoggedTunableNumber.ifChanged(
-                hashCode(),
-                (maxProfile) -> {
-                    io.setMaxProfile(
-                            RadiansPerSecond.of(0.0),
-                            VoltsPerRadianPerSecondSquared.ofNative(maxProfile[0]),
-                            VoltsPerRadianPerSecond.ofNative(maxProfile[1]));
-                },
-                elevatorExpokA,
-                elevatorExpokV);
+                LoggedTunableNumber.ifChanged(
+                        hashCode(),
+                        (maxProfile) -> {
+                            io.setMaxProfile(
+                                    RadiansPerSecond.of(0.0),
+                                    VoltsPerRadianPerSecondSquared.ofNative(maxProfile[0]),
+                                    VoltsPerRadianPerSecond.ofNative(maxProfile[1]));
+                        },
+                        elevatorExpokA,
+                        elevatorExpokV);
 
-        LoggedTunableNumber.ifChanged(
-                hashCode(),
-                (setpoint) -> {
-                    setGoalHeight(Meters.of(setpoint[0]));
-                },
-                elevatorTuningSetpointMeters);
+                LoggedTunableNumber.ifChanged(
+                        hashCode(),
+                        (setpoint) -> {
+                            setGoalHeight(Meters.of(setpoint[0]));
+                        },
+                        elevatorTuningSetpointMeters);
 
-        LoggedTunableNumber.ifChanged(
-                hashCode(),
-                (setpoint) -> {
-                    io.setOverrideVolts(Volts.of(setpoint[0]));
-                },
-                elevatorTuningOverrideVolts);
+                LoggedTunableNumber.ifChanged(
+                        hashCode(),
+                        (setpoint) -> {
+                            io.setOverrideVolts(Volts.of(setpoint[0]));
+                        },
+                        elevatorTuningOverrideVolts);
+                break;
+            default:
+                break;
+        }
     }
 
     public void seedWithCRT() {
