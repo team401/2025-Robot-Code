@@ -22,8 +22,10 @@ public class ExampleElevatorCommand extends Command {
     // control to 3 different setpoints along elevator's height. Then, subtract a small number so it
     // will wrap around to hit more varied setpoints.
     Distance stepHeight =
-            ElevatorConstants.maxElevatorHeight
-                    .minus(ElevatorConstants.minElevatorHeight)
+            ElevatorConstants.synced
+                    .getObject()
+                    .maxElevatorHeight
+                    .minus(ElevatorConstants.synced.getObject().minElevatorHeight)
                     .divide(3.0)
                     .minus(Meters.of(0.1));
 
@@ -67,18 +69,22 @@ public class ExampleElevatorCommand extends Command {
 
         // If current goal height is above max height, wrap around to the bottom of the range of
         // motion
-        if (currentGoalHeight.gt(ElevatorConstants.maxElevatorHeight)) {
+        if (currentGoalHeight.gt(ElevatorConstants.synced.getObject().maxElevatorHeight)) {
             Distance rangeOfMotion =
-                    ElevatorConstants.maxElevatorHeight.minus(ElevatorConstants.minElevatorHeight);
+                    ElevatorConstants.synced
+                            .getObject()
+                            .maxElevatorHeight
+                            .minus(ElevatorConstants.synced.getObject().minElevatorHeight);
             Distance goalHeightFromBottom =
-                    currentGoalHeight.minus(ElevatorConstants.minElevatorHeight);
+                    currentGoalHeight.minus(ElevatorConstants.synced.getObject().minElevatorHeight);
             // There seems to be no way to do a modulus supplied by units library. Therefore, we
             // have to convert out to meters, mod, and then create a new distance.
             goalHeightFromBottom =
                     Meters.of(goalHeightFromBottom.in(Meters) % rangeOfMotion.in(Meters));
 
             currentGoalHeight.mut_replace(
-                    goalHeightFromBottom.plus(ElevatorConstants.minElevatorHeight));
+                    goalHeightFromBottom.plus(
+                            ElevatorConstants.synced.getObject().minElevatorHeight));
         }
     }
 

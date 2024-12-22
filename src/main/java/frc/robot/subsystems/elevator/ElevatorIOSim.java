@@ -32,15 +32,15 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
     private final ElevatorSim elevatorSim =
             new ElevatorSim(
                     DCMotor.getKrakenX60Foc(2),
-                    ElevatorConstants.elevatorReduction,
-                    ElevatorConstants.carriageMass.in(Kilograms),
-                    ElevatorConstants.drumRadius.in(Meters),
-                    ElevatorConstants.minElevatorHeight.in(Meters),
-                    ElevatorConstants.maxElevatorHeight.in(Meters),
+                    ElevatorConstants.synced.getObject().elevatorReduction,
+                    ElevatorConstants.synced.getObject().carriageMass.in(Kilograms),
+                    ElevatorConstants.synced.getObject().drumRadius.in(Meters),
+                    ElevatorConstants.synced.getObject().minElevatorHeight.in(Meters),
+                    ElevatorConstants.synced.getObject().maxElevatorHeight.in(Meters),
                     true,
-                    ElevatorConstants.Sim.elevatorStartingHeight.in(Meters),
-                    ElevatorConstants.Sim.positionStdDev,
-                    ElevatorConstants.Sim.velocityStdDev);
+                    ElevatorConstants.Sim.synced.getObject().elevatorStartingHeight.in(Meters),
+                    ElevatorConstants.Sim.synced.getObject().positionStdDev,
+                    ElevatorConstants.Sim.synced.getObject().velocityStdDev);
 
     public ElevatorIOSim() {
         super();
@@ -64,39 +64,44 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
         Angle spoolRotations = Rotations.of(elevatorHeight.divide(Inches.of(4.724)).magnitude());
         Angle largeEncoderRotations =
                 spoolRotations.times(
-                        (double) ElevatorConstants.spoolTeeth
-                                / (double) ElevatorConstants.largeCANCoderTeeth);
+                        (double) ElevatorConstants.synced.getObject().spoolTeeth
+                                / (double) ElevatorConstants.synced.getObject().largeCANCoderTeeth);
         Angle smallEncoderRotations =
                 spoolRotations.times(
-                        (double) ElevatorConstants.spoolTeeth
-                                / (double) ElevatorConstants.smallCANCoderTeeth);
+                        (double) ElevatorConstants.synced.getObject().spoolTeeth
+                                / (double) ElevatorConstants.synced.getObject().smallCANCoderTeeth);
 
-        Angle motorRotations = spoolRotations.times(ElevatorConstants.elevatorReduction);
+        Angle motorRotations =
+                spoolRotations.times(ElevatorConstants.synced.getObject().elevatorReduction);
         // Convert elevator velocity (m/s) into angular velocity of spool by dividing by elevator to
         // spool (m/rot) to obtain rot/s, then multiply by elevator reduction, because the motors
         // will spin [reduction] times as many times as spool.
         AngularVelocity motorVelocity =
                 RotationsPerSecond.of(
                         elevatorVelocity.in(MetersPerSecond)
-                                / ElevatorConstants.elevatorToSpool.in(
-                                        PerUnit.combine(Meters, Rotations)));
-        // .times(ElevatorConstants.elevatorReduction);
+                                / ElevatorConstants.synced
+                                        .getObject()
+                                        .elevatorToSpool
+                                        .in(PerUnit.combine(Meters, Rotations)));
+        // .times(ElevatorConstants.synced.getObject().elevatorReduction);
         // TODO: Find out why sim breaks when multiplying motor velocity by motor reduction
 
         AngularVelocity spoolVelocity =
                 RotationsPerSecond.of(
                         elevatorVelocity.in(MetersPerSecond)
-                                / ElevatorConstants.elevatorToSpool.in(
-                                        PerUnit.combine(Meters, Rotations)));
+                                / ElevatorConstants.synced
+                                        .getObject()
+                                        .elevatorToSpool
+                                        .in(PerUnit.combine(Meters, Rotations)));
 
         AngularVelocity largeEncoderVelocity =
                 spoolVelocity.times(
-                        (double) ElevatorConstants.spoolTeeth
-                                / (double) ElevatorConstants.largeCANCoderTeeth);
+                        (double) ElevatorConstants.synced.getObject().spoolTeeth
+                                / (double) ElevatorConstants.synced.getObject().largeCANCoderTeeth);
         AngularVelocity smallEncoderVelocity =
                 spoolVelocity.times(
-                        (double) ElevatorConstants.spoolTeeth
-                                / (double) ElevatorConstants.smallCANCoderTeeth);
+                        (double) ElevatorConstants.synced.getObject().spoolTeeth
+                                / (double) ElevatorConstants.synced.getObject().smallCANCoderTeeth);
 
         largeCANcoderSimState.setRawPosition(largeEncoderRotations);
         largeCANcoderSimState.setVelocity(largeEncoderVelocity);

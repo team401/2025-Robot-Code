@@ -12,12 +12,13 @@ import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
 
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import coppercore.parameter_tools.JSONExclude;
+import coppercore.parameter_tools.JSONSync;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.PerUnit;
-import edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -25,96 +26,168 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Per;
+import edu.wpi.first.wpilibj.Filesystem;
 
 public final class ElevatorConstants {
+    @JSONExclude
+    public static final JSONSync<ElevatorConstants> synced =
+            new JSONSync<ElevatorConstants>(
+                    new ElevatorConstants(),
+                    Filesystem.getDeployDirectory()
+                            .toPath()
+                            .resolve("constants/ElevatorConstants.json")
+                            .toString(),
+                    new JSONSync.JSONSyncConfigBuilder().build());
+
     // TODO: Rename these
     // see ElevatorIOTalonFX
-    public static final int leadElevatorMotorId = 9; // TODO: Actual CAN IDs
-    public static final int followerElevatorMotorId = 10;
-    public static final boolean invertFollowerElevatorMotor = false;
+    public final Integer leadElevatorMotorId = 9; // TODO: Actual CAN IDs
+    public final Integer followerElevatorMotorId = 10;
+    public final Boolean invertFollowerElevatorMotor = false;
 
-    public static final int smallCANCoderTeeth = 17;
-    public static final int largeCANCoderTeeth = 19;
-    public static final int spoolTeeth = 18;
+    public final Integer smallCANCoderTeeth = 17;
+    public final Integer largeCANCoderTeeth = 19;
+    public final Integer spoolTeeth = 18;
 
     /** 5 motor rotations to 1 spool rotation */
-    public static final double elevatorReduction = 5.0;
+    public final Double elevatorReduction = 5.0;
 
     // TODO: Actual values
-    public static final Mass carriageMass = Pounds.of(20);
-    public static final Distance drumRadius =
-            Inches.of(1.503).divide(2.0); // 1.503 inch diameter, 1.503/2 radius
+    /* Carriage mass in pounds, represented as a double so it can be synced by JSONSync */
+    public final Double carriageMassPounds = 20.0;
+
+    @JSONExclude public final Mass carriageMass = Pounds.of(carriageMassPounds);
+
+    public final Double drumRadiusInches = 0.7515; // 1.503 inch diameter / 2
+    @JSONExclude public final Distance drumRadius = Inches.of(drumRadiusInches);
 
     // TODO: Use coppercore gear math after
     // https://github.com/team401/coppercore/issues/52 is
     // done.
-    public static final Distance elevatorHeightPerSpoolRotation = Inches.of(4.724);
+    public final Double elevatorInchesPerSpoolRotation = 4.724;
+
+    @JSONExclude
+    public final Distance elevatorHeightPerSpoolRotation =
+            Inches.of(elevatorInchesPerSpoolRotation);
 
     // TODO: Tune encoder directions!
-    public static final int elevatorLargeCANCoderID = 11;
-    public static final SensorDirectionValue elevatorLargeCANCoderDirection =
-            SensorDirectionValue.CounterClockwise_Positive;
-    public static final int elevatorSmallCANCoderID = 12;
-    public static final SensorDirectionValue elevatorSmallCANCoderDirection =
-            SensorDirectionValue.CounterClockwise_Positive;
+    public final int elevatorLargeCANCoderID = 11;
+    public final Boolean isLargeCANcoderClockwisePositive = true;
+
+    @JSONExclude
+    public final SensorDirectionValue elevatorLargeCANCoderDirection =
+            isLargeCANcoderClockwisePositive
+                    ? SensorDirectionValue.CounterClockwise_Positive
+                    : SensorDirectionValue.Clockwise_Positive;
+
+    public final int elevatorSmallCANCoderID = 12;
+    public final Boolean isSmallCANcoderClockwisePositive = true;
+
+    @JSONExclude
+    public final SensorDirectionValue elevatorSmallCANCoderDirection =
+            isSmallCANcoderClockwisePositive
+                    ? SensorDirectionValue.CounterClockwise_Positive
+                    : SensorDirectionValue.Clockwise_Positive;
 
     /*
      * The large CANCoder is represented as the mechanism in our Phoenix configs.
      * This means that we are controlling to a goal in terms of large CANCoder angle.
      */
-    public static final double largeCANCoderToMechanismRatio = 1.0;
-    public static final double rotorToLargeCANCoderRatio =
+    @JSONExclude public final double largeCANCoderToMechanismRatio = 1.0;
+
+    @JSONExclude
+    public final double rotorToLargeCANCoderRatio =
             elevatorReduction * (double) largeCANCoderTeeth / (double) spoolTeeth;
 
     // TODO: Tune elevator
-    public static final double elevatorkP = 20.0;
-    public static final double elevatorkI = 1.0;
-    public static final double elevatorkD = 0.0;
+    public final Double elevatorkP = 20.0;
+    public final Double elevatorkI = 1.0;
+    public final Double elevatorkD = 0.0;
 
-    public static final double elevatorkS = 0.0;
-    public static final double elevatorkV = 0.0;
-    public static final double elevatorkA = 0.0;
-    public static final double elevatorkG = 8.7;
+    public final Double elevatorkS = 0.0;
+    public final Double elevatorkV = 0.0;
+    public final Double elevatorkA = 0.0;
+    public final Double elevatorkG = 8.7;
 
     // TODO: Actual ratios
-    public static final Per<DistanceUnit, AngleUnit> elevatorToSpool =
-            Inches.of(4.724).divide(Rotations.of(1));
+    @JSONExclude
+    public final Per<DistanceUnit, AngleUnit> elevatorToSpool =
+            elevatorHeightPerSpoolRotation.divide(Rotations.of(1));
 
-    public static final LinearVelocity elevatorCruiseVelocity = MetersPerSecond.of(3.0);
+    public final Double elevatorCruiseVelocityMetersPerSecond = 3.0;
+
+    @JSONExclude
+    public final LinearVelocity elevatorCruiseVelocity =
+            MetersPerSecond.of(elevatorCruiseVelocityMetersPerSecond);
+
     // TODO: Factor in gearbox ratios and actual calculations into this constant
-    public static final AngularVelocity elevatorAngularCruiseVelocity =
+    @JSONExclude
+    public final AngularVelocity elevatorAngularCruiseVelocity =
             RadiansPerSecond.of(
                     elevatorCruiseVelocity.in(MetersPerSecond)
                             / elevatorToSpool.in(PerUnit.combine(Meters, Radians)));
+
+    /* The Motion Magic Expo kV, measured in Volts per Radian per Second, but represented as a double so it can be synced by JSONSync */
+    public final Double elevatorExpo_kV_raw = 0.0;
 
     /**
      * The kV used by Motion Magic Expo to generate a motion profile. Dividing the supply voltage by
      * kV results in the maximum velocity of the system. Therefore, a higher profile kV results in a
      * lower profile velocity.
      */
-    public static final Per<VoltageUnit, AngularVelocityUnit> elevatorExpo_kV =
-            VoltsPerRadianPerSecond.ofNative(0.0);
+    @JSONExclude
+    public final Per<VoltageUnit, AngularVelocityUnit> elevatorExpo_kV =
+            VoltsPerRadianPerSecond.ofNative(elevatorExpo_kV_raw);
 
-    public static final Per<VoltageUnit, AngularAccelerationUnit> elevatorExpo_kA =
-            VoltsPerRadianPerSecondSquared.ofNative(0.1);
+    /* The Motion Magic Expo kA, measured in Volts per Radian per Second Squared, but represented as a double so it can be synced by JSONSync */
+    public final Double elevatorExpo_kA_raw = 0.1;
+
+    @JSONExclude
+    public final Per<VoltageUnit, AngularAccelerationUnit> elevatorExpo_kA =
+            VoltsPerRadianPerSecondSquared.ofNative(elevatorExpo_kA_raw);
 
     // TODO: Find actual values for these!
-    public static final Distance minElevatorHeight = Meters.of(0.0);
-    public static final Distance maxElevatorHeight = Meters.of(3.0);
+    /* Minimum elevator height in meters, stored as a double so it can be synced by JSONSync */
+    public final Double minElevatorHeightMeters = 0.0;
+    @JSONExclude public final Distance minElevatorHeight = Meters.of(minElevatorHeightMeters);
+    /* Maximum elevator height in meters, stored as a double so it can be synced by JSONSync */
+    public final Double maxElevatorHeightMeters = 3.0;
+    @JSONExclude public final Distance maxElevatorHeight = Meters.of(maxElevatorHeightMeters);
 
     // TODO: Tune this value
-    public static final Current elevatorStatorCurrentLimit = Amps.of(80.0);
+    /* Maximum stator current in amps, stored as a double so it can be synced by JSONSync */
+    public final Double elevatorStatorCurrentLimitAmps = 80.0;
 
-    public static final int CRTticksPerRotation =
+    @JSONExclude
+    public final Current elevatorStatorCurrentLimit = Amps.of(elevatorStatorCurrentLimitAmps);
+
+    public final Integer CRTticksPerRotation =
             4096; // CANCoders have a resolution of 4096 ticks/rotation
 
     public static final class Sim {
+        @JSONExclude
+        public static final JSONSync<ElevatorConstants.Sim> synced =
+                new JSONSync<ElevatorConstants.Sim>(
+                        new ElevatorConstants.Sim(),
+                        Filesystem.getDeployDirectory()
+                                .toPath()
+                                .resolve("constants/ElevatorConstants.Sim.json")
+                                .toString(),
+                        new JSONSync.JSONSyncConfigBuilder().build());
+
         /** Standard deviation passed to sim for the position measurement */
-        public static final double positionStdDev = 0.0;
+        public final Double positionStdDev = 0.0;
 
         /** Standard deviation passed to sim for the velocity measurement */
-        public static final double velocityStdDev = 0.0;
+        public final Double velocityStdDev = 0.0;
 
-        public static final Distance elevatorStartingHeight = Meters.of(1.0);
+        /**
+         * Height the elevator sim is initialized to in meters, stored as a double so it can be
+         * synced by JSONSync
+         */
+        public final Double elevatorStartingHeightMeters = 1.0;
+
+        @JSONExclude
+        public final Distance elevatorStartingHeight = Meters.of(elevatorStartingHeightMeters);
     }
 }

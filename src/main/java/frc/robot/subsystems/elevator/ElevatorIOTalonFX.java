@@ -61,11 +61,11 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
     public ElevatorIOTalonFX() {
         // Initialize TalonFXs  and CANcoders with their correct IDs
-        leadMotor = new TalonFX(ElevatorConstants.leadElevatorMotorId);
-        followerMotor = new TalonFX(ElevatorConstants.followerElevatorMotorId);
+        leadMotor = new TalonFX(ElevatorConstants.synced.getObject().leadElevatorMotorId);
+        followerMotor = new TalonFX(ElevatorConstants.synced.getObject().followerElevatorMotorId);
 
-        largeCANCoder = new CANcoder(ElevatorConstants.elevatorLargeCANCoderID);
-        smallCANCoder = new CANcoder(ElevatorConstants.elevatorSmallCANCoderID);
+        largeCANCoder = new CANcoder(ElevatorConstants.synced.getObject().elevatorLargeCANCoderID);
+        smallCANCoder = new CANcoder(ElevatorConstants.synced.getObject().elevatorSmallCANCoderID);
 
         // Create one CANcoder configuration that will be modified slightly and applied to both
         // CANcoders
@@ -75,12 +75,12 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
         // Update with large CANcoder direction and apply
         cancoderConfiguration.MagnetSensor.SensorDirection =
-                ElevatorConstants.elevatorLargeCANCoderDirection;
+                ElevatorConstants.synced.getObject().elevatorLargeCANCoderDirection;
         largeCANCoder.getConfigurator().apply(cancoderConfiguration);
 
         // Update with small CANcoder direction and apply
         cancoderConfiguration.MagnetSensor.SensorDirection =
-                ElevatorConstants.elevatorSmallCANCoderDirection;
+                ElevatorConstants.synced.getObject().elevatorSmallCANCoderDirection;
         smallCANCoder.getConfigurator().apply(cancoderConfiguration);
 
         // Initialize talonFXConfigs to use FusedCANCoder and Motion Magic Expo and have correct PID
@@ -93,32 +93,40 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                                         .withFeedbackSensorSource(
                                                 FeedbackSensorSourceValue.FusedCANcoder)
                                         .withSensorToMechanismRatio(
-                                                ElevatorConstants.largeCANCoderToMechanismRatio)
+                                                ElevatorConstants.synced.getObject()
+                                                        .largeCANCoderToMechanismRatio)
                                         .withRotorToSensorRatio(
-                                                ElevatorConstants.rotorToLargeCANCoderRatio))
+                                                ElevatorConstants.synced.getObject()
+                                                        .rotorToLargeCANCoderRatio))
                         .withMotorOutput(
                                 new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
                         .withCurrentLimits(
                                 new CurrentLimitsConfigs()
                                         .withStatorCurrentLimitEnable(true)
                                         .withStatorCurrentLimit(
-                                                ElevatorConstants.elevatorStatorCurrentLimit))
+                                                ElevatorConstants.synced.getObject()
+                                                        .elevatorStatorCurrentLimit))
                         .withSlot0(
                                 new Slot0Configs()
                                         .withGravityType(GravityTypeValue.Elevator_Static)
-                                        .withKS(ElevatorConstants.elevatorkS)
-                                        .withKV(ElevatorConstants.elevatorkV)
-                                        .withKA(ElevatorConstants.elevatorkA)
-                                        .withKG(ElevatorConstants.elevatorkG)
-                                        .withKP(ElevatorConstants.elevatorkP)
-                                        .withKI(ElevatorConstants.elevatorkI)
-                                        .withKD(ElevatorConstants.elevatorkD))
+                                        .withKS(ElevatorConstants.synced.getObject().elevatorkS)
+                                        .withKV(ElevatorConstants.synced.getObject().elevatorkV)
+                                        .withKA(ElevatorConstants.synced.getObject().elevatorkA)
+                                        .withKG(ElevatorConstants.synced.getObject().elevatorkG)
+                                        .withKP(ElevatorConstants.synced.getObject().elevatorkP)
+                                        .withKI(ElevatorConstants.synced.getObject().elevatorkI)
+                                        .withKD(ElevatorConstants.synced.getObject().elevatorkD))
                         .withMotionMagic(
                                 new MotionMagicConfigs()
                                         .withMotionMagicCruiseVelocity(
-                                                ElevatorConstants.elevatorAngularCruiseVelocity)
-                                        .withMotionMagicExpo_kA(ElevatorConstants.elevatorExpo_kA)
-                                        .withMotionMagicExpo_kV(ElevatorConstants.elevatorExpo_kV));
+                                                ElevatorConstants.synced.getObject()
+                                                        .elevatorAngularCruiseVelocity)
+                                        .withMotionMagicExpo_kA(
+                                                ElevatorConstants.synced.getObject()
+                                                        .elevatorExpo_kA)
+                                        .withMotionMagicExpo_kV(
+                                                ElevatorConstants.synced.getObject()
+                                                        .elevatorExpo_kV));
 
         // Apply talonFX config to both motors
         leadMotor.getConfigurator().apply(talonFXConfigs);
@@ -127,7 +135,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         // Make follower motor permanently follow lead motor.
         followerMotor.setControl(
                 new Follower(
-                        leadMotor.getDeviceID(), ElevatorConstants.invertFollowerElevatorMotor));
+                        leadMotor.getDeviceID(),
+                        ElevatorConstants.synced.getObject().invertFollowerElevatorMotor));
     }
 
     @Override
@@ -187,7 +196,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     @Override
     public void setLargeCANCoderGoalPos(Angle goalPos) {
         largeEncoderGoalAngle.mut_replace(goalPos);
-        spoolGoalAngle.mut_replace(goalPos.divide(ElevatorConstants.largeCANCoderToMechanismRatio));
+        spoolGoalAngle.mut_replace(
+                goalPos.divide(ElevatorConstants.synced.getObject().largeCANCoderToMechanismRatio));
     }
 
     @Override

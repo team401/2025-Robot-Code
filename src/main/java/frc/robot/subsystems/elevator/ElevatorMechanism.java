@@ -25,8 +25,8 @@ public class ElevatorMechanism {
     MutDistance goalHeight = Meters.mutable(0.0);
     MutDistance clampedGoalHeight = Meters.mutable(0.0);
 
-    Distance minHeight = ElevatorConstants.minElevatorHeight;
-    Distance maxHeight = ElevatorConstants.maxElevatorHeight;
+    Distance minHeight = ElevatorConstants.synced.getObject().minElevatorHeight;
+    Distance maxHeight = ElevatorConstants.synced.getObject().maxElevatorHeight;
 
     LoggedTunableNumber elevatorkP;
     LoggedTunableNumber elevatorkI;
@@ -51,35 +51,42 @@ public class ElevatorMechanism {
     public ElevatorMechanism(ElevatorIO io) {
         elevatorkP =
                 new LoggedTunableNumber(
-                        "ElevatorTunables/elevatorkP", ElevatorConstants.elevatorkP);
+                        "ElevatorTunables/elevatorkP",
+                        ElevatorConstants.synced.getObject().elevatorkP);
         elevatorkI =
                 new LoggedTunableNumber(
-                        "ElevatorTunables/elevatorkI", ElevatorConstants.elevatorkI);
+                        "ElevatorTunables/elevatorkI",
+                        ElevatorConstants.synced.getObject().elevatorkI);
         elevatorkD =
                 new LoggedTunableNumber(
-                        "ElevatorTunables/elevatorkD", ElevatorConstants.elevatorkD);
+                        "ElevatorTunables/elevatorkD",
+                        ElevatorConstants.synced.getObject().elevatorkD);
 
         elevatorkS =
                 new LoggedTunableNumber(
-                        "ElevatorTunables/elevatorkS", ElevatorConstants.elevatorkS);
+                        "ElevatorTunables/elevatorkS",
+                        ElevatorConstants.synced.getObject().elevatorkS);
         elevatorkV =
                 new LoggedTunableNumber(
-                        "ElevatorTunables/elevatorkV", ElevatorConstants.elevatorkV);
+                        "ElevatorTunables/elevatorkV",
+                        ElevatorConstants.synced.getObject().elevatorkV);
         elevatorkA =
                 new LoggedTunableNumber(
-                        "ElevatorTunables/elevatorkA", ElevatorConstants.elevatorkA);
+                        "ElevatorTunables/elevatorkA",
+                        ElevatorConstants.synced.getObject().elevatorkA);
         elevatorkG =
                 new LoggedTunableNumber(
-                        "ElevatorTunables/elevatorkG", ElevatorConstants.elevatorkG);
+                        "ElevatorTunables/elevatorkG",
+                        ElevatorConstants.synced.getObject().elevatorkG);
 
         elevatorExpokV =
                 new LoggedTunableNumber(
                         "ElevatorTunables/elevatorExpokV",
-                        ElevatorConstants.elevatorExpo_kV.magnitude());
+                        ElevatorConstants.synced.getObject().elevatorExpo_kV.magnitude());
         elevatorExpokA =
                 new LoggedTunableNumber(
                         "ElevatorTunables/elevatorExpokA",
-                        ElevatorConstants.elevatorExpo_kA.magnitude());
+                        ElevatorConstants.synced.getObject().elevatorExpo_kA.magnitude());
 
         elevatorTuningSetpointMeters =
                 new LoggedTunableNumber("ElevatorTunables/elevatorTuningSetpointMeters", 0.0);
@@ -159,10 +166,10 @@ public class ElevatorMechanism {
     public void seedWithCRT() {
         Logger.recordOutput("elevator/CRTSolutionSpoolAngle", Rotations.of(-1.0));
 
-        final int ticks = ElevatorConstants.CRTticksPerRotation;
-        final int smallTeeth = ElevatorConstants.smallCANCoderTeeth;
-        final int largeTeeth = ElevatorConstants.largeCANCoderTeeth;
-        final int spoolTeeth = ElevatorConstants.spoolTeeth;
+        final int ticks = ElevatorConstants.synced.getObject().CRTticksPerRotation;
+        final int smallTeeth = ElevatorConstants.synced.getObject().smallCANCoderTeeth;
+        final int largeTeeth = ElevatorConstants.synced.getObject().largeCANCoderTeeth;
+        final int spoolTeeth = ElevatorConstants.synced.getObject().spoolTeeth;
         // Find the number of ticks of each encoder, but in terms of the spool.
         // These should be multiplied by 19/18 or 17/18 (the gear ratios of the CANCoders to the
         // spool), but since the resulting numbers
@@ -271,12 +278,14 @@ public class ElevatorMechanism {
         Angle spoolRotations =
                 Rotations.of(
                         clampedGoalHeight
-                                .divide(ElevatorConstants.elevatorHeightPerSpoolRotation)
+                                .divide(
+                                        ElevatorConstants.synced.getObject()
+                                                .elevatorHeightPerSpoolRotation)
                                 .magnitude());
         Angle largeEncoderRotations =
                 spoolRotations.times(
-                        (double) ElevatorConstants.spoolTeeth
-                                / (double) ElevatorConstants.largeCANCoderTeeth);
+                        (double) ElevatorConstants.synced.getObject().spoolTeeth
+                                / (double) ElevatorConstants.synced.getObject().largeCANCoderTeeth);
 
         io.setLargeCANCoderGoalPos(largeEncoderRotations);
     }
@@ -295,8 +304,8 @@ public class ElevatorMechanism {
         // Calculate spool rotations by: (largeEncoderPos * largeEncoderTeeth / spoolTeeth)
         Angle spoolAngle =
                 inputs.largeEncoderPos.times(
-                        (double) ElevatorConstants.largeCANCoderTeeth
-                                / (double) ElevatorConstants.spoolTeeth);
+                        (double) ElevatorConstants.synced.getObject().largeCANCoderTeeth
+                                / (double) ElevatorConstants.synced.getObject().spoolTeeth);
 
         // TODO: Use coppercore gear math after https://github.com/team401/coppercore/issues/52 is
         // done.
@@ -304,7 +313,10 @@ public class ElevatorMechanism {
         // Convert spool rotations to height by multiplying by height per rotation
         return Meters.of(
                 spoolAngle.in(Rotations)
-                        * ElevatorConstants.elevatorHeightPerSpoolRotation.in(Meters));
+                        * ElevatorConstants.synced
+                                .getObject()
+                                .elevatorHeightPerSpoolRotation
+                                .in(Meters));
     }
 
     /**
