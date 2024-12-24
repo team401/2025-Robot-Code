@@ -128,6 +128,7 @@ dependencies {
 	def coppercoreVersion = "2025.0.0-beta"
 	implementation "io.github.team401.coppercore:wpilib_interface:$coppercoreVersion"
 	implementation "io.github.team401.coppercore:parameter_tools:$coppercoreVersion"
+	implementation 'io.github.team401.coppercore:controls:2025.0.0-beta'
 }
 
 test {

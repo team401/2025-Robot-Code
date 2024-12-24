@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
 
+import coppercore.controls.LoggedTunableNumber;
 import coppercore.wpilib_interface.UnitUtils;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
@@ -15,7 +16,6 @@ import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.TestModeManager;
 import frc.robot.constants.ElevatorConstants;
-import frc.robot.utils.LoggedTunableNumber;
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorMechanism {
