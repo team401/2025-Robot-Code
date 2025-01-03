@@ -38,7 +38,7 @@ import java.util.function.Supplier;
 
 
 public class DriveCommands {
-  private static final double DEADBAND = 0.1;
+    private static final double DEADBAND = 0.1;
   private static final double ANGLE_KP = 5.0;
   private static final double ANGLE_KD = 0.4;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
@@ -50,9 +50,21 @@ public class DriveCommands {
 
   private DriveCommands() {}
 
+  private static double applyDeadband(double value, double deadband) {
+    if (Math.abs(value) > deadband) {
+      return Math.copySign((Math.abs(value) - deadband) / (1.0 - deadband), value);
+    } else {
+      return 0.0;
+    }
+  }
+
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
-    // Apply deadband
-    double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
+    // Apply deadband to each axis
+    x = applyDeadband(x, DEADBAND);
+    y = applyDeadband(y, DEADBAND);
+
+    // Calculate magnitude and direction
+    double linearMagnitude = Math.hypot(x, y);
     Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
 
     // Square magnitude for more precise control
@@ -79,7 +91,7 @@ public class DriveCommands {
               getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
           // Apply rotation deadband
-          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+          double omega = applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
 
           // Square rotation value for more precise control
           omega = Math.copySign(omega * omega, omega);
@@ -95,7 +107,7 @@ public class DriveCommands {
                   && DriverStation.getAlliance().get() == Alliance.Red;
           speeds.toRobotRelativeSpeeds(
               isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation());
-          drive.runVelocity(speeds);
+          drive.setGoalSpeeds(speeds);
         },
         drive);
   }
@@ -145,13 +157,14 @@ public class DriveCommands {
                   isFlipped
                       ? drive.getRotation().plus(new Rotation2d(Math.PI))
                       : drive.getRotation());
-              drive.runVelocity(speeds);
+              drive.setGoalSpeeds(speeds);
             },
             drive)
 
         // Reset PID controller when command starts
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
+
 
   /**
    * Measures the velocity feedforward constants for the drive motors.
@@ -234,7 +247,7 @@ public class DriveCommands {
             Commands.run(
                 () -> {
                   double speed = limiter.calculate(WHEEL_RADIUS_MAX_VELOCITY);
-                  drive.runVelocity(new ChassisSpeeds(0.0, 0.0, speed));
+                  drive.setGoalSpeeds(new ChassisSpeeds(0.0, 0.0, speed));
                 },
                 drive)),
 
