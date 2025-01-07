@@ -1,4 +1,3 @@
-
 package frc.robot.util;
 
 import com.ctre.phoenix6.StatusCode;

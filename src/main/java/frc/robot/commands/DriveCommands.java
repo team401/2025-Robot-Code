@@ -1,5 +1,3 @@
-
-
 package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
@@ -81,7 +79,7 @@ public class DriveCommands {
           boolean isFlipped =
               DriverStation.getAlliance().isPresent()
                   && DriverStation.getAlliance().get() == Alliance.Red;
-          drive.runVelocity(
+          drive.setGoalSpeeds(
               ChassisSpeeds.fromFieldRelativeSpeeds(
                   speeds,
                   isFlipped
@@ -132,7 +130,7 @@ public class DriveCommands {
               boolean isFlipped =
                   DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red;
-              drive.runVelocity(
+              drive.setGoalSpeeds(
                   ChassisSpeeds.fromFieldRelativeSpeeds(
                       speeds,
                       isFlipped
@@ -226,7 +224,7 @@ public class DriveCommands {
             Commands.run(
                 () -> {
                   double speed = limiter.calculate(WHEEL_RADIUS_MAX_VELOCITY);
-                  drive.runVelocity(new ChassisSpeeds(0.0, 0.0, speed));
+                  drive.setGoalSpeeds(new ChassisSpeeds(0.0, 0.0, speed));
                 },
                 drive)),
 
