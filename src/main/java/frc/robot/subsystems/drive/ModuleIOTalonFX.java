@@ -1,4 +1,3 @@
-
 package frc.robot.subsystems.drive;
 
 import static frc.robot.util.PhoenixUtil.*;
@@ -117,12 +116,14 @@ public class ModuleIOTalonFX implements ModuleIO {
           case FusedCANcoder -> FeedbackSensorSourceValue.FusedCANcoder;
           case SyncCANcoder -> FeedbackSensorSourceValue.SyncCANcoder;
         };
-    turnConfig.Feedback.RotorToSensorRatio = constants.SteerMotorGearRatio;
-    turnConfig.MotionMagic.MotionMagicCruiseVelocity = 100.0 / constants.SteerMotorGearRatio;
+    turnConfig.MotionMagic.MotionMagicCruiseVelocity =
+        DrivetrainConstants.TURN_CRUISE_VELOCITY / constants.SteerMotorGearRatio;
     turnConfig.MotionMagic.MotionMagicAcceleration =
-        turnConfig.MotionMagic.MotionMagicCruiseVelocity / 0.100;
-    turnConfig.MotionMagic.MotionMagicExpo_kV = 0.12 * constants.SteerMotorGearRatio;
-    turnConfig.MotionMagic.MotionMagicExpo_kA = 0.1;
+        turnConfig.MotionMagic.MotionMagicCruiseVelocity
+            * DrivetrainConstants.TURN_ACCELERATION_MULTIPLIER;
+    turnConfig.MotionMagic.MotionMagicExpo_kV =
+        DrivetrainConstants.TURN_FEEDFORWARD_kV * constants.SteerMotorGearRatio;
+    turnConfig.MotionMagic.MotionMagicExpo_kA = DrivetrainConstants.TURN_FEEDFORWARD_kA;
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnConfig.MotorOutput.Inverted =
         constants.SteerMotorInverted
