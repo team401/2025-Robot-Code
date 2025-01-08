@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -15,9 +16,6 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
-import coppercore.wpilib_interface.DriveTemplate;
-import coppercore.wpilib_interface.DriveWithJoysticks;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -31,9 +29,11 @@ public class RobotContainer {
 
   // Controller
   // private final CommandXboxController controller = new CommandXboxController(0);
-  private final CommandJoystick joystick1 = new CommandJoystick(0);
-  private final CommandJoystick joystick2 = new CommandJoystick(1);
-
+  private final CommandJoystick leftJoystick = new CommandJoystick(0);
+  private final CommandJoystick rightJoystick = new CommandJoystick(1);
+  private double maxLinearSpeed = 2;
+  private double maxAngularSpeed = 2;
+  private final double joystickDeadband = 0.01;
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -104,13 +104,23 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive, () -> -joystick1.getY(), () -> -joystick1.getX(), () -> -joystick2.getX()));
+    DriveCommands.joystickDrive(
+       drive, () -> -leftJoystick.getY(), () -> -leftJoystick.getX(), () ->
+     -rightJoystick.getX()));
+
+    drive.setDefaultCommand(
+        new DriveWithJoysticks(
+            drive, // type: DriveTemplate
+            leftJoystick, // type: CommandJoystick
+            rightJoystick, // type: CommandJoystick
+            maxLinearSpeed, // type: double (m/s)
+            maxAngularSpeed, // type: double (rad/s)
+            joystickDeadband // type: double
+            ));
   }
-
-
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
