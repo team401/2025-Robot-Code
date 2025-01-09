@@ -6,12 +6,14 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
-import frc.robot.subsystems.drive.DriveTemplate;
+import frc.robot.subsystems.drive.Drive;
 
 public class DriveWithJoysticks extends Command {
-  private DriveTemplate drive;
+  private Drive drive;
   private CommandJoystick leftJoystick;
   private CommandJoystick rightJoystick;
   private double maxLinearVelocity;
@@ -19,7 +21,7 @@ public class DriveWithJoysticks extends Command {
   private double joystickDeadband;
 
   public DriveWithJoysticks(
-      DriveTemplate drive,
+      Drive drive,
       CommandJoystick leftJoystick,
       CommandJoystick rightJoystick,
       double maxLinearVelocity,
@@ -42,11 +44,18 @@ public class DriveWithJoysticks extends Command {
     double omega = Deadband.oneAxisDeadband(-rightJoystick.getX(), joystickDeadband);
     omega = Math.copySign(omega * omega, omega);
 
-    drive.setGoalSpeeds(
+    ChassisSpeeds speeds =
         new ChassisSpeeds(
             linearSpeeds.getX() * maxLinearVelocity,
             linearSpeeds.getY() * maxLinearVelocity,
-            omega * maxAngularVelocity));
+            omega * maxAngularVelocity);
+    boolean isFlipped =
+        DriverStation.getAlliance().isPresent()
+            && DriverStation.getAlliance().get() == Alliance.Red;
+    drive.setGoalSpeeds(
+        ChassisSpeeds.fromFieldRelativeSpeeds(
+            speeds,
+            isFlipped ? drive.getRotation().plus(new Rotation2d(Math.PI)) : drive.getRotation()));
   }
 
   /* returns a calculated translation with squared velocity */

@@ -10,6 +10,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.DriveWithJoysticks;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DrivetrainConstants;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
@@ -24,6 +25,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+
   // Subsystems
   private final Drive drive;
 
@@ -31,9 +33,7 @@ public class RobotContainer {
   // private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandJoystick leftJoystick = new CommandJoystick(0);
   private final CommandJoystick rightJoystick = new CommandJoystick(1);
-  private double maxLinearSpeed = 2;
-  private double maxAngularSpeed = 2;
-  private final double joystickDeadband = 0.01;
+
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
@@ -107,26 +107,16 @@ public class RobotContainer {
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
-    DriveCommands.joystickDrive(
-       drive, () -> -leftJoystick.getY(), () -> -leftJoystick.getX(), () ->
-     -rightJoystick.getX()));
-
-    drive.setDefaultCommand(
         new DriveWithJoysticks(
             drive, // type: DriveTemplate
             leftJoystick, // type: CommandJoystick
             rightJoystick, // type: CommandJoystick
-            maxLinearSpeed, // type: double (m/s)
-            maxAngularSpeed, // type: double (rad/s)
-            joystickDeadband // type: double
+            DrivetrainConstants.maxLinearSpeed, // type: double (m/s)
+            DrivetrainConstants.maxAngularSpeed, // type: double (rad/s)
+            DrivetrainConstants.joystickDeadband // type: double
             ));
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
