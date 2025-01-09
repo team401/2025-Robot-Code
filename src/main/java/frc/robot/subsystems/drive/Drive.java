@@ -147,6 +147,7 @@ public class Drive implements DriveTemplate {
 
   @Override
   public void periodic() {
+    runVelocity(goalSpeeds);
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
