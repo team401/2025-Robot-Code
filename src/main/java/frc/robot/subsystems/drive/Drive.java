@@ -10,6 +10,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import coppercore.wpilib_interface.DriveTemplate;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -208,21 +209,32 @@ public class Drive implements DriveTemplate {
   public void setGoalSpeeds(ChassisSpeeds speeds) {
     this.goalSpeeds = speeds;
   }
-
   /**
-   * Runs the drive at the desired velocity.
+   * Runs the drive at the desired velocity in a field-centric manner.
    *
-   * @param speeds Speeds in meters/sec
+   * @param speeds2 Speeds in meters/sec
    */
-  public void runVelocity(ChassisSpeeds speeds) {
+  public void runVelocity(ChassisSpeeds speeds2) {
+    // Adjust for field-centric control
+    boolean isFlipped =
+        DriverStation.getAlliance().isPresent()
+            && DriverStation.getAlliance().get() == Alliance.Red;
+
+    Rotation2d robotRotation =
+        isFlipped
+            ? getRotation().plus(new Rotation2d(Math.PI)) // Flip orientation for Red Alliance
+            : getRotation();
+
+    ChassisSpeeds fieldRelativeSpeeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(speeds2, robotRotation);
+
     // Calculate module setpoints
-    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(goalSpeeds, 0.02);
-    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
+    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(fieldRelativeSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, TunerConstants.kSpeedAt12Volts);
 
     // Log unoptimized setpoints and setpoint speeds
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
-    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
+    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", fieldRelativeSpeeds);
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
@@ -231,6 +243,9 @@ public class Drive implements DriveTemplate {
 
     // Log optimized setpoints (runSetpoint mutates each state)
     Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+
+    // Update the goal speeds for odometry or other subsystems
+    setGoalSpeeds(fieldRelativeSpeeds);
   }
 
   /** Runs the drive in a straight line with the specified drive output. */
