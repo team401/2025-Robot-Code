@@ -8,7 +8,7 @@ import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
 
-import coppercore.controls.LoggedTunableNumber;
+import coppercore.parameter_tools.LoggedTunableNumber;
 import coppercore.wpilib_interface.UnitUtils;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
