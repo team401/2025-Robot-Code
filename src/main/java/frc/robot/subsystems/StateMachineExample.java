@@ -30,7 +30,7 @@ public class StateMachineExample extends SubsystemBase {
    public static enum ExampleStateContainer implements StateContainer {
       IDLE(new IdleState()),
       ACTION(new ActionState()),
-      OVERRIDE(new OverrideState()),
+      OVERRIDE(new OverrideState());
 
       private final PeriodicStateInterface state;
 
@@ -62,7 +62,7 @@ public class StateMachineExample extends SubsystemBase {
       return currentAction;
    }
 
-   public static void setupStateMachine(){
+   public void setupStateMachine(){
       StateMachineConfiguration<ExampleStateContainer, ExampleActions> stateMachineConfig = new StateMachineConfiguration<>();
 
       stateMachineConfig
