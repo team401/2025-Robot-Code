@@ -10,12 +10,12 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import org.ironmaple.simulation.drivesims.GyroSimulation;
 
 /** IO implementation for Pigeon 2. */
-public class GyroIOSim implements GyroIO {
+public class GyroIOMapleSim implements GyroIO {
   private final GyroSimulation gyroSimulation;
   private final Pigeon2SimState pigeon = new Pigeon2SimState(
     new CorePigeon2(TunerConstants.DrivetrainConstants.Pigeon2Id));
 
-  public GyroIOSim(GyroSimulation gyroSimulation) {
+  public GyroIOMapleSim(GyroSimulation gyroSimulation) {
     this.gyroSimulation = gyroSimulation;
     pigeon.setRawYaw(0.0);
   }

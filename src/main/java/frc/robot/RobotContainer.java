@@ -11,6 +11,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DrivetrainConstants;
 import frc.robot.subsystems.drive.GyroIO;
+import frc.robot.subsystems.drive.GyroIOMapleSim;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
@@ -59,6 +60,17 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+        break;
+
+        case MAPLESIM:
+        // Sim robot, instantiate physics sim IO implementations
+        drive =
+            new Drive(
+                new GyroIOMapleSim(),
+                new ModuleIOMapleSim(TunerConstants.FrontLeft),
+                new ModuleIOMapleSim(TunerConstants.FrontRight),
+                new ModuleIOMapleSim(TunerConstants.BackLeft),
+                new ModuleIOMapleSim(TunerConstants.BackRight));
         break;
 
       default:

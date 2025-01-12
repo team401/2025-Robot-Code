@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.Amp;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Radian;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -32,7 +33,7 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
  * Physics sim implementation of module IO. The sim models are configured using a set of module
  * constants from Phoenix. Simulation is always based on voltage control.
  */
-public class ModuleIOSimMaple implements ModuleIO {
+public class ModuleIOMapleSim implements ModuleIO {
   // TunerConstants doesn't support separate sim constants, so they are declared locally
   private static final double DRIVE_KP = 0.05;
   private static final double DRIVE_KD = 0.0;
@@ -63,15 +64,15 @@ public class ModuleIOSimMaple implements ModuleIO {
   private double driveAppliedVolts = 0.0;
   private double turnAppliedVolts = 0.0;
 
-  public ModuleIOSimMaple(SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+  public ModuleIOMapleSim(SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
   constants) {
     // Create drive and turn sim 
 
     //TODO: FIX
     SwerveModuleSimulationConfig configs = new SwerveModuleSimulationConfig(
         DRIVE_GEARBOX, TURN_GEARBOX, DriveMotorGearRatio, SteerMotorGearRatio, 
-        Voltage.ofBaseUnits(DRIVE_KS, Volts), Voltage.ofBaseUnits(DRIVE_KV_ROT, Volts),
-        Distance.ofBaseUnits(WheelRadius, Meter), null, 1.2);
+        Voltage.ofBaseUnits(constants.DriveFrictionVoltage, Volts), Voltage.ofBaseUnits(constants.SteerFrictionVoltage, Volts),
+        Distance.ofBaseUnits(constants.WheelRadius, Meter), MomentOfInertia.ofBaseUnits(constants.SteerInertia, KilogramSquareMeters), 1.2);
 
     moduleSimulation = new SwerveModuleSimulation(configs);
     driveSim = moduleSimulation

@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.RobotBase;
  * (log replay from a file).
  */
 public final class Constants {
-  public static final Mode simMode = Mode.SIM;
+  public static final Mode simMode = Mode.MAPLESIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
   public static enum Mode {
@@ -17,7 +17,7 @@ public final class Constants {
 
     /** Running a physics simulator. */
     SIM,
-
+    MAPLESIM,
     /** Replaying from a log file. */
     REPLAY
   }
