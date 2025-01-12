@@ -61,7 +61,7 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
         // TODO: Use coppercore gear math after https://github.com/team401/coppercore/issues/52 is
         // done.
 
-        Angle spoolRotations = Rotations.of(elevatorHeight.divide(Inches.of(4.724)).magnitude());
+        Angle spoolRotations = Rotations.of(elevatorHeight.div(Inches.of(4.724)).magnitude());
         Angle largeEncoderRotations =
                 spoolRotations.times(
                         (double) ElevatorConstants.synced.getObject().spoolTeeth

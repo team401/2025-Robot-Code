@@ -285,7 +285,7 @@ public class ElevatorMechanism {
         Angle spoolRotations =
                 Rotations.of(
                         clampedGoalHeight
-                                .divide(
+                                .div(
                                         ElevatorConstants.synced.getObject()
                                                 .elevatorHeightPerSpoolRotation)
                                 .magnitude());

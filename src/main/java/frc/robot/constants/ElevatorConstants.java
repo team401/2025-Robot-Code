@@ -70,6 +70,12 @@ public final class ElevatorConstants {
     public final Distance elevatorHeightPerSpoolRotation =
             Inches.of(elevatorInchesPerSpoolRotation);
 
+    /**
+     * What point in the sensor's range the discontinuity occurs. Results in a range of [1-x, x).
+     * For example, a value of 1 gives a range of [0.0, 1). This is what we want to use for CRT elevator sensors.
+     * */
+    public final Double elevatorCANCoderDiscontinuityPoint = 1.0;
+
     // TODO: Tune encoder directions!
     public final int elevatorLargeCANCoderID = 11;
     public final Boolean isLargeCANcoderClockwisePositive = true;
@@ -112,7 +118,7 @@ public final class ElevatorConstants {
     // TODO: Actual ratios
     @JSONExclude
     public final Per<DistanceUnit, AngleUnit> elevatorToSpool =
-            elevatorHeightPerSpoolRotation.divide(Rotations.of(1));
+            elevatorHeightPerSpoolRotation.div(Rotations.of(1));
 
     public final Double elevatorCruiseVelocityMetersPerSecond = 3.0;
 

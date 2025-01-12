@@ -26,7 +26,7 @@ public class ExampleElevatorCommand extends Command {
                     .getObject()
                     .maxElevatorHeight
                     .minus(ElevatorConstants.synced.getObject().minElevatorHeight)
-                    .divide(3.0)
+                    .div(3.0)
                     .minus(Meters.of(0.1));
 
     /*

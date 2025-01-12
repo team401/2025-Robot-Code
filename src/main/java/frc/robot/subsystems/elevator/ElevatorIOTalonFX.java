@@ -15,7 +15,6 @@ import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -70,8 +69,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         // Create one CANcoder configuration that will be modified slightly and applied to both
         // CANcoders
         CANcoderConfiguration cancoderConfiguration = new CANcoderConfiguration();
-        cancoderConfiguration.MagnetSensor.AbsoluteSensorRange =
-                AbsoluteSensorRangeValue.Unsigned_0To1;
+        cancoderConfiguration.MagnetSensor.AbsoluteSensorDiscontinuityPoint = ElevatorConstants.synced.getObject().elevatorCANCoderDiscontinuityPoint;
 
         // Update with large CANcoder direction and apply
         cancoderConfiguration.MagnetSensor.SensorDirection =
@@ -197,7 +195,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     public void setLargeCANCoderGoalPos(Angle goalPos) {
         largeEncoderGoalAngle.mut_replace(goalPos);
         spoolGoalAngle.mut_replace(
-                goalPos.divide(ElevatorConstants.synced.getObject().largeCANCoderToMechanismRatio));
+                goalPos.div(ElevatorConstants.synced.getObject().largeCANCoderToMechanismRatio));
     }
 
     @Override

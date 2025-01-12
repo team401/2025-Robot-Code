@@ -9,6 +9,7 @@
     "carriageMassPounds": 20.0,
     "drumRadiusInches": 0.7515,
     "elevatorInchesPerSpoolRotation": 4.724,
+    "elevatorCANCoderDiscontinuityPoint": 1.0,
     "elevatorLargeCANCoderID": 11,
     "isLargeCANcoderClockwisePositive": true,
     "elevatorSmallCANCoderID": 12,
