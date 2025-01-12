@@ -15,8 +15,8 @@ public class GyroIOMapleSim implements GyroIO {
   private final Pigeon2SimState pigeon = new Pigeon2SimState(
     new CorePigeon2(TunerConstants.DrivetrainConstants.Pigeon2Id));
 
-  public GyroIOMapleSim(GyroSimulation gyroSimulation) {
-    this.gyroSimulation = gyroSimulation;
+  public GyroIOMapleSim() {
+    this.gyroSimulation = new GyroSimulation(0, 0);
     pigeon.setRawYaw(0.0);
   }
 
