@@ -113,11 +113,14 @@ public class Drive implements DriveTemplate {
     PhoenixOdometryThread.getInstance().start();
 
     // Configure AutoBuilder for PathPlanner
+    // TODO fix this
     AutoBuilder.configure(
         this::getPose,
         this::setPose,
         this::getChassisSpeeds,
-        this::setGoalSpeeds,
+        (speeds) -> {
+          setGoalSpeeds(speeds);
+        },
         new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
         PP_CONFIG,
@@ -191,7 +194,7 @@ public class Drive implements DriveTemplate {
       // Update gyro angle
       if (gyroInputs.connected) {
         // Use the real gyro angle
-        rawGyroRotation = gyroInputs.odometryYawPositions[i];
+        rawGyroRotation = gyroInputs.yawPosition;
       } else {
         // Use the angle delta from the kinematics and module deltas
         Twist2d twist = kinematics.toTwist2d(moduleDeltas);
@@ -206,7 +209,12 @@ public class Drive implements DriveTemplate {
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
   }
 
+  // todo: consolidate- merge from main drive branch
   public void setGoalSpeeds(ChassisSpeeds speeds) {
+    this.setGoalSpeeds(speeds, true);
+  }
+
+  public void setGoalSpeeds(ChassisSpeeds speeds, boolean fieldCentric) {
     this.goalSpeeds = speeds;
   }
   /**

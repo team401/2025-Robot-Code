@@ -6,11 +6,6 @@ import static edu.wpi.first.units.Units.Radian;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
-import org.apache.commons.math3.exception.ZeroException;
-import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
-import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
-import org.ironmaple.simulation.motorsims.SimulatedMotorController;
-
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -18,15 +13,14 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.MomentOfInertiaUnit;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.MomentOfInertia;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
+import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
+import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 
 /**
  * Physics sim implementation of module IO. The sim models are configured using a set of module
@@ -43,9 +37,9 @@ public class ModuleIOSimMaple implements ModuleIO {
   private static final double TURN_KP = 8.0;
   private static final double TURN_KD = 0.0;
 
-  //TODO:FIX
+  // TODO:FIX
   private static final double DriveMotorGearRatio = 1.5;
-  private static final double SteerMotorGearRatio = 1.5; 
+  private static final double SteerMotorGearRatio = 1.5;
   private static final double WheelRadius = 0;
 
   private final SwerveModuleSimulation moduleSimulation;
@@ -63,22 +57,32 @@ public class ModuleIOSimMaple implements ModuleIO {
   private double driveAppliedVolts = 0.0;
   private double turnAppliedVolts = 0.0;
 
-  public ModuleIOSimMaple(SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
-  constants) {
-    // Create drive and turn sim 
+  public ModuleIOSimMaple(
+      SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
+          constants) {
+    // Create drive and turn sim
 
-    //TODO: FIX
-    SwerveModuleSimulationConfig configs = new SwerveModuleSimulationConfig(
-        DRIVE_GEARBOX, TURN_GEARBOX, DriveMotorGearRatio, SteerMotorGearRatio, 
-        Voltage.ofBaseUnits(DRIVE_KS, Volts), Voltage.ofBaseUnits(DRIVE_KV_ROT, Volts),
-        Distance.ofBaseUnits(WheelRadius, Meter), null, 0);
+    // TODO: FIX
+    SwerveModuleSimulationConfig configs =
+        new SwerveModuleSimulationConfig(
+            DRIVE_GEARBOX,
+            TURN_GEARBOX,
+            DriveMotorGearRatio,
+            SteerMotorGearRatio,
+            Voltage.ofBaseUnits(DRIVE_KS, Volts),
+            Voltage.ofBaseUnits(DRIVE_KV_ROT, Volts),
+            Distance.ofBaseUnits(WheelRadius, Meter),
+            null,
+            0);
 
     moduleSimulation = new SwerveModuleSimulation(configs);
-    driveSim = moduleSimulation
+    driveSim =
+        moduleSimulation
             .useGenericMotorControllerForDrive()
             .withCurrentLimit(Current.ofRelativeUnits(60, Amp));
 
-    turnSim = moduleSimulation
+    turnSim =
+        moduleSimulation
             .useGenericControllerForSteer()
             .withCurrentLimit(Current.ofRelativeUnits(20, Amp));
 
@@ -91,23 +95,32 @@ public class ModuleIOSimMaple implements ModuleIO {
     // Run closed-loop control
     if (driveClosedLoop) {
       driveAppliedVolts =
-          driveFFVolts + driveController.calculate(moduleSimulation.getDriveWheelFinalSpeed().in(RadiansPerSecond));
+          driveFFVolts
+              + driveController.calculate(
+                  moduleSimulation.getDriveWheelFinalSpeed().in(RadiansPerSecond));
     } else {
       driveController.reset();
     }
     if (turnClosedLoop) {
-      turnAppliedVolts = turnController.calculate(moduleSimulation.getSteerAbsoluteEncoderSpeed().in(RadiansPerSecond));
+      turnAppliedVolts =
+          turnController.calculate(
+              moduleSimulation.getSteerAbsoluteEncoderSpeed().in(RadiansPerSecond));
     } else {
       turnController.reset();
     }
 
     // Update simulation state
-    driveSim.requestVoltage(Voltage.ofRelativeUnits((MathUtil.clamp(driveAppliedVolts, -12.0, 12.0)), Volts));
-    turnSim.requestVoltage(Voltage.ofRelativeUnits((MathUtil.clamp(turnAppliedVolts, -12.0, 12.0)), Volts));
- 
+    driveSim.requestVoltage(
+        Voltage.ofRelativeUnits((MathUtil.clamp(driveAppliedVolts, -12.0, 12.0)), Volts));
+    turnSim.requestVoltage(
+        Voltage.ofRelativeUnits((MathUtil.clamp(turnAppliedVolts, -12.0, 12.0)), Volts));
+
     // Update drive inputs
     inputs.driveConnected = true;
-    inputs.drivePositionRad = moduleSimulation.getDriveWheelFinalPosition().in(Radian);//driveSim.getAngularPositionRad();
+    inputs.drivePositionRad =
+        moduleSimulation
+            .getDriveWheelFinalPosition()
+            .in(Radian); // driveSim.getAngularPositionRad();
     inputs.driveVelocityRadPerSec = moduleSimulation.getDriveWheelFinalSpeed().in(RadiansPerSecond);
     inputs.driveAppliedVolts = driveAppliedVolts;
     inputs.driveCurrentAmps = Math.abs(moduleSimulation.getDriveMotorStatorCurrent().in(Amp));
@@ -116,8 +129,10 @@ public class ModuleIOSimMaple implements ModuleIO {
     inputs.turnConnected = true;
     inputs.turnEncoderConnected = true;
     inputs.turnAbsolutePosition = moduleSimulation.getSteerAbsoluteFacing();
-    inputs.turnPosition = new Rotation2d(moduleSimulation.getSteerRelativeEncoderPosition().in(Radian));
-    inputs.turnVelocityRadPerSec = moduleSimulation.getSteerAbsoluteEncoderSpeed().in(RadiansPerSecond);
+    inputs.turnPosition =
+        new Rotation2d(moduleSimulation.getSteerRelativeEncoderPosition().in(Radian));
+    inputs.turnVelocityRadPerSec =
+        moduleSimulation.getSteerAbsoluteEncoderSpeed().in(RadiansPerSecond);
     inputs.turnAppliedVolts = turnAppliedVolts;
     inputs.turnCurrentAmps = Math.abs(moduleSimulation.getSteerMotorStatorCurrent().in(Amp));
 

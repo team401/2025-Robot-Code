@@ -63,7 +63,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackRight));
         break;
 
-        case MAPLESIM:
+      case MAPLESIM:
         // Sim robot, instantiate physics sim IO implementations
         drive =
             new Drive(
