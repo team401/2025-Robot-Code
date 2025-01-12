@@ -44,9 +44,9 @@ public class ModuleIOSimMaple implements ModuleIO {
   private static final double TURN_KD = 0.0;
 
   //TODO:FIX
-  private static final double DriveMotorGearRatio = 1.5;
-  private static final double SteerMotorGearRatio = 1.5; 
-  private static final double WheelRadius = 0;
+  private static final double DriveMotorGearRatio = 6.75;
+  private static final double SteerMotorGearRatio = 25; 
+  private static final double WheelRadius = 0.05;
 
   private final SwerveModuleSimulation moduleSimulation;
   private final SimulatedMotorController.GenericMotorController driveSim;
@@ -71,7 +71,7 @@ public class ModuleIOSimMaple implements ModuleIO {
     SwerveModuleSimulationConfig configs = new SwerveModuleSimulationConfig(
         DRIVE_GEARBOX, TURN_GEARBOX, DriveMotorGearRatio, SteerMotorGearRatio, 
         Voltage.ofBaseUnits(DRIVE_KS, Volts), Voltage.ofBaseUnits(DRIVE_KV_ROT, Volts),
-        Distance.ofBaseUnits(WheelRadius, Meter), null, 0);
+        Distance.ofBaseUnits(WheelRadius, Meter), null, 1.2);
 
     moduleSimulation = new SwerveModuleSimulation(configs);
     driveSim = moduleSimulation
