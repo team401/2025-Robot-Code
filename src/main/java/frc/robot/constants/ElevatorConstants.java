@@ -72,8 +72,9 @@ public final class ElevatorConstants {
 
     /**
      * What point in the sensor's range the discontinuity occurs. Results in a range of [1-x, x).
-     * For example, a value of 1 gives a range of [0.0, 1). This is what we want to use for CRT elevator sensors.
-     * */
+     * For example, a value of 1 gives a range of [0.0, 1). This is what we want to use for CRT
+     * elevator sensors.
+     */
     public final Double elevatorCANCoderDiscontinuityPoint = 1.0;
 
     // TODO: Tune encoder directions!

@@ -69,7 +69,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
         // Create one CANcoder configuration that will be modified slightly and applied to both
         // CANcoders
         CANcoderConfiguration cancoderConfiguration = new CANcoderConfiguration();
-        cancoderConfiguration.MagnetSensor.AbsoluteSensorDiscontinuityPoint = ElevatorConstants.synced.getObject().elevatorCANCoderDiscontinuityPoint;
+        cancoderConfiguration.MagnetSensor.AbsoluteSensorDiscontinuityPoint =
+                ElevatorConstants.synced.getObject().elevatorCANCoderDiscontinuityPoint;
 
         // Update with large CANcoder direction and apply
         cancoderConfiguration.MagnetSensor.SensorDirection =
