@@ -9,6 +9,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
+import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import coppercore.wpilib_interface.DriveTemplate;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -117,7 +118,7 @@ public class Drive implements DriveTemplate {
         this::getPose,
         this::setPose,
         this::getChassisSpeeds,
-        (ChassisSpeeds speeds) -> this.setGoalSpeeds(speeds, false),
+        (ChassisSpeeds speeds, DriveFeedforwards ff) -> this.setGoalSpeeds(speeds, false),
         new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
         PP_CONFIG,
