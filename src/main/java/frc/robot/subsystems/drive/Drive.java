@@ -117,7 +117,7 @@ public class Drive implements DriveTemplate {
         this::getPose,
         this::setPose,
         this::getChassisSpeeds,
-        this::setGoalSpeeds,
+        (ChassisSpeeds speeds) -> this.setGoalSpeeds(speeds, false),
         new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
         PP_CONFIG,
