@@ -148,7 +148,7 @@ public class Drive implements DriveTemplate {
 
   @Override
   public void periodic() {
-    runVelocity(goalSpeeds);
+    runVelocity();
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -206,35 +206,41 @@ public class Drive implements DriveTemplate {
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
   }
 
-  public void setGoalSpeeds(ChassisSpeeds speeds) {
-    this.goalSpeeds = speeds;
-  }
   /**
-   * Runs the drive at the desired velocity in a field-centric manner.
-   *
-   * @param speeds2 Speeds in meters/sec
+   * sets desired speeds of robot
+   * 
+   * @param speeds - desired speeds of robot
+   * @param fieldCentric - true if controlling in teleop (allows driving with field-oriented control), false for auto
    */
-  public void runVelocity(ChassisSpeeds speeds2) {
-    // Adjust for field-centric control
-    boolean isFlipped =
+  public void setGoalSpeeds(ChassisSpeeds speeds, boolean fieldCentric) {
+    if(fieldCentric) {
+        // Adjust for field-centric control
+        boolean isFlipped =
         DriverStation.getAlliance().isPresent()
             && DriverStation.getAlliance().get() == Alliance.Red;
 
-    Rotation2d robotRotation =
-        isFlipped
-            ? getRotation().plus(new Rotation2d(Math.PI)) // Flip orientation for Red Alliance
-            : getRotation();
+        Rotation2d robotRotation =
+            isFlipped
+                ? getRotation().plus(new Rotation2d(Math.PI)) // Flip orientation for Red Alliance
+                : getRotation();
 
-    ChassisSpeeds fieldRelativeSpeeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(speeds2, robotRotation);
-
+        this.goalSpeeds =
+        ChassisSpeeds.fromFieldRelativeSpeeds(speeds, robotRotation);
+    } else {
+      this.goalSpeeds = speeds;
+    }
+  }
+  /**
+   * Runs the drive at the desired velocity
+   */
+  public void runVelocity() {
     // Calculate module setpoints
-    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(fieldRelativeSpeeds);
+    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(this.goalSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, TunerConstants.kSpeedAt12Volts);
 
     // Log unoptimized setpoints and setpoint speeds
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
-    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", fieldRelativeSpeeds);
+    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", this.goalSpeeds);
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
@@ -243,9 +249,6 @@ public class Drive implements DriveTemplate {
 
     // Log optimized setpoints (runSetpoint mutates each state)
     Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
-
-    // Update the goal speeds for odometry or other subsystems
-    setGoalSpeeds(fieldRelativeSpeeds);
   }
 
   /** Runs the drive in a straight line with the specified drive output. */
@@ -257,7 +260,7 @@ public class Drive implements DriveTemplate {
 
   /** Stops the drive. */
   public void stop() {
-    setGoalSpeeds(new ChassisSpeeds(0, 0, 0));
+    setGoalSpeeds(new ChassisSpeeds(0, 0, 0), false);
   }
 
   /**
