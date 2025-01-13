@@ -148,7 +148,6 @@ public class Drive implements DriveTemplate {
 
   @Override
   public void periodic() {
-    runVelocity();
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -200,6 +199,9 @@ public class Drive implements DriveTemplate {
 
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+      
+      // command speeds for robot
+      runVelocity();
     }
 
     // Update gyro alert
@@ -210,7 +212,7 @@ public class Drive implements DriveTemplate {
    * sets desired speeds of robot
    * 
    * @param speeds - desired speeds of robot
-   * @param fieldCentric - true if controlling in teleop (allows driving with field-oriented control), false for auto
+   * @param fieldCentric - true if controlling in teleop (allows driving with field-oriented control), false for auto (robot centric)
    */
   public void setGoalSpeeds(ChassisSpeeds speeds, boolean fieldCentric) {
     if(fieldCentric) {
