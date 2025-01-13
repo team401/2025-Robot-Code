@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.net.WebServer;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,11 +16,6 @@ import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.net.WebServer;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -39,7 +36,6 @@ public class Robot extends LoggedRobot {
         // autonomous chooser on the dashboard.
         m_robotContainer = new RobotContainer();
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
-
 
         Logger.recordMetadata("ProjectName", "MyProject"); // Set a metadata value
 

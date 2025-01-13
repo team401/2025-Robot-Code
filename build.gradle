@@ -51,7 +51,7 @@ wpi.java.debugJni = false
 def includeDesktopSupport = true
 
 repositories {
-  maven {
+maven {
 		url = uri("https://maven.pkg.github.com/Mechanical-Advantage/AdvantageKit")
 		credentials {
 			username = "Mechanical-Advantage-Bot"
@@ -120,8 +120,8 @@ dependencies {
 	def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
 	annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
 
-  testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
-  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	def coppercoreVersion = "2025.0.0"
 	implementation "io.github.team401.coppercore:wpilib_interface:$coppercoreVersion"
