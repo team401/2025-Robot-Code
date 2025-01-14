@@ -1,8 +1,8 @@
 plugins {
-    id "java"
-    id "edu.wpi.first.GradleRIO" version "2025.1.1"
-    id "com.peterabeles.gversion" version "1.10"
-    id "com.diffplug.spotless" version "6.24.0"
+	id "java"
+	id "edu.wpi.first.GradleRIO" version "2025.1.1"
+	id "com.peterabeles.gversion" version "1.10"
+	id "com.diffplug.spotless" version "6.24.0"
 }
 
 java {
@@ -28,30 +28,30 @@ deploy {
 				// First part is artifact name, 2nd is artifact type
 				// getTargetTypeClass is a shortcut to get the class type using a string
 
-                frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
-                    // https://www.chiefdelphi.com/t/2024-wpilib-feedback/464322/141
-                    final MAX_JAVA_HEAP_SIZE_MB = 100;
-                    jvmArgs.add("-XX:+UnlockExperimentalVMOptions")
+				frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
+					// https://www.chiefdelphi.com/t/2024-wpilib-feedback/464322/141
+					final MAX_JAVA_HEAP_SIZE_MB = 100;
+					jvmArgs.add("-XX:+UnlockExperimentalVMOptions")
 
-                    // Set the minimum heap size to the maximum heap size to avoid resizing
-                    jvmArgs.add("-Xmx" + MAX_JAVA_HEAP_SIZE_MB + "M")
-                    jvmArgs.add("-Xms" + MAX_JAVA_HEAP_SIZE_MB + "M")
-                    jvmArgs.add("-XX:GCTimeRatio=5")
-                    jvmArgs.add("-XX:+UseSerialGC")
-                    jvmArgs.add("-XX:MaxGCPauseMillis=50")
-                }
+					// Set the minimum heap size to the maximum heap size to avoid resizing
+					jvmArgs.add("-Xmx" + MAX_JAVA_HEAP_SIZE_MB + "M")
+					jvmArgs.add("-Xms" + MAX_JAVA_HEAP_SIZE_MB + "M")
+					jvmArgs.add("-XX:GCTimeRatio=5")
+					jvmArgs.add("-XX:+UseSerialGC")
+					jvmArgs.add("-XX:MaxGCPauseMillis=50")
+				}
 
-                // Static files artifact
-                frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
-                    files = project.fileTree('src/main/deploy')
-                    directory = '/home/lvuser/deploy'
-                    // Change to true to delete files on roboRIO that no
-                    // longer exist in deploy directory on roboRIO
-                    deleteOldFiles = false
-                }
-            }
-        }
-    }
+				// Static files artifact
+				frcStaticFileDeploy(getArtifactTypeClass('FileTreeArtifact')) {
+					files = project.fileTree('src/main/deploy')
+					directory = '/home/lvuser/deploy'
+					// Change to true to delete files on roboRIO that no
+					// longer exist in deploy directory on roboRIO
+					deleteOldFiles = false
+				}
+			}
+		}
+	}
 }
 
 def deployArtifact = deploy.targets.roborio.artifacts.frcJava
@@ -125,21 +125,21 @@ dependencies {
 	nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
 	simulationRelease wpi.sim.enableRelease()
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
-    annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
+	def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
+	annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
 
-    def coppercoreVersion = "2025.0.2"
+	def coppercoreVersion = "2025.0.2"
 
-    implementation "io.github.team401.coppercore:controls:$coppercoreVersion"
-    implementation "io.github.team401.coppercore:geometry:$coppercoreVersion"
-    implementation "io.github.team401.coppercore:math:$coppercoreVersion"
-    implementation "io.github.team401.coppercore:monitors:$coppercoreVersion"
-    implementation "io.github.team401.coppercore:parameter_tools:$coppercoreVersion"
-    //implementation "io.github.team401.coppercore:vision:$coppercoreVersion"
-    implementation "io.github.team401.coppercore:wpilib_interface:$coppercoreVersion"
+	implementation "io.github.team401.coppercore:controls:$coppercoreVersion"
+	implementation "io.github.team401.coppercore:geometry:$coppercoreVersion"
+	implementation "io.github.team401.coppercore:math:$coppercoreVersion"
+	implementation "io.github.team401.coppercore:monitors:$coppercoreVersion"
+	implementation "io.github.team401.coppercore:parameter_tools:$coppercoreVersion"
+	//implementation "io.github.team401.coppercore:vision:$coppercoreVersion"
+	implementation "io.github.team401.coppercore:wpilib_interface:$coppercoreVersion"
 }
 
 test {
@@ -179,85 +179,43 @@ tasks.withType(JavaCompile) {
 // Create version file
 project.compileJava.dependsOn(createVersionFile)
 gversion {
-    srcDir       = "src/main/java/"
-    classPackage = "frc.robot"
-    className    = "BuildConstants"
-    dateFormat   = "yyyy-MM-dd HH:mm:ss z"
-    timeZone     = "America/New_York"
-    indent       = "  "
+	srcDir       = "src/main/java/"
+	classPackage = "frc.robot"
+	className    = "BuildConstants"
+	dateFormat   = "yyyy-MM-dd HH:mm:ss z"
+	timeZone     = "America/New_York"
+	indent       = "  "
 }
 
 // Create commit with working changes on event branches
 task(eventDeploy) {
-    doLast {
-        if (project.gradle.startParameter.taskNames.any({ it.toLowerCase().contains("deploy") })) {
-            def branchPrefix = "event"
-            def branch = 'git branch --show-current'.execute().text.trim()
-            def commitMessage = "Update at '${new Date().toString()}'"
+	doLast {
+		if (project.gradle.startParameter.taskNames.any({ it.toLowerCase().contains("deploy") })) {
+			def branchPrefix = "event"
+			def branch = 'git branch --show-current'.execute().text.trim()
+			def commitMessage = "Update at '${new Date().toString()}'"
 
-            if (branch.startsWith(branchPrefix)) {
-                exec {
-                    workingDir(projectDir)
-                    executable 'git'
-                    args 'add', '-A'
-                }
-                exec {
-                    workingDir(projectDir)
-                    executable 'git'
-                    args 'commit', '-m', commitMessage
-                    ignoreExitValue = true
-                }
+			if (branch.startsWith(branchPrefix)) {
+				exec {
+					workingDir(projectDir)
+					executable 'git'
+					args 'add', '-A'
+				}
+				exec {
+					workingDir(projectDir)
+					executable 'git'
+					args 'commit', '-m', commitMessage
+					ignoreExitValue = true
+				}
 
-                println "Committed to branch: '$branch'"
-                println "Commit message: '$commitMessage'"
-            } else {
-                println "Not on an event branch, skipping commit"
-            }
-        } else {
-            println "Not running deploy task, skipping commit"
-        }
-    }
+				println "Committed to branch: '$branch'"
+				println "Commit message: '$commitMessage'"
+			} else {
+				println "Not on an event branch, skipping commit"
+			}
+		} else {
+			println "Not running deploy task, skipping commit"
+		}
+	}
 }
 createVersionFile.dependsOn(eventDeploy)
-
-// Spotless formatting
-project.compileJava.dependsOn(spotlessApply)
-spotless {
-    java {
-        target fileTree(".") {
-            include "**/*.java"
-            exclude "**/build/**", "**/build-*/**"
-        }
-        toggleOffOn()
-        googleJavaFormat()
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-    groovyGradle {
-        target fileTree(".") {
-            include "**/*.gradle"
-            exclude "**/build/**", "**/build-*/**"
-        }
-        greclipse()
-        indentWithSpaces(4)
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-    json {
-        target fileTree(".") {
-            include "**/*.json"
-            exclude "**/build/**", "**/build-*/**"
-        }
-        gson().indentWithSpaces(2)
-    }
-    format "misc", {
-        target fileTree(".") {
-            include "**/*.md", "**/.gitignore"
-            exclude "**/build/**", "**/build-*/**"
-        }
-        trimTrailingWhitespace()
-        indentWithSpaces(2)
-        endWithNewline()
-    }
-}
