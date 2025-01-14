@@ -1,11 +1,6 @@
 package frc.robot.subsystems.drive;
 
-import static edu.wpi.first.units.Units.Amp;
-import static edu.wpi.first.units.Units.KilogramSquareMeters;
-import static edu.wpi.first.units.Units.Meter;
-import static edu.wpi.first.units.Units.Radian;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -16,10 +11,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.MomentOfInertia;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
+import java.util.Arrays;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
@@ -71,10 +64,10 @@ public class ModuleIOMapleSim implements ModuleIO {
             TURN_GEARBOX,
             DriveMotorGearRatio,
             SteerMotorGearRatio,
-            Voltage.ofBaseUnits(constants.DriveFrictionVoltage, Volts),
-            Voltage.ofBaseUnits(constants.SteerFrictionVoltage, Volts),
-            Distance.ofBaseUnits(constants.WheelRadius, Meter),
-            MomentOfInertia.ofBaseUnits(constants.SteerInertia * 10, KilogramSquareMeters),
+            Volts.of(constants.DriveFrictionVoltage),
+            Volts.of(constants.SteerFrictionVoltage),
+            Meters.of(constants.WheelRadius),
+            KilogramSquareMeters.of(constants.SteerInertia * 10),
             1.2);
 
     moduleSimulation = new SwerveModuleSimulation(configs);
@@ -112,10 +105,8 @@ public class ModuleIOMapleSim implements ModuleIO {
     }
 
     // Update simulation state
-    driveSim.requestVoltage(
-        Voltage.ofRelativeUnits((MathUtil.clamp(driveAppliedVolts, -12.0, 12.0)), Volts));
-    turnSim.requestVoltage(
-        Voltage.ofRelativeUnits((MathUtil.clamp(turnAppliedVolts, -12.0, 12.0)), Volts));
+    driveSim.requestVoltage(Volts.of((MathUtil.clamp(driveAppliedVolts, -12.0, 12.0))));
+    turnSim.requestVoltage(Volts.of((MathUtil.clamp(turnAppliedVolts, -12.0, 12.0))));
 
     // Update drive inputs
     inputs.driveConnected = true;
@@ -140,8 +131,11 @@ public class ModuleIOMapleSim implements ModuleIO {
 
     // Update odometry inputs (50Hz because high-frequency odometry in sim doesn't matter)
     inputs.odometryTimestamps = new double[] {Timer.getFPGATimestamp()};
-    inputs.odometryDrivePositionsRad = new double[] {inputs.drivePositionRad};
-    inputs.odometryTurnPositions = new Rotation2d[] {inputs.turnPosition};
+    inputs.odometryDrivePositionsRad =
+        Arrays.stream(moduleSimulation.getCachedDriveWheelFinalPositions())
+            .mapToDouble(angle -> angle.in(Radians))
+            .toArray();
+    inputs.odometryTurnPositions = moduleSimulation.getCachedSteerAbsolutePositions();
   }
 
   @Override
@@ -167,5 +161,9 @@ public class ModuleIOMapleSim implements ModuleIO {
   public void setTurnPosition(Rotation2d rotation) {
     turnClosedLoop = true;
     turnController.setSetpoint(rotation.getRadians());
+  }
+
+  public SwerveModuleSimulation getModuleSimulation() {
+    return moduleSimulation;
   }
 }

@@ -55,19 +55,25 @@ public class Drive implements DriveTemplate {
           Math.max(
               Math.hypot(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
               Math.hypot(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)));
+  public static final double DRIVE_BASE_WIDTH =
+      Math.max(
+          Math.abs(TunerConstants.FrontLeft.LocationY - TunerConstants.FrontRight.LocationY),
+          Math.abs(TunerConstants.BackLeft.LocationY - TunerConstants.BackRight.LocationY));
+  public static final double DRIVE_BASE_LENGTH =
+      Math.max(
+          Math.abs(TunerConstants.FrontLeft.LocationX - TunerConstants.BackLeft.LocationX),
+          Math.abs(TunerConstants.FrontRight.LocationX - TunerConstants.FrontRight.LocationX));
 
   // PathPlanner config constants
-  private static final double ROBOT_MASS_KG = 74.088;
-  private static final double ROBOT_MOI = 6.883;
-  private static final double WHEEL_COF = 1.2;
+
   private static final RobotConfig PP_CONFIG =
       new RobotConfig(
-          ROBOT_MASS_KG,
-          ROBOT_MOI,
+          DrivetrainConstants.PathPlannerConstants.ROBOT_MASS_KG,
+          DrivetrainConstants.PathPlannerConstants.ROBOT_MOI,
           new ModuleConfig(
               TunerConstants.FrontLeft.WheelRadius,
               TunerConstants.kSpeedAt12Volts.in(MetersPerSecond),
-              WHEEL_COF,
+              DrivetrainConstants.PathPlannerConstants.WHEEL_COF,
               DCMotor.getKrakenX60Foc(1)
                   .withReduction(TunerConstants.FrontLeft.DriveMotorGearRatio),
               TunerConstants.FrontLeft.SlipCurrent,
@@ -113,7 +119,6 @@ public class Drive implements DriveTemplate {
     PhoenixOdometryThread.getInstance().start();
 
     // Configure AutoBuilder for PathPlanner
-    // TODO fix this
     AutoBuilder.configure(
         this::getPose,
         this::setPose,

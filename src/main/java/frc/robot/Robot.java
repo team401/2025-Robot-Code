@@ -167,6 +167,7 @@ public class Robot extends LoggedRobot {
   public void simulationPeriodic() {
     if (Constants.currentMode == Mode.MAPLESIM) {
       SimulatedArena.getInstance().simulationPeriodic();
+      robotContainer.displaySimFieldToAdvantageScope();
     }
   }
 }

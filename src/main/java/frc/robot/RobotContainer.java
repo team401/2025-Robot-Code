@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import coppercore.wpilib_interface.DriveWithJoysticks;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,6 +18,8 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMapleSim;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -29,6 +32,7 @@ public class RobotContainer {
 
   // Subsystems
   private final Drive drive;
+  private SwerveDriveSimulation driveSim = null;
 
   // Controller
   // private final CommandXboxController controller = new CommandXboxController(0);
@@ -65,6 +69,9 @@ public class RobotContainer {
 
       case MAPLESIM:
         // Sim robot, instantiate physics sim IO implementations
+        driveSim =
+            new SwerveDriveSimulation(
+                DrivetrainConstants.SimConstants.driveSimConfig, new Pose2d());
         drive =
             new Drive(
                 new GyroIOMapleSim(),
@@ -127,5 +134,9 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  public void displaySimFieldToAdvantageScope() {
+    Logger.recordOutput("FieldSimulation/RobotPosition", driveSim.getSimulatedDriveTrainPose());
   }
 }
