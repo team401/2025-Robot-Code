@@ -62,7 +62,6 @@ public class ModuleIOSimMaple implements ModuleIO {
           constants) {
     // Create drive and turn sim
 
-    // TODO: FIX
     SwerveModuleSimulationConfig configs =
         new SwerveModuleSimulationConfig(
             DRIVE_GEARBOX,
@@ -92,6 +91,7 @@ public class ModuleIOSimMaple implements ModuleIO {
 
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
+
     // Run closed-loop control
     if (driveClosedLoop) {
       driveAppliedVolts =

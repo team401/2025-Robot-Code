@@ -19,7 +19,7 @@ public class GyroIOMapleSim implements GyroIO {
   private final Queue<Double> yawTimestampQueue;
 
   public GyroIOMapleSim() {
-    this.gyroSimulation = new GyroSimulation(0, 0);
+    this.gyroSimulation = DrivetrainConstants.SimConstants.gyroSimulation;
     pigeonSim.setRawYaw(0.0);
 
     yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
