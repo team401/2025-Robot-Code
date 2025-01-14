@@ -15,5 +15,5 @@ public final class OperatorConstants {
                             .toString(),
                     new JSONSync.JSONSyncConfigBuilder().build());
 
-    public final Integer kDriverControllerPort = 0;
+    public final Integer kDriverControllerPort = 2;
 }

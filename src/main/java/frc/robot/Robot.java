@@ -5,12 +5,9 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.constants.ModeConstants;
 import frc.robot.generated.TunerConstants;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -104,28 +101,6 @@ public class Robot extends LoggedRobot {
         // and put our autonomous chooser on the dashboard.
         robotContainer = new RobotContainer();
 
-        if (ModeConstants.currentMode == ModeConstants.Mode.REAL) {
-            Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
-            Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-            new PowerDistribution(1, ModuleType.kRev); // Enables power distribution logging
-        } else if (ModeConstants.currentMode == ModeConstants.Mode.SIM) {
-            setUseTiming(false);
-            Logger.addDataReceiver(new WPILOGWriter("logs/")); // This folder is gitignored
-            Logger.addDataReceiver(new NT4Publisher());
-        } /*TODO: Fix replay mode!
-          else {
-              setUseTiming(false); // Run as fast as possible
-              String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope
-              // (or prompt the user)
-              Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-              Logger.addDataReceiver(
-                      new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save
-              // outputs
-              // to
-              // a
-              // new
-              // log
-          }*/
         Logger.start();
     }
 
