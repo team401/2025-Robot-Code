@@ -164,6 +164,7 @@ public class Drive implements DriveTemplate {
         odometryLock.lock(); // Prevents odometry updates while reading data
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
+        Logger.recordOutput("Drive/goalSpeeds", goalSpeeds);
         for (var module : modules) {
             module.periodic();
         }
