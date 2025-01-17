@@ -115,15 +115,15 @@ public class ModuleIOTalonFX implements ModuleIO {
           case RemoteCANcoder -> FeedbackSensorSourceValue.RemoteCANcoder;
           case FusedCANcoder -> FeedbackSensorSourceValue.FusedCANcoder;
           case SyncCANcoder -> FeedbackSensorSourceValue.SyncCANcoder;
+          default -> throw new RuntimeException(
+              "You are using an unsupported swerve configuration, which this template does not support without manual customization. The 2025 release of Phoenix supports some swerve configurations which were not available during 2025 beta testing, preventing any development and support from the AdvantageKit developers.");
         };
-    turnConfig.MotionMagic.MotionMagicCruiseVelocity =
-        DrivetrainConstants.TURN_CRUISE_VELOCITY / constants.SteerMotorGearRatio;
+    turnConfig.Feedback.RotorToSensorRatio = constants.SteerMotorGearRatio;
+    turnConfig.MotionMagic.MotionMagicCruiseVelocity = 100.0 / constants.SteerMotorGearRatio;
     turnConfig.MotionMagic.MotionMagicAcceleration =
-        turnConfig.MotionMagic.MotionMagicCruiseVelocity
-            * DrivetrainConstants.TURN_ACCELERATION_MULTIPLIER;
-    turnConfig.MotionMagic.MotionMagicExpo_kV =
-        DrivetrainConstants.TURN_FEEDFORWARD_kV * constants.SteerMotorGearRatio;
-    turnConfig.MotionMagic.MotionMagicExpo_kA = DrivetrainConstants.TURN_FEEDFORWARD_kA;
+        turnConfig.MotionMagic.MotionMagicCruiseVelocity / 0.100;
+    turnConfig.MotionMagic.MotionMagicExpo_kV = 0.12 * constants.SteerMotorGearRatio;
+    turnConfig.MotionMagic.MotionMagicExpo_kA = 0.1;
     turnConfig.ClosedLoopGeneral.ContinuousWrap = true;
     turnConfig.MotorOutput.Inverted =
         constants.SteerMotorInverted

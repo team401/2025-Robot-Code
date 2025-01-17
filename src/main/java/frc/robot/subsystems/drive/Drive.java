@@ -45,7 +45,6 @@ import org.littletonrobotics.junction.Logger;
 
 public class Drive implements DriveTemplate {
   // TunerConstants doesn't include these constants, so they are declared locally
-  private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
   static final double ODOMETRY_FREQUENCY =
       new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
   public static final double DRIVE_BASE_RADIUS =
@@ -95,17 +94,19 @@ public class Drive implements DriveTemplate {
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
+  private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
+
   public Drive(
       GyroIO gyroIO,
-      ModuleIO frontLeftModuleIO,
-      ModuleIO frontRightModuleIO,
-      ModuleIO backLeftModuleIO,
-      ModuleIO backRightModuleIO) {
+      ModuleIO flModuleIO,
+      ModuleIO frModuleIO,
+      ModuleIO blModuleIO,
+      ModuleIO brModuleIO) {
     this.gyroIO = gyroIO;
-    modules[0] = new Module(frontLeftModuleIO, 0, TunerConstants.FrontLeft);
-    modules[1] = new Module(frontRightModuleIO, 1, TunerConstants.FrontRight);
-    modules[2] = new Module(backLeftModuleIO, 2, TunerConstants.BackLeft);
-    modules[3] = new Module(backRightModuleIO, 3, TunerConstants.BackRight);
+    modules[0] = new Module(flModuleIO, 0, TunerConstants.FrontLeft);
+    modules[1] = new Module(frModuleIO, 1, TunerConstants.FrontRight);
+    modules[2] = new Module(blModuleIO, 2, TunerConstants.BackLeft);
+    modules[3] = new Module(brModuleIO, 3, TunerConstants.BackRight);
 
     // Usage reporting for swerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
@@ -170,6 +171,9 @@ public class Drive implements DriveTemplate {
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
 
+    // run velocity if not disabled
+    this.runVelocity();
+
     // Update odometry
     double[] sampleTimestamps =
         modules[0].getOdometryTimestamps(); // All signals are sampled together
@@ -200,9 +204,6 @@ public class Drive implements DriveTemplate {
 
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
-      
-      // command speeds for robot
-      runVelocity();
     }
 
     // Update gyro alert
@@ -211,39 +212,39 @@ public class Drive implements DriveTemplate {
 
   /**
    * sets desired speeds of robot
-   * 
+   *
    * @param speeds - desired speeds of robot
-   * @param fieldCentric - true if controlling in teleop (allows driving with field-oriented control), false for auto (robot centric)
+   * @param fieldCentric - true if controlling in teleop (allows driving with field-oriented
+   *     control), false for auto (robot centric)
    */
   public void setGoalSpeeds(ChassisSpeeds speeds, boolean fieldCentric) {
-    if(fieldCentric) {
-        // Adjust for field-centric control
-        boolean isFlipped =
-        DriverStation.getAlliance().isPresent()
-            && DriverStation.getAlliance().get() == Alliance.Red;
+    if (fieldCentric) {
+      // Adjust for field-centric control
+      boolean isFlipped =
+          DriverStation.getAlliance().isPresent()
+              && DriverStation.getAlliance().get() == Alliance.Red;
 
-        Rotation2d robotRotation =
-            isFlipped
-                ? getRotation().plus(new Rotation2d(Math.PI)) // Flip orientation for Red Alliance
-                : getRotation();
+      Rotation2d robotRotation =
+          isFlipped
+              ? getRotation().plus(new Rotation2d(Math.PI)) // Flip orientation for Red Alliance
+              : getRotation();
 
-        this.goalSpeeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(speeds, robotRotation);
+      this.goalSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, robotRotation);
     } else {
       this.goalSpeeds = speeds;
     }
   }
-  /**
-   * Runs the drive at the desired velocity
-   */
+
+  /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
   public void runVelocity() {
     // Calculate module setpoints
-    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(this.goalSpeeds);
+    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(this.goalSpeeds, 0.02);
+    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, TunerConstants.kSpeedAt12Volts);
 
     // Log unoptimized setpoints and setpoint speeds
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
-    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", this.goalSpeeds);
+    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
@@ -263,7 +264,7 @@ public class Drive implements DriveTemplate {
 
   /** Stops the drive. */
   public void stop() {
-    setGoalSpeeds(new ChassisSpeeds(0, 0, 0), false);
+    setGoalSpeeds(new ChassisSpeeds(), false);
   }
 
   /**
