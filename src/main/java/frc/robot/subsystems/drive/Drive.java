@@ -66,7 +66,7 @@ public class Drive implements DriveTemplate {
           ROBOT_MOI,
           new ModuleConfig(
               TunerConstants.FrontLeft.WheelRadius,
-              TunerConstants.kSpeedAt12Volts.in(MetersPerSecond),
+              TunerConstants.kSpeedAt12VoltsMps,
               WHEEL_COF,
               DCMotor.getKrakenX60Foc(1)
                   .withReduction(TunerConstants.FrontLeft.DriveMotorGearRatio),
