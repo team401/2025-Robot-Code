@@ -12,7 +12,14 @@ import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
-import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import edu.wpi.first.net.WebServer;
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.constants.ModeConstants;
+import frc.robot.constants.ModeConstants.Mode;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -123,7 +130,6 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.schedule();
     }
-  }
 
   /** This function is called periodically during autonomous. */
   @Override
@@ -139,11 +145,10 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
-  }
 
-  /** This function is called periodically during operator control. */
-  @Override
-  public void teleopPeriodic() {}
+    /** This function is called once each time the robot enters Disabled mode. */
+    @Override
+    public void disabledInit() {}
 
   /** This function is called once when test mode is enabled. */
   @Override
@@ -152,15 +157,57 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().cancelAll();
   }
 
-  /** This function is called periodically during test mode. */
-  @Override
-  public void testPeriodic() {}
+    /**
+     * This autonomous runs the autonomous command selected by your {@link RobotContainer} class.
+     */
+    @Override
+    public void autonomousInit() {
+        m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-  /** This function is called once when the robot is first started up. */
-  @Override
-  public void simulationInit() {}
+        // schedule the autonomous command (example)
+        if (m_autonomousCommand != null) {
+            m_autonomousCommand.schedule();
+        }
+    }
 
-  /** This function is called periodically whilst in simulation. */
-  @Override
-  public void simulationPeriodic() {}
+    /** This function is called periodically during autonomous. */
+    @Override
+    public void autonomousPeriodic() {}
+
+    @Override
+    public void teleopInit() {
+        // This makes sure that the autonomous stops running when
+        // teleop starts running. If you want the autonomous to
+        // continue until interrupted by another command, remove
+        // this line or comment it out.
+        if (m_autonomousCommand != null) {
+            m_autonomousCommand.cancel();
+        }
+    }
+
+    /** This function is called periodically during operator control. */
+    @Override
+    public void teleopPeriodic() {}
+
+    @Override
+    public void testInit() {
+        // Cancels all running commands at the start of test mode.
+        CommandScheduler.getInstance().cancelAll();
+
+        TestModeManager.testInit();
+    }
+
+    /** This function is called periodically during test mode. */
+    @Override
+    public void testPeriodic() {
+        m_robotContainer.testPeriodic();
+    }
+
+    /** This function is called once when the robot is first started up. */
+    @Override
+    public void simulationInit() {}
+
+    /** This function is called periodically whilst in simulation. */
+    @Override
+    public void simulationPeriodic() {}
 }
