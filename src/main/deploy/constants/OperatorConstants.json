@@ -1,3 +1,5 @@
 {
-  "kDriverControllerPort": 0
+  "kLeftJoystickPort": 0,
+  "kRightJoystickPort": 1,
+  "kDriverControllerPort": 2
 }

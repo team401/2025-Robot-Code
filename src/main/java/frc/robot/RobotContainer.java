@@ -34,9 +34,9 @@ public class RobotContainer {
   private Drive drive;
 
   // Controller
-  private final CommandJoystick leftJoystick = new CommandJoystick(0);
+  private final CommandJoystick leftJoystick = new CommandJoystick(OperatorConstants.synced.getObject().kLeftJoystickPort);
 
-  private final CommandJoystick rightJoystick = new CommandJoystick(1);
+  private final CommandJoystick rightJoystick = new CommandJoystick(OperatorConstants.synced.getObject().kRightJoystickPort);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverController =
