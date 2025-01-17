@@ -12,14 +12,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.OperatorConstants;
-import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DrivetrainConstants;
-import frc.robot.subsystems.drive.GyroIO;
-import frc.robot.subsystems.drive.GyroIOPigeon2;
-import frc.robot.subsystems.drive.ModuleIO;
-import frc.robot.subsystems.drive.ModuleIOSim;
-import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
 /**
@@ -34,9 +28,11 @@ public class RobotContainer {
   private Drive drive;
 
   // Controller
-  private final CommandJoystick leftJoystick = new CommandJoystick(OperatorConstants.synced.getObject().kLeftJoystickPort);
+  private final CommandJoystick leftJoystick =
+      new CommandJoystick(OperatorConstants.synced.getObject().kLeftJoystickPort);
 
-  private final CommandJoystick rightJoystick = new CommandJoystick(OperatorConstants.synced.getObject().kRightJoystickPort);
+  private final CommandJoystick rightJoystick =
+      new CommandJoystick(OperatorConstants.synced.getObject().kRightJoystickPort);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController driverController =
@@ -61,8 +57,8 @@ public class RobotContainer {
     if (FeatureFlags.synced.getObject().runElevator) {
       elevatorSubsystem = InitSubsystems.initElevatorSubsystem();
     }
-    if(FeatureFlags.synced.getObject().runDrive) {
-        drive = InitSubsystems.initDriveSubsystem();
+    if (FeatureFlags.synced.getObject().runDrive) {
+      drive = InitSubsystems.initDriveSubsystem();
     }
   }
 
