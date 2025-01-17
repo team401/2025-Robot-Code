@@ -9,30 +9,6 @@ java {
 	targetCompatibility = JavaVersion.VERSION_17
 }
 
-spotless {
-	// optional: limit format enforcement to just the files changed by this feature branch
-	ratchetFrom 'origin/main'
-
-	format 'misc', {
-		// define the files to apply `misc` to
-		target '*.gradle', '.gitattributes', '.gitignore'
-
-		// define the steps to apply to those files
-		trimTrailingWhitespace()
-		indentWithTabs() // or spaces. Takes an integer argument if you don't like 4
-		endWithNewline()
-	}
-	java {
-		// don't need to set target, it is inferred from java
-		// Allow ignoring certain parts in formatting.
-		toggleOffOn()
-		// apply a specific flavor of google-java-format
-		googleJavaFormat('1.19.2').aosp().reflowLongStrings()
-		// fix formatting of type annotations
-		formatAnnotations()
-	}
-}
-compileJava.dependsOn 'spotlessApply'
 
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
 
@@ -160,7 +136,7 @@ dependencies {
 	def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
 	annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
 
-	def coppercoreVersion = "2025.0.0"
+	def coppercoreVersion = "2025.0.2"
 	implementation "io.github.team401.coppercore:wpilib_interface:$coppercoreVersion"
 	implementation "io.github.team401.coppercore:parameter_tools:$coppercoreVersion"
 	implementation "io.github.team401.coppercore:controls:$coppercoreVersion"
