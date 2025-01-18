@@ -2,6 +2,7 @@ package frc.robot.subsystems.climb;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
@@ -13,14 +14,14 @@ public interface ClimbIO {
     @AutoLog
     public static class ClimbInputs {
         boolean lockedToCage = false;
-        
-        MutVoltage motorVoltage = Volts.mutable(0);
+
         MutAngle motorAngle = Radians.mutable(0);
+        MutAngle goalAngle = Radians.mutable(0);
     }
 
     @AutoLog
     public static class ClimbOutputs {
-        MutVoltage goalVoltage = Volts.mutable(0);
+        MutVoltage appliedVoltage = Volts.mutable(0);
         //MutAngle goalAngle = Radians.mutable(0);
     }
 
@@ -28,10 +29,10 @@ public interface ClimbIO {
 
     public default void applyOutputs(ClimbOutputs outputs) {}
 
-    public default void setVoltage(Voltage voltage) {}
-    public default void setVoltage(double voltage) {}
-
-    public default void setGoalAngle() {}
+    public default void setGoalAngle(Angle angle) {}
+    
+    public default void setOverrideVoltage(Voltage voltage) {}
 
     public default void setPID(double p, double i, double d) {}
+ 
 }

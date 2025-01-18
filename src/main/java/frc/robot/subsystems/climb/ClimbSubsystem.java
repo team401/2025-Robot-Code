@@ -6,6 +6,7 @@ import com.google.common.base.Supplier;
 
 import edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.ClimbConstants;
 
 public class ClimbSubsystem extends SubsystemBase {
  
@@ -13,15 +14,14 @@ public class ClimbSubsystem extends SubsystemBase {
     private ClimbInputsAutoLogged inputs = new ClimbInputsAutoLogged();
     private ClimbOutputsAutoLogged outputs = new ClimbOutputsAutoLogged();
 
-    private ClimbAction Action = ClimbAction.WAIT;
+    private ClimbAction Action = ClimbAction.NONE;
     private ClimbState State = ClimbState.IDLE;
     
     private Supplier<Boolean> rampClear = () -> true;
     
     private enum ClimbAction {
-        WAIT, // do nothing
-        LOCKING, // move arm up until sensors triggered
-        LIFTING, // move arm down to hang
+        NONE, // do nothing
+        CLIMB, //start automated climb sequence
         OVERRIDE
     }
 
@@ -30,7 +30,6 @@ public class ClimbSubsystem extends SubsystemBase {
         WAITING, // waiting for system to be ready for climb
         SEARCHING, // searching for target
         LIFTING, // moving arm to hang
-        HANGING, // hanging from bars steadily
         OVERRIDE
     }
 
@@ -42,23 +41,50 @@ public class ClimbSubsystem extends SubsystemBase {
         Action = action;
     }
 
-    //todo fix
-    private boolean reachedAngle() {
-        return inputs.motorAngle.in(Degrees) > 90;
-    }
-
     private void idle() {
-        io.setVoltage(0.0);
+        io.setGoalAngle(ClimbConstants.restingAngle);
 
-        if (Action == ClimbAction.LOCKING) {
-            if (!rampClear.get()) State = ClimbState.WAITING;
-            else if (!inputs.lockedToCage) State = ClimbState.SEARCHING;
-        } else if (Action == ClimbAction.LIFTING) {
-            if (!reachedAngle()) State = ClimbState.LIFTING;
-            else State = ClimbState.HANGING;
+        if (Action == ClimbAction.CLIMB) {
+            State = ClimbState.WAITING;
         } else if (Action == ClimbAction.OVERRIDE) {
             State = ClimbState.OVERRIDE;
         }
     }
+
+    private void waiting() {
+        if (Action != ClimbAction.CLIMB) {
+            State = ClimbState.IDLE;
+        } else if (rampClear.get()) {
+            State = ClimbState.SEARCHING;
+        } else {
+            io.setGoalAngle(ClimbConstants.restingAngle);
+        }
+    }
+
+    private void searching() {
+        if (Action != ClimbAction.CLIMB) {
+            State = ClimbState.IDLE;
+        } else if (!rampClear.get()) {
+            State = ClimbState.WAITING;
+        } else if (inputs.lockedToCage) {
+            State = ClimbState.LIFTING;
+        } else {
+            io.setGoalAngle(ClimbConstants.searchingAngle);
+            // passive lock to bars
+            // drive forward?
+        }
+    }
+
+    private void lifting() {
+        if (Action != ClimbAction.CLIMB) {
+            State = ClimbState.IDLE;
+        } else if (!rampClear.get() || !inputs.lockedToCage) {
+            State = ClimbState.WAITING;
+        } else if (inputs.motorAngle.in(Degrees) > 20) {
+            io.setGoalAngle(ClimbConstants.finalHangingAngle);
+            // passive lock to bars
+        }
+    }
+
 
 }
