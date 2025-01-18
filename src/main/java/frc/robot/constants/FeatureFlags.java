@@ -15,5 +15,7 @@ public final class FeatureFlags {
                             .toString(),
                     new JSONSync.JSONSyncConfigBuilder().build());
 
+    public final Boolean runScoring = true;
     public final Boolean runElevator = true;
+    public final Boolean runClaw = true;
 }

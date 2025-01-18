@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.OperatorConstants;
-import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -20,7 +20,7 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem;
  */
 public class RobotContainer {
     // The robot's subsystems and commands are defined here
-    private ElevatorSubsystem elevatorSubsystem;
+    private ScoringSubsystem scoringSubsystem;
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController m_driverController =
@@ -42,8 +42,8 @@ public class RobotContainer {
     }
 
     public void configureSubsystems() {
-        if (FeatureFlags.synced.getObject().runElevator) {
-            elevatorSubsystem = InitSubsystems.initElevatorSubsystem();
+        if (FeatureFlags.synced.getObject().runScoring) {
+            scoringSubsystem = InitSubsystems.initScoringSubsystem();
         }
     }
 
@@ -70,8 +70,8 @@ public class RobotContainer {
 
     /** This method must be called from the robot, as it isn't called automatically. */
     public void testPeriodic() {
-        if (FeatureFlags.synced.getObject().runElevator) {
-            elevatorSubsystem.testPeriodic();
+        if (FeatureFlags.synced.getObject().runScoring) {
+            scoringSubsystem.testPeriodic();
         }
     }
 }

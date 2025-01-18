@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class TestModeManager {
     public enum TestMode {
         ElevatorTuning,
+        ClawTuning,
         None, // Default test mode that does nothing until a new one is selected.
     }
 

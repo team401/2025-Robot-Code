@@ -1,14 +1,16 @@
-package frc.robot.subsystems.elevator;
+package frc.robot.subsystems.scoring;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.ExampleElevatorCommand;
 
-public class ElevatorSubsystem extends SubsystemBase {
+public class ScoringSubsystem extends SubsystemBase {
     private ElevatorMechanism elevatorMechanism;
+    private ClawMechanism clawMechanism;
 
-    public ElevatorSubsystem(ElevatorMechanism elevatorMechanism) {
+    public ScoringSubsystem(ElevatorMechanism elevatorMechanism, ClawMechanism clawMechanism) {
         this.elevatorMechanism = elevatorMechanism;
+        this.clawMechanism = clawMechanism;
 
         setDefaultCommand(new ExampleElevatorCommand(this));
     }
@@ -36,10 +38,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         elevatorMechanism.periodic();
+        clawMechanism.periodic();
     }
 
     /** This method must be called by RobotContainer, as it does not run automatically! */
     public void testPeriodic() {
         elevatorMechanism.testPeriodic();
+        clawMechanism.testPeriodic();
     }
 }
