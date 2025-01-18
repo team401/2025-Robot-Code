@@ -4,6 +4,7 @@ import coppercore.controls.state_machine.StateMachine;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.stateMachineExample.state_machine.ExampleStateContainer;
 import frc.robot.subsystems.stateMachineExample.state_machine.ExampleStateMachine;
+import org.littletonrobotics.junction.Logger;
 
 public class StateMachineExample extends SubsystemBase {
 
@@ -32,6 +33,7 @@ public class StateMachineExample extends SubsystemBase {
     @Override
     public void periodic() {
         stateMachine.fire(currentAction);
-        stateMachine.getCurrentState().getState().periodic();
+        Logger.recordOutput("stateMachineExample/state", stateMachine.getCurrentState());
+        stateMachine.periodic();
     }
 }

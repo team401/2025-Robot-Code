@@ -23,7 +23,7 @@ public class ExampleStateMachine {
 
         stateMachineConfig
                 .configure(ExampleStateContainer.OVERRIDE)
-                .permit(ExampleActions.ACTION, ExampleStateContainer.ACTION)
+                .permit(ExampleActions.ACTION, ExampleStateContainer.IDLE)
                 .permit(ExampleActions.IDLE, ExampleStateContainer.IDLE);
         return stateMachineConfig;
     }
