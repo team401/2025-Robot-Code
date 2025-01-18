@@ -172,7 +172,9 @@ public class Drive implements DriveTemplate {
     }
 
     // run velocity if not disabled
-    this.runVelocity();
+    if (!DriverStation.isTest()) {
+      this.runVelocity();
+    }
 
     // Update odometry
     double[] sampleTimestamps =

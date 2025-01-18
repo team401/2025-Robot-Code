@@ -6,9 +6,11 @@ package frc.robot;
 
 import coppercore.wpilib_interface.DriveWithJoysticks;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.drive.AkitDriveCommands;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.OperatorConstants;
@@ -91,7 +93,19 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return null;
+    return AkitDriveCommands.feedforwardCharacterization(drive);
+  }
+
+  /** This method must be called from robot, as it isn't called automatically */
+  public void testInit() {
+    switch (TestModeManager.getTestMode()) {
+      case FeedForwardCharacterization:
+        CommandScheduler.getInstance()
+            .schedule(AkitDriveCommands.feedforwardCharacterization(drive));
+        break;
+      default:
+        break;
+    }
   }
 
   /** This method must be called from the robot, as it isn't called automatically. */
@@ -99,5 +113,11 @@ public class RobotContainer {
     if (FeatureFlags.synced.getObject().runElevator) {
       elevatorSubsystem.testPeriodic();
     }
+  }
+
+  public void disabledPeriodic() {}
+
+  public void disabledInit() {
+    TestModeManager.testInit();
   }
 }

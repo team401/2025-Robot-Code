@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class TestModeManager {
   public enum TestMode {
     ElevatorTuning,
+    FeedForwardCharacterization,
     None, // Default test mode that does nothing until a new one is selected.
   }
 
@@ -22,6 +23,7 @@ public class TestModeManager {
 
     testModeChooser.setDefaultOption("None", TestMode.None);
     testModeChooser.addOption("Elevator Tuning", TestMode.ElevatorTuning);
+    testModeChooser.addOption("Drive Characterization", TestMode.FeedForwardCharacterization);
 
     SmartDashboard.putData("Test Mode Chooser", testModeChooser);
   }
