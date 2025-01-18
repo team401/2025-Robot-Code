@@ -5,11 +5,14 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.OperatorConstants;
+import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem.ClimbAction;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
 /**
@@ -21,10 +24,12 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem;
 public class RobotContainer {
     // The robot's subsystems and commands are defined here
     private ElevatorSubsystem elevatorSubsystem;
+    private ClimbSubsystem climbSubsystem;
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController m_driverController =
             new CommandXboxController(OperatorConstants.synced.getObject().kDriverControllerPort);
+    private final CommandXboxController m_buttonMasher = new CommandXboxController(2);
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
@@ -45,6 +50,9 @@ public class RobotContainer {
         if (FeatureFlags.synced.getObject().runElevator) {
             elevatorSubsystem = InitSubsystems.initElevatorSubsystem();
         }
+        if (FeatureFlags.synced.getObject().runClimb) {
+            climbSubsystem = InitSubsystems.initClimbSubsystem();
+        }
     }
 
     /**
@@ -56,7 +64,15 @@ public class RobotContainer {
      * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
      * joysticks}.
      */
-    private void configureBindings() {}
+    private void configureBindings() {
+
+        if (FeatureFlags.synced.getObject().runClimb) {
+            m_buttonMasher
+                    .a()
+                    .onTrue(Commands.runOnce(() -> climbSubsystem.setAction(ClimbAction.CLIMB)))
+                    .onFalse(Commands.runOnce(() -> climbSubsystem.setAction(ClimbAction.NONE)));
+        }
+    }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
