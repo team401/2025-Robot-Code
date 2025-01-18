@@ -23,9 +23,10 @@ public class ClimbIOSim implements ClimbIO {
                     90,
                     false,
                     0,
-                    null);
+                    0,
+                    0);
 
-    private final PIDController angleController = new PIDController(0, 0, 0);
+    private final PIDController angleController = new PIDController(10, 0, 0);
 
     private MutAngle goalAngle = Radians.mutable(0);
     private MutVoltage overrideVoltage = Volts.mutable(0.0);
@@ -52,7 +53,7 @@ public class ClimbIOSim implements ClimbIO {
         } else {
             appliedVolts =
                     Volts.of(
-                            angleController.calculate(goalAngle.in(Radians), climb.getAngleRads()));
+                            angleController.calculate(climb.getAngleRads(), goalAngle.in(Radians)));
         }
 
         outputs.appliedVoltage.mut_replace(appliedVolts);

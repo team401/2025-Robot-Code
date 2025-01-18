@@ -117,5 +117,7 @@ public class ClimbSubsystem extends SubsystemBase {
 
         Logger.processInputs("climb/inputs", inputs);
         Logger.processInputs("climb/outputs", outputs);
+        Logger.recordOutput("State", State);
+        Logger.recordOutput("Action", Action);
     }
 }
