@@ -14,6 +14,7 @@ import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import coppercore.parameter_tools.JSONExclude;
 import coppercore.parameter_tools.JSONSync;
+import coppercore.parameter_tools.JSONSyncConfigBuilder;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
@@ -37,7 +38,7 @@ public final class ElevatorConstants {
               .toPath()
               .resolve("constants/ElevatorConstants.json")
               .toString(),
-          new JSONSync.JSONSyncConfigBuilder().build());
+          new JSONSyncConfigBuilder().build());
 
   // TODO: Rename these
   // see ElevatorIOTalonFX
@@ -179,7 +180,7 @@ public final class ElevatorConstants {
                 .toPath()
                 .resolve("constants/ElevatorConstants.Sim.json")
                 .toString(),
-            new JSONSync.JSONSyncConfigBuilder().build());
+            new JSONSyncConfigBuilder().build());
 
     /** Standard deviation passed to sim for the position measurement */
     public final Double positionStdDev = 0.0;
