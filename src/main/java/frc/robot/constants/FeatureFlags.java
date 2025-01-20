@@ -2,6 +2,7 @@ package frc.robot.constants;
 
 import coppercore.parameter_tools.JSONExclude;
 import coppercore.parameter_tools.JSONSync;
+import coppercore.parameter_tools.JSONSyncConfigBuilder;
 import edu.wpi.first.wpilibj.Filesystem;
 
 public final class FeatureFlags {
@@ -13,7 +14,7 @@ public final class FeatureFlags {
               .toPath()
               .resolve("constants/FeatureFlags.json")
               .toString(),
-          new JSONSync.JSONSyncConfigBuilder().build());
+          new JSONSyncConfigBuilder().build());
 
   public Boolean runElevator = true;
   public Boolean runDrive = true;
