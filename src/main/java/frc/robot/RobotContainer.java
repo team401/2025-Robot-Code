@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.drive.AkitDriveCommands;
-import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.FeatureFlags;
+import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DrivetrainConstants;
@@ -49,10 +49,9 @@ public class RobotContainer {
   }
 
   public void loadConstants() {
+    JsonConstants.loadConstants();
     FeatureFlags.synced.loadData();
     OperatorConstants.synced.loadData();
-    ElevatorConstants.synced.loadData();
-    ElevatorConstants.Sim.synced.loadData();
   }
 
   public void configureSubsystems() {

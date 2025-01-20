@@ -1,7 +1,7 @@
 package frc.robot;
 
+import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
-import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -34,19 +34,19 @@ public final class InitSubsystems {
         // Real robot, instantiate hardware IO implementations
         return new Drive(
             new GyroIOPigeon2(),
-            new ModuleIOTalonFX(TunerConstants.FrontLeft),
-            new ModuleIOTalonFX(TunerConstants.FrontRight),
-            new ModuleIOTalonFX(TunerConstants.BackLeft),
-            new ModuleIOTalonFX(TunerConstants.BackRight));
+            new ModuleIOTalonFX(JsonConstants.drivetrainConstants.FrontLeft),
+            new ModuleIOTalonFX(JsonConstants.drivetrainConstants.FrontRight),
+            new ModuleIOTalonFX(JsonConstants.drivetrainConstants.BackLeft),
+            new ModuleIOTalonFX(JsonConstants.drivetrainConstants.BackRight));
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         return new Drive(
             new GyroIO() {},
-            new ModuleIOSim(TunerConstants.FrontLeft),
-            new ModuleIOSim(TunerConstants.FrontRight),
-            new ModuleIOSim(TunerConstants.BackLeft),
-            new ModuleIOSim(TunerConstants.BackRight));
+            new ModuleIOSim(JsonConstants.drivetrainConstants.FrontLeft),
+            new ModuleIOSim(JsonConstants.drivetrainConstants.FrontRight),
+            new ModuleIOSim(JsonConstants.drivetrainConstants.BackLeft),
+            new ModuleIOSim(JsonConstants.drivetrainConstants.BackRight));
 
       default:
         // Replayed robot, disable IO implementations
