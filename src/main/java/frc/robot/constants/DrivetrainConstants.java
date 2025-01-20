@@ -10,6 +10,7 @@ import com.ctre.phoenix6.swerve.*;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.*;
 import coppercore.parameter_tools.JSONExclude;
 import coppercore.parameter_tools.JSONSync;
+import coppercore.parameter_tools.JSONSyncConfigBuilder;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -28,7 +29,7 @@ public class DrivetrainConstants {
               .toPath()
               .resolve("constants/DrivetrainConstants.json")
               .toString(),
-          new JSONSync.JSONSyncConfigBuilder().setPrettyPrinting(true).build());
+          new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
   // The steer motor uses any SwerveModule.SteerRequestType control request with the
   // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
 
