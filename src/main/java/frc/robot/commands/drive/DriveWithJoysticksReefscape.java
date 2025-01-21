@@ -45,8 +45,8 @@ public class DriveWithJoysticksReefscape extends DriveWithJoysticks {
    * @return true if inputs are greater than the deadband on any joystick
    */
   public boolean areJoysticksActive() {
-    return leftJoystick.getX() > joystickDeadband
-        || leftJoystick.getY() > joystickDeadband
-        || rightJoystick.getX() > joystickDeadband;
+    return Math.abs(leftJoystick.getX()) > joystickDeadband
+        || Math.abs(leftJoystick.getY()) > joystickDeadband
+        || Math.abs(rightJoystick.getX()) > joystickDeadband;
   }
 }
