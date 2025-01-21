@@ -9,7 +9,6 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -208,10 +207,10 @@ public class Drive implements DriveTemplate {
     }
 
     // runs drive command if otf (taking over set goal speeds)
-    if(isOTF) {
-        this.driveToPose = getDriveToPoseCommand();
-        driveToPose.schedule();
-    // otherwise we cancel command, to give control back to drive with joysticks
+    if (isOTF) {
+      this.driveToPose = getDriveToPoseCommand();
+      driveToPose.schedule();
+      // otherwise we cancel command, to give control back to drive with joysticks
     } else {
       this.driveToPose.cancel();
     }
@@ -283,9 +282,9 @@ public class Drive implements DriveTemplate {
   }
 
   /**
-   * sets isOTF of robot
-   * true will cause robot to create a path from current location to the set PathLocation
-   * 
+   * sets isOTF of robot true will cause robot to create a path from current location to the set
+   * PathLocation
+   *
    * @param isOTF boolean telling robot if it should create a OTF path
    */
   public void setOTF(boolean isOTF) {
@@ -294,7 +293,7 @@ public class Drive implements DriveTemplate {
 
   /**
    * checks if drive is currently following an on the fly path
-   * 
+   *
    * @return state of OTF following
    */
   public boolean isDriveOTF() {
@@ -302,9 +301,9 @@ public class Drive implements DriveTemplate {
   }
 
   /**
-   * sets desired path location
-   * calling this and then setting OTF to true will cause robot to drive path from current pose to the location
-   * 
+   * sets desired path location calling this and then setting OTF to true will cause robot to drive
+   * path from current pose to the location
+   *
    * @param location desired location for robot to pathfind to
    */
   public void setPathLocation(PathLocation location) {
@@ -313,13 +312,13 @@ public class Drive implements DriveTemplate {
 
   /**
    * finds a pose to pathfind to based on desiredLocation enum
-   * 
+   *
    * @return a pose representing the corresponding scoring location
    */
   public Pose2d findOTFPoseFromPathLocation() {
-    switch(this.desiredLocation) {
-      // reef 0 and 1 will have the same path
-      // NOTE: use PathPlannerPath.getStartingHolonomicPose to find pose for reef lineup if wanted
+    switch (this.desiredLocation) {
+        // reef 0 and 1 will have the same path
+        // NOTE: use PathPlannerPath.getStartingHolonomicPose to find pose for reef lineup if wanted
       case Reef0:
         return new Pose2d();
       case Reef1:
@@ -333,16 +332,15 @@ public class Drive implements DriveTemplate {
 
   /**
    * gets the path from current pose to the desired pose found from location
-   * 
+   *
    * @return command that drive can schedule to follow the path found
    */
-  public Command getDriveToPoseCommand () {
+  public Command getDriveToPoseCommand() {
     Pose2d targetPose = findOTFPoseFromPathLocation();
 
     // Create the constraints to use while pathfinding
-    PathConstraints constraints = new PathConstraints(
-        3.0, 4.0,
-        Units.degreesToRadians(540), Units.degreesToRadians(720));
+    PathConstraints constraints =
+        new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
 
     return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0);
   }
