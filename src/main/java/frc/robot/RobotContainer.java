@@ -16,8 +16,8 @@ import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.OTFLocation;
 import frc.robot.subsystems.drive.DrivetrainConstants;
-import frc.robot.subsystems.drive.Drive.PathLocation;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
 /**
@@ -87,13 +87,23 @@ public class RobotContainer {
             ));
 
     // press a to start OTF, let go to stop
-    driverController.a().onTrue(new InstantCommand(() -> {
-      drive.setOTF(true);
-      drive.setPathLocation(PathLocation.Reef0);
-    }, drive));
-    driverController.a().onFalse(new InstantCommand(() -> {
-      drive.setOTF(false);
-    }, drive));
+    driverController
+        .a()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  drive.setOTF(true);
+                  drive.setOTFLocation(OTFLocation.Reef0);
+                },
+                drive));
+    driverController
+        .a()
+        .onFalse(
+            new InstantCommand(
+                () -> {
+                  drive.setOTF(false);
+                },
+                drive));
   }
 
   /**
