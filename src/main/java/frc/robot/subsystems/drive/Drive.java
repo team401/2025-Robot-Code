@@ -8,6 +8,8 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -28,6 +30,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -106,7 +109,7 @@ public class Drive implements DriveTemplate {
 
   private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
 
-  public enum OTFLocation {
+  public enum PathLocation {
     Reef0,
     Reef1,
     Reef2,
@@ -123,9 +126,11 @@ public class Drive implements DriveTemplate {
     ProcessorRight,
   }
 
-  private OTFLocation desiredLocation = OTFLocation.Reef0;
+  private PathLocation desiredLocation = PathLocation.Reef0;
 
   private boolean isOTF = false;
+
+  private Command driveToPose = AutoBuilder.pathfindToPose(new Pose2d(), null);
 
   public Drive(
       GyroIO gyroIO,
@@ -202,6 +207,15 @@ public class Drive implements DriveTemplate {
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
 
+    // runs drive command if otf (taking over set goal speeds)
+    if(isOTF) {
+        this.driveToPose = getDriveToPoseCommand();
+        driveToPose.schedule();
+    // otherwise we cancel command, to give control back to drive with joysticks
+    } else {
+      this.driveToPose.cancel();
+    }
+
     // run velocity if not disabled
     if (!DriverStation.isTest()) {
       this.runVelocity();
@@ -270,7 +284,7 @@ public class Drive implements DriveTemplate {
 
   /**
    * sets isOTF of robot
-   * true will cause robot to create a path from current location to the set OTFLocation
+   * true will cause robot to create a path from current location to the set PathLocation
    * 
    * @param isOTF boolean telling robot if it should create a OTF path
    */
@@ -279,12 +293,12 @@ public class Drive implements DriveTemplate {
   }
 
   /**
-   * sets desired on the fly location
+   * sets desired path location
    * calling this and then setting OTF to true will cause robot to drive path from current pose to the location
    * 
    * @param location desired location for robot to pathfind to
    */
-  public void setOTFLocation(OTFLocation location) {
+  public void setPathLocation(PathLocation location) {
     this.desiredLocation = location;
   }
 
@@ -293,8 +307,12 @@ public class Drive implements DriveTemplate {
    * 
    * @return a pose representing the corresponding scoring location
    */
-  public Pose2d findPoseFromOTFLocation() {
+  public Pose2d findOTFPoseFromPathLocation() {
     switch(this.desiredLocation) {
+      // reef 0 and 1 will have the same path
+      // NOTE: use PathPlannerPath.getStartingHolonomicPose to find pose for reef lineup
+      case Reef0:
+        return new Pose2d();
       case Reef1:
         return new Pose2d();
       default:
@@ -302,6 +320,17 @@ public class Drive implements DriveTemplate {
         this.setOTF(false);
         return new Pose2d();
     }
+  }
+
+  public Command getDriveToPoseCommand () {
+    Pose2d targetPose = findOTFPoseFromPathLocation();
+
+    // Create the constraints to use while pathfinding
+    PathConstraints constraints = new PathConstraints(
+        3.0, 4.0,
+        Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+    return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0);
   }
 
   /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
