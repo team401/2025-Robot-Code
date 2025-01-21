@@ -106,6 +106,25 @@ public class Drive implements DriveTemplate {
 
   private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
 
+  public enum OTFLocations {
+    Reef0,
+    Reef1,
+    Reef2,
+    Reef3,
+    Reef4,
+    Reef5,
+    Reef6,
+    Reef7,
+    Reef8,
+    Reef9,
+    Reef10,
+    Reef11,
+    ProcessorLeft,
+    ProcessorRight,
+  }
+
+  private OTFLocations desiredLocation = OTFLocations.Reef0;
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
