@@ -2,6 +2,11 @@ package frc.robot.subsystems.scoring;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.configs.CANrangeConfiguration;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.ProximityParamsConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -17,6 +22,58 @@ public class ClawIOTalonFX implements ClawIO {
 
     private MutVoltage outputVoltage = Volts.mutable(0.0);
     private VoltageOut voltageRequest = new VoltageOut(outputVoltage);
+
+    public ClawIOTalonFX() {
+        TalonFXConfiguration talonFXConfigs =
+                new TalonFXConfiguration()
+                        .withMotorOutput(
+                                new MotorOutputConfigs()
+                                        .withInverted(
+                                                ClawConstants.synced.getObject()
+                                                        .kClawMotorInverted))
+                        .withCurrentLimits(
+                                new CurrentLimitsConfigs()
+                                        .withSupplyCurrentLimit(
+                                                ClawConstants.synced.getObject()
+                                                        .clawSupplyCurrentLimit)
+                                        .withStatorCurrentLimit(
+                                                ClawConstants.synced.getObject()
+                                                        .clawStatorCurrentLimit));
+
+        rollerMotor.getConfigurator().apply(talonFXConfigs);
+
+        CANrangeConfiguration coralRangeConfigs =
+                new CANrangeConfiguration()
+                        .withProximityParams(
+                                new ProximityParamsConfigs()
+                                        .withMinSignalStrengthForValidMeasurement(
+                                                ClawConstants.synced.getObject()
+                                                        .coralMinSignalStrengthForValidMeasurement)
+                                        .withProximityThreshold(
+                                                ClawConstants.synced.getObject()
+                                                        .coralProximityThreshold)
+                                        .withProximityHysteresis(
+                                                ClawConstants.synced.getObject()
+                                                        .coralProximityHysteresis));
+
+        coralRange.getConfigurator().apply(coralRangeConfigs);
+
+        CANrangeConfiguration algaeRangeConfigs =
+                new CANrangeConfiguration()
+                        .withProximityParams(
+                                new ProximityParamsConfigs()
+                                        .withMinSignalStrengthForValidMeasurement(
+                                                ClawConstants.synced.getObject()
+                                                        .algaeMinSignalStrengthForValidMeasurement)
+                                        .withProximityThreshold(
+                                                ClawConstants.synced.getObject()
+                                                        .algaeProximityThreshold)
+                                        .withProximityHysteresis(
+                                                ClawConstants.synced.getObject()
+                                                        .algaeProximityHysteresis));
+
+        algaeRange.getConfigurator().apply(algaeRangeConfigs);
+    }
 
     public void updateInputs(ClawInputs inputs) {}
 
