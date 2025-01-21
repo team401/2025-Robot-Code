@@ -3,14 +3,16 @@ package frc.robot.commands.drive;
 import coppercore.wpilib_interface.DriveTemplate;
 import coppercore.wpilib_interface.DriveWithJoysticks;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
+import frc.robot.subsystems.drive.Drive;
 
 public class DriveWithJoysticksReefscape extends DriveWithJoysticks {
   private CommandJoystick leftJoystick;
   private CommandJoystick rightJoystick;
   private double joystickDeadband;
+  private Drive drive;
 
   public DriveWithJoysticksReefscape(
-      DriveTemplate drive,
+      Drive drive,
       CommandJoystick leftJoystick,
       CommandJoystick rightJoystick,
       double maxLinearVelocity,
@@ -27,15 +29,21 @@ public class DriveWithJoysticksReefscape extends DriveWithJoysticks {
     this.leftJoystick = leftJoystick;
     this.rightJoystick = rightJoystick;
     this.joystickDeadband = joystickDeadband;
+    this.drive = drive;
   }
 
   @Override
   public void execute() {
+    // NOTE: Joysticks will override OTF here, maybe we want a way to disable that, ie if we hold trigger then continue following
     if (areJoysticksActive()) {
       // set mode to MANUAL and execute joystick command
+      drive.setOTF(false);
       super.execute();
     } else {
-      // check for OTF mode, otherwise still run joystick command, or maybe run stop here?
+      // if no OTF, stop drivetrain
+      if(!drive.isDriveOTF()) {
+        drive.stop();
+      }
     }
   }
 

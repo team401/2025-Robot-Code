@@ -293,6 +293,15 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * checks if drive is currently following an on the fly path
+   * 
+   * @return state of OTF following
+   */
+  public boolean isDriveOTF() {
+    return isOTF;
+  }
+
+  /**
    * sets desired path location
    * calling this and then setting OTF to true will cause robot to drive path from current pose to the location
    * 
@@ -310,7 +319,7 @@ public class Drive implements DriveTemplate {
   public Pose2d findOTFPoseFromPathLocation() {
     switch(this.desiredLocation) {
       // reef 0 and 1 will have the same path
-      // NOTE: use PathPlannerPath.getStartingHolonomicPose to find pose for reef lineup
+      // NOTE: use PathPlannerPath.getStartingHolonomicPose to find pose for reef lineup if wanted
       case Reef0:
         return new Pose2d();
       case Reef1:
@@ -322,6 +331,11 @@ public class Drive implements DriveTemplate {
     }
   }
 
+  /**
+   * gets the path from current pose to the desired pose found from location
+   * 
+   * @return command that drive can schedule to follow the path found
+   */
   public Command getDriveToPoseCommand () {
     Pose2d targetPose = findOTFPoseFromPathLocation();
 
