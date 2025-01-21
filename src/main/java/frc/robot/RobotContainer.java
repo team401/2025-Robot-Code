@@ -7,6 +7,7 @@ package frc.robot;
 import coppercore.wpilib_interface.DriveWithJoysticks;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -16,6 +17,7 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DrivetrainConstants;
+import frc.robot.subsystems.drive.Drive.PathLocation;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
 /**
@@ -83,6 +85,15 @@ public class RobotContainer {
             DrivetrainConstants.maxAngularSpeed, // type: double (rad/s)
             DrivetrainConstants.joystickDeadband // type: double
             ));
+
+    // press a to start OTF, let go to stop
+    driverController.a().onTrue(new InstantCommand(() -> {
+      drive.setOTF(true);
+      drive.setPathLocation(PathLocation.Reef0);
+    }, drive));
+    driverController.a().onFalse(new InstantCommand(() -> {
+      drive.setOTF(false);
+    }, drive));
   }
 
   /**
