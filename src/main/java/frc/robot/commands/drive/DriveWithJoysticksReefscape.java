@@ -32,9 +32,10 @@ public class DriveWithJoysticksReefscape extends DriveWithJoysticks {
   @Override
   public void execute() {
     if (areJoysticksActive()) {
+      // set mode to MANUAL and execute joystick command
       super.execute();
     } else {
-      // check for OTF 
+      // check for OTF mode, otherwise still run joystick command, or maybe run stop here?
     }
   }
 

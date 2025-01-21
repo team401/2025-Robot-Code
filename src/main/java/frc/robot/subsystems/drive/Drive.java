@@ -106,7 +106,7 @@ public class Drive implements DriveTemplate {
 
   private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
 
-  public enum OTFLocations {
+  public enum OTFLocation {
     Reef0,
     Reef1,
     Reef2,
@@ -123,7 +123,9 @@ public class Drive implements DriveTemplate {
     ProcessorRight,
   }
 
-  private OTFLocations desiredLocation = OTFLocations.Reef0;
+  private OTFLocation desiredLocation = OTFLocation.Reef0;
+
+  private boolean isOTF = false;
 
   public Drive(
       GyroIO gyroIO,
@@ -263,6 +265,42 @@ public class Drive implements DriveTemplate {
       this.goalSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, robotRotation);
     } else {
       this.goalSpeeds = speeds;
+    }
+  }
+
+  /**
+   * sets isOTF of robot
+   * true will cause robot to create a path from current location to the set OTFLocation
+   * 
+   * @param isOTF boolean telling robot if it should create a OTF path
+   */
+  public void setOTF(boolean isOTF) {
+    this.isOTF = isOTF;
+  }
+
+  /**
+   * sets desired on the fly location
+   * calling this and then setting OTF to true will cause robot to drive path from current pose to the location
+   * 
+   * @param location desired location for robot to pathfind to
+   */
+  public void setOTFLocation(OTFLocation location) {
+    this.desiredLocation = location;
+  }
+
+  /**
+   * finds a pose to pathfind to based on desiredLocation enum
+   * 
+   * @return a pose representing the corresponding scoring location
+   */
+  public Pose2d findPoseFromOTFLocation() {
+    switch(this.desiredLocation) {
+      case Reef1:
+        return new Pose2d();
+      default:
+        // no location set, so don't allow drive to run OTF
+        this.setOTF(false);
+        return new Pose2d();
     }
   }
 
