@@ -17,10 +17,10 @@ public class ClimbIOSim implements ClimbIO {
             new SingleJointedArmSim(
                     DCMotor.getKrakenX60(2),
                     75,
-                    SingleJointedArmSim.estimateMOI(0.75, 0.5),
+                    SingleJointedArmSim.estimateMOI(0.5, 0.5),
                     0.5,
                     0,
-                    90,
+                    2 * Math.PI,
                     false,
                     0,
                     0,
@@ -57,7 +57,7 @@ public class ClimbIOSim implements ClimbIO {
         }
 
         outputs.appliedVoltage.mut_replace(appliedVolts);
-        climb.setInputVoltage(outputs.appliedVoltage.in(Volt));
+        climb.setInputVoltage(appliedVolts.in(Volt));
     }
 
     @Override
