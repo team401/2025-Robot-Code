@@ -104,7 +104,6 @@ public class RobotContainer {
         CommandScheduler.getInstance()
             .schedule(AkitDriveCommands.feedforwardCharacterization(drive));
         break;
-
       case DriveWheelRadiusCharacterization:
         CommandScheduler.getInstance()
             .schedule(AkitDriveCommands.wheelRadiusCharacterization(drive));

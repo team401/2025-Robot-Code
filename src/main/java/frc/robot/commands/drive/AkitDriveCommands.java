@@ -228,7 +228,7 @@ public class AkitDriveCommands {
     SlewRateLimiter limiter = new SlewRateLimiter(WHEEL_RADIUS_RAMP_RATE);
     WheelRadiusCharacterizationState state = new WheelRadiusCharacterizationState();
 
-    return Commands.parallel(
+    return Commands.sequence(
         // Drive control sequence
         Commands.sequence(
             // Reset acceleration limiter
