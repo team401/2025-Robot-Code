@@ -16,7 +16,7 @@ import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.Drive.OTFLocation;
+import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.DrivetrainConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
@@ -86,24 +86,14 @@ public class RobotContainer {
             DrivetrainConstants.joystickDeadband // type: double
             ));
 
-    // press a to start OTF, let go to stop
-    driverController
-        .a()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  drive.setOTF(true);
-                  drive.setOTFLocation(OTFLocation.Reef0);
-                },
-                drive));
-    driverController
-        .a()
-        .onFalse(
-            new InstantCommand(
-                () -> {
-                  drive.setOTF(false);
-                },
-                drive));
+    // hold right joystick trigger down to have drive go to desired location
+    rightJoystick.trigger().onTrue(new InstantCommand(() -> {
+      drive.setDesiredLocation(DesiredLocation.Reef0);
+      drive.setOTF(true);
+    }, drive));
+    rightJoystick.trigger().onFalse(new InstantCommand(() -> {
+      drive.setOTF(false);
+    }, drive));
   }
 
   /**

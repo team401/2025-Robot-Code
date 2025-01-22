@@ -108,7 +108,7 @@ public class Drive implements DriveTemplate {
 
   private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
 
-  public enum OTFLocation {
+  public enum DesiredLocation {
     Reef0,
     Reef1,
     Reef2,
@@ -125,7 +125,7 @@ public class Drive implements DriveTemplate {
     ProcessorRight,
   }
 
-  private OTFLocation desiredLocation = OTFLocation.Reef0;
+  private DesiredLocation desiredLocation = DesiredLocation.Reef0;
 
   private boolean isOTF = false;
 
@@ -306,7 +306,7 @@ public class Drive implements DriveTemplate {
    *
    * @param location desired location for robot to pathfind to
    */
-  public void setOTFLocation(OTFLocation location) {
+  public void setDesiredLocation(DesiredLocation location) {
     this.desiredLocation = location;
   }
 
