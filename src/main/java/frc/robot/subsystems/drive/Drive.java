@@ -299,6 +299,7 @@ public class Drive implements DriveTemplate {
 
       this.goalSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, robotRotation);
     } else {
+      Logger.recordOutput("Drive/DesiredOTFSpeeds", speeds);
       this.goalSpeeds = speeds;
     }
   }
