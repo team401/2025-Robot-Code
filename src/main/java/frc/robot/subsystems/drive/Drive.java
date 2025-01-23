@@ -11,7 +11,6 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
-import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import coppercore.wpilib_interface.DriveTemplate;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -172,7 +171,7 @@ public class Drive implements DriveTemplate {
         this::getPose,
         this::setPose,
         this::getChassisSpeeds,
-        (ChassisSpeeds speeds, DriveFeedforwards ff) -> this.setGoalSpeeds(speeds, false),
+        (ChassisSpeeds speeds) -> this.setGoalSpeeds(speeds, false),
         new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
         PP_CONFIG,
@@ -191,7 +190,6 @@ public class Drive implements DriveTemplate {
 
     // warm up java processing for faster pathfind later
     PathfindingCommand.warmupCommand().schedule();
-    AutoBuilder.pathfindToPose(new Pose2d(), null);
 
     // Configure SysId
     sysId =
@@ -228,11 +226,13 @@ public class Drive implements DriveTemplate {
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
 
-    // runs drive command if otf (taking over set goal speeds)
+    // OTF Command
     Logger.recordOutput("Drive/OnTheFly", isOTF);
     if (driveToPose != null) {
       Logger.recordOutput("Drive/OnTheFlyCommandStatus", this.driveToPose.isScheduled());
-      if(!isOTF) {
+
+      // cancel path following command once OTF cancelled (likely via trigger)
+      if (!isOTF) {
         driveToPose.cancel();
       }
     }
