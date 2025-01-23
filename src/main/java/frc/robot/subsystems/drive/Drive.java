@@ -126,6 +126,23 @@ public class Drive implements DriveTemplate {
     ProcessorRight,
   }
 
+  public DesiredLocation[] locationArray = {
+    DesiredLocation.Reef0,
+    DesiredLocation.Reef1,
+    DesiredLocation.Reef2,
+    DesiredLocation.Reef3,
+    DesiredLocation.Reef4,
+    DesiredLocation.Reef5,
+    DesiredLocation.Reef6,
+    DesiredLocation.Reef7,
+    DesiredLocation.Reef8,
+    DesiredLocation.Reef9,
+    DesiredLocation.Reef10,
+    DesiredLocation.Reef11,
+    DesiredLocation.ProcessorLeft,
+    DesiredLocation.ProcessorRight
+  };
+
   private DesiredLocation desiredLocation = DesiredLocation.Reef0;
 
   private boolean isOTF = false;
@@ -313,6 +330,16 @@ public class Drive implements DriveTemplate {
    */
   public void setDesiredLocation(DesiredLocation location) {
     this.desiredLocation = location;
+  }
+
+  /**
+   * sets desired path location calling this and then setting OTF to true will cause robot to drive
+   * path from current pose to the location
+   *
+   * @param locationIndex desired location index from DesiredLocationSelector
+   */
+  public void setDesiredLocation(int locationIndex) {
+    this.desiredLocation = locationArray[locationIndex];
   }
 
   /**
