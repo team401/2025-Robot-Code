@@ -238,7 +238,7 @@ public class Drive implements DriveTemplate {
     }
 
     // run velocity if not disabled
-    if (!DriverStation.isTest()) {
+    if (!DriverStation.isTest() && !DriverStation.isDisabled()) {
       this.runVelocity();
     }
 
@@ -411,6 +411,13 @@ public class Drive implements DriveTemplate {
     }
   }
 
+  /** Runs one steer motor with the specified turn output */
+  public void runSteerCharacterization(double output) {
+    for (int i = 0; i < 4; i++) {
+      modules[i].runSteerCharacterization(output);
+    }
+  }
+
   /** Stops the drive. */
   public void stop() {
     setGoalSpeeds(new ChassisSpeeds(), false);
@@ -480,6 +487,14 @@ public class Drive implements DriveTemplate {
     double output = 0.0;
     for (int i = 0; i < 4; i++) {
       output += modules[i].getFFCharacterizationVelocity() / 4.0;
+    }
+    return output;
+  }
+
+  public double getSteerCharacterizationVelocity() {
+    double output = 0.0;
+    for (int i = 0; i < 4; i++) {
+      output += modules[i].getSteerCharacterizationVelocity() / 4.0;
     }
     return output;
   }

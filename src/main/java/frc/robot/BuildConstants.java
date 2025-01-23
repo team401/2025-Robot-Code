@@ -11,6 +11,7 @@ public final class BuildConstants {
   public static final String GIT_BRANCH = "otf-drive-command";
   public static final String BUILD_DATE = "2025-01-23 09:28:10 EST";
   public static final long BUILD_UNIX_TIME = 1737642490515L;
+
   public static final int DIRTY = 1;
 
   private BuildConstants() {}
