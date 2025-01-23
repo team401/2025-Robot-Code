@@ -172,6 +172,7 @@ public class Drive implements DriveTemplate {
           Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
 
+    // warm up java processing for faster pathfind later
     PathfindingCommand.warmupCommand().schedule();
     AutoBuilder.pathfindToPose(new Pose2d(), null);
 
