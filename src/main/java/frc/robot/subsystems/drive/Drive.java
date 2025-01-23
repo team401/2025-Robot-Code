@@ -229,12 +229,12 @@ public class Drive implements DriveTemplate {
     }
 
     // runs drive command if otf (taking over set goal speeds)
-    if (isOTF) {
-      this.driveToPose = getDriveToPoseCommand();
-      driveToPose.schedule();
-      // otherwise we cancel command, to give control back to drive with joysticks
-    } else if (driveToPose != null) {
-      this.driveToPose.cancel();
+    Logger.recordOutput("Drive/OnTheFly", isOTF);
+    if (driveToPose != null) {
+      Logger.recordOutput("Drive/OnTheFlyCommandStatus", this.driveToPose.isScheduled());
+      if(!isOTF) {
+        driveToPose.cancel();
+      }
     }
 
     // run velocity if not disabled
@@ -311,6 +311,11 @@ public class Drive implements DriveTemplate {
    */
   public void setOTF(boolean isOTF) {
     this.isOTF = isOTF;
+
+    if (isOTF) {
+      this.driveToPose = this.getDriveToPoseCommand();
+      this.driveToPose.schedule();
+    }
   }
 
   /**

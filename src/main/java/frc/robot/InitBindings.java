@@ -36,7 +36,7 @@ public final class InitBindings {
 
     // hold right joystick trigger down to have drive go to desired location
     rightJoystick
-        .trigger()
+        .button(1)
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -45,7 +45,7 @@ public final class InitBindings {
                 },
                 drive));
     rightJoystick
-        .trigger()
+        .button(1)
         .onFalse(
             new InstantCommand(
                 () -> {
