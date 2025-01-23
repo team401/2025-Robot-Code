@@ -115,6 +115,7 @@ public class ModuleIOTalonFX implements ModuleIO {
           case RemoteCANcoder -> FeedbackSensorSourceValue.RemoteCANcoder;
           case FusedCANcoder -> FeedbackSensorSourceValue.FusedCANcoder;
           case SyncCANcoder -> FeedbackSensorSourceValue.SyncCANcoder;
+          default -> null;
         };
     turnConfig.MotionMagic.MotionMagicCruiseVelocity =
         DrivetrainConstants.TURN_CRUISE_VELOCITY / constants.SteerMotorGearRatio;

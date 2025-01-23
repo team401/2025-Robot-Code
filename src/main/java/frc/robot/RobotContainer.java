@@ -18,6 +18,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMapleSim;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -72,9 +73,10 @@ public class RobotContainer {
         driveSim =
             new SwerveDriveSimulation(
                 DrivetrainConstants.SimConstants.driveSimConfig, new Pose2d());
+        SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
         drive =
             new Drive(
-                new GyroIOMapleSim(),
+                new GyroIOMapleSim(driveSim.getGyroSimulation()),
                 new ModuleIOMapleSim(TunerConstants.FrontLeft),
                 new ModuleIOMapleSim(TunerConstants.FrontRight),
                 new ModuleIOMapleSim(TunerConstants.BackLeft),

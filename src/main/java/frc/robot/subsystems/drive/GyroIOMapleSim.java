@@ -4,8 +4,8 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 
 import com.ctre.phoenix6.hardware.core.CorePigeon2;
 import com.ctre.phoenix6.sim.Pigeon2SimState;
-import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.generated.TunerConstants;
+import frc.robot.util.PhoenixUtil;
 import java.util.Queue;
 import org.ironmaple.simulation.drivesims.GyroSimulation;
 
@@ -15,15 +15,9 @@ public class GyroIOMapleSim implements GyroIO {
   private final CorePigeon2 pigeon = new CorePigeon2(TunerConstants.DrivetrainConstants.Pigeon2Id);
   private final Pigeon2SimState pigeonSim = new Pigeon2SimState(pigeon);
 
-  private final Queue<Double> yawPositionQueue;
-  private final Queue<Double> yawTimestampQueue;
-
-  public GyroIOMapleSim() {
-    this.gyroSimulation = DrivetrainConstants.SimConstants.gyroSimulation;
+  public GyroIOMapleSim(GyroSimulation gyroSimulation) {
+    this.gyroSimulation = gyroSimulation;
     pigeonSim.setRawYaw(0.0);
-
-    yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
-    yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(pigeon.getYaw());
   }
 
   @Override
@@ -32,13 +26,8 @@ public class GyroIOMapleSim implements GyroIO {
     inputs.yawPosition = gyroSimulation.getGyroReading();
     inputs.yawVelocityRadPerSec = gyroSimulation.getMeasuredAngularVelocity().in(RadiansPerSecond);
 
-    inputs.odometryYawTimestamps =
-        yawTimestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    inputs.odometryYawPositions =
-        yawPositionQueue.stream()
-            .map((Double value) -> Rotation2d.fromDegrees(value))
-            .toArray(Rotation2d[]::new);
-    yawTimestampQueue.clear();
-    yawPositionQueue.clear();
+    inputs.odometryYawTimestamps = PhoenixUtil.getSimulationOdometryTimeStamps();
+
+    inputs.odometryYawPositions = gyroSimulation.getCachedGyroReadings();
   }
 }
