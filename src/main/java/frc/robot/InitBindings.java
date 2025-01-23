@@ -40,7 +40,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  drive.setDesiredLocation(DesiredLocation.Reef0);
+                  drive.setDesiredLocation(DesiredLocation.CoralStationLeft);
                   drive.setOTF(true);
                 },
                 drive));

@@ -121,8 +121,9 @@ public class Drive implements DriveTemplate {
     Reef9,
     Reef10,
     Reef11,
-    ProcessorLeft,
-    ProcessorRight,
+    Processor,
+    CoralStationLeft,
+    CoralStationRight,
   }
 
   public DesiredLocation[] locationArray = {
@@ -138,8 +139,9 @@ public class Drive implements DriveTemplate {
     DesiredLocation.Reef9,
     DesiredLocation.Reef10,
     DesiredLocation.Reef11,
-    DesiredLocation.ProcessorLeft,
-    DesiredLocation.ProcessorRight
+    DesiredLocation.Processor,
+    DesiredLocation.CoralStationLeft,
+    DesiredLocation.CoralStationRight
   };
 
   private DesiredLocation desiredLocation = DesiredLocation.Reef0;
@@ -361,6 +363,10 @@ public class Drive implements DriveTemplate {
         return new Pose2d();
       case Reef1:
         return new Pose2d();
+      case CoralStationRight:
+          return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
+      case CoralStationLeft:
+          return new Pose2d(1.2, 7.0, Rotation2d.fromRadians(-1));
       default:
         // no location set, so don't allow drive to run OTF
         this.setOTF(false);

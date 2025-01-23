@@ -10,7 +10,7 @@ public class DesiredLocationSelector {
   }
 
   public static void incrementIndex() {
-    if (locationIndex > 12) {
+    if (locationIndex > 13) {
       locationIndex = 0;
     } else {
       locationIndex++;
@@ -19,7 +19,7 @@ public class DesiredLocationSelector {
 
   public static void decrementIndex() {
     if (locationIndex < 1) {
-      locationIndex = 13;
+      locationIndex = 14;
     } else {
       locationIndex++;
     }
