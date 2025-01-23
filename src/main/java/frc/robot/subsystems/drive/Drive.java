@@ -364,9 +364,9 @@ public class Drive implements DriveTemplate {
       case Reef1:
         return new Pose2d();
       case CoralStationRight:
-          return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
+        return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
       case CoralStationLeft:
-          return new Pose2d(1.2, 7.0, Rotation2d.fromRadians(-1));
+        return new Pose2d(1.2, 7.0, Rotation2d.fromRadians(-1));
       default:
         // no location set, so don't allow drive to run OTF
         this.setOTF(false);
