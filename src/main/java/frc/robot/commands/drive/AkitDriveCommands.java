@@ -168,8 +168,6 @@ public class AkitDriveCommands {
     List<Double> voltageSamples = new LinkedList<>();
     Timer timer = new Timer();
 
-    System.out.println("LOLOLOLOLOLOLOL");
-
     return Commands.sequence(
         // Reset data
         Commands.runOnce(
@@ -223,12 +221,71 @@ public class AkitDriveCommands {
                 }));
   }
 
+  public static Command steerAngleCharacterization(Drive drive) {
+    List<Double> velocitySamples = new LinkedList<>();
+    List<Double> voltageSamples = new LinkedList<>();
+    Timer timer = new Timer();
+
+    return Commands.sequence(
+        // Reset data
+        Commands.runOnce(
+            () -> {
+              velocitySamples.clear();
+              voltageSamples.clear();
+            }),
+
+        // Allow modules to orient
+        Commands.run(
+                () -> {
+                  drive.runSteerCharacterization(0.0);
+                },
+                drive)
+            .withTimeout(FF_START_DELAY),
+
+        // Start timer
+        Commands.runOnce(timer::restart),
+
+        // Accelerate and gather data
+        Commands.run(
+                () -> {
+                  double voltage = timer.get() * FF_RAMP_RATE;
+                  drive.runSteerCharacterization(voltage);
+                  velocitySamples.add(drive.getSteerCharacterizationVelocity());
+                  voltageSamples.add(voltage);
+                },
+                drive)
+
+            // When cancelled, calculate and print results
+            .finallyDo(
+                () -> {
+                  int n = velocitySamples.size();
+                  double sumX = 0.0;
+                  double sumY = 0.0;
+                  double sumXY = 0.0;
+                  double sumX2 = 0.0;
+                  for (int i = 0; i < n; i++) {
+                    sumX += velocitySamples.get(i);
+                    sumY += voltageSamples.get(i);
+                    sumXY += velocitySamples.get(i) * voltageSamples.get(i);
+                    sumX2 += velocitySamples.get(i) * velocitySamples.get(i);
+                  }
+                  double kS = (sumY * sumX2 - sumX * sumXY) / (n * sumX2 - sumX * sumX);
+                  double kV = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+
+                  NumberFormat formatter = new DecimalFormat("#0.00000");
+                  System.out.println("********** Steer Motor Characterization Results **********");
+                  System.out.println("\tkS: " + formatter.format(kS));
+                  System.out.println("\tkV: " + formatter.format(kV));
+                }));
+  }
+
   /** Measures the robot's wheel radius by spinning in a circle. */
   public static Command wheelRadiusCharacterization(Drive drive) {
     SlewRateLimiter limiter = new SlewRateLimiter(WHEEL_RADIUS_RAMP_RATE);
     WheelRadiusCharacterizationState state = new WheelRadiusCharacterizationState();
-
+    System.out.println("started the wheel thingy");
     return Commands.parallel(
+
         // Drive control sequence
         Commands.sequence(
             // Reset acceleration limiter
