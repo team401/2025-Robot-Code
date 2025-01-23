@@ -11,6 +11,7 @@ public class TestModeManager {
     DriveFeedForwardCharacterization,
     DriveWheelRadiusCharacterization,
     DriveSysIdQuasistaticForward,
+    DriveSteerMotorCharacterization,
     DriveSysIdQuasistaticBackward,
     DriveSysIdDynamicForward,
     DriveSysIdDynamicBackward,
@@ -33,7 +34,9 @@ public class TestModeManager {
     testModeChooser.addOption(
         "Drive FeedForward Characterization", TestMode.DriveFeedForwardCharacterization);
     testModeChooser.addOption(
-        "Drive Steer Characterization", TestMode.DriveWheelRadiusCharacterization);
+        "Drive Steer Motor Characterization", TestMode.DriveSteerMotorCharacterization);
+    testModeChooser.addOption(
+        "Drive Wheel Radius Characterization", TestMode.DriveWheelRadiusCharacterization);
     testModeChooser.addOption(
         "Drive SysId (Quasistatic Forward)", TestMode.DriveSysIdQuasistaticForward);
     testModeChooser.addOption(

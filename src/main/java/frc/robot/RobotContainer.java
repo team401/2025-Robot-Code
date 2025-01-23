@@ -108,6 +108,10 @@ public class RobotContainer {
         CommandScheduler.getInstance()
             .schedule(AkitDriveCommands.wheelRadiusCharacterization(drive));
         break;
+      case DriveSteerMotorCharacterization:
+        CommandScheduler.getInstance()
+            .schedule(AkitDriveCommands.steerAngleCharacterization(drive));
+        break;
 
       case DriveSysIdQuasistaticForward:
         CommandScheduler.getInstance()
@@ -143,5 +147,7 @@ public class RobotContainer {
 
   public void disabledPeriodic() {}
 
-  public void disabledInit() {}
+  public void disabledInit() {
+    CommandScheduler.getInstance().cancelAll();
+  }
 }
