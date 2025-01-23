@@ -4,12 +4,13 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
-import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import coppercore.wpilib_interface.DriveTemplate;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -28,6 +29,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -106,6 +108,48 @@ public class Drive implements DriveTemplate {
 
   private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
 
+  public enum DesiredLocation {
+    Reef0,
+    Reef1,
+    Reef2,
+    Reef3,
+    Reef4,
+    Reef5,
+    Reef6,
+    Reef7,
+    Reef8,
+    Reef9,
+    Reef10,
+    Reef11,
+    Processor,
+    CoralStationLeft,
+    CoralStationRight,
+  }
+
+  public DesiredLocation[] locationArray = {
+    DesiredLocation.Reef0,
+    DesiredLocation.Reef1,
+    DesiredLocation.Reef2,
+    DesiredLocation.Reef3,
+    DesiredLocation.Reef4,
+    DesiredLocation.Reef5,
+    DesiredLocation.Reef6,
+    DesiredLocation.Reef7,
+    DesiredLocation.Reef8,
+    DesiredLocation.Reef9,
+    DesiredLocation.Reef10,
+    DesiredLocation.Reef11,
+    DesiredLocation.Processor,
+    DesiredLocation.CoralStationLeft,
+    DesiredLocation.CoralStationRight
+  };
+
+  private DesiredLocation desiredLocation = DesiredLocation.Reef0;
+
+  private boolean isOTF = false;
+
+  private Command driveToPose = null;
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -129,7 +173,7 @@ public class Drive implements DriveTemplate {
         this::getPose,
         this::setPose,
         this::getChassisSpeeds,
-        (ChassisSpeeds speeds, DriveFeedforwards ff) -> this.setGoalSpeeds(speeds, false),
+        (ChassisSpeeds speeds) -> this.setGoalSpeeds(speeds, false),
         new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
         PP_CONFIG,
@@ -145,6 +189,9 @@ public class Drive implements DriveTemplate {
         (targetPose) -> {
           Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
+
+    // warm up java processing for faster pathfind later
+    PathfindingCommand.warmupCommand().schedule();
 
     // Configure SysId
     sysId =
@@ -179,6 +226,17 @@ public class Drive implements DriveTemplate {
     if (DriverStation.isDisabled()) {
       Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
+    }
+
+    // OTF Command
+    Logger.recordOutput("Drive/OnTheFly", isOTF);
+    if (driveToPose != null) {
+      Logger.recordOutput("Drive/OnTheFlyCommandStatus", this.driveToPose.isScheduled());
+
+      // cancel path following command once OTF cancelled (likely via trigger)
+      if (!isOTF) {
+        driveToPose.cancel();
+      }
     }
 
     // run velocity if not disabled
@@ -243,8 +301,92 @@ public class Drive implements DriveTemplate {
 
       this.goalSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, robotRotation);
     } else {
+      Logger.recordOutput("Drive/DesiredOTFSpeeds", speeds);
       this.goalSpeeds = speeds;
     }
+  }
+
+  /**
+   * sets isOTF of robot true will cause robot to create a path from current location to the set
+   * PathLocation
+   *
+   * @param isOTF boolean telling robot if it should create a OTF path
+   */
+  public void setOTF(boolean isOTF) {
+    this.isOTF = isOTF;
+
+    if (isOTF) {
+      this.driveToPose = this.getDriveToPoseCommand();
+      this.driveToPose.schedule();
+    }
+  }
+
+  /**
+   * checks if drive is currently following an on the fly path
+   *
+   * @return state of OTF following
+   */
+  public boolean isDriveOTF() {
+    return isOTF;
+  }
+
+  /**
+   * sets desired path location calling this and then setting OTF to true will cause robot to drive
+   * path from current pose to the location
+   *
+   * @param location desired location for robot to pathfind to
+   */
+  public void setDesiredLocation(DesiredLocation location) {
+    this.desiredLocation = location;
+  }
+
+  /**
+   * sets desired path location calling this and then setting OTF to true will cause robot to drive
+   * path from current pose to the location
+   *
+   * @param locationIndex desired location index from DesiredLocationSelector
+   */
+  public void setDesiredLocation(int locationIndex) {
+    this.desiredLocation = locationArray[locationIndex];
+  }
+
+  /**
+   * finds a pose to pathfind to based on desiredLocation enum
+   *
+   * @return a pose representing the corresponding scoring location
+   */
+  public Pose2d findOTFPoseFromPathLocation() {
+    switch (this.desiredLocation) {
+        // reef 0 and 1 will have the same path
+        // NOTE: use PathPlannerPath.getStartingHolonomicPose to find pose for reef lineup if wanted
+      case Reef0:
+        return new Pose2d();
+      case Reef1:
+        return new Pose2d();
+      case CoralStationRight:
+        return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
+      case CoralStationLeft:
+        return new Pose2d(1.2, 7.0, Rotation2d.fromRadians(-1));
+      default:
+        // no location set, so don't allow drive to run OTF
+        this.setOTF(false);
+        return new Pose2d();
+    }
+  }
+
+  /**
+   * gets the path from current pose to the desired pose found from location
+   *
+   * @return command that drive can schedule to follow the path found
+   */
+  public Command getDriveToPoseCommand() {
+    Pose2d targetPose = findOTFPoseFromPathLocation();
+
+    // Create the constraints to use while pathfinding
+    PathConstraints constraints =
+        new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+
+    return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0);
   }
 
   /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
