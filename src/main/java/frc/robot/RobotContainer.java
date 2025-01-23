@@ -4,10 +4,8 @@
 
 package frc.robot;
 
-import coppercore.wpilib_interface.DriveWithJoysticks;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -16,8 +14,6 @@ import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.Drive.DesiredLocation;
-import frc.robot.subsystems.drive.DrivetrainConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
 /**
@@ -75,25 +71,10 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        new DriveWithJoysticks(
-            drive, // type: DriveTemplate
-            leftJoystick, // type: CommandJoystick
-            rightJoystick, // type: CommandJoystick
-            DrivetrainConstants.maxLinearSpeed, // type: double (m/s)
-            DrivetrainConstants.maxAngularSpeed, // type: double (rad/s)
-            DrivetrainConstants.joystickDeadband // type: double
-            ));
-
-    // hold right joystick trigger down to have drive go to desired location
-    rightJoystick.trigger().onTrue(new InstantCommand(() -> {
-      drive.setDesiredLocation(DesiredLocation.Reef0);
-      drive.setOTF(true);
-    }, drive));
-    rightJoystick.trigger().onFalse(new InstantCommand(() -> {
-      drive.setOTF(false);
-    }, drive));
+    // initialize helper commands
+    if (FeatureFlags.synced.getObject().runDrive) {
+      InitBindings.initDriveBindings(drive);
+    }
   }
 
   /**

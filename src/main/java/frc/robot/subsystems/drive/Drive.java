@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -129,7 +130,7 @@ public class Drive implements DriveTemplate {
 
   private boolean isOTF = false;
 
-  private Command driveToPose = AutoBuilder.pathfindToPose(new Pose2d(), null);
+  private Command driveToPose = null;
 
   public Drive(
       GyroIO gyroIO,
@@ -171,6 +172,9 @@ public class Drive implements DriveTemplate {
           Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
 
+    PathfindingCommand.warmupCommand().schedule();
+    AutoBuilder.pathfindToPose(new Pose2d(), null);
+
     // Configure SysId
     sysId =
         new SysIdRoutine(
@@ -211,7 +215,7 @@ public class Drive implements DriveTemplate {
       this.driveToPose = getDriveToPoseCommand();
       driveToPose.schedule();
       // otherwise we cancel command, to give control back to drive with joysticks
-    } else {
+    } else if (driveToPose != null) {
       this.driveToPose.cancel();
     }
 
