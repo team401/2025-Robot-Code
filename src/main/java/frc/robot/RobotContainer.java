@@ -4,6 +4,12 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Centimeters;
+
+import com.ctre.phoenix6.configs.CANrangeConfiguration;
+import com.ctre.phoenix6.configs.ProximityParamsConfigs;
+import com.ctre.phoenix6.hardware.CANrange;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -27,6 +33,9 @@ public class RobotContainer {
   private ElevatorSubsystem elevatorSubsystem;
   private Drive drive;
 
+  private CANrange canrange = new CANrange(30);
+  private boolean wasObjectDetected = false;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     loadConstants();
@@ -34,6 +43,25 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
     TestModeManager.testInit();
+
+    /*
+     * IF YOU ARE REVIEWING THIS - DO NOT MERGE THIS CODE TO MAIN
+     * This branch only exists for HITL testing of the CANrange sensors we received.
+     */
+    canrange
+        .getConfigurator()
+        .apply(
+            new CANrangeConfiguration()
+                .withProximityParams(
+                    new ProximityParamsConfigs()
+                        .withMinSignalStrengthForValidMeasurement(2500)
+                        .withProximityThreshold(Centimeters.of(10.0))
+                        .withProximityHysteresis(Centimeters.of(2.0))));
+
+    wasObjectDetected = canrange.getIsDetected(true).getValue();
+    SmartDashboard.putBoolean("canrangeTest/objectedDetected", wasObjectDetected);
+    SmartDashboard.putNumber(
+        "canrangeTest/distance", canrange.getDistance(true).getValueAsDouble());
   }
 
   public void loadConstants() {
@@ -120,6 +148,18 @@ public class RobotContainer {
 
   /** This method must be called from the robot, as it isn't called automatically. */
   public void testPeriodic() {
+    boolean isObjectDetected = canrange.getIsDetected(true).getValue();
+    if (isObjectDetected && !wasObjectDetected) {
+      System.out.println("Object is now detected!");
+    } else if (!isObjectDetected && wasObjectDetected) {
+      System.out.println("Object now no longer detecte!");
+    }
+    wasObjectDetected = isObjectDetected;
+
+    SmartDashboard.putBoolean("canrangeTest/objectedDetected", wasObjectDetected);
+    SmartDashboard.putNumber(
+        "canrangeTest/distance", canrange.getDistance(true).getValueAsDouble());
+
     if (FeatureFlags.synced.getObject().runElevator) {
       elevatorSubsystem.testPeriodic();
     }
