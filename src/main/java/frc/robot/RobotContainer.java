@@ -5,6 +5,8 @@ import coppercore.wpilib_interface.DriveWithJoysticks;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -20,6 +22,7 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -34,7 +37,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private SwerveDriveSimulation driveSim = null;
-
+  private Field2d field2d;
   // Controller
   // private final CommandXboxController controller = new CommandXboxController(0);
   private final CommandJoystick leftJoystick = new CommandJoystick(0);
@@ -70,9 +73,8 @@ public class RobotContainer {
 
       case MAPLESIM:
         // Sim robot, instantiate physics sim IO implementations
-        driveSim =
-            new SwerveDriveSimulation(
-                DrivetrainConstants.SimConstants.driveSimConfig, new Pose2d());
+        driveSim = new SwerveDriveSimulation(DriveTrainSimulationConfig.Default(), new Pose2d());
+        // DrivetrainConstants.SimConstants.driveSimConfig, new Pose2d());
         SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
         drive =
             new Drive(
@@ -81,6 +83,9 @@ public class RobotContainer {
                 new ModuleIOMapleSim(TunerConstants.FrontRight),
                 new ModuleIOMapleSim(TunerConstants.BackLeft),
                 new ModuleIOMapleSim(TunerConstants.BackRight));
+
+        field2d = new Field2d();
+        SmartDashboard.putData("simulation field", field2d);
         break;
 
       default:

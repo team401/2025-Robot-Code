@@ -11,7 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.wpilibj.Timer;
+import frc.robot.util.PhoenixUtil;
 import java.util.Arrays;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
@@ -98,8 +98,7 @@ public class ModuleIOMapleSim implements ModuleIO {
     }
     if (turnClosedLoop) {
       turnAppliedVolts =
-          turnController.calculate(
-              moduleSimulation.getSteerAbsoluteEncoderSpeed().in(RadiansPerSecond));
+          turnController.calculate(moduleSimulation.getSteerAbsoluteFacing().getRadians());
     } else {
       turnController.reset();
     }
@@ -130,7 +129,7 @@ public class ModuleIOMapleSim implements ModuleIO {
     inputs.turnCurrentAmps = Math.abs(moduleSimulation.getSteerMotorStatorCurrent().in(Amp));
 
     // Update odometry inputs (50Hz because high-frequency odometry in sim doesn't matter)
-    inputs.odometryTimestamps = new double[] {Timer.getFPGATimestamp()};
+    inputs.odometryTimestamps = PhoenixUtil.getSimulationOdometryTimeStamps();
     inputs.odometryDrivePositionsRad =
         Arrays.stream(moduleSimulation.getCachedDriveWheelFinalPositions())
             .mapToDouble(angle -> angle.in(Radians))

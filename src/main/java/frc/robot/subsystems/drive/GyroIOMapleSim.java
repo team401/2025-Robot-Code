@@ -6,7 +6,6 @@ import com.ctre.phoenix6.hardware.core.CorePigeon2;
 import com.ctre.phoenix6.sim.Pigeon2SimState;
 import frc.robot.generated.TunerConstants;
 import frc.robot.util.PhoenixUtil;
-import java.util.Queue;
 import org.ironmaple.simulation.drivesims.GyroSimulation;
 
 /** IO implementation for Pigeon 2. */
@@ -23,6 +22,7 @@ public class GyroIOMapleSim implements GyroIO {
   @Override
   public void updateInputs(GyroIOInputs inputs) {
     inputs.connected = true;
+
     inputs.yawPosition = gyroSimulation.getGyroReading();
     inputs.yawVelocityRadPerSec = gyroSimulation.getMeasuredAngularVelocity().in(RadiansPerSecond);
 
