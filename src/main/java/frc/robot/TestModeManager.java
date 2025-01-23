@@ -8,7 +8,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class TestModeManager {
   public enum TestMode {
     ElevatorTuning,
-    FeedForwardCharacterization,
+    DriveFeedForwardCharacterization,
+    DriveWheelRadiusCharacterization,
+    DriveSysIdQuasistaticForward,
+    DriveSteerMotorCharacterization,
+    DriveSysIdQuasistaticBackward,
+    DriveSysIdDynamicForward,
+    DriveSysIdDynamicBackward,
     None, // Default test mode that does nothing until a new one is selected.
   }
 
@@ -22,10 +28,23 @@ public class TestModeManager {
     testModeChooser = new SendableChooser<TestMode>();
 
     testModeChooser.setDefaultOption("None", TestMode.None);
+    // Elevator Test Modes
     testModeChooser.addOption("Elevator Tuning", TestMode.ElevatorTuning);
-    testModeChooser.addOption("Drive Characterization", TestMode.FeedForwardCharacterization);
+    // Drive Test Modes
+    testModeChooser.addOption(
+        "Drive FeedForward Characterization", TestMode.DriveFeedForwardCharacterization);
+    testModeChooser.addOption(
+        "Drive Steer Motor Characterization", TestMode.DriveSteerMotorCharacterization);
+    testModeChooser.addOption(
+        "Drive Wheel Radius Characterization", TestMode.DriveWheelRadiusCharacterization);
+    testModeChooser.addOption(
+        "Drive SysId (Quasistatic Forward)", TestMode.DriveSysIdQuasistaticForward);
+    testModeChooser.addOption(
+        "Drive SysId (Quasistatic Reverse)", TestMode.DriveSysIdQuasistaticBackward);
+    testModeChooser.addOption("Drive SysId (Dynamic Forward)", TestMode.DriveSysIdDynamicForward);
+    testModeChooser.addOption("Drive SysId (Dynamic Reverse)", TestMode.DriveSysIdDynamicBackward);
 
-    SmartDashboard.putData("Test Mode Chooser", testModeChooser);
+    SmartDashboard.putData("Test Mode Selector", testModeChooser);
   }
 
   public static TestMode getTestMode() {
