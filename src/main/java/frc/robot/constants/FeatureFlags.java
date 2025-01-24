@@ -2,20 +2,20 @@ package frc.robot.constants;
 
 import coppercore.parameter_tools.JSONExclude;
 import coppercore.parameter_tools.JSONSync;
-import edu.wpi.first.wpilibj.Filesystem;
+import coppercore.parameter_tools.JSONSyncConfigBuilder;
+import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 
 public final class FeatureFlags {
-    @JSONExclude
-    public static final JSONSync<FeatureFlags> synced =
-            new JSONSync<FeatureFlags>(
-                    new FeatureFlags(),
-                    Filesystem.getDeployDirectory()
-                            .toPath()
-                            .resolve("constants/FeatureFlags.json")
-                            .toString(),
-                    new JSONSync.JSONSyncConfigBuilder().build());
+  @JSONExclude
+  public static final JSONSync<FeatureFlags> synced =
+      new JSONSync<FeatureFlags>(
+          new FeatureFlags(),
+          "FeatureFlags.json",
+          EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
+          new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
+    public Boolean runDrive = true;
     public final Boolean runScoring = true;
-    public final Boolean runElevator = true;
-    public final Boolean runClaw = true;
+    // public final Boolean runElevator = true; // TODO: Figure out if we need Mechanism-level feature flags
+    // public final Boolean runClaw = true;
 }
