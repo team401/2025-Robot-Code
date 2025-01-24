@@ -15,82 +15,71 @@ import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.ClawConstants;
 
 public class ClawIOTalonFX implements ClawIO {
-    CANrange coralRange = new CANrange(ClawConstants.synced.getObject().coralCANrangeID);
-    CANrange algaeRange = new CANrange(ClawConstants.synced.getObject().algaeCANrangeID);
+  CANrange coralRange = new CANrange(ClawConstants.synced.getObject().coralCANrangeID);
+  CANrange algaeRange = new CANrange(ClawConstants.synced.getObject().algaeCANrangeID);
 
-    TalonFX rollerMotor = new TalonFX(ClawConstants.synced.getObject().clawMotorID);
+  TalonFX rollerMotor = new TalonFX(ClawConstants.synced.getObject().clawMotorID);
 
-    private MutVoltage outputVoltage = Volts.mutable(0.0);
-    private VoltageOut voltageRequest = new VoltageOut(outputVoltage);
+  private MutVoltage outputVoltage = Volts.mutable(0.0);
+  private VoltageOut voltageRequest = new VoltageOut(outputVoltage);
 
-    public ClawIOTalonFX() {
-        TalonFXConfiguration talonFXConfigs =
-                new TalonFXConfiguration()
-                        .withMotorOutput(
-                                new MotorOutputConfigs()
-                                        .withInverted(
-                                                ClawConstants.synced.getObject()
-                                                        .kClawMotorInverted))
-                        .withCurrentLimits(
-                                new CurrentLimitsConfigs()
-                                        .withSupplyCurrentLimit(
-                                                ClawConstants.synced.getObject()
-                                                        .clawSupplyCurrentLimit)
-                                        .withStatorCurrentLimit(
-                                                ClawConstants.synced.getObject()
-                                                        .clawStatorCurrentLimit));
+  public ClawIOTalonFX() {
+    TalonFXConfiguration talonFXConfigs =
+        new TalonFXConfiguration()
+            .withMotorOutput(
+                new MotorOutputConfigs()
+                    .withInverted(ClawConstants.synced.getObject().kClawMotorInverted))
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withSupplyCurrentLimit(ClawConstants.synced.getObject().clawSupplyCurrentLimit)
+                    .withStatorCurrentLimit(
+                        ClawConstants.synced.getObject().clawStatorCurrentLimit));
 
-        rollerMotor.getConfigurator().apply(talonFXConfigs);
+    rollerMotor.getConfigurator().apply(talonFXConfigs);
 
-        CANrangeConfiguration coralRangeConfigs =
-                new CANrangeConfiguration()
-                        .withProximityParams(
-                                new ProximityParamsConfigs()
-                                        .withMinSignalStrengthForValidMeasurement(
-                                                ClawConstants.synced.getObject()
-                                                        .coralMinSignalStrengthForValidMeasurement)
-                                        .withProximityThreshold(
-                                                ClawConstants.synced.getObject()
-                                                        .coralProximityThreshold)
-                                        .withProximityHysteresis(
-                                                ClawConstants.synced.getObject()
-                                                        .coralProximityHysteresis));
+    CANrangeConfiguration coralRangeConfigs =
+        new CANrangeConfiguration()
+            .withProximityParams(
+                new ProximityParamsConfigs()
+                    .withMinSignalStrengthForValidMeasurement(
+                        ClawConstants.synced.getObject().coralMinSignalStrengthForValidMeasurement)
+                    .withProximityThreshold(
+                        ClawConstants.synced.getObject().coralProximityThreshold)
+                    .withProximityHysteresis(
+                        ClawConstants.synced.getObject().coralProximityHysteresis));
 
-        coralRange.getConfigurator().apply(coralRangeConfigs);
+    coralRange.getConfigurator().apply(coralRangeConfigs);
 
-        CANrangeConfiguration algaeRangeConfigs =
-                new CANrangeConfiguration()
-                        .withProximityParams(
-                                new ProximityParamsConfigs()
-                                        .withMinSignalStrengthForValidMeasurement(
-                                                ClawConstants.synced.getObject()
-                                                        .algaeMinSignalStrengthForValidMeasurement)
-                                        .withProximityThreshold(
-                                                ClawConstants.synced.getObject()
-                                                        .algaeProximityThreshold)
-                                        .withProximityHysteresis(
-                                                ClawConstants.synced.getObject()
-                                                        .algaeProximityHysteresis));
+    CANrangeConfiguration algaeRangeConfigs =
+        new CANrangeConfiguration()
+            .withProximityParams(
+                new ProximityParamsConfigs()
+                    .withMinSignalStrengthForValidMeasurement(
+                        ClawConstants.synced.getObject().algaeMinSignalStrengthForValidMeasurement)
+                    .withProximityThreshold(
+                        ClawConstants.synced.getObject().algaeProximityThreshold)
+                    .withProximityHysteresis(
+                        ClawConstants.synced.getObject().algaeProximityHysteresis));
 
-        algaeRange.getConfigurator().apply(algaeRangeConfigs);
-    }
+    algaeRange.getConfigurator().apply(algaeRangeConfigs);
+  }
 
-    public void updateInputs(ClawInputs inputs) {}
+  public void updateInputs(ClawInputs inputs) {}
 
-    public void applyOutputs(ClawOutputs outputs) {
-        outputs.clawAppliedVolts.mut_replace(outputVoltage);
-        rollerMotor.setControl(voltageRequest.withOutput(outputVoltage));
-    }
+  public void applyOutputs(ClawOutputs outputs) {
+    outputs.clawAppliedVolts.mut_replace(outputVoltage);
+    rollerMotor.setControl(voltageRequest.withOutput(outputVoltage));
+  }
 
-    public void setVoltage(Voltage volts) {
-        outputVoltage.mut_replace(volts);
-    }
+  public void setVoltage(Voltage volts) {
+    outputVoltage.mut_replace(volts);
+  }
 
-    public boolean getCoralDetected() {
-        return coralRange.getIsDetected().getValue();
-    }
+  public boolean getCoralDetected() {
+    return coralRange.getIsDetected().getValue();
+  }
 
-    public boolean getAlgaeDetected() {
-        return algaeRange.getIsDetected().getValue();
-    }
+  public boolean getAlgaeDetected() {
+    return algaeRange.getIsDetected().getValue();
+  }
 }

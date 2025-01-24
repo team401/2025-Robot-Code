@@ -6,17 +6,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Object to handle switching between test modes. */
 public class TestModeManager {
-    public enum TestMode {
-        ElevatorTuning,
-        ClawTuning,
-        DriveFeedForwardCharacterization,
-        DriveWheelRadiusCharacterization,
-        DriveSysIdQuasistaticForward,
-        DriveSteerMotorCharacterization,
-        DriveSysIdQuasistaticBackward,
-        DriveSysIdDynamicForward,
-        DriveSysIdDynamicBackward,
-        None, // Default test mode that does nothing until a new one is selected.
+  public enum TestMode {
+    ElevatorTuning,
+    ClawTuning,
+    DriveFeedForwardCharacterization,
+    DriveWheelRadiusCharacterization,
+    DriveSysIdQuasistaticForward,
+    DriveSteerMotorCharacterization,
+    DriveSysIdQuasistaticBackward,
+    DriveSysIdDynamicForward,
+    DriveSysIdDynamicBackward,
+    None, // Default test mode that does nothing until a new one is selected.
   }
 
   private static SendableChooser<TestMode> testModeChooser;

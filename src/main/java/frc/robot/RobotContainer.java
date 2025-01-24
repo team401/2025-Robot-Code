@@ -23,14 +23,9 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-    // The robot's subsystems and commands are defined here
-    private ScoringSubsystem scoringSubsystem;
-  private Drive drive;
-
-    // Replace with CommandPS4Controller or CommandJoystick if needed
-    private final CommandXboxController m_driverController =
-            new CommandXboxController(OperatorConstants.synced.getObject().kDriverControllerPort);
   // The robot's subsystems and commands are defined here
+  private ScoringSubsystem scoringSubsystem;
+  private Drive drive;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -47,11 +42,14 @@ public class RobotContainer {
     OperatorConstants.synced.loadData();
   }
 
-    public void configureSubsystems() {
-        if (FeatureFlags.synced.getObject().runScoring) {
-            scoringSubsystem = InitSubsystems.initScoringSubsystem();
-        }
+  public void configureSubsystems() {
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem = InitSubsystems.initScoringSubsystem();
     }
+    if (FeatureFlags.synced.getObject().runDrive) {
+      drive = InitSubsystems.initDriveSubsystem();
+    }
+  }
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
@@ -120,10 +118,16 @@ public class RobotContainer {
     }
   }
 
-    /** This method must be called from the robot, as it isn't called automatically. */
-    public void testPeriodic() {
-        if (FeatureFlags.synced.getObject().runScoring) {
-            scoringSubsystem.testPeriodic();
-        }
+  /** This method must be called from the robot, as it isn't called automatically. */
+  public void testPeriodic() {
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem.testPeriodic();
     }
+  }
+
+  public void disabledPeriodic() {}
+
+  public void disabledInit() {
+    CommandScheduler.getInstance().cancelAll();
+  }
 }

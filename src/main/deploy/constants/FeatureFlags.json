@@ -1,5 +1,5 @@
 {
-    "runScoring": true,
-    "runElevator": true,
-    "runClaw": true
+  "runScoring": true,
+  "runElevator": true,
+  "runClaw": true
 }

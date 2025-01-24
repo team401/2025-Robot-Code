@@ -5,15 +5,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.ExampleElevatorCommand;
 
 public class ScoringSubsystem extends SubsystemBase {
-    private ElevatorMechanism elevatorMechanism;
-    private ClawMechanism clawMechanism;
+  private ElevatorMechanism elevatorMechanism;
+  private ClawMechanism clawMechanism;
 
-    public ScoringSubsystem(ElevatorMechanism elevatorMechanism, ClawMechanism clawMechanism) {
-        this.elevatorMechanism = elevatorMechanism;
-        this.clawMechanism = clawMechanism;
+  public ScoringSubsystem(ElevatorMechanism elevatorMechanism, ClawMechanism clawMechanism) {
+    this.elevatorMechanism = elevatorMechanism;
+    this.clawMechanism = clawMechanism;
 
-        setDefaultCommand(new ExampleElevatorCommand(this));
-    }
+    setDefaultCommand(new ExampleElevatorCommand(this));
+  }
 
   /**
    * Send a new goal height to the elevator mechanism
@@ -40,9 +40,9 @@ public class ScoringSubsystem extends SubsystemBase {
     elevatorMechanism.periodic();
   }
 
-    /** This method must be called by RobotContainer, as it does not run automatically! */
-    public void testPeriodic() {
-        elevatorMechanism.testPeriodic();
-        clawMechanism.testPeriodic();
-    }
+  /** This method must be called by RobotContainer, as it does not run automatically! */
+  public void testPeriodic() {
+    elevatorMechanism.testPeriodic();
+    clawMechanism.testPeriodic();
+  }
 }

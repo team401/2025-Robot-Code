@@ -15,7 +15,7 @@ import org.littletonrobotics.junction.Logger;
  * the elevator, and then wraps its setpoints around the max position to control back to the bottom.
  */
 public class ExampleElevatorCommand extends Command {
-    ScoringSubsystem scoringSubsystem;
+  ScoringSubsystem scoringSubsystem;
 
   MutDistance currentGoalHeight = Meters.mutable(0.0);
   // Start with getting max range of elevator (max height - min height), then divide by 3 to
@@ -36,8 +36,8 @@ public class ExampleElevatorCommand extends Command {
    */
   final double setpointThresholdMeters = 0.01;
 
-    public ExampleElevatorCommand(ScoringSubsystem scoringSubsystem) {
-        this.scoringSubsystem = scoringSubsystem;
+  public ExampleElevatorCommand(ScoringSubsystem scoringSubsystem) {
+    this.scoringSubsystem = scoringSubsystem;
 
     addRequirements(scoringSubsystem);
   }
