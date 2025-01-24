@@ -148,6 +148,8 @@ public class Drive implements DriveTemplate {
 
   private boolean isOTF = false;
 
+  private boolean isLiningUp = false;
+
   private Command driveToPose = null;
 
   public Drive(
@@ -330,6 +332,27 @@ public class Drive implements DriveTemplate {
     return isOTF;
   }
 
+    /**
+   * sets isLiningUp of robot
+   *  true will cause robot to gather distance from reef tag and drive towards it
+   * PathLocation
+   *
+   * @param isLiningUp boolean telling robot if it should create a OTF path
+   */
+  public void setLiningUp(boolean isLiningUp) {
+    this.isLiningUp = isLiningUp;
+  }
+
+    /**
+   * checks if drive is currently lining up to a reef
+   *
+   * @return state of lining up
+   */
+  @AutoLogOutput(key = "Drive/isLiningUp")
+  public boolean isDriveLiningUp() {
+    return isLiningUp;
+  }
+
   /**
    * sets desired path location calling this and then setting OTF to true will cause robot to drive
    * path from current pose to the location
@@ -387,6 +410,53 @@ public class Drive implements DriveTemplate {
         new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
 
     return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0);
+  }
+
+  public boolean isAllianceRed() {
+    return DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Red);
+  }
+
+  public int getTagIdForReef() {
+    boolean allianceRed = this.isAllianceRed();
+    switch (desiredLocation) {
+      case Reef0:
+        return allianceRed ? 10 : 21;
+      case Reef1:
+        return allianceRed ? 10 : 21;
+      case Reef2:
+        return allianceRed ? 9 : 22;
+      case Reef3:
+        return allianceRed ? 9 : 22;
+      case Reef4:
+        return allianceRed ? 8 : 17;
+      case Reef5:
+        return allianceRed ? 8 : 17;
+      case Reef6:
+        return allianceRed ? 7 : 18;
+      case Reef7:
+        return allianceRed ? 7 : 18;
+      case Reef8:
+        return allianceRed ? 6 : 19;
+      case Reef9:
+        return allianceRed ? 6 : 19;
+      case Reef10:
+        return allianceRed ? 11 : 20;
+      case Reef11:
+        return allianceRed ? 11 : 20;
+      default:
+        return -1;
+    }
+  }
+
+  public void LineupWithReefLocation() {
+    int tagId = this.getTagIdForReef();
+
+    if (tagId == -1) {
+      // cancel lineup or whatever
+      return;
+    }
+
+
   }
 
   /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
