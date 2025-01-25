@@ -170,6 +170,16 @@ public final class ElevatorConstants {
   public final Integer CRTticksPerRotation =
       4096; // CANCoders have a resolution of 4096 ticks/rotation
 
+  /** Height to drive the elevator to in Idle */
+  public final Double elevatorIdleHeightMeters = 0.0;
+
+  @JSONExclude public final Distance elevatorIdleHeight = Meters.of(elevatorIdleHeightMeters);
+
+  /** Height to drive the elevator to in intake */
+  public final Double elevatorIntakeHeightMeters = 0.2; // TODO: Tune this value
+
+  @JSONExclude public final Distance elevatorIntakeHeight = Meters.of(elevatorIntakeHeightMeters);
+
   public static final class Sim {
     @JSONExclude
     public static final JSONSync<ElevatorConstants.Sim> synced =

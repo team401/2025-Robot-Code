@@ -38,6 +38,8 @@ public interface ClawIO {
   /**
    * Updates a ClawInputs with the current information from sensors and motors.
    *
+   * <p>Should be called by the ClawMechanism periodically
+   *
    * @param inputs The ClawInputs to update with the latest information
    */
   public default void updateInputs(ClawInputs inputs) {}
@@ -45,6 +47,8 @@ public interface ClawIO {
   /**
    * Applies requests to motors and updates a ClawOutputs object with information about motor
    * output.
+   *
+   * <p>Should be called by the ClawMechanism periodically
    *
    * @param outputs ClawOutputs to update with the latest applied voltage.
    */
@@ -62,7 +66,7 @@ public interface ClawIO {
    *
    * @return True if a coral is detected, false if not
    */
-  public default boolean getCoralDetected() {
+  public default boolean isCoralDetected() {
     return false;
   }
 
@@ -71,7 +75,7 @@ public interface ClawIO {
    *
    * @return True if an algae is detected, false if not
    */
-  public default boolean getAlgaeDetected() {
+  public default boolean isAlgaeDetected() {
     return false;
   }
 }

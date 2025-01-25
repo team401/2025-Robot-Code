@@ -27,5 +27,7 @@
   "minElevatorHeightMeters": 0.0,
   "maxElevatorHeightMeters": 3.0,
   "elevatorStatorCurrentLimitAmps": 80.0,
-  "CRTticksPerRotation": 4096
+  "CRTticksPerRotation": 4096,
+  "elevatorIdleHeightMeters": 0.2,
+  "elevatorIntakeHeightMeters": 0.2
 }

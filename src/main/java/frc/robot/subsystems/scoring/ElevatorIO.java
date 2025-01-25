@@ -96,6 +96,9 @@ public interface ElevatorIO {
   /**
    * Set the goal position of CANCoder 19 which the elevator will control to when it is not in
    * override mode
+   *
+   * <p>This method should only be called by the ElevatorMechanism! There is important safety
+   * control logic housed there which, if bypassed, will be sorely missed.
    */
   public default void setLargeCANCoderGoalPos(Angle goalPos) {}
 
@@ -113,7 +116,7 @@ public interface ElevatorIO {
    * Set the position of the 19 tooth CANCoder. This position is separate from absolute position and
    * can track multiple rotations.
    */
-  public default void setLargeCANCoderPosition(Angle newAngle) {}
+  default void setLargeCANCoderPosition(Angle newAngle) {}
 
   /**
    * Set the position of the 17 tooth CANCoder. This position is separate from absolute position and

@@ -2,6 +2,7 @@ package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import coppercore.parameter_tools.JSONExclude;
@@ -9,6 +10,7 @@ import coppercore.parameter_tools.JSONSync;
 import coppercore.parameter_tools.JSONSyncConfigBuilder;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Filesystem;
 
 public class ClawConstants {
@@ -40,4 +42,6 @@ public class ClawConstants {
   public final Distance algaeProximityThreshold = Centimeters.of(5.0); // TODO: Tune these values!
   public final Distance algaeProximityHysteresis = Centimeters.of(0.5);
   public final double algaeMinSignalStrengthForValidMeasurement = 2500.0;
+
+  public final Voltage intakeVoltage = Volts.of(3.0);
 }

@@ -75,11 +75,11 @@ public class ClawIOTalonFX implements ClawIO {
     outputVoltage.mut_replace(volts);
   }
 
-  public boolean getCoralDetected() {
+  public boolean isCoralDetected() {
     return coralRange.getIsDetected().getValue();
   }
 
-  public boolean getAlgaeDetected() {
+  public boolean isAlgaeDetected() {
     return algaeRange.getIsDetected().getValue();
   }
 }

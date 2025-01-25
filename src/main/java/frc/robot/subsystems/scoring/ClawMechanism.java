@@ -7,16 +7,27 @@ import frc.robot.TestModeManager;
 import org.littletonrobotics.junction.Logger;
 
 public class ClawMechanism {
-  ClawIO io;
-  ClawInputsAutoLogged inputs = new ClawInputsAutoLogged();
-  ClawOutputsAutoLogged outputs = new ClawOutputsAutoLogged();
+  private ClawIO io;
+  private ClawInputsAutoLogged inputs = new ClawInputsAutoLogged();
+  private ClawOutputsAutoLogged outputs = new ClawOutputsAutoLogged();
 
-  LoggedTunableNumber manualTuningVolts;
+  private LoggedTunableNumber manualTuningVolts;
 
   public ClawMechanism(ClawIO io) {
     manualTuningVolts = new LoggedTunableNumber("ClawTunables/clawManualVolts", 0.0);
 
     this.io = io;
+  }
+
+  /**
+   * Return a the ClawMechanism instance's ClawIO instance
+   *
+   * <p>NOTE: Be careful to only call methods from where they're allowed to be called!
+   *
+   * @return a ClawIO
+   */
+  public ClawIO getIO() {
+    return io;
   }
 
   /**
