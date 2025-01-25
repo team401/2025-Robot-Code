@@ -67,6 +67,7 @@ public class RobotContainer {
     private void configureBindings() {
 
         if (FeatureFlags.synced.getObject().runClimb) {
+
             m_buttonMasher
                     .a()
                     .onTrue(Commands.runOnce(() -> climbSubsystem.setAction(ClimbAction.CLIMB)))

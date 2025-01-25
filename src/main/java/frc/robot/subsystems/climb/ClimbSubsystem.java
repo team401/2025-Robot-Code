@@ -97,6 +97,9 @@ public class ClimbSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
 
+        io.updateInputs(inputs);
+        io.applyOutputs(outputs);
+
         switch (State) {
             case WAITING:
                 waiting();
@@ -112,12 +115,9 @@ public class ClimbSubsystem extends SubsystemBase {
                 break;
         }
 
-        io.updateInputs(inputs);
-        io.applyOutputs(outputs);
-
         Logger.processInputs("climb/inputs", inputs);
         Logger.processInputs("climb/outputs", outputs);
-        Logger.recordOutput("State", State);
-        Logger.recordOutput("Action", Action);
+        Logger.recordOutput("climb/State", State);
+        Logger.recordOutput("climb/Action", Action);
     }
 }

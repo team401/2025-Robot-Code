@@ -9,7 +9,7 @@ import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import java.util.function.BooleanSupplier;
 
 public class ClimbIOSim implements ClimbIO {
 
@@ -23,24 +23,24 @@ public class ClimbIOSim implements ClimbIO {
                     2 * Math.PI,
                     false,
                     0,
-                    0,
+                    0.005,
                     0);
 
-    private final PIDController angleController = new PIDController(10, 0, 0);
+    private final PIDController angleController = new PIDController(5, 0, 0);
+
+    private BooleanSupplier lockedToCage = () -> true;
 
     private MutAngle goalAngle = Radians.mutable(0);
     private MutVoltage overrideVoltage = Volts.mutable(0.0);
 
     private boolean override = false;
 
-    public ClimbIOSim() {
-        SmartDashboard.putBoolean("lockedToCage", false);
-    }
+    public ClimbIOSim() {}
 
     @Override
     public void updateInputs(ClimbInputs inputs) {
 
-        inputs.lockedToCage = SmartDashboard.getBoolean("lockedToCage", false);
+        inputs.lockedToCage = this.lockedToCage.getAsBoolean();
         inputs.goalAngle.mut_replace(goalAngle);
         inputs.motorAngle.mut_replace(Radians.of(climb.getAngleRads()));
     }
@@ -57,7 +57,8 @@ public class ClimbIOSim implements ClimbIO {
         }
 
         outputs.appliedVoltage.mut_replace(appliedVolts);
-        climb.setInputVoltage(appliedVolts.in(Volt));
+        climb.setInputVoltage(appliedVolts.in(Volts));
+        climb.update(0.02);
     }
 
     @Override
