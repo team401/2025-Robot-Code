@@ -364,7 +364,8 @@ public class Drive implements DriveTemplate {
       case Reef1:
         return new Pose2d();
       case CoralStationRight:
-        return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
+        return new Pose2d(16.0, 6.6, new Rotation2d(0.0));
+        // return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
       case CoralStationLeft:
         return new Pose2d(1.2, 7.0, Rotation2d.fromRadians(-1));
       default:

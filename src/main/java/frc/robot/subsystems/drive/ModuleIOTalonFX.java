@@ -29,7 +29,6 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.JsonConstants;
 import java.util.Queue;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
