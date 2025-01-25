@@ -3,6 +3,7 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import coppercore.wpilib_interface.DriveWithJoysticks;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -23,6 +24,7 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.seasonspecific.crescendo2024.CrescendoNoteOnField;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -72,6 +74,10 @@ public class RobotContainer {
         break;
 
       case MAPLESIM:
+        SimulatedArena.getInstance().clearGamePieces();
+        SimulatedArena.getInstance()
+            .addGamePiece(new CrescendoNoteOnField(new Translation2d(3, 3)));
+
         // Sim robot, instantiate physics sim IO implementations
         driveSim = new SwerveDriveSimulation(DriveTrainSimulationConfig.Default(), new Pose2d());
         // DrivetrainConstants.SimConstants.driveSimConfig, new Pose2d());

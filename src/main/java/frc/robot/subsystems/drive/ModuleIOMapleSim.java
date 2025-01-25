@@ -105,7 +105,7 @@ public class ModuleIOMapleSim implements ModuleIO {
 
     // Update simulation state
     driveSim.requestVoltage(Volts.of((MathUtil.clamp(driveAppliedVolts, -12.0, 12.0))));
-    turnSim.requestVoltage(Volts.of((MathUtil.clamp(turnAppliedVolts, -12.0, 12.0))));
+    turnSim.requestVoltage(Volts.of(MathUtil.clamp(turnAppliedVolts, -12.0, 12.0)));
 
     // Update drive inputs
     inputs.driveConnected = true;
@@ -135,6 +135,10 @@ public class ModuleIOMapleSim implements ModuleIO {
             .mapToDouble(angle -> angle.in(Radians))
             .toArray();
     inputs.odometryTurnPositions = moduleSimulation.getCachedSteerAbsolutePositions();
+
+    driveSim.updateControlSignal(Angleinputs.drivePositionRad, inputs.driveVelocityRadPerSec, inputs.drivePositionRad, inputs.driveVelocityRadPerSec);
+    driveSim.updateControlSignal(inputs.turnAbsolutePosition, inputs.driveVelocityRadPerSec, inputs.turnAbsolutePosition, inputs.driveVelocityRadPerSec);
+
   }
 
   @Override
