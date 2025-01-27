@@ -1,7 +1,7 @@
 {
   "steerKp": 40.0,
   "steerKi": 0.0,
-  "steerKd": 0.0,
+  "steerKd": 0.5,
   "steerKs": 0.18753,
   "steerKv": 2.49773,
   "steerKa": 0.0,
@@ -311,6 +311,10 @@
   "kInvertLeftSide": false,
   "kInvertRightSide": true,
   "kPigeonId": 20,
+  "OTFMaxLinearVelocity": 3.5,
+  "OTFMaxLinearAccel": 0.5,
+  "OTFMaxAngularVelocity": 3.141592653589793,
+  "OTFMaxAngularAccel": 1.5707963267948966,
   "DrivetrainConstants": {
     "CANBusName": "canivore",
     "Pigeon2Id": 20

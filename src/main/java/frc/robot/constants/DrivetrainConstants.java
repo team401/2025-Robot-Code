@@ -109,6 +109,12 @@ public class DrivetrainConstants {
 
   public final Integer kPigeonId = 20;
 
+  // OTF Max speed / accel
+  public final Double OTFMaxLinearVelocity = 3.5;
+  public final Double OTFMaxLinearAccel = 0.5;
+  public final Double OTFMaxAngularVelocity = Math.PI;
+  public final Double OTFMaxAngularAccel = Math.PI / 2;
+
   // These are only used for simulation
   @JSONExclude public final MomentOfInertia kSteerInertia = KilogramSquareMeters.of(0.01);
   @JSONExclude public final MomentOfInertia kDriveInertia = KilogramSquareMeters.of(0.01);
