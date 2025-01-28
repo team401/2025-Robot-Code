@@ -6,10 +6,12 @@ import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.state.StateContainer;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.ExampleElevatorCommand;
 import frc.robot.subsystems.scoring.states.IdleState;
 import frc.robot.subsystems.scoring.states.IntakeCoralState;
+import org.littletonrobotics.junction.Logger;
 
 public class ScoringSubsystem extends SubsystemBase {
   private ElevatorMechanism elevatorMechanism;
@@ -60,9 +62,13 @@ public class ScoringSubsystem extends SubsystemBase {
 
     stateMachineConfiguration
         .configure(ScoringStateContainer.IntakeCoral)
+        // .permitIf(ScoringStateMachineTriggers.BeginIntake, ScoringStateContainer.Idle, () ->
+        // isCoralDetected())
         .permit(ScoringStateMachineTriggers.DoneIntaking, ScoringStateContainer.Idle);
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, ScoringStateContainer.Idle);
+
+    SmartDashboard.putBoolean("scoring/fireStartIntaking", false);
   }
 
   /**
@@ -116,9 +122,17 @@ public class ScoringSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    boolean fireStartIntaking = SmartDashboard.getBoolean("scoring/fireStartIntaking", false);
+    if (fireStartIntaking) {
+      stateMachine.fire(ScoringStateMachineTriggers.BeginIntake);
+    }
+
     stateMachine.periodic();
 
     elevatorMechanism.periodic();
+    clawMechanism.periodic();
+
+    Logger.recordOutput("scoring/state", stateMachine.getCurrentState());
   }
 
   /** This method must be called by RobotContainer, as it does not run automatically! */

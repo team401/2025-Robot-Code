@@ -8,6 +8,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import coppercore.parameter_tools.JSONExclude;
 import coppercore.parameter_tools.JSONSync;
 import coppercore.parameter_tools.JSONSyncConfigBuilder;
+import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
@@ -18,10 +19,8 @@ public class ClawConstants {
   public static final JSONSync<ClawConstants> synced =
       new JSONSync<ClawConstants>(
           new ClawConstants(),
-          Filesystem.getDeployDirectory()
-              .toPath()
-              .resolve("constants/ClawConstants.json")
-              .toString(),
+          "ClawConstants.json",
+          EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
           new JSONSyncConfigBuilder().build());
 
   public final Integer coralCANrangeID = 20; // TODO: Actual CAN id
@@ -43,5 +42,20 @@ public class ClawConstants {
   public final Distance algaeProximityHysteresis = Centimeters.of(0.5);
   public final double algaeMinSignalStrengthForValidMeasurement = 2500.0;
 
-  public final Voltage intakeVoltage = Volts.of(3.0);
+  public final Voltage intakeVoltage = Volts.of(12.0);
+
+  public static final class Sim {
+    @JSONExclude
+    public static final JSONSync<ClawConstants.Sim> synced =
+        new JSONSync<ClawConstants.Sim>(
+            new ClawConstants.Sim(),
+            Filesystem.getDeployDirectory()
+                .toPath()
+                .resolve("constants/ClawConstants.Sim.json")
+                .toString(),
+            new JSONSyncConfigBuilder().build());
+
+    /** How long the motor must remain powered to intake or outtake a game piece */
+    public final Double actionTimeSeconds = 1.0;
+  }
 }

@@ -12,13 +12,19 @@ public class JsonConstants {
     DrivetrainConstants.synced.loadData();
     ElevatorConstants.synced.loadData();
     ElevatorConstants.Sim.synced.loadData();
+    ClawConstants.synced.loadData();
+    ClawConstants.Sim.synced.loadData();
 
     drivetrainConstants = DrivetrainConstants.synced.getObject();
     elevatorConstants = ElevatorConstants.synced.getObject();
     elevatorConstantsSim = ElevatorConstants.Sim.synced.getObject();
+    clawConstants = ClawConstants.synced.getObject();
+    clawConstantsSim = ClawConstants.Sim.synced.getObject();
   }
 
   public static DrivetrainConstants drivetrainConstants;
   public static ElevatorConstants elevatorConstants;
   public static ElevatorConstants.Sim elevatorConstantsSim;
+  public static ClawConstants clawConstants;
+  public static ClawConstants.Sim clawConstantsSim;
 }

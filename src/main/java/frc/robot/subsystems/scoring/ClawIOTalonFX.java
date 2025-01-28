@@ -12,13 +12,13 @@ import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.constants.ClawConstants;
+import frc.robot.constants.JsonConstants;
 
 public class ClawIOTalonFX implements ClawIO {
-  CANrange coralRange = new CANrange(ClawConstants.synced.getObject().coralCANrangeID);
-  CANrange algaeRange = new CANrange(ClawConstants.synced.getObject().algaeCANrangeID);
+  CANrange coralRange = new CANrange(JsonConstants.clawConstants.coralCANrangeID);
+  CANrange algaeRange = new CANrange(JsonConstants.clawConstants.algaeCANrangeID);
 
-  TalonFX rollerMotor = new TalonFX(ClawConstants.synced.getObject().clawMotorID);
+  TalonFX rollerMotor = new TalonFX(JsonConstants.clawConstants.clawMotorID);
 
   private MutVoltage outputVoltage = Volts.mutable(0.0);
   private VoltageOut voltageRequest = new VoltageOut(outputVoltage);
@@ -28,12 +28,11 @@ public class ClawIOTalonFX implements ClawIO {
         new TalonFXConfiguration()
             .withMotorOutput(
                 new MotorOutputConfigs()
-                    .withInverted(ClawConstants.synced.getObject().kClawMotorInverted))
+                    .withInverted(JsonConstants.clawConstants.kClawMotorInverted))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
-                    .withSupplyCurrentLimit(ClawConstants.synced.getObject().clawSupplyCurrentLimit)
-                    .withStatorCurrentLimit(
-                        ClawConstants.synced.getObject().clawStatorCurrentLimit));
+                    .withSupplyCurrentLimit(JsonConstants.clawConstants.clawSupplyCurrentLimit)
+                    .withStatorCurrentLimit(JsonConstants.clawConstants.clawStatorCurrentLimit));
 
     rollerMotor.getConfigurator().apply(talonFXConfigs);
 
@@ -42,11 +41,9 @@ public class ClawIOTalonFX implements ClawIO {
             .withProximityParams(
                 new ProximityParamsConfigs()
                     .withMinSignalStrengthForValidMeasurement(
-                        ClawConstants.synced.getObject().coralMinSignalStrengthForValidMeasurement)
-                    .withProximityThreshold(
-                        ClawConstants.synced.getObject().coralProximityThreshold)
-                    .withProximityHysteresis(
-                        ClawConstants.synced.getObject().coralProximityHysteresis));
+                        JsonConstants.clawConstants.coralMinSignalStrengthForValidMeasurement)
+                    .withProximityThreshold(JsonConstants.clawConstants.coralProximityThreshold)
+                    .withProximityHysteresis(JsonConstants.clawConstants.coralProximityHysteresis));
 
     coralRange.getConfigurator().apply(coralRangeConfigs);
 
@@ -55,16 +52,20 @@ public class ClawIOTalonFX implements ClawIO {
             .withProximityParams(
                 new ProximityParamsConfigs()
                     .withMinSignalStrengthForValidMeasurement(
-                        ClawConstants.synced.getObject().algaeMinSignalStrengthForValidMeasurement)
-                    .withProximityThreshold(
-                        ClawConstants.synced.getObject().algaeProximityThreshold)
-                    .withProximityHysteresis(
-                        ClawConstants.synced.getObject().algaeProximityHysteresis));
+                        JsonConstants.clawConstants.algaeMinSignalStrengthForValidMeasurement)
+                    .withProximityThreshold(JsonConstants.clawConstants.algaeProximityThreshold)
+                    .withProximityHysteresis(JsonConstants.clawConstants.algaeProximityHysteresis));
 
     algaeRange.getConfigurator().apply(algaeRangeConfigs);
   }
 
-  public void updateInputs(ClawInputs inputs) {}
+  public void updateInputs(ClawInputs inputs) {
+    inputs.algaeDetected = isAlgaeDetected();
+    inputs.coralDetected = isCoralDetected();
+
+    inputs.clawStatorCurrent.mut_replace(rollerMotor.getStatorCurrent().getValue());
+    inputs.clawSupplyCurrent.mut_replace(rollerMotor.getSupplyCurrent().getValue());
+  }
 
   public void applyOutputs(ClawOutputs outputs) {
     outputs.clawAppliedVolts.mut_replace(outputVoltage);

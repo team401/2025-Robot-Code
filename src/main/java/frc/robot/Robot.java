@@ -67,7 +67,9 @@ public class Robot extends LoggedRobot {
 
     // Start AdvantageKit logger
     Logger.start();
+
     JsonConstants.loadConstants();
+
     // Check for valid swerve config
     var modules =
         new SwerveModuleConstants[] {

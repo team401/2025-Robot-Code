@@ -39,7 +39,7 @@ public class ClawMechanism {
     io.applyOutputs(outputs);
 
     Logger.processInputs("claw/inputs", inputs);
-    Logger.processInputs("claw/outputs", inputs);
+    Logger.processInputs("claw/outputs", outputs);
   }
 
   /** This method must be called from the subsystem's test periodic! */
