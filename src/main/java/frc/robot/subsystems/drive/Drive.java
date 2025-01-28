@@ -350,6 +350,38 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * updates desired path location (for when OTF is already running)
+   * this will cancel old command and generate a new OTF path to run
+   * 
+   * @param location desired location for robot to pathfind to
+   */
+  public void updateDesiredLocation(DesiredLocation location) {
+    this.setDesiredLocation(location);
+
+    if (isOTF) {
+      this.driveToPose.cancel();
+      this.driveToPose = this.getDriveToPoseCommand();
+      this.driveToPose.schedule();
+    }
+  }
+
+   /**
+   * updates desired path location (for when OTF is already running)
+   * this will cancel old command and generate a new OTF path to run
+   * 
+   * @param locationIndex desired location index for robot to pathfind to (sent from DesiredLocationSelector)
+   */
+  public void updateDesiredLocation(int locationIndex) {
+    this.setDesiredLocation(locationIndex);
+
+    if (isOTF) {
+      this.driveToPose.cancel();
+      this.driveToPose = this.getDriveToPoseCommand();
+      this.driveToPose.schedule();
+    }
+  }
+
+  /**
    * finds a pose to pathfind to based on desiredLocation enum
    *
    * @return a pose representing the corresponding scoring location
