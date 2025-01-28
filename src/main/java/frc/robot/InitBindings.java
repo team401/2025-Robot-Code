@@ -85,7 +85,7 @@ public final class InitBindings {
                 () -> {
                   drive.setPose(
                       new Pose2d(
-                          Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.zero())));
+                          Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
                 }));
   }
 }

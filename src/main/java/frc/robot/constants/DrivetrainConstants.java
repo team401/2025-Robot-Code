@@ -35,7 +35,7 @@ public class DrivetrainConstants {
 
   public final Double steerKp = 40.0;
   public final Double steerKi = 0.0;
-  public final Double steerKd = 0.5;
+  public final Double steerKd = 0.0;
   public final Double steerKs = 0.18753;
   public final Double steerKv = 2.49773;
   public final Double steerKa = 0.0;
