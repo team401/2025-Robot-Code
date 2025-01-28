@@ -53,6 +53,7 @@ public class ModuleIOMapleSim implements ModuleIO {
   private double turnAppliedVolts = 0.0;
 
   public ModuleIOMapleSim(
+      SwerveModuleSimulation moduleSimulation,
       SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
           constants) {
     // Create drive and turn sim
@@ -70,7 +71,7 @@ public class ModuleIOMapleSim implements ModuleIO {
             KilogramSquareMeters.of(constants.SteerInertia * 10),
             1.2);
 
-    moduleSimulation = new SwerveModuleSimulation(configs);
+    this.moduleSimulation = moduleSimulation;
     driveSim =
         moduleSimulation
             .useGenericMotorControllerForDrive()
@@ -136,9 +137,16 @@ public class ModuleIOMapleSim implements ModuleIO {
             .toArray();
     inputs.odometryTurnPositions = moduleSimulation.getCachedSteerAbsolutePositions();
 
-    driveSim.updateControlSignal(Angleinputs.drivePositionRad, inputs.driveVelocityRadPerSec, inputs.drivePositionRad, inputs.driveVelocityRadPerSec);
-    driveSim.updateControlSignal(inputs.turnAbsolutePosition, inputs.driveVelocityRadPerSec, inputs.turnAbsolutePosition, inputs.driveVelocityRadPerSec);
-
+    driveSim.updateControlSignal(
+        Radians.of(inputs.drivePositionRad),
+        RadiansPerSecond.of(inputs.driveVelocityRadPerSec),
+        Radians.of(inputs.drivePositionRad),
+        RadiansPerSecond.of(inputs.driveVelocityRadPerSec));
+    driveSim.updateControlSignal(
+        Radians.of(inputs.turnAbsolutePosition.getRadians()),
+        RadiansPerSecond.of(inputs.driveVelocityRadPerSec),
+        Radians.of(inputs.turnAbsolutePosition.getRadians()),
+        RadiansPerSecond.of(inputs.driveVelocityRadPerSec));
   }
 
   @Override

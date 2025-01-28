@@ -1,6 +1,6 @@
 package frc.robot.util;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.StatusCode;
 import edu.wpi.first.wpilibj.Timer;

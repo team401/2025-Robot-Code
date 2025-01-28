@@ -3,11 +3,11 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import coppercore.wpilib_interface.DriveWithJoysticks;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -24,7 +24,7 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
-import org.ironmaple.simulation.seasonspecific.crescendo2024.CrescendoNoteOnField;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgaeStack;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -76,22 +76,21 @@ public class RobotContainer {
       case MAPLESIM:
         SimulatedArena.getInstance().clearGamePieces();
         SimulatedArena.getInstance()
-            .addGamePiece(new CrescendoNoteOnField(new Translation2d(3, 3)));
-
+            .addGamePiece(new ReefscapeCoralAlgaeStack(new Translation2d(5, 5)));
         // Sim robot, instantiate physics sim IO implementations
-        driveSim = new SwerveDriveSimulation(DriveTrainSimulationConfig.Default(), new Pose2d());
+        driveSim =
+            new SwerveDriveSimulation(
+                DriveTrainSimulationConfig.Default(), new Pose2d(3, 5, new Rotation2d()));
         // DrivetrainConstants.SimConstants.driveSimConfig, new Pose2d());
         SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
         drive =
             new Drive(
                 new GyroIOMapleSim(driveSim.getGyroSimulation()),
-                new ModuleIOMapleSim(TunerConstants.FrontLeft),
-                new ModuleIOMapleSim(TunerConstants.FrontRight),
-                new ModuleIOMapleSim(TunerConstants.BackLeft),
-                new ModuleIOMapleSim(TunerConstants.BackRight));
-
-        field2d = new Field2d();
-        SmartDashboard.putData("simulation field", field2d);
+                new ModuleIOMapleSim(driveSim.getModules()[0], TunerConstants.FrontLeft),
+                new ModuleIOMapleSim(driveSim.getModules()[1], TunerConstants.FrontRight),
+                new ModuleIOMapleSim(driveSim.getModules()[2], TunerConstants.BackLeft),
+                new ModuleIOMapleSim(driveSim.getModules()[3], TunerConstants.BackRight));
+        
         break;
 
       default:
