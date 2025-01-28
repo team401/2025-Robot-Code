@@ -123,7 +123,7 @@ dependencies {
 testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
 testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	def coppercoreVersion = "2025.0.0"
+	def coppercoreVersion = "2025.1.2"
 	implementation "io.github.team401.coppercore:wpilib_interface:$coppercoreVersion"
 	implementation "io.github.team401.coppercore:parameter_tools:$coppercoreVersion"
 	implementation "io.github.team401.coppercore:controls:$coppercoreVersion"

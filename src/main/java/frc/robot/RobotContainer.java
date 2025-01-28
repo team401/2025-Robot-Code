@@ -70,7 +70,9 @@ public class RobotContainer {
 
             m_buttonMasher
                     .a()
-                    .onTrue(Commands.runOnce(() -> climbSubsystem.setAction(ClimbAction.CLIMB)))
+                    .onTrue(
+                            Commands.runOnce(
+                                    () -> climbSubsystem.setAction(ClimbAction.START_CLIMB)))
                     .onFalse(Commands.runOnce(() -> climbSubsystem.setAction(ClimbAction.NONE)));
         }
     }

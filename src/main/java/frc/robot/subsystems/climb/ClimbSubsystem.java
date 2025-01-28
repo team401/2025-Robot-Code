@@ -1,17 +1,14 @@
 package frc.robot.subsystems.climb;
 
-import static edu.wpi.first.units.Units.Degrees;
-
+import coppercore.controls.state_machine.StateMachine;
+import coppercore.controls.state_machine.StateMachineConfiguration;
+import coppercore.controls.state_machine.state.PeriodicStateInterface;
+import coppercore.controls.state_machine.state.StateContainer;
 import edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.ClimbConstants;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
-
-import coppercore.controls.state_machine.StateMachine;
-import coppercore.controls.state_machine.StateMachineConfiguration;
-import coppercore.controls.state_machine.state.PeriodicStateInterface;
-import coppercore.controls.state_machine.state.StateContainer;
 
 public class ClimbSubsystem extends SubsystemBase {
 
@@ -20,6 +17,8 @@ public class ClimbSubsystem extends SubsystemBase {
     private ClimbOutputsAutoLogged outputs = new ClimbOutputsAutoLogged();
 
     private BooleanSupplier rampClear = () -> true;
+
+    static ClimbSubsystem instance;
 
     public enum ClimbAction {
         NONE, // do nothing
@@ -31,16 +30,52 @@ public class ClimbSubsystem extends SubsystemBase {
 
     ClimbAction currentAction = ClimbAction.NONE;
 
-    private enum ClimbState implements StateContainer {
-        IDLE(ClimbSubsystem.idle()), // do nothing
-        WAITING, // waiting for system to be ready for climb
-        SEARCHING, // searching for target
-        LIFTING, // moving arm to hang
-        OVERRIDE;
+    private static enum ClimbState implements StateContainer {
+        IDLE(new IdleState()), // do nothing
+        WAITING(new WaitingState()), // waiting for system to be ready for climb
+        SEARCHING(new SearchingState()), // searching for target
+        LIFTING(new LiftingState()), // moving arm to hang
+        OVERRIDE(new PeriodicStateInterface() {});
+
+        private final PeriodicStateInterface state;
+
+        ClimbState(PeriodicStateInterface state) {
+            this.state = state;
+          }
 
         @Override
         public PeriodicStateInterface getState() {
             return state;
+        }
+    }
+
+    public class IdleState implements PeriodicStateInterface {
+        @Override
+        public void periodic() {
+            io.setGoalAngle(ClimbConstants.restingAngle);
+        }
+    }
+
+    public class WaitingState implements PeriodicStateInterface {
+        @Override
+        public void periodic() {
+            io.setGoalAngle(ClimbConstants.restingAngle);
+            if (rampClear.getAsBoolean()) climbMachine.fire(ClimbAction.SYSTEM_READY);
+        }
+    }
+
+    public class SearchingState implements PeriodicStateInterface {
+        @Override
+        public void periodic() {
+            io.setGoalAngle(ClimbConstants.searchingAngle);
+            if (inputs.lockedToCage) climbMachine.fire(ClimbAction.READY_FOR_CLIMB);
+        }
+    }
+
+    public class LiftingState implements PeriodicStateInterface {
+        @Override
+        public void periodic() {
+            io.setGoalAngle(ClimbConstants.finalHangingAngle);
         }
     }
 
@@ -72,30 +107,6 @@ public class ClimbSubsystem extends SubsystemBase {
                 .permit(ClimbAction.NONE, ClimbState.IDLE);
 
         climbMachine = new StateMachine(climbMachineConfiguration, ClimbAction.NONE);
-
-    }
-
-    public void setAction(ClimbAction action) {
-        currentAction = action;
-    }
-
-    private void idle() {
-    }
-
-    private void waiting() {
-        io.setGoalAngle(ClimbConstants.restingAngle);
-    }
-
-    private void searching() {
-        io.setGoalAngle(ClimbConstants.searchingAngle);
-    }
-
-    private void lifting() {
-        io.setGoalAngle(ClimbConstants.finalHangingAngle);
-    }
-
-    private void override() {
-        // idk not my top priority tbh
     }
 
     @Override
