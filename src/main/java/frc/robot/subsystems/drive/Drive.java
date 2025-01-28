@@ -29,6 +29,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -149,6 +152,10 @@ public class Drive implements DriveTemplate {
 
   private Command driveToPose = null;
 
+  private NetworkTableInstance inst = NetworkTableInstance.getDefault();
+  private NetworkTable table = inst.getTable("");
+  private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -238,6 +245,9 @@ public class Drive implements DriveTemplate {
       }
     }
 
+    // check for update from reef touchscreen
+    this.updateDesiredLocationFromNetworkTables();
+
     // run velocity if not disabled
     if (!DriverStation.isTest() && !DriverStation.isDisabled()) {
       this.runVelocity();
@@ -316,7 +326,9 @@ public class Drive implements DriveTemplate {
 
     if (isOTF) {
       this.driveToPose = this.getDriveToPoseCommand();
-      this.driveToPose.schedule();
+      if (this.driveToPose != null) {
+        this.driveToPose.schedule();
+      }
     }
   }
 
@@ -349,10 +361,26 @@ public class Drive implements DriveTemplate {
     this.desiredLocation = locationArray[locationIndex];
   }
 
+  public void updateDesiredLocationFromNetworkTables() {
+    double desiredIndex = reefLocationSelector.get();
+    if (desiredIndex == -1) {
+      this.setOTF(false);
+      return;
+    }
+    desiredIndex = desiredIndex - 1;
+    if (locationArray[(int) desiredIndex] != desiredLocation) {
+      if (isOTF) {
+        this.updateDesiredLocation((int) desiredIndex);
+      } else {
+        this.setDesiredLocation((int) desiredIndex);
+      }
+    }
+  }
+
   /**
-   * updates desired path location (for when OTF is already running)
-   * this will cancel old command and generate a new OTF path to run
-   * 
+   * updates desired path location (for when OTF is already running) this will cancel old command
+   * and generate a new OTF path to run
+   *
    * @param location desired location for robot to pathfind to
    */
   public void updateDesiredLocation(DesiredLocation location) {
@@ -365,11 +393,12 @@ public class Drive implements DriveTemplate {
     }
   }
 
-   /**
-   * updates desired path location (for when OTF is already running)
-   * this will cancel old command and generate a new OTF path to run
-   * 
-   * @param locationIndex desired location index for robot to pathfind to (sent from DesiredLocationSelector)
+  /**
+   * updates desired path location (for when OTF is already running) this will cancel old command
+   * and generate a new OTF path to run
+   *
+   * @param locationIndex desired location index for robot to pathfind to (sent from
+   *     DesiredLocationSelector)
    */
   public void updateDesiredLocation(int locationIndex) {
     this.setDesiredLocation(locationIndex);
@@ -391,9 +420,11 @@ public class Drive implements DriveTemplate {
         // reef 0 and 1 will have the same path
         // NOTE: use PathPlannerPath.getStartingHolonomicPose to find pose for reef lineup if wanted
       case Reef0:
-        return new Pose2d();
+        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+            ? JsonConstants.redFieldLocations.reef0
+            : new Pose2d();
       case Reef1:
-        return new Pose2d();
+        return null;
       case CoralStationRight:
         return new Pose2d(16.0, 6.6, new Rotation2d(0.0));
         // return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
@@ -402,7 +433,7 @@ public class Drive implements DriveTemplate {
       default:
         // no location set, so don't allow drive to run OTF
         this.setOTF(false);
-        return new Pose2d();
+        return null;
     }
   }
 
@@ -413,6 +444,10 @@ public class Drive implements DriveTemplate {
    */
   public Command getDriveToPoseCommand() {
     Pose2d targetPose = findOTFPoseFromPathLocation();
+
+    if (targetPose == null) {
+      return null;
+    }
 
     // Create the constraints to use while pathfinding
     PathConstraints constraints =
