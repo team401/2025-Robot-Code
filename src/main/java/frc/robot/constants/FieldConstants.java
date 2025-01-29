@@ -22,27 +22,18 @@ public final class FieldConstants {
   // RED - Pose2d
   public final Pose2d redReefCenter =
       new Pose2d(514.13, 158.5, new Rotation2d()); // center of red apriltags
-  public final static Pose2d redReefAprilTag1 =
-        new Pose2d(530.49, 130.17, new Rotation2d(300)); // real april tag 6
-    public final Pose2d redReefAprilTag2 =
-        new Pose2d(546.87, 158.5, new Rotation2d(0)); // real april tag 7
-    public final Pose2d redReefAprilTag3 =
-        new Pose2d(530.49, 186.83, new Rotation2d(60)); // real april tag 8
-    public final Pose2d redReefAprilTag4 =
-        new Pose2d(497.77, 186.83, new Rotation2d(120)); // real april tag 9
-    public final Pose2d redReefAprilTag5 =
-        new Pose2d(481.39, 158.5, new Rotation2d(180)); // real april tag 10
-    public final Pose2d redReefAprilTag6 =
-        new Pose2d(497.77, 130.17, new Rotation2d(240)); // real april tag 11
-  
-    // RED - Rotation2d
-    public final Rotation2d redReefCenterRotation = redReefCenter.getRotation();
-    public final Rotation2d redReefAprilTag1Rotation = redReefAprilTag1.getRotation();
-  public final Rotation2d redReefAprilTag2Rotation = redReefAprilTag2.getRotation();
-  public final Rotation2d redReefAprilTag3Rotation = redReefAprilTag3.getRotation();
-  public final Rotation2d redReefAprilTag4Rotation = redReefAprilTag4.getRotation();
-  public final Rotation2d redReefAprilTag5Rotation = redReefAprilTag5.getRotation();
-  public final Rotation2d redReefAprilTag6Rotation = redReefAprilTag6.getRotation();
+  public static final Pose2d redReefAprilTag1 =
+      new Pose2d(530.49, 130.17, new Rotation2d(300)); // real april tag 6
+  public final Pose2d redReefAprilTag2 =
+      new Pose2d(546.87, 158.5, new Rotation2d(0)); // real april tag 7
+  public final Pose2d redReefAprilTag3 =
+      new Pose2d(530.49, 186.83, new Rotation2d(60)); // real april tag 8
+  public final Pose2d redReefAprilTag4 =
+      new Pose2d(497.77, 186.83, new Rotation2d(120)); // real april tag 9
+  public final Pose2d redReefAprilTag5 =
+      new Pose2d(481.39, 158.5, new Rotation2d(180)); // real april tag 10
+  public final Pose2d redReefAprilTag6 =
+      new Pose2d(497.77, 130.17, new Rotation2d(240)); // real april tag 11
 
   // BLUE - Pose2d
   public final Pose2d blueReefCenter =
@@ -59,13 +50,4 @@ public final class FieldConstants {
       new Pose2d(144.00, 158.5, new Rotation2d(180)); // real april tag 18
   public final Pose2d blueReefAprilTag6 =
       new Pose2d(160.39, 130.17, new Rotation2d(240)); // real april tag 17
-
-  // BLUE - Rotation2d
-  public final Rotation2d blueReefCenterRotation = blueReefCenter.getRotation();
-  public final Rotation2d blueReefAprilTag1Rotation = blueReefAprilTag1.getRotation();
-  public final Rotation2d blueReefAprilTag2Rotation = blueReefAprilTag2.getRotation();
-  public final Rotation2d blueReefAprilTag3Rotation = blueReefAprilTag3.getRotation();
-  public final Rotation2d blueReefAprilTag4Rotation = blueReefAprilTag4.getRotation();
-  public final Rotation2d blueReefAprilTag5Rotation = blueReefAprilTag5.getRotation();
-  public final Rotation2d blueReefAprilTag6Rotation = blueReefAprilTag6.getRotation();
 }

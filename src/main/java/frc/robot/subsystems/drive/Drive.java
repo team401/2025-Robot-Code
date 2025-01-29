@@ -17,6 +17,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,6 +30,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -147,7 +149,7 @@ public class Drive implements DriveTemplate {
   private DesiredLocation desiredLocation = DesiredLocation.Reef0;
 
   private boolean isOTF = false;
-
+  private boolean isAngleAlign = true;
   private Command driveToPose = null;
 
   public Drive(
@@ -241,7 +243,7 @@ public class Drive implements DriveTemplate {
 
     // run velocity if not disabled
     if (!DriverStation.isTest() && !DriverStation.isDisabled()) {
-      this.runVelocity();
+      this.runVelocity(new Rotation2d(300));
     }
 
     // Update odometry
@@ -390,7 +392,18 @@ public class Drive implements DriveTemplate {
   }
 
   /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
-  public void runVelocity() {
+  public void runVelocity(Rotation2d desiredRotation) {
+    if (isAngleAlign) {
+      ProfiledPIDController angleController =
+          new ProfiledPIDController(5, 0.0, 0.4, new TrapezoidProfile.Constraints(8.0, 20));
+      angleController.enableContinuousInput(-Math.PI, Math.PI);
+      double omega =
+          angleController.calculate(getRotation().getRadians(), desiredRotation.getRadians());
+      this.goalSpeeds =
+          new ChassisSpeeds(
+              this.goalSpeeds.vxMetersPerSecond, this.goalSpeeds.vyMetersPerSecond, omega);
+    }
+
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(this.goalSpeeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
