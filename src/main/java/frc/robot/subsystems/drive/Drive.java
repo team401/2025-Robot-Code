@@ -486,27 +486,21 @@ public class Drive implements DriveTemplate {
     boolean allianceRed = this.isAllianceRed();
     switch (desiredLocation) {
       case Reef0:
-        return allianceRed ? 10 : 21;
       case Reef1:
         return allianceRed ? 10 : 21;
       case Reef2:
-        return allianceRed ? 9 : 22;
       case Reef3:
         return allianceRed ? 9 : 22;
       case Reef4:
-        return allianceRed ? 8 : 17;
       case Reef5:
         return allianceRed ? 8 : 17;
       case Reef6:
-        return allianceRed ? 7 : 18;
       case Reef7:
         return allianceRed ? 7 : 18;
       case Reef8:
-        return allianceRed ? 6 : 19;
       case Reef9:
         return allianceRed ? 6 : 19;
       case Reef10:
-        return allianceRed ? 11 : 20;
       case Reef11:
         return allianceRed ? 11 : 20;
       default:
