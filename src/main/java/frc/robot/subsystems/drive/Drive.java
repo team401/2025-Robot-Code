@@ -156,7 +156,7 @@ public class Drive implements DriveTemplate {
 
   private VisionAlignment alignmentSupplier;
 
-  private PIDController driveLineupController = new PIDController(20, 0,0);
+  private PIDController driveLineupController = new PIDController(20, 0, 0);
   private PIDController rotationController = new PIDController(20, 0, 0);
 
   public Drive(
@@ -350,6 +350,18 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * checks if robot pose is sufficiently close to desired pose
+   *
+   * @return true if robot pose is close to desired pose
+   */
+  public boolean isOTFFinished() {
+    // relative to transforms first pose into distance from desired pose
+    // then get distance between poses (if less than 0.1 meters we are good)
+    return this.getPose().relativeTo(this.findOTFPoseFromPathLocation()).getTranslation().getNorm()
+        < 0.1;
+  }
+
+  /**
    * sets isLiningUp of robot true will cause robot to gather distance from reef tag and drive
    * towards it PathLocation
    *
@@ -367,6 +379,35 @@ public class Drive implements DriveTemplate {
   @AutoLogOutput(key = "Drive/isLiningUp")
   public boolean isDriveLiningUp() {
     return isLiningUp;
+  }
+
+  /**
+   * checks if desired locaiton is set to a reef location
+   *
+   * @return true if location is reef; false otherwise (processor / coral station)
+   */
+  public boolean isDesiredLocationReef() {
+    if (desiredLocation == DesiredLocation.CoralStationLeft
+        || desiredLocation == DesiredLocation.CoralStationRight
+        || desiredLocation == DesiredLocation.Processor) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * allows drive to be controlled by on the fly / landing zone alignment
+   *
+   * @param autoAlignment true allows drive to go into otf and alignment
+   */
+  public void setAutoAlignment(boolean autoAlignment) {
+    if (autoAlignment) {
+      if (isOTFFinished() && isDesiredLocationReef()) {
+        this.setLiningUp(true);
+      } else {
+        this.setOTF(true);
+      }
+    }
   }
 
   /**
@@ -512,10 +553,10 @@ public class Drive implements DriveTemplate {
 
   /**
    * gets rotation for each side of hexagonal reef for lineup
-   * 
+   *
    * @return Rotation2d representing desired rotation for lineup
    */
-  public Rotation2d getRotationForReefSide () {
+  public Rotation2d getRotationForReefSide() {
     switch (desiredLocation) {
       case Reef0:
         return new Rotation2d();
@@ -524,25 +565,25 @@ public class Drive implements DriveTemplate {
       case Reef2:
         return new Rotation2d();
       case Reef3:
-      return new Rotation2d();
+        return new Rotation2d();
       case Reef4:
-      return new Rotation2d();
+        return new Rotation2d();
       case Reef5:
-      return new Rotation2d();
+        return new Rotation2d();
       case Reef6:
-      return new Rotation2d();
+        return new Rotation2d();
       case Reef7:
-      return new Rotation2d();
+        return new Rotation2d();
       case Reef8:
-      return new Rotation2d();
+        return new Rotation2d();
       case Reef9:
-      return new Rotation2d();
+        return new Rotation2d();
       case Reef10:
-      return new Rotation2d();
+        return new Rotation2d();
       case Reef11:
-      return new Rotation2d();
+        return new Rotation2d();
       default:
-       return new Rotation2d();
+        return new Rotation2d();
     }
   }
 
@@ -566,7 +607,9 @@ public class Drive implements DriveTemplate {
     // give to PID Controllers and setGoalSpeeds (robotCentric)
     double vx = driveLineupController.calculate(observation.alongTrackDistance());
     double vy = driveLineupController.calculate(observation.crossTrackDistance());
-    double omega = rotationController.calculate(this.getRotation().getRadians(), this.getRotationForReefSide().getRadians());
+    double omega =
+        rotationController.calculate(
+            this.getRotation().getRadians(), this.getRotationForReefSide().getRadians());
 
     this.setGoalSpeeds(new ChassisSpeeds(vx, vy, omega), false);
   }
