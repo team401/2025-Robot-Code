@@ -149,8 +149,15 @@ public class Drive implements DriveTemplate {
   private DesiredLocation desiredLocation = DesiredLocation.Reef0;
 
   private boolean isOTF = false;
-  private boolean isAngleAlign = true;
   private Command driveToPose = null;
+
+  private final ProfiledPIDController angleController =
+      new ProfiledPIDController(5, 0.0, 0.4, new TrapezoidProfile.Constraints(1000, 2000));
+
+  private boolean lockRotationToPoint;
+  private Translation2d lockedTargetPosition = new Translation2d();
+  private Translation2d redReefCenter = new Translation2d(4.5, 4);
+  private Translation2d blueReefCenter = new Translation2d(4.5, 4);
 
   public Drive(
       GyroIO gyroIO,
@@ -194,7 +201,7 @@ public class Drive implements DriveTemplate {
 
     // warm up java processing for faster pathfind later
     PathfindingCommand.warmupCommand().schedule();
-
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
     // Configure SysId
     sysId =
         new SysIdRoutine(
@@ -243,7 +250,7 @@ public class Drive implements DriveTemplate {
 
     // run velocity if not disabled
     if (!DriverStation.isTest() && !DriverStation.isDisabled()) {
-      this.runVelocity(new Rotation2d(300));
+      this.runVelocity();
     }
 
     // Update odometry
@@ -306,6 +313,16 @@ public class Drive implements DriveTemplate {
       Logger.recordOutput("Drive/DesiredOTFSpeeds", speeds);
       this.goalSpeeds = speeds;
     }
+  }
+
+  public void lockRotationToPosition(Translation2d targetPosition) {
+    lockRotationToPoint = true;
+    lockedTargetPosition = targetPosition;
+    angleController.reset(getRotation().getRadians());
+  }
+
+  public void disableRotationLock() {
+    lockRotationToPoint = false;
   }
 
   /**
@@ -391,17 +408,33 @@ public class Drive implements DriveTemplate {
     return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0);
   }
 
+  public void rotationallyLockedIn() {
+    double omega = 0.0;
+
+    // Get current position
+    Translation2d currentPosition = getPose().getTranslation();
+
+    // Calculate desired angle to face the target position
+    double targetAngle =
+        Math.atan2(
+            lockedTargetPosition.getY() - currentPosition.getY(),
+            lockedTargetPosition.getX() - currentPosition.getX());
+
+    // Use PID to rotate toward the target angle
+    omega = angleController.calculate(getRotation().getRadians(), targetAngle);
+    setGoalSpeeds(
+        new ChassisSpeeds(goalSpeeds.vxMetersPerSecond, goalSpeeds.vyMetersPerSecond, omega),
+        false);
+
+    if (DriverStation.getAlliance().isPresent()
+        && DriverStation.getAlliance().get() == Alliance.Red) lockRotationToPosition(redReefCenter);
+    else lockRotationToPosition(blueReefCenter);
+  }
+
   /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
-  public void runVelocity(Rotation2d desiredRotation) {
-    if (isAngleAlign) {
-      ProfiledPIDController angleController =
-          new ProfiledPIDController(5, 0.0, 0.4, new TrapezoidProfile.Constraints(8.0, 20));
-      angleController.enableContinuousInput(-Math.PI, Math.PI);
-      double omega =
-          angleController.calculate(getRotation().getRadians(), desiredRotation.getRadians());
-      this.goalSpeeds =
-          new ChassisSpeeds(
-              this.goalSpeeds.vxMetersPerSecond, this.goalSpeeds.vyMetersPerSecond, omega);
+  public void runVelocity() {
+    if (lockRotationToPoint) {
+      rotationallyLockedIn();
     }
 
     // Calculate module setpoints
