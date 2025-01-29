@@ -6,10 +6,10 @@ import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 
-public class IdleState implements PeriodicStateInterface {
+public class ScoreState implements PeriodicStateInterface {
   private ScoringSubsystem scoringSubsystem;
 
-  public IdleState(ScoringSubsystem scoringSubsystem) {
+  public ScoreState(ScoringSubsystem scoringSubsystem) {
     this.scoringSubsystem = scoringSubsystem;
   }
 

@@ -12,9 +12,9 @@ import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
 
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import coppercore.parameter_tools.JSONExclude;
-import coppercore.parameter_tools.JSONSync;
-import coppercore.parameter_tools.JSONSyncConfigBuilder;
+import coppercore.parameter_tools.json.JSONExclude;
+import coppercore.parameter_tools.json.JSONSync;
+import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
 import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.AngularAccelerationUnit;
@@ -170,15 +170,11 @@ public final class ElevatorConstants {
   public final Integer CRTticksPerRotation =
       4096; // CANCoders have a resolution of 4096 ticks/rotation
 
-  /** Height to drive the elevator to in Idle */
-  public final Double elevatorIdleHeightMeters = 0.0;
-
-  @JSONExclude public final Distance elevatorIdleHeight = Meters.of(elevatorIdleHeightMeters);
-
-  /** Height to drive the elevator to in intake */
-  public final Double elevatorIntakeHeightMeters = 0.2; // TODO: Tune this value
-
-  @JSONExclude public final Distance elevatorIntakeHeight = Meters.of(elevatorIntakeHeightMeters);
+  /**
+   * How many meters away from setpoint the elevator height can be while still being considered "at
+   * the setpoint"
+   */
+  public final double elevatorTargetThresholdMeters = 0.03;
 
   public static final class Sim {
     @JSONExclude
