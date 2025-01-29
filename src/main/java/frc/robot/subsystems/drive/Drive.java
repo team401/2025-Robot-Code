@@ -14,6 +14,8 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import coppercore.vision.VisionLocalizer.DistanceToTag;
 import coppercore.wpilib_interface.DriveTemplate;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -21,6 +23,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -43,6 +46,7 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -154,6 +158,7 @@ public class Drive implements DriveTemplate {
   private Command driveToPose = null;
 
   private VisionAlignment alignmentSupplier;
+  private BooleanSupplier visionHasMultitag;
 
   private PIDController driveAlongTrackLineupController = new PIDController(20, 0, 0);
   private PIDController driveCrossTrackLineupController = new PIDController(20, 0, 0);
@@ -248,6 +253,16 @@ public class Drive implements DriveTemplate {
       }
     }
 
+    if (isDriveCloseToFinalLineupPose() && isOTF) {
+      this.setOTF(false);
+      driveToPose.cancel();
+      this.setLiningUp(true);
+    }
+
+    if (isLiningUp) {
+      this.LineupWithReefLocation();
+    }
+
     // run velocity if not disabled
     if (!DriverStation.isTest() && !DriverStation.isDisabled()) {
       this.runVelocity();
@@ -324,6 +339,10 @@ public class Drive implements DriveTemplate {
     this.alignmentSupplier = alignmentSupplier;
   }
 
+  public void setVisionHasMultitagSupplier(BooleanSupplier visionMultitag) {
+    this.visionHasMultitag = visionMultitag;
+  }
+
   /**
    * sets isOTF of robot true will cause robot to create a path from current location to the set
    * PathLocation
@@ -357,7 +376,10 @@ public class Drive implements DriveTemplate {
   public boolean isDriveCloseToFinalLineupPose() {
     // relative to transforms first pose into distance from desired pose
     // then get distance between poses (if less than 0.1 meters we are good)
-    return this.getPose().relativeTo(this.findOTFPoseFromDesiredLocation()).getTranslation().getNorm()
+    return this.getPose()
+            .relativeTo(this.findOTFPoseFromDesiredLocation())
+            .getTranslation()
+            .getNorm()
         < 0.1;
   }
 
@@ -407,6 +429,9 @@ public class Drive implements DriveTemplate {
       } else {
         this.setOTF(true);
       }
+    } else {
+      setOTF(false);
+      setLiningUp(false);
     }
   }
 
@@ -470,9 +495,10 @@ public class Drive implements DriveTemplate {
    */
   public Pose2d findOTFPoseFromDesiredLocation() {
     switch (this.desiredLocation) {
-      // NOTE: pairs of reef sides (ie 0 and 1) will have the same otf pose (approximately 0.5-1 meter away from center of tag)
+        // NOTE: pairs of reef sides (ie 0 and 1) will have the same otf pose (approximately 0.5-1
+        // meter away from center of tag)
       case Reef0:
-        return new Pose2d();
+        return new Pose2d(11.48, 4.019, new Rotation2d());
       case Reef1:
         return new Pose2d();
       case CoralStationRight:
@@ -618,6 +644,17 @@ public class Drive implements DriveTemplate {
     }
   }
 
+  public DistanceToTag getDistanceFromMultiTag(int tagId) {
+    if (AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField).getTagPose(tagId).isPresent()) {
+      Pose3d tagPose =
+          AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField).getTagPose(tagId).get();
+      Translation2d distance =
+          tagPose.getTranslation().toTranslation2d().minus(getPose().getTranslation());
+      return new DistanceToTag(distance.getY(), distance.getX(), true);
+    }
+    return new DistanceToTag(0, 0, false);
+  }
+
   /** take over goal speeds to align to reef exactly */
   public void LineupWithReefLocation() {
     int tagId = this.getTagIdForReef();
@@ -629,11 +666,17 @@ public class Drive implements DriveTemplate {
       return;
     }
 
-    DistanceToTag observation = alignmentSupplier.get(tagId, cameraIndex, 0, 0);
+    DistanceToTag observation;
+    if (visionHasMultitag != null && visionHasMultitag.getAsBoolean()) {
+      observation = getDistanceFromMultiTag(tagId);
+    } else {
+      observation = alignmentSupplier.get(tagId, cameraIndex, 0, 0);
+    }
 
     if (!observation.isValid()) {
       return;
     }
+    // TODO: add alignment when we see multiple tags (check by calling vision.hasMultitagResult)
 
     // give to PID Controllers and setGoalSpeeds (robotCentric)
     double vx = driveAlongTrackLineupController.calculate(observation.alongTrackDistance());
@@ -641,6 +684,9 @@ public class Drive implements DriveTemplate {
     double omega =
         rotationController.calculate(
             this.getRotation().getRadians(), this.getRotationForReefSide().getRadians());
+
+    Logger.recordOutput("Drive/Lineup/AlongTrackDistance", observation.alongTrackDistance());
+    Logger.recordOutput("Drive/Lineup/CrossTrackDistance", observation.crossTrackDistance());
 
     this.setGoalSpeeds(new ChassisSpeeds(vx, vy, omega), false);
   }

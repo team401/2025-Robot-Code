@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.drive.DesiredLocationSelector;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.DrivetrainConstants;
 
 public final class InitBindings {
@@ -45,8 +44,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  drive.setDesiredLocation(DesiredLocation.CoralStationRight);
-                  drive.setOTF(true);
+                  drive.setAutoAlignment(true);
                 },
                 drive));
     rightJoystick
@@ -54,7 +52,7 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  drive.setOTF(false);
+                  drive.setAutoAlignment(false);
                 },
                 drive));
 
