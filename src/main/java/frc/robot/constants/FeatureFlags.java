@@ -1,8 +1,8 @@
 package frc.robot.constants;
 
-import coppercore.parameter_tools.JSONExclude;
-import coppercore.parameter_tools.JSONSync;
-import coppercore.parameter_tools.JSONSyncConfigBuilder;
+import coppercore.parameter_tools.json.JSONExclude;
+import coppercore.parameter_tools.json.JSONSync;
+import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
 import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 
 public final class FeatureFlags {
@@ -16,4 +16,5 @@ public final class FeatureFlags {
 
   public Boolean runElevator = false;
   public Boolean runDrive = true;
+  public Boolean runVision = true;
 }

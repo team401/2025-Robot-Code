@@ -1,5 +1,12 @@
 package frc.robot;
 
+import coppercore.vision.VisionIO;
+import coppercore.vision.VisionIOPhotonReal;
+import coppercore.vision.VisionIOPhotonSim;
+import coppercore.vision.VisionLocalizer;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -56,6 +63,33 @@ public final class InitSubsystems {
             new ModuleIO() {},
             new ModuleIO() {},
             new ModuleIO() {});
+    }
+  }
+
+  public static VisionLocalizer initVisionSubsystem(Drive drive) {
+    AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+    switch (Constants.currentMode) {
+      case REAL:
+        return new VisionLocalizer(
+            null,
+            tagLayout,
+            new double[0],
+            new VisionIOPhotonReal("FrontLeft", new Transform3d()),
+            new VisionIOPhotonReal("FrontRight", new Transform3d()));
+      case SIM:
+        return new VisionLocalizer(
+            null,
+            tagLayout,
+            new double[0],
+            new VisionIOPhotonSim("FrontLeft", new Transform3d(), drive::getPose, tagLayout),
+            new VisionIOPhotonSim("FrontRight", new Transform3d(), drive::getPose, tagLayout));
+      default:
+        return new VisionLocalizer(
+            drive::addVisionMeasurement,
+            tagLayout,
+            new double[0],
+            new VisionIO() {},
+            new VisionIO() {});
     }
   }
 }

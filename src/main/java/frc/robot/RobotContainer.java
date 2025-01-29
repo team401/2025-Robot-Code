@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -26,6 +27,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here
   private ElevatorSubsystem elevatorSubsystem;
   private Drive drive;
+  private VisionLocalizer vision;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -48,6 +50,10 @@ public class RobotContainer {
     }
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
+
+      if (FeatureFlags.synced.getObject().runVision) {
+        vision = InitSubsystems.initVisionSubsystem(drive);
+      }
     }
   }
 

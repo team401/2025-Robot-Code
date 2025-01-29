@@ -332,10 +332,9 @@ public class Drive implements DriveTemplate {
     return isOTF;
   }
 
-    /**
-   * sets isLiningUp of robot
-   *  true will cause robot to gather distance from reef tag and drive towards it
-   * PathLocation
+  /**
+   * sets isLiningUp of robot true will cause robot to gather distance from reef tag and drive
+   * towards it PathLocation
    *
    * @param isLiningUp boolean telling robot if it should create a OTF path
    */
@@ -343,7 +342,7 @@ public class Drive implements DriveTemplate {
     this.isLiningUp = isLiningUp;
   }
 
-    /**
+  /**
    * checks if drive is currently lining up to a reef
    *
    * @return state of lining up
@@ -455,8 +454,6 @@ public class Drive implements DriveTemplate {
       // cancel lineup or whatever
       return;
     }
-
-
   }
 
   /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
