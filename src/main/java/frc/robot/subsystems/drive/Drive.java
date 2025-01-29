@@ -12,6 +12,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import coppercore.vision.VisionLocalizer.DistanceToTag;
 import coppercore.wpilib_interface.DriveTemplate;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -152,12 +153,15 @@ public class Drive implements DriveTemplate {
 
   private Command driveToPose = null;
 
+  private VisionAlignment alignmentSupplier;
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
       ModuleIO brModuleIO) {
+    this.alignmentSupplier = null;
     this.gyroIO = gyroIO;
     modules[0] = new Module(flModuleIO, 0, JsonConstants.drivetrainConstants.FrontLeft);
     modules[1] = new Module(frModuleIO, 1, JsonConstants.drivetrainConstants.FrontRight);
@@ -308,6 +312,15 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * sets the supplier for landing zone alignment help
+   *
+   * @param alignmentSupplier from vision.getDistanceErrorToTag; helps drive align to reef
+   */
+  public void setAlignmentSupplier(VisionAlignment alignmentSupplier) {
+    this.alignmentSupplier = alignmentSupplier;
+  }
+
+  /**
    * sets isOTF of robot true will cause robot to create a path from current location to the set
    * PathLocation
    *
@@ -413,6 +426,7 @@ public class Drive implements DriveTemplate {
 
   /**
    * checks if driver station alliance is red
+   *
    * @return true if alliance is red
    */
   public boolean isAllianceRed() {
@@ -421,6 +435,7 @@ public class Drive implements DriveTemplate {
 
   /**
    * gets tag to use for final alignment with vision
+   *
    * @return int representing tag id to use
    */
   public int getTagIdForReef() {
@@ -457,7 +472,7 @@ public class Drive implements DriveTemplate {
 
   /**
    * gets camera index for vision single tag lineup
-   * 
+   *
    * @return 0 for Front Left camera; 1 for Front Right camera
    */
   public int getCameraIndexForLineup() {
@@ -491,18 +506,24 @@ public class Drive implements DriveTemplate {
     }
   }
 
-  /**
-   * take over goal speeds to align to reef exactly
-   */
+  /** take over goal speeds to align to reef exactly */
   public void LineupWithReefLocation() {
     int tagId = this.getTagIdForReef();
     int cameraIndex = this.getCameraIndexForLineup();
 
-    if (tagId == -1 || cameraIndex == -1) {
+    if (tagId == -1 || cameraIndex == -1 || alignmentSupplier == null) {
       // cancel lineup or whatever
       this.setLiningUp(false);
       return;
     }
+
+    DistanceToTag observation = alignmentSupplier.get(tagId, cameraIndex, 0, 0);
+
+    if (!observation.isValid()) {
+      return;
+    }
+
+    // give to PID Controllers and setGoalSpeeds (fieldentric?)
   }
 
   /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
@@ -672,5 +693,14 @@ public class Drive implements DriveTemplate {
           JsonConstants.drivetrainConstants.BackRight.LocationX,
           JsonConstants.drivetrainConstants.BackRight.LocationY)
     };
+  }
+
+  @FunctionalInterface
+  public static interface VisionAlignment {
+    public DistanceToTag get(
+        int tagId,
+        int desiredCameraIndex,
+        double crossTrackOffsetMeters,
+        double alongTrackOffsetMeters);
   }
 }
