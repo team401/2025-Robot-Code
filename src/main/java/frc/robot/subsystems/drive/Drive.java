@@ -364,10 +364,8 @@ public class Drive implements DriveTemplate {
   public void updateDesiredLocationFromNetworkTables() {
     double desiredIndex = reefLocationSelector.get();
     if (desiredIndex == -1) {
-      this.setOTF(false);
       return;
     }
-    desiredIndex = desiredIndex - 1;
     if (locationArray[(int) desiredIndex] != desiredLocation) {
       if (isOTF) {
         this.updateDesiredLocation((int) desiredIndex);
@@ -424,7 +422,7 @@ public class Drive implements DriveTemplate {
             ? JsonConstants.redFieldLocations.reef0
             : new Pose2d();
       case Reef1:
-        return null;
+        return new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180)));
       case CoralStationRight:
         return new Pose2d(16.0, 6.6, new Rotation2d(0.0));
         // return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
