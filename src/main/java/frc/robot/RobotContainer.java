@@ -146,7 +146,4 @@ public class RobotContainer {
     CommandScheduler.getInstance().cancelAll();
   }
 
-  public void displaySimFieldToAdvantageScope() {
-    Logger.recordOutput("FieldSimulation/RobotPosition", driveSim.getSimulatedDriveTrainPose());
-  }
 }

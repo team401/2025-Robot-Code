@@ -48,6 +48,23 @@ public final class InitSubsystems {
             new ModuleIOSim(DriveConfiguration.getInstance().BackLeft),
             new ModuleIOSim(DriveConfiguration.getInstance().BackRight));
 
+      case MAPLESIM:
+        // Sim robot, instantiate physics sim IO implementations
+        new SwerveDriveSimulation driveSim =
+            new SwerveDriveSimulation(
+                DriveTrainSimulationConfig.Default());
+        // DrivetrainConstants.SimConstants.driveSimConfig, new Pose2d());
+        SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
+        drive =
+            new Drive(
+                new GyroIOMapleSim(driveSim.getGyroSimulation()),
+                new ModuleIOMapleSim(driveSim.getModules()[0], TunerConstants.FrontLeft),
+                new ModuleIOMapleSim(driveSim.getModules()[1], TunerConstants.FrontRight),
+                new ModuleIOMapleSim(driveSim.getModules()[2], TunerConstants.BackLeft),
+                new ModuleIOMapleSim(driveSim.getModules()[3], TunerConstants.BackRight));
+        
+        break;
+
       default:
         // Replayed robot, disable IO implementations
         return new Drive(
@@ -59,3 +76,45 @@ public final class InitSubsystems {
     }
   }
 }
+
+
+<<<<<<< HEAD
+
+  // Subsystems
+  private final Drive drive;
+  private SwerveDriveSimulation driveSim = null;
+  private Field2d field2d;
+  // Controller
+  // private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandJoystick leftJoystick = new CommandJoystick(0);
+  private final CommandJoystick rightJoystick = new CommandJoystick(1);
+
+  // Dashboard inputs
+  private final LoggedDashboardChooser<Command> autoChooser;
+
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  public RobotContainer() {
+    switch (Constants.currentMode) {
+      case REAL:
+        // Real robot, instantiate hardware IO implementations
+        drive =
+            new Drive(
+                new GyroIOPigeon2(),
+                new ModuleIOTalonFX(TunerConstants.FrontLeft),
+                new ModuleIOTalonFX(TunerConstants.FrontRight),
+                new ModuleIOTalonFX(TunerConstants.BackLeft),
+                new ModuleIOTalonFX(TunerConstants.BackRight));
+        break;
+
+      case SIM:
+        // Sim robot, instantiate physics sim IO implementations
+        drive =
+            new Drive(
+                new GyroIO() {},
+                new ModuleIOSim(TunerConstants.FrontLeft),
+                new ModuleIOSim(TunerConstants.FrontRight),
+                new ModuleIOSim(TunerConstants.BackLeft),
+                new ModuleIOSim(TunerConstants.BackRight));
+        break;
+
+

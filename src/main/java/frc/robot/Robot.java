@@ -186,12 +186,6 @@ public class Robot extends LoggedRobot {
   public void simulationPeriodic() {
     if (Constants.currentMode == Mode.MAPLESIM) {
       SimulatedArena.getInstance().simulationPeriodic();
-      robotContainer.displaySimFieldToAdvantageScope();
-
-      // Get the positions of the notes (both on the field and in the air)
-      Pose3d[] notesPoses = SimulatedArena.getInstance().getGamePiecesArrayByType("Note");
-      // Publish to telemetry using AdvantageKit
-      Logger.recordOutput("FieldSimulation/NotesPositions", notesPoses);
     }
   }
 }
