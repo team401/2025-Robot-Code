@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.Mode;
 import frc.robot.generated.TunerConstants;
 import org.ironmaple.simulation.SimulatedArena;
+import edu.wpi.first.wpilibj.Threads;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -111,11 +114,15 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    robotContainer.disabledInit();
+  }
 
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    robotContainer.disabledPeriodic();
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
@@ -144,6 +151,15 @@ public class Robot extends LoggedRobot {
     }
   }
 
+  /** This function is called once when test mode is enabled. */
+  @Override
+  public void testInit() {
+    // Cancels all running commands at the start of test mode.
+    CommandScheduler.getInstance().cancelAll();
+
+    robotContainer.testInit();
+  }
+
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {}
@@ -157,7 +173,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    robotContainer.testPeriodic();
+  }
 
   /** This function is called once when the robot is first started up. */
   @Override

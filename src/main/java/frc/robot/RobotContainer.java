@@ -27,6 +27,17 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralAlgaeStack;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.drive.AkitDriveCommands;
+import frc.robot.constants.FeatureFlags;
+import frc.robot.constants.JsonConstants;
+import frc.robot.constants.OperatorConstants;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -35,93 +46,32 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-
-  // Subsystems
-  private final Drive drive;
-  private SwerveDriveSimulation driveSim = null;
-  private Field2d field2d;
-  // Controller
-  // private final CommandXboxController controller = new CommandXboxController(0);
-  private final CommandJoystick leftJoystick = new CommandJoystick(0);
-  private final CommandJoystick rightJoystick = new CommandJoystick(1);
-
-  // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
+  // The robot's subsystems and commands are defined here
+  private ElevatorSubsystem elevatorSubsystem;
+  private Drive drive;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    switch (Constants.currentMode) {
-      case REAL:
-        // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                new ModuleIOTalonFX(TunerConstants.FrontRight),
-                new ModuleIOTalonFX(TunerConstants.BackLeft),
-                new ModuleIOTalonFX(TunerConstants.BackRight));
-        break;
+    loadConstants();
+    configureSubsystems();
+    // Configure the trigger bindings
+    configureBindings();
+    TestModeManager.testInit();
+  }
 
-      case SIM:
-        // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(TunerConstants.FrontLeft),
-                new ModuleIOSim(TunerConstants.FrontRight),
-                new ModuleIOSim(TunerConstants.BackLeft),
-                new ModuleIOSim(TunerConstants.BackRight));
-        break;
+  public void loadConstants() {
+    JsonConstants.loadConstants();
+    FeatureFlags.synced.loadData();
+    OperatorConstants.synced.loadData();
+  }
 
-      case MAPLESIM:
-        SimulatedArena.getInstance().clearGamePieces();
-        SimulatedArena.getInstance()
-            .addGamePiece(new ReefscapeCoralAlgaeStack(new Translation2d(5, 5)));
-        // Sim robot, instantiate physics sim IO implementations
-        driveSim =
-            new SwerveDriveSimulation(
-                DriveTrainSimulationConfig.Default(), new Pose2d(3, 5, new Rotation2d()));
-        // DrivetrainConstants.SimConstants.driveSimConfig, new Pose2d());
-        SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
-        drive =
-            new Drive(
-                new GyroIOMapleSim(driveSim.getGyroSimulation()),
-                new ModuleIOMapleSim(driveSim.getModules()[0], TunerConstants.FrontLeft),
-                new ModuleIOMapleSim(driveSim.getModules()[1], TunerConstants.FrontRight),
-                new ModuleIOMapleSim(driveSim.getModules()[2], TunerConstants.BackLeft),
-                new ModuleIOMapleSim(driveSim.getModules()[3], TunerConstants.BackRight));
-        
-        break;
-
-      default:
-        // Replayed robot, disable IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
-        break;
+  public void configureSubsystems() {
+    if (FeatureFlags.synced.getObject().runElevator) {
+      elevatorSubsystem = InitSubsystems.initElevatorSubsystem();
     }
-
-    // Set up auto routines
-    autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
-
-    // Set up SysId routines
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Forward)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Quasistatic Reverse)",
-        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
-    autoChooser.addOption(
-        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-
-    // Configure the button bindings
-    configureButtonBindings();
+    if (FeatureFlags.synced.getObject().runDrive) {
+      drive = InitSubsystems.initDriveSubsystem();
+    }
   }
 
   /**
@@ -130,22 +80,70 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {
-
-    // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        new DriveWithJoysticks(
-            drive, // type: DriveTemplate
-            leftJoystick, // type: CommandJoystick
-            rightJoystick, // type: CommandJoystick
-            DrivetrainConstants.maxLinearSpeed, // type: double (m/s)
-            DrivetrainConstants.maxAngularSpeed, // type: double (rad/s)
-            DrivetrainConstants.joystickDeadband // type: double
-            ));
+  private void configureBindings() {
+    // initialize helper commands
+    if (FeatureFlags.synced.getObject().runDrive) {
+      InitBindings.initDriveBindings(drive);
+    }
   }
 
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    // An example command will be run in autonomous
+    return AkitDriveCommands.feedforwardCharacterization(drive);
+  }
+
+  /** This method must be called from robot, as it isn't called automatically */
+  public void testInit() {
+    switch (TestModeManager.getTestMode()) {
+      case DriveFeedForwardCharacterization:
+        CommandScheduler.getInstance()
+            .schedule(AkitDriveCommands.feedforwardCharacterization(drive));
+        break;
+      case DriveWheelRadiusCharacterization:
+        CommandScheduler.getInstance()
+            .schedule(AkitDriveCommands.wheelRadiusCharacterization(drive));
+        break;
+      case DriveSteerMotorCharacterization:
+        CommandScheduler.getInstance()
+            .schedule(AkitDriveCommands.steerAngleCharacterization(drive));
+        break;
+
+      case DriveSysIdQuasistaticForward:
+        CommandScheduler.getInstance()
+            .schedule(drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+        break;
+
+      case DriveSysIdQuasistaticBackward:
+        CommandScheduler.getInstance()
+            .schedule(drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+        break;
+
+      case DriveSysIdDynamicForward:
+        CommandScheduler.getInstance()
+            .schedule(drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+        break;
+
+      case DriveSysIdDynamicBackward:
+        CommandScheduler.getInstance()
+            .schedule(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  /** This method must be called from the robot, as it isn't called automatically. */
+  public void testPeriodic() {
+    if (FeatureFlags.synced.getObject().runElevator) {
+      elevatorSubsystem.testPeriodic();
+    }
+  }
+
+  public void disabledPeriodic() {}
+
+  public void disabledInit() {
+    CommandScheduler.getInstance().cancelAll();
   }
 
   public void displaySimFieldToAdvantageScope() {

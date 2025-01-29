@@ -4,10 +4,12 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import coppercore.wpilib_interface.DriveTemplate;
@@ -35,7 +37,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.generated.TunerConstants;
+import frc.robot.constants.JsonConstants;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -43,40 +45,43 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive implements DriveTemplate {
-  // TunerConstants doesn't include these constants, so they are declared locally
-  private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
+  // JsonConstants.tunerConstants doesn't include these constants, so they are declared locally
   static final double ODOMETRY_FREQUENCY =
-      new CANBus(TunerConstants.DrivetrainConstants.CANBusName).isNetworkFD() ? 250.0 : 100.0;
+      new CANBus(JsonConstants.drivetrainConstants.DrivetrainConstants.CANBusName).isNetworkFD()
+          ? 250.0
+          : 100.0;
   public static final double DRIVE_BASE_RADIUS =
       Math.max(
           Math.max(
-              Math.hypot(TunerConstants.FrontLeft.LocationX, TunerConstants.FrontLeft.LocationY),
-              Math.hypot(TunerConstants.FrontRight.LocationX, TunerConstants.FrontRight.LocationY)),
+              Math.hypot(
+                  DriveConfiguration.getInstance().FrontLeft.LocationX,
+                  DriveConfiguration.getInstance().FrontLeft.LocationY),
+              Math.hypot(
+                  DriveConfiguration.getInstance().FrontRight.LocationX,
+                  DriveConfiguration.getInstance().FrontRight.LocationY)),
           Math.max(
-              Math.hypot(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
-              Math.hypot(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)));
-  public static final double DRIVE_BASE_WIDTH =
-      Math.max(
-          Math.abs(TunerConstants.FrontLeft.LocationY - TunerConstants.FrontRight.LocationY),
-          Math.abs(TunerConstants.BackLeft.LocationY - TunerConstants.BackRight.LocationY));
-  public static final double DRIVE_BASE_LENGTH =
-      Math.max(
-          Math.abs(TunerConstants.FrontLeft.LocationX - TunerConstants.BackLeft.LocationX),
-          Math.abs(TunerConstants.FrontRight.LocationX - TunerConstants.FrontRight.LocationX));
+              Math.hypot(
+                  DriveConfiguration.getInstance().BackLeft.LocationX,
+                  DriveConfiguration.getInstance().BackLeft.LocationY),
+              Math.hypot(
+                  DriveConfiguration.getInstance().BackRight.LocationX,
+                  DriveConfiguration.getInstance().BackRight.LocationY)));
 
   // PathPlanner config constants
-
+  private static final double ROBOT_MASS_KG = 74.088;
+  private static final double ROBOT_MOI = 6.883;
+  private static final double WHEEL_COF = 1.2;
   private static final RobotConfig PP_CONFIG =
       new RobotConfig(
-          DrivetrainConstants.PathPlannerConstants.ROBOT_MASS_KG,
-          DrivetrainConstants.PathPlannerConstants.ROBOT_MOI,
+          ROBOT_MASS_KG,
+          ROBOT_MOI,
           new ModuleConfig(
-              TunerConstants.FrontLeft.WheelRadius,
-              TunerConstants.kSpeedAt12Volts.in(MetersPerSecond),
-              DrivetrainConstants.PathPlannerConstants.WHEEL_COF,
+              DriveConfiguration.getInstance().FrontLeft.WheelRadius,
+              JsonConstants.drivetrainConstants.kSpeedAt12Volts.in(MetersPerSecond),
+              WHEEL_COF,
               DCMotor.getKrakenX60Foc(1)
-                  .withReduction(TunerConstants.FrontLeft.DriveMotorGearRatio),
-              TunerConstants.FrontLeft.SlipCurrent,
+                  .withReduction(DriveConfiguration.getInstance().FrontLeft.DriveMotorGearRatio),
+              DriveConfiguration.getInstance().FrontLeft.SlipCurrent,
               1),
           getModuleTranslations());
 
@@ -100,17 +105,61 @@ public class Drive implements DriveTemplate {
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
+  private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
+
+  public enum DesiredLocation {
+    Reef0,
+    Reef1,
+    Reef2,
+    Reef3,
+    Reef4,
+    Reef5,
+    Reef6,
+    Reef7,
+    Reef8,
+    Reef9,
+    Reef10,
+    Reef11,
+    Processor,
+    CoralStationLeft,
+    CoralStationRight,
+  }
+
+  public DesiredLocation[] locationArray = {
+    DesiredLocation.Reef0,
+    DesiredLocation.Reef1,
+    DesiredLocation.Reef2,
+    DesiredLocation.Reef3,
+    DesiredLocation.Reef4,
+    DesiredLocation.Reef5,
+    DesiredLocation.Reef6,
+    DesiredLocation.Reef7,
+    DesiredLocation.Reef8,
+    DesiredLocation.Reef9,
+    DesiredLocation.Reef10,
+    DesiredLocation.Reef11,
+    DesiredLocation.Processor,
+    DesiredLocation.CoralStationLeft,
+    DesiredLocation.CoralStationRight
+  };
+
+  private DesiredLocation desiredLocation = DesiredLocation.Reef0;
+
+  private boolean isOTF = false;
+
+  private Command driveToPose = null;
+
   public Drive(
       GyroIO gyroIO,
-      ModuleIO frontLeftModuleIO,
-      ModuleIO frontRightModuleIO,
-      ModuleIO backLeftModuleIO,
-      ModuleIO backRightModuleIO) {
+      ModuleIO flModuleIO,
+      ModuleIO frModuleIO,
+      ModuleIO blModuleIO,
+      ModuleIO brModuleIO) {
     this.gyroIO = gyroIO;
-    modules[0] = new Module(frontLeftModuleIO, 0, TunerConstants.FrontLeft);
-    modules[1] = new Module(frontRightModuleIO, 1, TunerConstants.FrontRight);
-    modules[2] = new Module(backLeftModuleIO, 2, TunerConstants.BackLeft);
-    modules[3] = new Module(backRightModuleIO, 3, TunerConstants.BackRight);
+    modules[0] = new Module(flModuleIO, 0, DriveConfiguration.getInstance().FrontLeft);
+    modules[1] = new Module(frModuleIO, 1, DriveConfiguration.getInstance().FrontRight);
+    modules[2] = new Module(blModuleIO, 2, DriveConfiguration.getInstance().BackLeft);
+    modules[3] = new Module(brModuleIO, 3, DriveConfiguration.getInstance().BackRight);
 
     // Usage reporting for swerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
@@ -123,9 +172,7 @@ public class Drive implements DriveTemplate {
         this::getPose,
         this::setPose,
         this::getChassisSpeeds,
-        (speeds) -> {
-          setGoalSpeeds(speeds);
-        },
+        (ChassisSpeeds speeds) -> this.setGoalSpeeds(speeds, false),
         new PPHolonomicDriveController(
             new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
         PP_CONFIG,
@@ -142,6 +189,9 @@ public class Drive implements DriveTemplate {
           Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
         });
 
+    // warm up java processing for faster pathfind later
+    PathfindingCommand.warmupCommand().schedule();
+
     // Configure SysId
     sysId =
         new SysIdRoutine(
@@ -156,7 +206,6 @@ public class Drive implements DriveTemplate {
 
   @Override
   public void periodic() {
-    runVelocity(goalSpeeds);
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -176,6 +225,22 @@ public class Drive implements DriveTemplate {
     if (DriverStation.isDisabled()) {
       Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
+    }
+
+    // OTF Command
+    Logger.recordOutput("Drive/OnTheFly", isOTF);
+    if (driveToPose != null) {
+      Logger.recordOutput("Drive/OnTheFlyCommandStatus", this.driveToPose.isScheduled());
+
+      // cancel path following command once OTF cancelled (likely via trigger)
+      if (!isOTF) {
+        driveToPose.cancel();
+      }
+    }
+
+    // run velocity if not disabled
+    if (!DriverStation.isTest() && !DriverStation.isDisabled()) {
+      this.runVelocity();
     }
 
     // Update odometry
@@ -199,7 +264,7 @@ public class Drive implements DriveTemplate {
       // Update gyro angle
       if (gyroInputs.connected) {
         // Use the real gyro angle
-        rawGyroRotation = gyroInputs.yawPosition;
+        rawGyroRotation = gyroInputs.odometryYawPositions[i];
       } else {
         // Use the angle delta from the kinematics and module deltas
         Twist2d twist = kinematics.toTwist2d(moduleDeltas);
@@ -214,40 +279,164 @@ public class Drive implements DriveTemplate {
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
   }
 
-  // todo: consolidate- merge from main drive branch
-  public void setGoalSpeeds(ChassisSpeeds speeds) {
-    this.setGoalSpeeds(speeds, true);
-  }
-
-  public void setGoalSpeeds(ChassisSpeeds speeds, boolean fieldCentric) {
-    this.goalSpeeds = speeds;
-  }
   /**
-   * Runs the drive at the desired velocity in a field-centric manner.
+   * sets desired speeds of robot
    *
-   * @param speeds2 Speeds in meters/sec
+   * @param speeds - desired speeds of robot
+   * @param fieldCentric - true if controlling in teleop (allows driving with field-oriented
+   *     control), false for auto (robot centric)
    */
-  public void runVelocity(ChassisSpeeds speeds2) {
-    // Adjust for field-centric control
-    boolean isFlipped =
-        DriverStation.getAlliance().isPresent()
-            && DriverStation.getAlliance().get() == Alliance.Red;
+  public void setGoalSpeeds(ChassisSpeeds speeds, boolean fieldCentric) {
+    if (fieldCentric) {
+      // Adjust for field-centric control
+      boolean isFlipped =
+          DriverStation.getAlliance().isPresent()
+              && DriverStation.getAlliance().get() == Alliance.Red;
 
-    Rotation2d robotRotation =
-        isFlipped
-            ? getRotation().plus(new Rotation2d(Math.PI)) // Flip orientation for Red Alliance
-            : getRotation();
+      Rotation2d robotRotation =
+          isFlipped
+              ? getRotation().plus(new Rotation2d(Math.PI)) // Flip orientation for Red Alliance
+              : getRotation();
 
-    ChassisSpeeds fieldRelativeSpeeds =
-        ChassisSpeeds.fromFieldRelativeSpeeds(speeds2, robotRotation);
+      this.goalSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, robotRotation);
+    } else {
+      Logger.recordOutput("Drive/DesiredOTFSpeeds", speeds);
+      this.goalSpeeds = speeds;
+    }
+  }
 
+  /**
+   * sets isOTF of robot true will cause robot to create a path from current location to the set
+   * PathLocation
+   *
+   * @param isOTF boolean telling robot if it should create a OTF path
+   */
+  public void setOTF(boolean isOTF) {
+    this.isOTF = isOTF;
+
+    if (isOTF) {
+      this.driveToPose = this.getDriveToPoseCommand();
+      this.driveToPose.schedule();
+    }
+  }
+
+  /**
+   * checks if drive is currently following an on the fly path
+   *
+   * @return state of OTF following
+   */
+  public boolean isDriveOTF() {
+    return isOTF;
+  }
+
+  /**
+   * sets desired path location calling this and then setting OTF to true will cause robot to drive
+   * path from current pose to the location
+   *
+   * @param location desired location for robot to pathfind to
+   */
+  public void setDesiredLocation(DesiredLocation location) {
+    this.desiredLocation = location;
+  }
+
+  /**
+   * sets desired path location calling this and then setting OTF to true will cause robot to drive
+   * path from current pose to the location
+   *
+   * @param locationIndex desired location index from DesiredLocationSelector
+   */
+  public void setDesiredLocation(int locationIndex) {
+    this.desiredLocation = locationArray[locationIndex];
+  }
+
+  /**
+   * updates desired path location (for when OTF is already running) this will cancel old command
+   * and generate a new OTF path to run
+   *
+   * @param location desired location for robot to pathfind to
+   */
+  public void updateDesiredLocation(DesiredLocation location) {
+    this.setDesiredLocation(location);
+
+    if (isOTF) {
+      this.driveToPose.cancel();
+      this.driveToPose = this.getDriveToPoseCommand();
+      this.driveToPose.schedule();
+    }
+  }
+
+  /**
+   * updates desired path location (for when OTF is already running) this will cancel old command
+   * and generate a new OTF path to run
+   *
+   * @param locationIndex desired location index for robot to pathfind to (sent from
+   *     DesiredLocationSelector)
+   */
+  public void updateDesiredLocation(int locationIndex) {
+    this.setDesiredLocation(locationIndex);
+
+    if (isOTF) {
+      this.driveToPose.cancel();
+      this.driveToPose = this.getDriveToPoseCommand();
+      this.driveToPose.schedule();
+    }
+  }
+
+  /**
+   * finds a pose to pathfind to based on desiredLocation enum
+   *
+   * @return a pose representing the corresponding scoring location
+   */
+  public Pose2d findOTFPoseFromPathLocation() {
+    switch (this.desiredLocation) {
+        // reef 0 and 1 will have the same path
+        // NOTE: use PathPlannerPath.getStartingHolonomicPose to find pose for reef lineup if wanted
+      case Reef0:
+        return new Pose2d();
+      case Reef1:
+        return new Pose2d();
+      case CoralStationRight:
+        return new Pose2d(16.0, 6.6, new Rotation2d(0.0));
+        // return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
+      case CoralStationLeft:
+        return new Pose2d(1.2, 7.0, Rotation2d.fromRadians(-1));
+      default:
+        // no location set, so don't allow drive to run OTF
+        this.setOTF(false);
+        return new Pose2d();
+    }
+  }
+
+  /**
+   * gets the path from current pose to the desired pose found from location
+   *
+   * @return command that drive can schedule to follow the path found
+   */
+  public Command getDriveToPoseCommand() {
+    Pose2d targetPose = findOTFPoseFromPathLocation();
+
+    // Create the constraints to use while pathfinding
+    PathConstraints constraints =
+        new PathConstraints(
+            JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
+            JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
+            JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
+            JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
+
+    return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0);
+  }
+
+  /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
+  public void runVelocity() {
     // Calculate module setpoints
-    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(fieldRelativeSpeeds);
-    SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, TunerConstants.kSpeedAt12Volts);
+    ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(this.goalSpeeds, 0.02);
+    SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        setpointStates, JsonConstants.drivetrainConstants.kSpeedAt12Volts);
 
     // Log unoptimized setpoints and setpoint speeds
     Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
-    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", fieldRelativeSpeeds);
+    Logger.recordOutput("SwerveChassisSpeeds/Setpoints", discreteSpeeds);
 
     // Send setpoints to modules
     for (int i = 0; i < 4; i++) {
@@ -256,9 +445,6 @@ public class Drive implements DriveTemplate {
 
     // Log optimized setpoints (runSetpoint mutates each state)
     Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
-
-    // Update the goal speeds for odometry or other subsystems
-    setGoalSpeeds(fieldRelativeSpeeds);
   }
 
   /** Runs the drive in a straight line with the specified drive output. */
@@ -268,9 +454,16 @@ public class Drive implements DriveTemplate {
     }
   }
 
+  /** Runs one steer motor with the specified turn output */
+  public void runSteerCharacterization(double output) {
+    for (int i = 0; i < 4; i++) {
+      modules[i].runSteerCharacterization(output);
+    }
+  }
+
   /** Stops the drive. */
   public void stop() {
-    setGoalSpeeds(new ChassisSpeeds(0, 0, 0));
+    setGoalSpeeds(new ChassisSpeeds(), false);
   }
 
   /**
@@ -341,6 +534,14 @@ public class Drive implements DriveTemplate {
     return output;
   }
 
+  public double getSteerCharacterizationVelocity() {
+    double output = 0.0;
+    for (int i = 0; i < 4; i++) {
+      output += modules[i].getSteerCharacterizationVelocity() / 4.0;
+    }
+    return output;
+  }
+
   /** Returns the current odometry pose. */
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
@@ -368,7 +569,7 @@ public class Drive implements DriveTemplate {
 
   /** Returns the maximum linear speed in meters per sec. */
   public double getMaxLinearSpeedMetersPerSec() {
-    return TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+    return JsonConstants.drivetrainConstants.kSpeedAt12Volts.in(MetersPerSecond);
   }
 
   /** Returns the maximum angular speed in radians per sec. */
@@ -379,10 +580,18 @@ public class Drive implements DriveTemplate {
   /** Returns an array of module translations. */
   public static Translation2d[] getModuleTranslations() {
     return new Translation2d[] {
-      new Translation2d(TunerConstants.FrontLeft.LocationX, TunerConstants.FrontLeft.LocationY),
-      new Translation2d(TunerConstants.FrontRight.LocationX, TunerConstants.FrontRight.LocationY),
-      new Translation2d(TunerConstants.BackLeft.LocationX, TunerConstants.BackLeft.LocationY),
-      new Translation2d(TunerConstants.BackRight.LocationX, TunerConstants.BackRight.LocationY)
+      new Translation2d(
+          DriveConfiguration.getInstance().FrontLeft.LocationX,
+          DriveConfiguration.getInstance().FrontLeft.LocationY),
+      new Translation2d(
+          DriveConfiguration.getInstance().FrontRight.LocationX,
+          DriveConfiguration.getInstance().FrontRight.LocationY),
+      new Translation2d(
+          DriveConfiguration.getInstance().BackLeft.LocationX,
+          DriveConfiguration.getInstance().BackLeft.LocationY),
+      new Translation2d(
+          DriveConfiguration.getInstance().BackRight.LocationX,
+          DriveConfiguration.getInstance().BackRight.LocationY)
     };
   }
 }
