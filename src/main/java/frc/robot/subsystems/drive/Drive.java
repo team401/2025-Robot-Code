@@ -18,6 +18,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -154,6 +155,9 @@ public class Drive implements DriveTemplate {
   private Command driveToPose = null;
 
   private VisionAlignment alignmentSupplier;
+
+  private PIDController driveLineupController = new PIDController(20, 0,0);
+  private PIDController rotationController = new PIDController(20, 0, 0);
 
   public Drive(
       GyroIO gyroIO,
@@ -306,7 +310,7 @@ public class Drive implements DriveTemplate {
 
       this.goalSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, robotRotation);
     } else {
-      Logger.recordOutput("Drive/DesiredOTFSpeeds", speeds);
+      Logger.recordOutput("Drive/DesiredRobotCentricSpeeds", speeds);
       this.goalSpeeds = speeds;
     }
   }
@@ -506,6 +510,42 @@ public class Drive implements DriveTemplate {
     }
   }
 
+  /**
+   * gets rotation for each side of hexagonal reef for lineup
+   * 
+   * @return Rotation2d representing desired rotation for lineup
+   */
+  public Rotation2d getRotationForReefSide () {
+    switch (desiredLocation) {
+      case Reef0:
+        return new Rotation2d();
+      case Reef1:
+        return new Rotation2d();
+      case Reef2:
+        return new Rotation2d();
+      case Reef3:
+      return new Rotation2d();
+      case Reef4:
+      return new Rotation2d();
+      case Reef5:
+      return new Rotation2d();
+      case Reef6:
+      return new Rotation2d();
+      case Reef7:
+      return new Rotation2d();
+      case Reef8:
+      return new Rotation2d();
+      case Reef9:
+      return new Rotation2d();
+      case Reef10:
+      return new Rotation2d();
+      case Reef11:
+      return new Rotation2d();
+      default:
+       return new Rotation2d();
+    }
+  }
+
   /** take over goal speeds to align to reef exactly */
   public void LineupWithReefLocation() {
     int tagId = this.getTagIdForReef();
@@ -523,7 +563,12 @@ public class Drive implements DriveTemplate {
       return;
     }
 
-    // give to PID Controllers and setGoalSpeeds (fieldentric?)
+    // give to PID Controllers and setGoalSpeeds (robotCentric)
+    double vx = driveLineupController.calculate(observation.alongTrackDistance());
+    double vy = driveLineupController.calculate(observation.crossTrackDistance());
+    double omega = rotationController.calculate(this.getRotation().getRadians(), this.getRotationForReefSide().getRadians());
+
+    this.setGoalSpeeds(new ChassisSpeeds(vx, vy, omega), false);
   }
 
   /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
