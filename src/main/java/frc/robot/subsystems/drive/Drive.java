@@ -354,10 +354,10 @@ public class Drive implements DriveTemplate {
    *
    * @return true if robot pose is close to desired pose
    */
-  public boolean isOTFFinished() {
+  public boolean isDriveCloseToFinalLineupPose() {
     // relative to transforms first pose into distance from desired pose
     // then get distance between poses (if less than 0.1 meters we are good)
-    return this.getPose().relativeTo(this.findOTFPoseFromPathLocation()).getTranslation().getNorm()
+    return this.getPose().relativeTo(this.findOTFPoseFromDesiredLocation()).getTranslation().getNorm()
         < 0.1;
   }
 
@@ -402,7 +402,7 @@ public class Drive implements DriveTemplate {
    */
   public void setAutoAlignment(boolean autoAlignment) {
     if (autoAlignment) {
-      if (isOTFFinished() && isDesiredLocationReef()) {
+      if (isDriveCloseToFinalLineupPose() && isDesiredLocationReef()) {
         this.setLiningUp(true);
       } else {
         this.setOTF(true);
@@ -435,10 +435,9 @@ public class Drive implements DriveTemplate {
    *
    * @return a pose representing the corresponding scoring location
    */
-  public Pose2d findOTFPoseFromPathLocation() {
+  public Pose2d findOTFPoseFromDesiredLocation() {
     switch (this.desiredLocation) {
-        // reef 0 and 1 will have the same path
-        // NOTE: use PathPlannerPath.getStartingHolonomicPose to find pose for reef lineup if wanted
+      // NOTE: pairs of reef sides (ie 0 and 1) will have the same otf pose (approximately 0.5-1 meter away from center of tag)
       case Reef0:
         return new Pose2d();
       case Reef1:
@@ -460,7 +459,7 @@ public class Drive implements DriveTemplate {
    * @return command that drive can schedule to follow the path found
    */
   public Command getDriveToPoseCommand() {
-    Pose2d targetPose = findOTFPoseFromPathLocation();
+    Pose2d targetPose = findOTFPoseFromDesiredLocation();
 
     // Create the constraints to use while pathfinding
     PathConstraints constraints =
