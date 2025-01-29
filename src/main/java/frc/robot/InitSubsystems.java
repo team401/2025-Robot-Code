@@ -71,14 +71,14 @@ public final class InitSubsystems {
     switch (Constants.currentMode) {
       case REAL:
         return new VisionLocalizer(
-            null,
+            drive::addVisionMeasurement,
             tagLayout,
             new double[0],
             new VisionIOPhotonReal("FrontLeft", new Transform3d()),
             new VisionIOPhotonReal("FrontRight", new Transform3d()));
       case SIM:
         return new VisionLocalizer(
-            null,
+            drive::addVisionMeasurement,
             tagLayout,
             new double[0],
             new VisionIOPhotonSim("FrontLeft", new Transform3d(), drive::getPose, tagLayout),
