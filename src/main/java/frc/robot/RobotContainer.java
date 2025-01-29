@@ -53,6 +53,8 @@ public class RobotContainer {
 
       if (FeatureFlags.synced.getObject().runVision) {
         vision = InitSubsystems.initVisionSubsystem(drive);
+
+        drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
       }
     }
   }
