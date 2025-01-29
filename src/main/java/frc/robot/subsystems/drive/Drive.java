@@ -31,7 +31,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -57,18 +56,18 @@ public class Drive implements DriveTemplate {
       Math.max(
           Math.max(
               Math.hypot(
-                  JsonConstants.drivetrainConstants.FrontLeft.LocationX,
-                  JsonConstants.drivetrainConstants.FrontLeft.LocationY),
+                  DriveConfiguration.getInstance().FrontLeft.LocationX,
+                  DriveConfiguration.getInstance().FrontLeft.LocationY),
               Math.hypot(
-                  JsonConstants.drivetrainConstants.FrontRight.LocationX,
-                  JsonConstants.drivetrainConstants.FrontRight.LocationY)),
+                  DriveConfiguration.getInstance().FrontRight.LocationX,
+                  DriveConfiguration.getInstance().FrontRight.LocationY)),
           Math.max(
               Math.hypot(
-                  JsonConstants.drivetrainConstants.BackLeft.LocationX,
-                  JsonConstants.drivetrainConstants.BackLeft.LocationY),
+                  DriveConfiguration.getInstance().BackLeft.LocationX,
+                  DriveConfiguration.getInstance().BackLeft.LocationY),
               Math.hypot(
-                  JsonConstants.drivetrainConstants.BackRight.LocationX,
-                  JsonConstants.drivetrainConstants.BackRight.LocationY)));
+                  DriveConfiguration.getInstance().BackRight.LocationX,
+                  DriveConfiguration.getInstance().BackRight.LocationY)));
 
   // PathPlanner config constants
   private static final double ROBOT_MASS_KG = 74.088;
@@ -79,12 +78,12 @@ public class Drive implements DriveTemplate {
           ROBOT_MASS_KG,
           ROBOT_MOI,
           new ModuleConfig(
-              JsonConstants.drivetrainConstants.FrontLeft.WheelRadius,
+              DriveConfiguration.getInstance().FrontLeft.WheelRadius,
               JsonConstants.drivetrainConstants.kSpeedAt12Volts.in(MetersPerSecond),
               WHEEL_COF,
               DCMotor.getKrakenX60Foc(1)
-                  .withReduction(JsonConstants.drivetrainConstants.FrontLeft.DriveMotorGearRatio),
-              JsonConstants.drivetrainConstants.FrontLeft.SlipCurrent,
+                  .withReduction(DriveConfiguration.getInstance().FrontLeft.DriveMotorGearRatio),
+              DriveConfiguration.getInstance().FrontLeft.SlipCurrent,
               1),
           getModuleTranslations());
 
@@ -168,10 +167,10 @@ public class Drive implements DriveTemplate {
       ModuleIO brModuleIO) {
     this.alignmentSupplier = null;
     this.gyroIO = gyroIO;
-    modules[0] = new Module(flModuleIO, 0, JsonConstants.drivetrainConstants.FrontLeft);
-    modules[1] = new Module(frModuleIO, 1, JsonConstants.drivetrainConstants.FrontRight);
-    modules[2] = new Module(blModuleIO, 2, JsonConstants.drivetrainConstants.BackLeft);
-    modules[3] = new Module(brModuleIO, 3, JsonConstants.drivetrainConstants.BackRight);
+    modules[0] = new Module(flModuleIO, 0, DriveConfiguration.getInstance().FrontLeft);
+    modules[1] = new Module(frModuleIO, 1, DriveConfiguration.getInstance().FrontRight);
+    modules[2] = new Module(blModuleIO, 2, DriveConfiguration.getInstance().BackLeft);
+    modules[3] = new Module(brModuleIO, 3, DriveConfiguration.getInstance().BackRight);
 
     // Usage reporting for swerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
@@ -432,6 +431,39 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * updates desired path location (for when OTF is already running) this will cancel old command
+   * and generate a new OTF path to run
+   *
+   * @param location desired location for robot to pathfind to
+   */
+  public void updateDesiredLocation(DesiredLocation location) {
+    this.setDesiredLocation(location);
+
+    if (isOTF) {
+      this.driveToPose.cancel();
+      this.driveToPose = this.getDriveToPoseCommand();
+      this.driveToPose.schedule();
+    }
+  }
+
+  /**
+   * updates desired path location (for when OTF is already running) this will cancel old command
+   * and generate a new OTF path to run
+   *
+   * @param locationIndex desired location index for robot to pathfind to (sent from
+   *     DesiredLocationSelector)
+   */
+  public void updateDesiredLocation(int locationIndex) {
+    this.setDesiredLocation(locationIndex);
+
+    if (isOTF) {
+      this.driveToPose.cancel();
+      this.driveToPose = this.getDriveToPoseCommand();
+      this.driveToPose.schedule();
+    }
+  }
+
+  /**
    * finds a pose to pathfind to based on desiredLocation enum
    *
    * @return a pose representing the corresponding scoring location
@@ -444,7 +476,8 @@ public class Drive implements DriveTemplate {
       case Reef1:
         return new Pose2d();
       case CoralStationRight:
-        return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
+        return new Pose2d(16.0, 6.6, new Rotation2d(0.0));
+        // return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
       case CoralStationLeft:
         return new Pose2d(1.2, 7.0, Rotation2d.fromRadians(-1));
       default:
@@ -464,7 +497,11 @@ public class Drive implements DriveTemplate {
 
     // Create the constraints to use while pathfinding
     PathConstraints constraints =
-        new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+        new PathConstraints(
+            JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
+            JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
+            JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
+            JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
 
     return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0);
   }
@@ -763,17 +800,17 @@ public class Drive implements DriveTemplate {
   public static Translation2d[] getModuleTranslations() {
     return new Translation2d[] {
       new Translation2d(
-          JsonConstants.drivetrainConstants.FrontLeft.LocationX,
-          JsonConstants.drivetrainConstants.FrontLeft.LocationY),
+          DriveConfiguration.getInstance().FrontLeft.LocationX,
+          DriveConfiguration.getInstance().FrontLeft.LocationY),
       new Translation2d(
-          JsonConstants.drivetrainConstants.FrontRight.LocationX,
-          JsonConstants.drivetrainConstants.FrontRight.LocationY),
+          DriveConfiguration.getInstance().FrontRight.LocationX,
+          DriveConfiguration.getInstance().FrontRight.LocationY),
       new Translation2d(
-          JsonConstants.drivetrainConstants.BackLeft.LocationX,
-          JsonConstants.drivetrainConstants.BackLeft.LocationY),
+          DriveConfiguration.getInstance().BackLeft.LocationX,
+          DriveConfiguration.getInstance().BackLeft.LocationY),
       new Translation2d(
-          JsonConstants.drivetrainConstants.BackRight.LocationX,
-          JsonConstants.drivetrainConstants.BackRight.LocationY)
+          DriveConfiguration.getInstance().BackRight.LocationX,
+          DriveConfiguration.getInstance().BackRight.LocationY)
     };
   }
 
