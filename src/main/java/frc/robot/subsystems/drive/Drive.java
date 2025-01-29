@@ -156,7 +156,8 @@ public class Drive implements DriveTemplate {
 
   private VisionAlignment alignmentSupplier;
 
-  private PIDController driveLineupController = new PIDController(20, 0, 0);
+  private PIDController driveAlongTrackLineupController = new PIDController(20, 0, 0);
+  private PIDController driveCrossTrackLineupController = new PIDController(20, 0, 0);
   private PIDController rotationController = new PIDController(20, 0, 0);
 
   public Drive(
@@ -598,8 +599,8 @@ public class Drive implements DriveTemplate {
     }
 
     // give to PID Controllers and setGoalSpeeds (robotCentric)
-    double vx = driveLineupController.calculate(observation.alongTrackDistance());
-    double vy = driveLineupController.calculate(observation.crossTrackDistance());
+    double vx = driveAlongTrackLineupController.calculate(observation.alongTrackDistance());
+    double vy = driveCrossTrackLineupController.calculate(observation.crossTrackDistance());
     double omega =
         rotationController.calculate(
             this.getRotation().getRadians(), this.getRotationForReefSide().getRadians());
