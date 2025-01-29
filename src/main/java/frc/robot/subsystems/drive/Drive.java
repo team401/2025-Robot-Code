@@ -231,7 +231,6 @@ public class Drive implements DriveTemplate {
     }
 
     // OTF Command
-    Logger.recordOutput("Drive/OnTheFly", isOTF);
     if (driveToPose != null) {
       Logger.recordOutput("Drive/OnTheFlyCommandStatus", this.driveToPose.isScheduled());
 
@@ -328,6 +327,7 @@ public class Drive implements DriveTemplate {
    *
    * @return state of OTF following
    */
+  @AutoLogOutput(key = "Drive/isOTF")
   public boolean isDriveOTF() {
     return isOTF;
   }
@@ -500,6 +500,7 @@ public class Drive implements DriveTemplate {
 
     if (tagId == -1 || cameraIndex == -1) {
       // cancel lineup or whatever
+      this.setLiningUp(false);
       return;
     }
   }
