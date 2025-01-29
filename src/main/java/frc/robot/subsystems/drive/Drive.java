@@ -411,10 +411,18 @@ public class Drive implements DriveTemplate {
     return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0);
   }
 
+  /**
+   * checks if driver station alliance is red
+   * @return true if alliance is red
+   */
   public boolean isAllianceRed() {
     return DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Red);
   }
 
+  /**
+   * gets tag to use for final alignment with vision
+   * @return int representing tag id to use
+   */
   public int getTagIdForReef() {
     boolean allianceRed = this.isAllianceRed();
     switch (desiredLocation) {
@@ -447,10 +455,50 @@ public class Drive implements DriveTemplate {
     }
   }
 
+  /**
+   * gets camera index for vision single tag lineup
+   * 
+   * @return 0 for Front Left camera; 1 for Front Right camera
+   */
+  public int getCameraIndexForLineup() {
+    switch (desiredLocation) {
+      case Reef0:
+        return 0;
+      case Reef1:
+        return 1;
+      case Reef2:
+        return 0;
+      case Reef3:
+        return 1;
+      case Reef4:
+        return 0;
+      case Reef5:
+        return 1;
+      case Reef6:
+        return 0;
+      case Reef7:
+        return 1;
+      case Reef8:
+        return 0;
+      case Reef9:
+        return 1;
+      case Reef10:
+        return 0;
+      case Reef11:
+        return 1;
+      default:
+        return -1;
+    }
+  }
+
+  /**
+   * take over goal speeds to align to reef exactly
+   */
   public void LineupWithReefLocation() {
     int tagId = this.getTagIdForReef();
+    int cameraIndex = this.getCameraIndexForLineup();
 
-    if (tagId == -1) {
+    if (tagId == -1 || cameraIndex == -1) {
       // cancel lineup or whatever
       return;
     }
