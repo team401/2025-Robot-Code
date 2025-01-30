@@ -16,6 +16,7 @@ public class JsonConstants {
     ClawConstants.Sim.synced.loadData();
     ScoringFeatureFlags.synced.loadData();
     ScoringSetpoints.synced.loadData();
+    RedFieldLocations.synced.loadData();
 
     drivetrainConstants = DrivetrainConstants.synced.getObject();
     elevatorConstants = ElevatorConstants.synced.getObject();
@@ -24,6 +25,7 @@ public class JsonConstants {
     clawConstantsSim = ClawConstants.Sim.synced.getObject();
     scoringFeatureFlags = ScoringFeatureFlags.synced.getObject();
     scoringSetpoints = ScoringSetpoints.synced.getObject();
+    redFieldLocations = RedFieldLocations.synced.getObject();
   }
 
   public static DrivetrainConstants drivetrainConstants;
@@ -33,4 +35,5 @@ public class JsonConstants {
   public static ClawConstants.Sim clawConstantsSim;
   public static ScoringFeatureFlags scoringFeatureFlags;
   public static ScoringSetpoints scoringSetpoints;
+  public static RedFieldLocations redFieldLocations;
 }
