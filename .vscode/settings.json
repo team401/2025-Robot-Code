@@ -69,5 +69,5 @@
     "edu.wpi.first.math.**.struct.*",
     null
   ],
-  "java.debug.settings.onBuildFailureProceed": true
+  "java.compile.nullAnalysis.mode": "automatic"
 }
