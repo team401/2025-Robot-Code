@@ -15,6 +15,7 @@ public class TestModeManager {
     DriveSysIdQuasistaticBackward,
     DriveSysIdDynamicForward,
     DriveSysIdDynamicBackward,
+    DriveLineupTuning,
     None, // Default test mode that does nothing until a new one is selected.
   }
 
@@ -43,6 +44,7 @@ public class TestModeManager {
         "Drive SysId (Quasistatic Reverse)", TestMode.DriveSysIdQuasistaticBackward);
     testModeChooser.addOption("Drive SysId (Dynamic Forward)", TestMode.DriveSysIdDynamicForward);
     testModeChooser.addOption("Drive SysId (Dynamic Reverse)", TestMode.DriveSysIdDynamicBackward);
+    testModeChooser.addOption("Drive Lineup Tuning", TestMode.DriveLineupTuning);
 
     SmartDashboard.putData("Test Mode Selector", testModeChooser);
   }

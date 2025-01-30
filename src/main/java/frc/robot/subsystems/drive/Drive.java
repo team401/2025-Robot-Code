@@ -12,6 +12,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import coppercore.parameter_tools.LoggedTunableNumber;
 import coppercore.vision.VisionLocalizer.DistanceToTag;
 import coppercore.wpilib_interface.DriveTemplate;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -39,6 +40,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
@@ -157,6 +159,30 @@ public class Drive implements DriveTemplate {
   private Command driveToPose = null;
 
   private VisionAlignment alignmentSupplier;
+
+  // along track pid test mode
+  private LoggedTunableNumber alongTrackkP =
+      new LoggedTunableNumber("DriveLineupGains/AlongTrackkP", 0);
+  private LoggedTunableNumber alongTrackkI =
+      new LoggedTunableNumber("DriveLineupGains/AlongTrackkI", 0);
+  private LoggedTunableNumber alongTrackkD =
+      new LoggedTunableNumber("DriveLineupGains/AlongTrackkD", 0);
+
+  // cross tack pid test mode
+  private LoggedTunableNumber crossTrackkP =
+      new LoggedTunableNumber("DriveLineupGains/CrossTrackkP", 0);
+  private LoggedTunableNumber crossTrackkI =
+      new LoggedTunableNumber("DriveLineupGains/CrossTrackkI", 0);
+  private LoggedTunableNumber crossTrackkD =
+      new LoggedTunableNumber("DriveLineupGains/CrossTrackkD", 0);
+
+  // rotation pid test mode
+  private LoggedTunableNumber rotationkP =
+      new LoggedTunableNumber("DriveLineupGains/rotationkP", 0);
+  private LoggedTunableNumber rotationkI =
+      new LoggedTunableNumber("DriveLineupGains/rotationkI", 0);
+  private LoggedTunableNumber rotationkD =
+      new LoggedTunableNumber("DriveLineupGains/rotationkP", 0);
 
   private PIDController driveAlongTrackLineupController = new PIDController(0.5, 0, 0);
   private PIDController driveCrossTrackLineupController = new PIDController(0.5, 0, 0);
@@ -302,6 +328,39 @@ public class Drive implements DriveTemplate {
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
   }
 
+  public void testPeriodic() {
+    switch (TestModeManager.getTestMode()) {
+      case DriveLineupTuning:
+        LoggedTunableNumber.ifChanged(
+            hashCode(),
+            (pid) -> {
+              this.setAlongTrackPID(pid[0], pid[1], pid[2]);
+            },
+            alongTrackkP,
+            alongTrackkI,
+            alongTrackkD);
+        LoggedTunableNumber.ifChanged(
+            hashCode(),
+            (pid) -> {
+              this.setCrossTrackPID(pid[0], pid[1], pid[2]);
+            },
+            crossTrackkP,
+            crossTrackkI,
+            crossTrackkD);
+        LoggedTunableNumber.ifChanged(
+            hashCode(),
+            (pid) -> {
+              this.setRotationLineupPID(pid[0], pid[1], pid[2]);
+            },
+            rotationkP,
+            rotationkI,
+            rotationkD);
+        break;
+      default:
+        break;
+    }
+  }
+
   /**
    * sets desired speeds of robot
    *
@@ -330,56 +389,59 @@ public class Drive implements DriveTemplate {
 
   /**
    * sets lineup along track pid gains
+   *
    * @param kP proportional gain
    * @param kI integral gain
    * @param kD derivative gain
    */
   public void setAlongTrackPID(double kP, double kI, double kD) {
-    if(kP < 0) {
+    if (kP < 0) {
       kP = this.driveAlongTrackLineupController.getP();
     }
-    if(kI < 0) {
+    if (kI < 0) {
       kI = this.driveAlongTrackLineupController.getI();
     }
-    if(kD < 0) {
+    if (kD < 0) {
       kD = this.driveAlongTrackLineupController.getD();
     }
     this.driveAlongTrackLineupController = new PIDController(kP, kI, kD);
   }
 
-    /**
+  /**
    * sets lineup cross track pid gains
+   *
    * @param kP proportional gain
    * @param kI integral gain
    * @param kD derivative gain
    */
   public void setCrossTrackPID(double kP, double kI, double kD) {
-    if(kP < 0) {
+    if (kP < 0) {
       kP = this.driveCrossTrackLineupController.getP();
     }
-    if(kI < 0) {
+    if (kI < 0) {
       kI = this.driveCrossTrackLineupController.getI();
     }
-    if(kD < 0) {
+    if (kD < 0) {
       kD = this.driveCrossTrackLineupController.getD();
     }
     this.driveCrossTrackLineupController = new PIDController(kP, kI, kD);
   }
 
-    /**
+  /**
    * sets lineup rotation pid gains
+   *
    * @param kP proportional gain
    * @param kI integral gain
    * @param kD derivative gain
    */
-  public void setRotationLineupController (double kP, double kI, double kD) {
-    if(kP < 0) {
+  public void setRotationLineupPID(double kP, double kI, double kD) {
+    if (kP < 0) {
       kP = this.rotationController.getP();
     }
-    if(kI < 0) {
+    if (kI < 0) {
       kI = this.rotationController.getI();
     }
-    if(kD < 0) {
+    if (kD < 0) {
       kD = this.rotationController.getD();
     }
     this.rotationController = new PIDController(kP, kI, kD);
@@ -630,7 +692,7 @@ public class Drive implements DriveTemplate {
    */
   public int getCameraIndexForLineup() {
     switch (desiredLocation) {
-      // Right Side of reef side (align to left camera)
+        // Right Side of reef side (align to left camera)
       case Reef0:
       case Reef2:
       case Reef4:
@@ -638,7 +700,7 @@ public class Drive implements DriveTemplate {
       case Reef8:
       case Reef10:
         return FrontLeftCameraIndex;
-      // Left side of reef side (align to right camera)
+        // Left side of reef side (align to right camera)
       case Reef1:
       case Reef3:
       case Reef5:

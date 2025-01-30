@@ -120,7 +120,6 @@ public class RobotContainer {
         CommandScheduler.getInstance()
             .schedule(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         break;
-
       default:
         break;
     }
@@ -130,6 +129,9 @@ public class RobotContainer {
   public void testPeriodic() {
     if (FeatureFlags.synced.getObject().runElevator) {
       elevatorSubsystem.testPeriodic();
+    }
+    if (FeatureFlags.synced.getObject().runDrive) {
+      drive.testPeriodic();
     }
   }
 
