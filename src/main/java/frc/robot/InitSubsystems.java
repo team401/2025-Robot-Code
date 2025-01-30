@@ -1,5 +1,6 @@
 package frc.robot;
 
+import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConfiguration;
@@ -18,19 +19,32 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
 
 public final class InitSubsystems {
   public static ScoringSubsystem initScoringSubsystem() {
+    ElevatorMechanism elevatorMechanism = null;
+    ClawMechanism clawMechanism = null;
     switch (ModeConstants.currentMode) {
       case REAL:
-        return new ScoringSubsystem(
-            new ElevatorMechanism(new ElevatorIOTalonFX()), new ClawMechanism(new ClawIOTalonFX()));
+        if (JsonConstants.scoringFeatureFlags.runElevator) {
+          elevatorMechanism = new ElevatorMechanism(new ElevatorIOTalonFX());
+        }
+        if (JsonConstants.scoringFeatureFlags.runClaw) {
+          clawMechanism = new ClawMechanism(new ClawIOTalonFX());
+        }
+        break;
       case SIM:
-        return new ScoringSubsystem(
-            new ElevatorMechanism(new ElevatorIOSim()), new ClawMechanism(new ClawIOSim()));
+        if (JsonConstants.scoringFeatureFlags.runElevator) {
+          elevatorMechanism = new ElevatorMechanism(new ElevatorIOSim());
+        }
+        if (JsonConstants.scoringFeatureFlags.runClaw) {
+          clawMechanism = new ClawMechanism(new ClawIOSim());
+        }
+        break;
       case REPLAY:
-        throw new UnsupportedOperationException("Elevator replay is not yet implemented.");
+        throw new UnsupportedOperationException("Scoring replay is not yet implemented.");
       default:
         throw new UnsupportedOperationException(
             "Non-exhaustive list of mode types supported in InitSubsystems");
     }
+    return new ScoringSubsystem(elevatorMechanism, clawMechanism);
   }
 
   public static Drive initDriveSubsystem() {

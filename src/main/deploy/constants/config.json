@@ -1,5 +1,5 @@
 {
-  "environment": "test_drivebase",
+  "environment": "hitl",
   "defaults": "comp",
   "environments": [
     {
@@ -9,7 +9,9 @@
         "DrivetrainConstants.json",
         "ElevatorConstants.json",
         "FeatureFlags.json",
-        "OperatorConstants.json"
+        "OperatorConstants.json",
+        "ScoringFeatureFlags.json",
+        "ScoringSetpoints.json"
       ]
     },
     {
@@ -19,7 +21,9 @@
         "DrivetrainConstants.json",
         "ElevatorConstants.json",
         "FeatureFlags.json",
-        "OperatorConstants.json"
+        "OperatorConstants.json",
+        "ScoringFeatureFlags.json",
+        "ScoringSetpoints.json"
       ]
     },
     {
@@ -29,7 +33,9 @@
         "DrivetrainConstants.json",
         "ElevatorConstants.json",
         "FeatureFlags.json",
-        "OperatorConstants.json"
+        "OperatorConstants.json",
+        "ScoringFeatureFlags.json",
+        "ScoringSetpoints.json"
       ]
     }
   ]

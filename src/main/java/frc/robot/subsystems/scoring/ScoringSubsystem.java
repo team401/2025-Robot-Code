@@ -1,5 +1,7 @@
 package frc.robot.subsystems.scoring;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import coppercore.controls.state_machine.StateMachine;
 import coppercore.controls.state_machine.StateMachineConfiguration;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
@@ -9,6 +11,7 @@ import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.ExampleElevatorCommand;
+import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.scoring.states.IdleState;
 import frc.robot.subsystems.scoring.states.IntakeState;
 import frc.robot.subsystems.scoring.states.ScoreState;
@@ -21,6 +24,12 @@ public class ScoringSubsystem extends SubsystemBase {
 
   // Keep track of an instance to pass to state machine
   private static ScoringSubsystem instance;
+
+  /**
+   * Whether or not we should automatically transition through the workflow Idle -> Intake -> Warmup
+   * -> Score
+   */
+  private boolean autoTransition = true;
 
   public enum FieldTarget {
     L1,
@@ -69,6 +78,8 @@ public class ScoringSubsystem extends SubsystemBase {
     BeginIntake,
     DoneIntaking,
     CancelAction,
+    ToggleWarmup, // warmup button toggles warmup <-> idle
+    ScoredPiece,
   }
 
   private StateMachineConfiguration<ScoringState, ScoringTrigger> stateMachineConfiguration;
@@ -87,18 +98,24 @@ public class ScoringSubsystem extends SubsystemBase {
 
     stateMachineConfiguration
         .configure(ScoringState.Idle)
-        .permit(ScoringTrigger.BeginIntake, ScoringState.Intake);
+        .permit(ScoringTrigger.BeginIntake, ScoringState.Intake)
+        .permit(ScoringTrigger.ToggleWarmup, ScoringState.Warmup);
 
     stateMachineConfiguration
         .configure(ScoringState.Intake)
-        // .permitIf(ScoringStateMachineTriggers.BeginIntake, ScoringStateContainer.Idle, () ->
-        // isCoralDetected())
-        .permit(ScoringTrigger.DoneIntaking, ScoringState.Idle)
+        // If autoTransition, go straight to warmup from intake once we're done
+        // Otherwise, return to idle
+        .permitIf(ScoringTrigger.DoneIntaking, ScoringState.Warmup, () -> autoTransition)
+        .permitIf(ScoringTrigger.DoneIntaking, ScoringState.Idle, () -> !autoTransition)
         .permit(ScoringTrigger.CancelAction, ScoringState.Idle);
 
     stateMachineConfiguration
         .configure(ScoringState.Warmup)
-        .permit(ScoringTrigger.CancelAction, ScoringState.Idle);
+        .permit(ScoringTrigger.ToggleWarmup, ScoringState.Idle);
+
+    stateMachineConfiguration
+        .configure(ScoringState.Score)
+        .permit(ScoringTrigger.ScoredPiece, ScoringState.Idle);
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, ScoringState.Idle);
 
@@ -120,7 +137,9 @@ public class ScoringSubsystem extends SubsystemBase {
    * @param goalHeight Goal height to command elevator mechanism to
    */
   public void setElevatorGoalHeight(Distance goalHeight) {
-    elevatorMechanism.setGoalHeight(goalHeight);
+    if (JsonConstants.scoringFeatureFlags.runElevator) {
+      elevatorMechanism.setGoalHeight(goalHeight);
+    }
   }
 
   /**
@@ -131,7 +150,11 @@ public class ScoringSubsystem extends SubsystemBase {
    * @return
    */
   public Distance getElevatorHeight() {
-    return elevatorMechanism.getElevatorHeight();
+    if (JsonConstants.scoringFeatureFlags.runElevator) {
+      return elevatorMechanism.getElevatorHeight();
+    } else {
+      return Meters.zero();
+    }
   }
 
   /**
@@ -142,7 +165,9 @@ public class ScoringSubsystem extends SubsystemBase {
    * @param voltage The voltage to run the claw at.
    */
   public void setClawRollerVoltage(Voltage voltage) {
-    clawMechanism.getIO().setVoltage(voltage);
+    if (JsonConstants.scoringFeatureFlags.runClaw) {
+      clawMechanism.getIO().setVoltage(voltage);
+    }
   }
 
   /**
@@ -151,7 +176,11 @@ public class ScoringSubsystem extends SubsystemBase {
    * @return True if yes, false if no.
    */
   public boolean isCoralDetected() {
-    return clawMechanism.getIO().isCoralDetected();
+    if (JsonConstants.scoringFeatureFlags.runClaw) {
+      return clawMechanism.getIO().isCoralDetected();
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -160,7 +189,11 @@ public class ScoringSubsystem extends SubsystemBase {
    * @return True if yes, false if no.
    */
   public boolean isAlgaeDetected() {
-    return clawMechanism.getIO().isAlgaeDetected();
+    if (JsonConstants.scoringFeatureFlags.runClaw) {
+      return clawMechanism.getIO().isAlgaeDetected();
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -208,15 +241,25 @@ public class ScoringSubsystem extends SubsystemBase {
 
     stateMachine.periodic();
 
-    elevatorMechanism.periodic();
-    clawMechanism.periodic();
+    if (JsonConstants.scoringFeatureFlags.runElevator) {
+      elevatorMechanism.periodic();
+    }
+
+    if (JsonConstants.scoringFeatureFlags.runClaw) {
+      clawMechanism.periodic();
+    }
 
     Logger.recordOutput("scoring/state", stateMachine.getCurrentState());
   }
 
   /** This method must be called by RobotContainer, as it does not run automatically! */
   public void testPeriodic() {
-    elevatorMechanism.testPeriodic();
-    clawMechanism.testPeriodic();
+    if (JsonConstants.scoringFeatureFlags.runElevator) {
+      elevatorMechanism.testPeriodic();
+    }
+
+    if (JsonConstants.scoringFeatureFlags.runClaw) {
+      clawMechanism.testPeriodic();
+    }
   }
 }
