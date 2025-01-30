@@ -329,6 +329,63 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * sets lineup along track pid gains
+   * @param kP proportional gain
+   * @param kI integral gain
+   * @param kD derivative gain
+   */
+  public void setAlongTrackPID(double kP, double kI, double kD) {
+    if(kP < 0) {
+      kP = this.driveAlongTrackLineupController.getP();
+    }
+    if(kI < 0) {
+      kI = this.driveAlongTrackLineupController.getI();
+    }
+    if(kD < 0) {
+      kD = this.driveAlongTrackLineupController.getD();
+    }
+    this.driveAlongTrackLineupController = new PIDController(kP, kI, kD);
+  }
+
+    /**
+   * sets lineup cross track pid gains
+   * @param kP proportional gain
+   * @param kI integral gain
+   * @param kD derivative gain
+   */
+  public void setCrossTrackPID(double kP, double kI, double kD) {
+    if(kP < 0) {
+      kP = this.driveCrossTrackLineupController.getP();
+    }
+    if(kI < 0) {
+      kI = this.driveCrossTrackLineupController.getI();
+    }
+    if(kD < 0) {
+      kD = this.driveCrossTrackLineupController.getD();
+    }
+    this.driveCrossTrackLineupController = new PIDController(kP, kI, kD);
+  }
+
+    /**
+   * sets lineup rotation pid gains
+   * @param kP proportional gain
+   * @param kI integral gain
+   * @param kD derivative gain
+   */
+  public void setRotationLineupController (double kP, double kI, double kD) {
+    if(kP < 0) {
+      kP = this.rotationController.getP();
+    }
+    if(kI < 0) {
+      kI = this.rotationController.getI();
+    }
+    if(kD < 0) {
+      kD = this.rotationController.getD();
+    }
+    this.rotationController = new PIDController(kP, kI, kD);
+  }
+
+  /**
    * sets the supplier for landing zone alignment help
    *
    * @param alignmentSupplier from vision.getDistanceErrorToTag; helps drive align to reef
