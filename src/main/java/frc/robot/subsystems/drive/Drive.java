@@ -147,6 +147,9 @@ public class Drive implements DriveTemplate {
 
   private DesiredLocation desiredLocation = DesiredLocation.Reef0;
 
+  private final int FrontLeftCameraIndex = 0;
+  private final int FrontRightCameraIndex = 1;
+
   private boolean isOTF = false;
 
   private boolean isLiningUp = false;
@@ -571,29 +574,19 @@ public class Drive implements DriveTemplate {
   public int getCameraIndexForLineup() {
     switch (desiredLocation) {
       case Reef0:
-        return 0;
-      case Reef1:
-        return 1;
       case Reef2:
-        return 0;
-      case Reef3:
-        return 1;
       case Reef4:
-        return 0;
-      case Reef5:
-        return 1;
       case Reef6:
-        return 0;
-      case Reef7:
-        return 1;
       case Reef8:
-        return 0;
-      case Reef9:
-        return 1;
       case Reef10:
-        return 0;
+        return FrontLeftCameraIndex;
+      case Reef1:
+      case Reef3:
+      case Reef5:
+      case Reef7:
+      case Reef9:
       case Reef11:
-        return 1;
+        return FrontRightCameraIndex;
       default:
         return -1;
     }
