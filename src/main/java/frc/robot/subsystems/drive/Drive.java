@@ -14,8 +14,6 @@ import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import coppercore.vision.VisionLocalizer.DistanceToTag;
 import coppercore.wpilib_interface.DriveTemplate;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
@@ -23,7 +21,6 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
@@ -158,7 +155,6 @@ public class Drive implements DriveTemplate {
   private Command driveToPose = null;
 
   private VisionAlignment alignmentSupplier;
-  private BooleanSupplier visionHasMultitag;
 
   private PIDController driveAlongTrackLineupController = new PIDController(20, 0, 0);
   private PIDController driveCrossTrackLineupController = new PIDController(20, 0, 0);
@@ -245,7 +241,7 @@ public class Drive implements DriveTemplate {
 
     // OTF Command
     if (driveToPose != null) {
-      Logger.recordOutput("Drive/OnTheFlyCommandStatus", this.driveToPose.isScheduled());
+      Logger.recordOutput("Drive/OTF/OnTheFlyCommandStatus", this.driveToPose.isScheduled());
 
       // cancel path following command once OTF cancelled (likely via trigger)
       if (!isOTF) {
@@ -339,10 +335,6 @@ public class Drive implements DriveTemplate {
     this.alignmentSupplier = alignmentSupplier;
   }
 
-  public void setVisionHasMultitagSupplier(BooleanSupplier visionMultitag) {
-    this.visionHasMultitag = visionMultitag;
-  }
-
   /**
    * sets isOTF of robot true will cause robot to create a path from current location to the set
    * PathLocation
@@ -363,7 +355,7 @@ public class Drive implements DriveTemplate {
    *
    * @return state of OTF following
    */
-  @AutoLogOutput(key = "Drive/isOTF")
+  @AutoLogOutput(key = "Drive/OTF/isOTF")
   public boolean isDriveOTF() {
     return isOTF;
   }
@@ -398,7 +390,7 @@ public class Drive implements DriveTemplate {
    *
    * @return state of lining up
    */
-  @AutoLogOutput(key = "Drive/isLiningUp")
+  @AutoLogOutput(key = "Drive/Lineup/isLiningUp")
   public boolean isDriveLiningUp() {
     return isLiningUp;
   }
@@ -644,17 +636,6 @@ public class Drive implements DriveTemplate {
     }
   }
 
-  public DistanceToTag getDistanceFromMultiTag(int tagId) {
-    if (AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField).getTagPose(tagId).isPresent()) {
-      Pose3d tagPose =
-          AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField).getTagPose(tagId).get();
-      Translation2d distance =
-          tagPose.getTranslation().toTranslation2d().minus(getPose().getTranslation());
-      return new DistanceToTag(distance.getY(), distance.getX(), true);
-    }
-    return new DistanceToTag(0, 0, false);
-  }
-
   /** take over goal speeds to align to reef exactly */
   public void LineupWithReefLocation() {
     int tagId = this.getTagIdForReef();
@@ -666,17 +647,11 @@ public class Drive implements DriveTemplate {
       return;
     }
 
-    DistanceToTag observation;
-    if (visionHasMultitag != null && visionHasMultitag.getAsBoolean()) {
-      observation = getDistanceFromMultiTag(tagId);
-    } else {
-      observation = alignmentSupplier.get(tagId, cameraIndex, 0, 0);
-    }
+    DistanceToTag observation = alignmentSupplier.get(tagId, cameraIndex, 0, 0);
 
     if (!observation.isValid()) {
       return;
     }
-    // TODO: add alignment when we see multiple tags (check by calling vision.hasMultitagResult)
 
     // give to PID Controllers and setGoalSpeeds (robotCentric)
     double vx = driveAlongTrackLineupController.calculate(observation.alongTrackDistance());

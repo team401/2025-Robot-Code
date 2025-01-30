@@ -55,7 +55,6 @@ public class RobotContainer {
         vision = InitSubsystems.initVisionSubsystem(drive);
 
         drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
-        drive.setVisionHasMultitagSupplier(vision::hasMultitagResult);
       }
     }
   }
