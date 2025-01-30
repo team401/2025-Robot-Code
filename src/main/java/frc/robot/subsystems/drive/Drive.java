@@ -43,7 +43,6 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -156,9 +155,9 @@ public class Drive implements DriveTemplate {
 
   private VisionAlignment alignmentSupplier;
 
-  private PIDController driveAlongTrackLineupController = new PIDController(20, 0, 0);
-  private PIDController driveCrossTrackLineupController = new PIDController(20, 0, 0);
-  private PIDController rotationController = new PIDController(20, 0, 0);
+  private PIDController driveAlongTrackLineupController = new PIDController(0.5, 0, 0);
+  private PIDController driveCrossTrackLineupController = new PIDController(0.5, 0, 0);
+  private PIDController rotationController = new PIDController(0.5, 0, 0);
 
   public Drive(
       GyroIO gyroIO,
