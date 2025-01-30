@@ -211,7 +211,7 @@ public class Drive implements DriveTemplate {
           JsonConstants.drivetrainConstants.driveRotationkP,
           JsonConstants.drivetrainConstants.driveRotationkI,
           JsonConstants.drivetrainConstants.driveRotationkD);
-  
+
   private NetworkTableInstance inst = NetworkTableInstance.getDefault();
   private NetworkTable table = inst.getTable("");
   private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
@@ -314,7 +314,7 @@ public class Drive implements DriveTemplate {
     if (isLiningUp) {
       this.LineupWithReefLocation();
     }
-    
+
     // check for update from reef touchscreen
     this.updateDesiredLocationFromNetworkTables();
 
@@ -555,12 +555,9 @@ public class Drive implements DriveTemplate {
    * @return true if location is reef; false otherwise (processor / coral station)
    */
   public boolean isDesiredLocationReef() {
-    if (desiredLocation == DesiredLocation.CoralStationLeft
+    return !(desiredLocation == DesiredLocation.CoralStationLeft
         || desiredLocation == DesiredLocation.CoralStationRight
-        || desiredLocation == DesiredLocation.Processor) {
-      return false;
-    }
-    return true;
+        || desiredLocation == DesiredLocation.Processor);
   }
 
   /**
