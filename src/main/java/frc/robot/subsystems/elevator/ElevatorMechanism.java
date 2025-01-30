@@ -15,7 +15,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.TestModeManager;
-import frc.robot.constants.ElevatorConstants;
+import frc.robot.constants.subsystems.ElevatorConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorMechanism {

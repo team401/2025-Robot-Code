@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Meters;
 import coppercore.wpilib_interface.DriveWithJoysticks;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -58,7 +59,22 @@ public final class InitBindings {
                 },
                 drive));
 
-    // pov right (reef 0-11 -> processor left -> processor right )
+    leftJoystick
+        .button(1)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  drive.lockRotationToPosition(new Translation2d(3.5, 3));
+                },
+                drive));
+    leftJoystick
+        .button(1)
+        .onFalse(
+            new InstantCommand(
+                () -> {
+                  drive.disableRotationLock();
+                },
+                drive)); // pov right (reef 0-11 -> processor left -> processor right )
     // pov left (goes backwards of right)
     driverController
         .povRight()
