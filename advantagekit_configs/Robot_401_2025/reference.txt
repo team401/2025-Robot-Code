@@ -1,0 +1,7 @@
+model.glb = robot base + drive
+model_0.glb = ramp
+model_1.glb = climb arm
+model_2.glb = claw
+model_3.glb = carriage
+model_4.glb = elevator intermediate stage
+model_5.glb = elevator inner stage
