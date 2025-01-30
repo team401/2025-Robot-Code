@@ -162,31 +162,52 @@ public class Drive implements DriveTemplate {
 
   // along track pid test mode
   private LoggedTunableNumber alongTrackkP =
-      new LoggedTunableNumber("DriveLineupGains/AlongTrackkP", 0);
+      new LoggedTunableNumber(
+          "DriveLineupGains/AlongTrackkP", JsonConstants.drivetrainConstants.driveAlongTrackkP);
   private LoggedTunableNumber alongTrackkI =
-      new LoggedTunableNumber("DriveLineupGains/AlongTrackkI", 0);
+      new LoggedTunableNumber(
+          "DriveLineupGains/AlongTrackkI", JsonConstants.drivetrainConstants.driveAlongTrackkI);
   private LoggedTunableNumber alongTrackkD =
-      new LoggedTunableNumber("DriveLineupGains/AlongTrackkD", 0);
+      new LoggedTunableNumber(
+          "DriveLineupGains/AlongTrackkD", JsonConstants.drivetrainConstants.driveAlongTrackkD);
 
   // cross tack pid test mode
   private LoggedTunableNumber crossTrackkP =
-      new LoggedTunableNumber("DriveLineupGains/CrossTrackkP", 0);
+      new LoggedTunableNumber(
+          "DriveLineupGains/CrossTrackkP", JsonConstants.drivetrainConstants.driveCrossTrackkP);
   private LoggedTunableNumber crossTrackkI =
-      new LoggedTunableNumber("DriveLineupGains/CrossTrackkI", 0);
+      new LoggedTunableNumber(
+          "DriveLineupGains/CrossTrackkI", JsonConstants.drivetrainConstants.driveCrossTrackkI);
   private LoggedTunableNumber crossTrackkD =
-      new LoggedTunableNumber("DriveLineupGains/CrossTrackkD", 0);
+      new LoggedTunableNumber(
+          "DriveLineupGains/CrossTrackkD", JsonConstants.drivetrainConstants.driveCrossTrackkD);
 
   // rotation pid test mode
   private LoggedTunableNumber rotationkP =
-      new LoggedTunableNumber("DriveLineupGains/rotationkP", 0);
+      new LoggedTunableNumber(
+          "DriveLineupGains/rotationkP", JsonConstants.drivetrainConstants.driveRotationkP);
   private LoggedTunableNumber rotationkI =
-      new LoggedTunableNumber("DriveLineupGains/rotationkI", 0);
+      new LoggedTunableNumber(
+          "DriveLineupGains/rotationkI", JsonConstants.drivetrainConstants.driveRotationkI);
   private LoggedTunableNumber rotationkD =
-      new LoggedTunableNumber("DriveLineupGains/rotationkP", 0);
+      new LoggedTunableNumber(
+          "DriveLineupGains/rotationkP", JsonConstants.drivetrainConstants.driveRotationkD);
 
-  private PIDController driveAlongTrackLineupController = new PIDController(0.5, 0, 0);
-  private PIDController driveCrossTrackLineupController = new PIDController(0.5, 0, 0);
-  private PIDController rotationController = new PIDController(0.5, 0, 0);
+  private PIDController driveAlongTrackLineupController =
+      new PIDController(
+          JsonConstants.drivetrainConstants.driveAlongTrackkP,
+          JsonConstants.drivetrainConstants.driveAlongTrackkI,
+          JsonConstants.drivetrainConstants.driveAlongTrackkD);
+  private PIDController driveCrossTrackLineupController =
+      new PIDController(
+          JsonConstants.drivetrainConstants.driveCrossTrackkP,
+          JsonConstants.drivetrainConstants.driveCrossTrackkI,
+          JsonConstants.drivetrainConstants.driveCrossTrackkD);
+  private PIDController rotationController =
+      new PIDController(
+          JsonConstants.drivetrainConstants.driveRotationkP,
+          JsonConstants.drivetrainConstants.driveRotationkI,
+          JsonConstants.drivetrainConstants.driveRotationkD);
 
   public Drive(
       GyroIO gyroIO,

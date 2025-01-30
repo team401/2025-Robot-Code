@@ -52,6 +52,19 @@ public class DrivetrainConstants {
   public final Double driveKa = 0.0;
   public final Double driveKg = 0.0;
 
+  // lineup PID gains
+  public final Double driveAlongTrackkP = 0.5;
+  public final Double driveAlongTrackkI = 0.0;
+  public final Double driveAlongTrackkD = 0.0;
+
+  public final Double driveCrossTrackkP = 0.5;
+  public final Double driveCrossTrackkI = 0.0;
+  public final Double driveCrossTrackkD = 0.0;
+
+  public final Double driveRotationkP = 0.5;
+  public final Double driveRotationkI = 0.0;
+  public final Double driveRotationkD = 0.0;
+
   // The closed-loop output type to use for the steer motors;
   // This affects the PID/FF gains for the steer motors
   public final ClosedLoopOutputType kSteerClosedLoopOutput = ClosedLoopOutputType.Voltage;
