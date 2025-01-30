@@ -1,11 +1,13 @@
 package frc.robot.subsystems.scoring;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Rotations;
 
 import coppercore.controls.state_machine.StateMachine;
 import coppercore.controls.state_machine.StateMachineConfiguration;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.state.StateContainer;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -171,6 +173,13 @@ public class ScoringSubsystem extends SubsystemBase {
     if (JsonConstants.scoringFeatureFlags.runClaw) {
       clawMechanism.getIO().setVoltage(voltage);
     }
+  }
+
+  public Angle getClawRollerPosition() {
+    if (JsonConstants.scoringFeatureFlags.runClaw) {
+      clawMechanism.getIO();
+    }
+    return Rotations.zero();
   }
 
   /**

@@ -1,8 +1,12 @@
 package frc.robot.subsystems.scoring.states;
 
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
+import coppercore.controls.state_machine.transition.Transition;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.MutAngle;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
@@ -11,11 +15,27 @@ import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 public class IntakeState implements PeriodicStateInterface {
   private ScoringSubsystem scoringSubsystem;
 
+  /**
+   * Keep track of what angle the motor was at when the sensor first detected the game piece.
+   *
+   * <p>The thinking here is that it will operate like a stopwatch: store the initial angle on
+   * detect and then get the current angle to see how much it's rotated since then. r
+   */
+  private MutAngle detectedAngle;
+
+  /** Are we currently counting rotations to stop intake */
+  private boolean isCounting;
+
   public IntakeState(ScoringSubsystem scoringSubsystem) {
     this.scoringSubsystem = scoringSubsystem;
   }
 
-  @Override
+  public void onEntry(Transition transition) {
+    detectedAngle = Rotations.mutable(0.0);
+    isCounting = false;
+  }
+
+  // @Override
   public void periodic() {
     scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.intakeVoltage);
 
@@ -56,14 +76,41 @@ public class IntakeState implements PeriodicStateInterface {
     switch (scoringSubsystem.getGamePiece()) {
       case Coral:
         if (scoringSubsystem.isCoralDetected()) {
-          scoringSubsystem.setClawRollerVoltage(Volts.zero());
-          scoringSubsystem.fireTrigger(ScoringTrigger.DoneIntaking);
+          Angle currentPos = scoringSubsystem.getClawRollerPosition();
+          if (isCounting) {
+            // If we're already counting, check if we've rotated far enough
+            Angle diff = currentPos.minus(detectedAngle);
+            if (diff.gt(JsonConstants.clawConstants.intakeAnglePastCoralrange)) {
+              scoringSubsystem.setClawRollerVoltage(Volts.zero());
+              scoringSubsystem.fireTrigger(ScoringTrigger.DoneIntaking);
+            }
+          } else {
+            // If we're not already counting, start counting and record where we started
+            detectedAngle.mut_replace(currentPos);
+            isCounting = true;
+          }
+        } else {
+          // If gamepiece not detected, we're no longer counting
+          isCounting = false;
         }
         break;
       case Algae:
         if (scoringSubsystem.isAlgaeDetected()) {
           scoringSubsystem.setClawRollerVoltage(Volts.zero());
-          scoringSubsystem.fireTrigger(ScoringTrigger.DoneIntaking);
+          Angle currentPos = scoringSubsystem.getClawRollerPosition();
+          if (isCounting) {
+            Angle diff = currentPos.minus(detectedAngle);
+            if (diff.gt(JsonConstants.clawConstants.intakeAnglePastAlgaerange)) {
+              scoringSubsystem.setClawRollerVoltage(Volts.zero());
+              scoringSubsystem.fireTrigger(ScoringTrigger.DoneIntaking);
+            }
+          } else {
+            detectedAngle.mut_replace(currentPos);
+            isCounting = true;
+          }
+        } else {
+          // If gamepiece not detected, we're no longer counting
+          isCounting = false;
         }
         break;
     }

@@ -2,6 +2,7 @@ package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -9,6 +10,7 @@ import coppercore.parameter_tools.json.JSONExclude;
 import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
 import coppercore.parameter_tools.path_provider.EnvironmentHandler;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
@@ -46,6 +48,12 @@ public class ClawConstants {
   public final Voltage coralScoreVoltage = Volts.of(3.0);
   public final Voltage algaeScoreVoltage = Volts.of(-3.0);
 
+  /** How far should the motor rotate after the sensor detects a coral to intake? */
+  public final Angle intakeAnglePastCoralrange = Rotations.of(0.2);
+
+  /** How far should the motor rotate after the sensor detects an algae to intake? */
+  public final Angle intakeAnglePastAlgaerange = Rotations.of(0.1);
+
   public static final class Sim {
     @JSONExclude
     public static final JSONSync<ClawConstants.Sim> synced =
@@ -59,5 +67,11 @@ public class ClawConstants {
 
     /** How long the motor must remain powered to intake or outtake a game piece */
     public final Double actionTimeSeconds = 1.0;
+
+    /**
+     * How many rotations per second the motor will spin per volt applied. This isn't a unit because
+     * I couldn't fight the double-layered PerUnit mess to get it to do what I want.
+     */
+    public final double rotationsPerSecondPerVolt = 1.0;
   }
 }

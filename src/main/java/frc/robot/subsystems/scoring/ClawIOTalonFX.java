@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.TalonFX;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.JsonConstants;
@@ -74,6 +75,10 @@ public class ClawIOTalonFX implements ClawIO {
 
   public void setVoltage(Voltage volts) {
     outputVoltage.mut_replace(volts);
+  }
+
+  public Angle getClawMotorPos() {
+    return rollerMotor.getPosition().getValue();
   }
 
   public boolean isCoralDetected() {
