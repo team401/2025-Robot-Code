@@ -15,6 +15,7 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import coppercore.parameter_tools.json.JSONExclude;
 import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
+import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
@@ -34,11 +35,9 @@ public final class ElevatorConstants {
   public static final JSONSync<ElevatorConstants> synced =
       new JSONSync<ElevatorConstants>(
           new ElevatorConstants(),
-          Filesystem.getDeployDirectory()
-              .toPath()
-              .resolve("constants/ElevatorConstants.json")
-              .toString(),
-          new JSONSyncConfigBuilder().build());
+          "ElevatorConstants.json",
+          EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
+          new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
   // TODO: Rename these
   // see ElevatorIOTalonFX

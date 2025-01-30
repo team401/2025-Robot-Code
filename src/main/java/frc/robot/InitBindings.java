@@ -1,5 +1,8 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+
 import coppercore.wpilib_interface.DriveWithJoysticks;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -41,7 +44,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  drive.setDesiredLocation(DesiredLocation.CoralStationLeft);
+                  drive.setDesiredLocation(DesiredLocation.CoralStationRight);
                   drive.setOTF(true);
                 },
                 drive));
@@ -88,5 +91,15 @@ public final class InitBindings {
                   DesiredLocationSelector.setLocationFromIndex(drive);
                 },
                 drive));
+
+    leftJoystick
+        .top()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  drive.setPose(
+                      new Pose2d(
+                          Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
+                }));
   }
 }
