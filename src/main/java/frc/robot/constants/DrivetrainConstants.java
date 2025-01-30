@@ -64,6 +64,8 @@ public class DrivetrainConstants {
   public final Double driveRotationkI = 0.0;
   public final Double driveRotationkD = 0.0;
 
+  public final Double otfPoseDistanceLimit = 0.1;
+
   // The closed-loop output type to use for the steer motors;
   // This affects the PID/FF gains for the steer motors
   public final ClosedLoopOutputType kSteerClosedLoopOutput = ClosedLoopOutputType.Voltage;

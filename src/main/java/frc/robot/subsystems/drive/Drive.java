@@ -514,7 +514,7 @@ public class Drive implements DriveTemplate {
             .relativeTo(this.findOTFPoseFromDesiredLocation())
             .getTranslation()
             .getNorm()
-        < 0.1;
+        < JsonConstants.drivetrainConstants.otfPoseDistanceLimit;
   }
 
   /**

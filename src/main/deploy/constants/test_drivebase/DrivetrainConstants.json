@@ -22,6 +22,7 @@
   "driveRotationkP": 0.5,
   "driveRotationkI": 0.0,
   "driveRotationkD": 0.0,
+  "otfPoseDistanceLimit": 0.1,
   "kSteerClosedLoopOutput": "Voltage",
   "kDriveClosedLoopOutput": "TorqueCurrentFOC",
   "kDriveMotorType": "TalonFX_Integrated",
