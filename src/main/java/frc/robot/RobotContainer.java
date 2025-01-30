@@ -72,8 +72,8 @@ public class RobotContainer {
                     .a()
                     .onTrue(
                             Commands.runOnce(
-                                    () -> climbSubsystem.setAction(ClimbAction.START_CLIMB)))
-                    .onFalse(Commands.runOnce(() -> climbSubsystem.setAction(ClimbAction.NONE)));
+                                    () -> climbSubsystem.fireTrigger(ClimbAction.START_CLIMB)))
+                    .onFalse(Commands.runOnce(() -> climbSubsystem.fireTrigger(ClimbAction.NONE)));
         }
     }
 

@@ -41,7 +41,7 @@ public class ClimbSubsystem extends SubsystemBase {
 
         ClimbState(PeriodicStateInterface state) {
             this.state = state;
-          }
+        }
 
         @Override
         public PeriodicStateInterface getState() {
@@ -109,10 +109,16 @@ public class ClimbSubsystem extends SubsystemBase {
         climbMachine = new StateMachine(climbMachineConfiguration, ClimbAction.NONE);
     }
 
+    public void fireTrigger(ClimbAction action) {
+        climbMachine.fire(action);
+    }
+
     @Override
     public void periodic() {
 
         climbMachine.fire(currentAction);
+
+        climbMachine.periodic();
 
         io.updateInputs(inputs);
         io.applyOutputs(outputs);
