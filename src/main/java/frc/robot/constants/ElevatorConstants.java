@@ -53,21 +53,15 @@ public final class ElevatorConstants {
   public final Double elevatorReduction = 5.0;
 
   // TODO: Actual values
-  /* Carriage mass in pounds, represented as a double so it can be synced by JSONSync */
-  public final Double carriageMassPounds = 20.0;
 
-  @JSONExclude public final Mass carriageMass = Pounds.of(carriageMassPounds);
+  public final Mass carriageMass = Pounds.of(20.0);
 
-  public final Double drumRadiusInches = 0.7515; // 1.503 inch diameter / 2
-  @JSONExclude public final Distance drumRadius = Inches.of(drumRadiusInches);
+  public final Distance drumRadius = Inches.of(0.7515); // 1.503 inch diameter / 2
 
   // TODO: Use coppercore gear math after
   // https://github.com/team401/coppercore/issues/52 is
   // done.
-  public final Double elevatorInchesPerSpoolRotation = 4.724;
-
-  @JSONExclude
-  public final Distance elevatorHeightPerSpoolRotation = Inches.of(elevatorInchesPerSpoolRotation);
+  public final Distance elevatorHeightPerSpoolRotation = Inches.of(4.724);
 
   /**
    * What point in the sensor's range the discontinuity occurs. Results in a range of [1-x, x). For
@@ -161,11 +155,7 @@ public final class ElevatorConstants {
   @JSONExclude public final Distance maxElevatorHeight = Meters.of(maxElevatorHeightMeters);
 
   // TODO: Tune this value
-  /* Maximum stator current in amps, stored as a double so it can be synced by JSONSync */
-  public final Double elevatorStatorCurrentLimitAmps = 80.0;
-
-  @JSONExclude
-  public final Current elevatorStatorCurrentLimit = Amps.of(elevatorStatorCurrentLimitAmps);
+  public final Current elevatorStatorCurrentLimit = Amps.of(80.0);
 
   public final Integer CRTticksPerRotation =
       4096; // CANCoders have a resolution of 4096 ticks/rotation

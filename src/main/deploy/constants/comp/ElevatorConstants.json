@@ -6,9 +6,18 @@
   "largeCANCoderTeeth": 19,
   "spoolTeeth": 18,
   "elevatorReduction": 5.0,
-  "carriageMassPounds": 20.0,
-  "drumRadiusInches": 0.7515,
-  "elevatorInchesPerSpoolRotation": 4.724,
+  "carriageMass": {
+    "value": 20.0,
+    "unit": "Pound"
+  },
+  "drumRadius": {
+    "value": 0.7515,
+    "unit": "Inch"
+  },
+  "elevatorHeightPerSpoolRotation": {
+    "value": 4.724,
+    "unit": "Inch"
+  },
   "elevatorCANCoderDiscontinuityPoint": 1.0,
   "elevatorLargeCANCoderID": 11,
   "isLargeCANcoderClockwisePositive": true,
@@ -26,8 +35,13 @@
   "elevatorExpo_kA_raw": 0.1,
   "minElevatorHeightMeters": 0.0,
   "maxElevatorHeightMeters": 3.0,
-  "elevatorStatorCurrentLimitAmps": 80.0,
+  "elevatorStatorCurrentLimit": {
+    "value": 80.0,
+    "unit": "Amp"
+  },
   "CRTticksPerRotation": 4096,
-  "elevatorIdleHeightMeters": 0.2,
-  "elevatorIntakeHeightMeters": 0.2
+  "elevatorTargetThresholdMeters": {
+    "value": 0.03,
+    "unit": "Meter"
+  }
 }
