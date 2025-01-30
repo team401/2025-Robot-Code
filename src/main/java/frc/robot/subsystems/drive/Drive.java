@@ -361,6 +361,10 @@ public class Drive implements DriveTemplate {
     this.desiredLocation = locationArray[locationIndex];
   }
 
+  /**
+   * checks for update from reef location network table (SnakeScreen)
+   * run periodically in drive
+   */
   public void updateDesiredLocationFromNetworkTables() {
     double desiredIndex = reefLocationSelector.get();
     if (desiredIndex == -1) {
@@ -401,13 +405,7 @@ public class Drive implements DriveTemplate {
    *     DesiredLocationSelector)
    */
   public void updateDesiredLocation(int locationIndex) {
-    this.setDesiredLocation(locationIndex);
-
-    if (isOTF) {
-      this.driveToPose.cancel();
-      this.driveToPose = this.getDriveToPoseCommand();
-      this.driveToPose.schedule();
-    }
+    this.updateDesiredLocation(locationArray[locationIndex]);
   }
 
   /**
