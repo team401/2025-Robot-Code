@@ -36,7 +36,7 @@ public final class InitSubsystems {
   }
 
   public static Drive initDriveSubsystem() {
-    switch (Constants.currentMode) {
+    switch (ModeConstants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         return new Drive(
@@ -56,6 +56,7 @@ public final class InitSubsystems {
             new ModuleIOSim(DriveConfiguration.getInstance().BackRight));
 
       case MAPLESIM:
+
         // Sim robot, instantiate physics sim IO implementations
         RobotContainer.driveSim =
             new SwerveDriveSimulation(DriveTrainSimulationConfig.Default(), new Pose2d());

@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -8,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.drive.AkitDriveCommands;
 import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
+import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
@@ -47,6 +50,9 @@ public class RobotContainer {
     }
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
+      if (ModeConstants.simMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
+        drive.setPose(new Pose2d(3, 5, new Rotation2d()));
+      }
     }
   }
 
