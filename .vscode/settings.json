@@ -68,5 +68,6 @@
     "edu.wpi.first.math.**.proto.*",
     "edu.wpi.first.math.**.struct.*",
     null
-  ]
+  ],
+  "java.compile.nullAnalysis.mode": "automatic"
 }
