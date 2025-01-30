@@ -573,6 +573,7 @@ public class Drive implements DriveTemplate {
    */
   public int getCameraIndexForLineup() {
     switch (desiredLocation) {
+      // Right Side of reef side (align to left camera)
       case Reef0:
       case Reef2:
       case Reef4:
@@ -580,6 +581,7 @@ public class Drive implements DriveTemplate {
       case Reef8:
       case Reef10:
         return FrontLeftCameraIndex;
+      // Left side of reef side (align to right camera)
       case Reef1:
       case Reef3:
       case Reef5:
