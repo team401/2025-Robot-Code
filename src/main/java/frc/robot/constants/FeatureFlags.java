@@ -1,9 +1,9 @@
 package frc.robot.constants;
 
-import coppercore.parameter_tools.JSONExclude;
-import coppercore.parameter_tools.JSONSync;
-import coppercore.parameter_tools.JSONSyncConfigBuilder;
-import edu.wpi.first.wpilibj.Filesystem;
+import coppercore.parameter_tools.json.JSONExclude;
+import coppercore.parameter_tools.json.JSONSync;
+import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
+import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 
 public final class FeatureFlags {
   @JSONExclude
