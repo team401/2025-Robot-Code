@@ -46,7 +46,7 @@ public class IntakeState implements PeriodicStateInterface {
         System.out.println(
             "ERROR: Unkown GamePiece "
                 + scoringSubsystem.getGamePiece()
-                + " (defaulted to idle target)");
+                + " (defaulted to idle setpoint)");
         setpoint = JsonConstants.scoringSetpoints.idle;
         break;
     }

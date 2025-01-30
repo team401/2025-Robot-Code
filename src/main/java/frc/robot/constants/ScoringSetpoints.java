@@ -8,6 +8,7 @@ import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Filesystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
 
 public class ScoringSetpoints {
   /** Keeps track of a setpoint for the scoring subsystem. */
@@ -43,4 +44,31 @@ public class ScoringSetpoints {
   public final ScoringSetpoint net = new ScoringSetpoint(Meters.of(1.25));
 
   public final ScoringSetpoint ground = new ScoringSetpoint(Meters.of(0.0));
+
+  /**
+   * Given a fieldTarget, return the correct warmup setpoint
+   *
+   * @return
+   */
+  public static ScoringSetpoint getWarmupSetpoint(FieldTarget target) {
+    switch (target) {
+      case L1:
+        return JsonConstants.scoringSetpoints.L1;
+      case L2:
+        return JsonConstants.scoringSetpoints.L2;
+      case L3:
+        return JsonConstants.scoringSetpoints.L3;
+      case L4:
+        return JsonConstants.scoringSetpoints.L4;
+      case Net:
+        return JsonConstants.scoringSetpoints.net;
+      case Processor:
+        return JsonConstants.scoringSetpoints.processor;
+      case Ground:
+      default:
+        System.out.println(
+            "ERROR: Can't warmup for FieldTarget " + target + ", defaulting to idle");
+        return JsonConstants.scoringSetpoints.idle;
+    }
+  }
 }
