@@ -98,7 +98,10 @@ public class ScoringSubsystem extends SubsystemBase {
 
     stateMachineConfiguration
         .configure(ScoringState.Idle)
-        .permit(ScoringTrigger.BeginIntake, ScoringState.Intake)
+        .permitIf(
+            ScoringTrigger.BeginIntake,
+            ScoringState.Intake,
+            () -> !(isCoralDetected() || isAlgaeDetected()))
         .permit(ScoringTrigger.ToggleWarmup, ScoringState.Warmup);
 
     stateMachineConfiguration

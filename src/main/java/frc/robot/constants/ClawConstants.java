@@ -42,7 +42,9 @@ public class ClawConstants {
   public final Distance algaeProximityHysteresis = Centimeters.of(0.5);
   public final double algaeMinSignalStrengthForValidMeasurement = 2500.0;
 
-  public final Voltage intakeVoltage = Volts.of(12.0);
+  public final Voltage intakeVoltage = Volts.of(3.0);
+  public final Voltage coralScoreVoltage = Volts.of(3.0);
+  public final Voltage algaeScoreVoltage = Volts.of(-3.0);
 
   public static final class Sim {
     @JSONExclude

@@ -3,7 +3,6 @@ package frc.robot.subsystems.scoring.states;
 import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
-import frc.robot.constants.ClawConstants;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
@@ -18,7 +17,7 @@ public class IntakeState implements PeriodicStateInterface {
 
   @Override
   public void periodic() {
-    scoringSubsystem.setClawRollerVoltage(ClawConstants.synced.getObject().intakeVoltage);
+    scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.intakeVoltage);
 
     ScoringSetpoint setpoint;
     switch (scoringSubsystem.getGamePiece()) {
@@ -28,18 +27,19 @@ public class IntakeState implements PeriodicStateInterface {
       case Algae:
         switch (scoringSubsystem.getTarget()) {
           case L2:
-            setpoint = JsonConstants.scoringSetpoints.l2algae;
+            setpoint = JsonConstants.scoringSetpoints.L2algae;
             break;
           case Ground:
             setpoint = JsonConstants.scoringSetpoints.ground;
             break;
           default:
+            // TODO: Decide if we want to default to L3 or ground
             System.out.println(
                 "ERROR: Scoring commanded to intake algae but FieldTarget was "
                     + scoringSubsystem.getTarget().toString()
                     + " (not L2, L3, or Ground). Defaulted to L3.");
           case L3:
-            setpoint = JsonConstants.scoringSetpoints.l3algae;
+            setpoint = JsonConstants.scoringSetpoints.L3algae;
             break;
         }
       default:

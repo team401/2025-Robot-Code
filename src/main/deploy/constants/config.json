@@ -8,6 +8,7 @@
       "files": [
         "DrivetrainConstants.json",
         "ElevatorConstants.json",
+        "ClawConstants.json",
         "FeatureFlags.json",
         "OperatorConstants.json",
         "ScoringFeatureFlags.json",
@@ -20,6 +21,7 @@
       "files": [
         "DrivetrainConstants.json",
         "ElevatorConstants.json",
+        "ClawConstants.json",
         "FeatureFlags.json",
         "OperatorConstants.json",
         "ScoringFeatureFlags.json",
@@ -32,6 +34,7 @@
       "files": [
         "DrivetrainConstants.json",
         "ElevatorConstants.json",
+        "ClawConstants.json",
         "FeatureFlags.json",
         "OperatorConstants.json",
         "ScoringFeatureFlags.json",

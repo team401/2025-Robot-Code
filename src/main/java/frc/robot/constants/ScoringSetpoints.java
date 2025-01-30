@@ -12,7 +12,8 @@ import edu.wpi.first.wpilibj.Filesystem;
 public class ScoringSetpoints {
   /** Keeps track of a setpoint for the scoring subsystem. */
   public static record ScoringSetpoint(Distance elevatorHeight) {}
-  ; // TODO: Add wrist angle to ScoringSetpoint
+
+  // TODO: Add wrist angle to ScoringSetpoint
 
   @JSONExclude
   public static final JSONSync<ScoringSetpoints> synced =
@@ -28,13 +29,13 @@ public class ScoringSetpoints {
       new ScoringSetpoint(Inches.of(1.5)); // Idle at 1.5 inches to avoid obstructing cameras
 
   // TODO: Get actual values for all values from here down
-  public final ScoringSetpoint l1 = new ScoringSetpoint(Meters.of(0.05));
-  public final ScoringSetpoint l2 = new ScoringSetpoint(Meters.of(0.25));
-  public final ScoringSetpoint l3 = new ScoringSetpoint(Meters.of(0.5));
-  public final ScoringSetpoint l4 = new ScoringSetpoint(Meters.of(0.75));
+  public final ScoringSetpoint L1 = new ScoringSetpoint(Meters.of(0.05));
+  public final ScoringSetpoint L2 = new ScoringSetpoint(Meters.of(0.25));
+  public final ScoringSetpoint L3 = new ScoringSetpoint(Meters.of(0.5));
+  public final ScoringSetpoint L4 = new ScoringSetpoint(Meters.of(0.75));
 
-  public final ScoringSetpoint l2algae = new ScoringSetpoint(Meters.of(0.2));
-  public final ScoringSetpoint l3algae = new ScoringSetpoint(Meters.of(0.4));
+  public final ScoringSetpoint L2algae = new ScoringSetpoint(Meters.of(0.2));
+  public final ScoringSetpoint L3algae = new ScoringSetpoint(Meters.of(0.4));
 
   public final ScoringSetpoint coralStation = new ScoringSetpoint(Meters.of(1.0));
 

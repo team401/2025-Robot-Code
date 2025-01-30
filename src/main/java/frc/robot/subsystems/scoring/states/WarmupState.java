@@ -20,16 +20,16 @@ public class WarmupState implements PeriodicStateInterface {
 
     switch (scoringSubsystem.getTarget()) {
       case L1:
-        setpoint = JsonConstants.scoringSetpoints.l1;
+        setpoint = JsonConstants.scoringSetpoints.L1;
         break;
       case L2:
-        setpoint = JsonConstants.scoringSetpoints.l2;
+        setpoint = JsonConstants.scoringSetpoints.L2;
         break;
       case L3:
-        setpoint = JsonConstants.scoringSetpoints.l3;
+        setpoint = JsonConstants.scoringSetpoints.L3;
         break;
       case L4:
-        setpoint = JsonConstants.scoringSetpoints.l4;
+        setpoint = JsonConstants.scoringSetpoints.L4;
         break;
       case Net:
         setpoint = JsonConstants.scoringSetpoints.net;
@@ -42,8 +42,8 @@ public class WarmupState implements PeriodicStateInterface {
         System.out.println(
             "ERROR: Can't warmup for FieldTarget "
                 + scoringSubsystem.getTarget()
-                + ", defaulting to L1");
-        setpoint = JsonConstants.scoringSetpoints.l1;
+                + ", defaulting to idle");
+        setpoint = JsonConstants.scoringSetpoints.idle;
         break;
     }
 

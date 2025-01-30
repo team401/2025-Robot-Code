@@ -174,7 +174,7 @@ public final class ElevatorConstants {
    * How many meters away from setpoint the elevator height can be while still being considered "at
    * the setpoint"
    */
-  public final double elevatorTargetThresholdMeters = 0.03;
+  public final Distance elevatorTargetThresholdMeters = Meters.of(0.03);
 
   public static final class Sim {
     @JSONExclude

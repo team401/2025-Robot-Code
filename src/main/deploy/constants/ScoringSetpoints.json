@@ -5,25 +5,25 @@
       "unit": "Inch"
     }
   },
-  "l1": {
+  "L1": {
     "elevatorHeight": {
       "value": 0.05,
       "unit": "Meter"
     }
   },
-  "l2": {
+  "L2": {
     "elevatorHeight": {
       "value": 0.25,
       "unit": "Meter"
     }
   },
-  "l3": {
+  "L3": {
     "elevatorHeight": {
       "value": 0.5,
       "unit": "Meter"
     }
   },
-  "l4": {
+  "L4": {
     "elevatorHeight": {
       "value": 0.75,
       "unit": "Meter"

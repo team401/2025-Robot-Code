@@ -29,5 +29,9 @@
   "elevatorStatorCurrentLimitAmps": 80.0,
   "CRTticksPerRotation": 4096,
   "elevatorIdleHeightMeters": 0.2,
-  "elevatorIntakeHeightMeters": 0.2
+  "elevatorIntakeHeightMeters": 0.2,
+  "elevatorTargetThresholdMeters": {
+    "value": 0.03,
+    "unit": "Meter"
+  }
 }
