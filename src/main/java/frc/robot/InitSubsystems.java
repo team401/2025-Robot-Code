@@ -1,17 +1,24 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.constants.ModeConstants;
+import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConfiguration;
 import frc.robot.subsystems.drive.GyroIO;
+import frc.robot.subsystems.drive.GyroIOMapleSim;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
+import frc.robot.subsystems.drive.ModuleIOMapleSim;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.elevator.ElevatorIOTalonFX;
 import frc.robot.subsystems.elevator.ElevatorMechanism;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
 public final class InitSubsystems {
   public static ElevatorSubsystem initElevatorSubsystem() {
@@ -50,20 +57,18 @@ public final class InitSubsystems {
 
       case MAPLESIM:
         // Sim robot, instantiate physics sim IO implementations
-        new SwerveDriveSimulation driveSim =
-            new SwerveDriveSimulation(
-                DriveTrainSimulationConfig.Default());
+        RobotContainer.driveSim =
+            new SwerveDriveSimulation(DriveTrainSimulationConfig.Default(), new Pose2d());
         // DrivetrainConstants.SimConstants.driveSimConfig, new Pose2d());
-        SimulatedArena.getInstance().addDriveTrainSimulation(driveSim);
-        drive =
-            new Drive(
-                new GyroIOMapleSim(driveSim.getGyroSimulation()),
-                new ModuleIOMapleSim(driveSim.getModules()[0], TunerConstants.FrontLeft),
-                new ModuleIOMapleSim(driveSim.getModules()[1], TunerConstants.FrontRight),
-                new ModuleIOMapleSim(driveSim.getModules()[2], TunerConstants.BackLeft),
-                new ModuleIOMapleSim(driveSim.getModules()[3], TunerConstants.BackRight));
-        
-        break;
+        SimulatedArena.getInstance().addDriveTrainSimulation(RobotContainer.driveSim);
+        return new Drive(
+            new GyroIOMapleSim(RobotContainer.driveSim.getGyroSimulation()),
+            new ModuleIOMapleSim(RobotContainer.driveSim.getModules()[0], TunerConstants.FrontLeft),
+            new ModuleIOMapleSim(
+                RobotContainer.driveSim.getModules()[1], TunerConstants.FrontRight),
+            new ModuleIOMapleSim(RobotContainer.driveSim.getModules()[2], TunerConstants.BackLeft),
+            new ModuleIOMapleSim(
+                RobotContainer.driveSim.getModules()[3], TunerConstants.BackRight));
 
       default:
         // Replayed robot, disable IO implementations
@@ -76,45 +81,3 @@ public final class InitSubsystems {
     }
   }
 }
-
-
-<<<<<<< HEAD
-
-  // Subsystems
-  private final Drive drive;
-  private SwerveDriveSimulation driveSim = null;
-  private Field2d field2d;
-  // Controller
-  // private final CommandXboxController controller = new CommandXboxController(0);
-  private final CommandJoystick leftJoystick = new CommandJoystick(0);
-  private final CommandJoystick rightJoystick = new CommandJoystick(1);
-
-  // Dashboard inputs
-  private final LoggedDashboardChooser<Command> autoChooser;
-
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
-    switch (Constants.currentMode) {
-      case REAL:
-        // Real robot, instantiate hardware IO implementations
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                new ModuleIOTalonFX(TunerConstants.FrontRight),
-                new ModuleIOTalonFX(TunerConstants.BackLeft),
-                new ModuleIOTalonFX(TunerConstants.BackRight));
-        break;
-
-      case SIM:
-        // Sim robot, instantiate physics sim IO implementations
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(TunerConstants.FrontLeft),
-                new ModuleIOSim(TunerConstants.FrontRight),
-                new ModuleIOSim(TunerConstants.BackLeft),
-                new ModuleIOSim(TunerConstants.BackRight));
-        break;
-
-

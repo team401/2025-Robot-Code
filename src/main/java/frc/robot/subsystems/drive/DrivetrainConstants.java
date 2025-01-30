@@ -29,10 +29,10 @@ public final class DrivetrainConstants {
     public static final DriveTrainSimulationConfig driveSimConfig =
         new DriveTrainSimulationConfig(
             Kilograms.of(DrivetrainConstants.PathPlannerConstants.ROBOT_MASS_KG),
-            Meters.of(Drive.DRIVE_BASE_LENGTH + 0.05),
-            Meters.of(Drive.DRIVE_BASE_WIDTH + 0.05),
-            Meters.of(Drive.DRIVE_BASE_LENGTH),
-            Meters.of(Drive.DRIVE_BASE_WIDTH),
+            Meters.of(0.9 + 0.05),
+            Meters.of(0.546 + 0.05),
+            Meters.of(0.9),
+            Meters.of(0.546),
             COTS.ofMark4(DCMotor.getKrakenX60(1), DCMotor.getKrakenX60(1), 1.2, 2),
             () -> DrivetrainConstants.SimConstants.gyroSimulation);
   }
