@@ -108,7 +108,8 @@ public class ScoringSubsystem extends SubsystemBase {
 
     stateMachineConfiguration
         .configure(ScoringState.Intake)
-        // .configureOnEntryAction(ScoringState.Intake.state::onEntry) // Just tried this line too but it didn't work
+        // .configureOnEntryAction(ScoringState.Intake.state::onEntry) // Just tried this line too
+        // but it didn't work
         // If autoTransition, go straight to warmup from intake once we're done
         // Otherwise, return to idle
         .permitIf(ScoringTrigger.DoneIntaking, ScoringState.Warmup, () -> autoTransition)
