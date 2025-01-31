@@ -153,7 +153,7 @@ public class Drive implements DriveTemplate {
   private DesiredLocation desiredLocation = DesiredLocation.Reef0;
 
   private final int FrontLeftCameraIndex = 0;
-  private final int FrontRightCameraIndex = 1;
+  private final int FrontRightCameraIndex = 0;
 
   private boolean isOTF = false;
 
