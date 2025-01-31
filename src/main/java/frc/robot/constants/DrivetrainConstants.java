@@ -30,19 +30,24 @@ public class DrivetrainConstants {
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
   // Both sets of gains need to be tuned to your individual robot.
 
-  public final Slot0Configs steerGains =
-      new Slot0Configs()
-          .withKP(100)
-          .withKI(0)
-          .withKD(0.5)
-          .withKS(0.1)
-          .withKV(3.1)
-          .withKA(0)
-          .withFeedforwardSign(FeedforwardSignValue.UseClosedLoopSign);
+  public final Double steerKp = 40.0;
+  public final Double steerKi = 0.0;
+  public final Double steerKd = 0.0;
+  public final Double steerKs = 0.18753;
+  public final Double steerKv = 2.49773;
+  public final Double steerKa = 0.0;
+  public final Double steerKg = 0.0;
+
   // When using closed-loop control, the drive motor uses the control
   // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
-  public final Slot0Configs driveGains =
-      new Slot0Configs().withKP(0.1).withKI(0).withKD(0).withKS(0).withKV(0.124);
+
+  public final Double driveKp = 30.0;
+  public final Double driveKi = 0.0;
+  public final Double driveKd = 0.0;
+  public final Double driveKs = 0.1915;
+  public final Double driveKv = 0.83161;
+  public final Double driveKa = 0.0;
+  public final Double driveKg = 0.0;
 
   // The closed-loop output type to use for the steer motors;
   // This affects the PID/FF gains for the steer motors
