@@ -1,0 +1,18 @@
+{
+  "actionTime": {
+    "magnitude": 1.0,
+    "baseUnitMagnitude": 1.0,
+    "unit": {
+      "m_toBaseConverter": {
+        "arg$1": 1.0
+      },
+      "m_fromBaseConverter": {
+        "arg$1": 1.0
+      },
+      "m_name": "Second",
+      "m_symbol": "s",
+      "m_zero": {},
+      "m_one": {}
+    }
+  }
+}
