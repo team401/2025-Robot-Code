@@ -152,9 +152,6 @@ public class Drive implements DriveTemplate {
 
   private DesiredLocation desiredLocation = DesiredLocation.Reef0;
 
-  private final int FrontLeftCameraIndex = 0;
-  private final int FrontRightCameraIndex = 0;
-
   private boolean isOTF = false;
 
   private boolean isLiningUp = false;
@@ -744,7 +741,7 @@ public class Drive implements DriveTemplate {
       case Reef6:
       case Reef8:
       case Reef10:
-        return FrontLeftCameraIndex;
+        return JsonConstants.visionConstants.FrontLeftCameraIndex;
         // Left side of reef side (align to right camera)
       case Reef1:
       case Reef3:
@@ -752,7 +749,7 @@ public class Drive implements DriveTemplate {
       case Reef7:
       case Reef9:
       case Reef11:
-        return FrontRightCameraIndex;
+        return JsonConstants.visionConstants.FrontRightCameraIndex;
       default:
         return -1;
     }

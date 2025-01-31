@@ -9,6 +9,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConfiguration;
@@ -78,11 +79,7 @@ public final class InitSubsystems {
             new double[0],
             new VisionIOPhotonReal(
                 "Front Right",
-                new Transform3d(
-                    Units.inchesToMeters(7.0),
-                    Units.inchesToMeters(-5.5),
-                    Units.inchesToMeters(12.0),
-                    new Rotation3d())));
+                JsonConstants.visionConstants.FrontRightTransform));
       case SIM:
         return new VisionLocalizer(
             drive::addVisionMeasurement,
@@ -90,11 +87,7 @@ public final class InitSubsystems {
             new double[0],
             new VisionIOPhotonSim(
                 "Front Right",
-                new Transform3d(
-                    Units.inchesToMeters(7.0),
-                    Units.inchesToMeters(-5.5),
-                    Units.inchesToMeters(12.0),
-                    new Rotation3d()),
+                JsonConstants.visionConstants.FrontRightTransform,
                 drive::getPose,
                 tagLayout));
       default:
