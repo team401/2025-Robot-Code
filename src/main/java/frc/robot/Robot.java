@@ -174,7 +174,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationPeriodic() {
     if (ModeConstants.currentMode == frc.robot.constants.ModeConstants.Mode.SIM
-        && ModeConstants.currentMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
+        || ModeConstants.currentMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
       SimulatedArena.getInstance().simulationPeriodic();
     }
   }
