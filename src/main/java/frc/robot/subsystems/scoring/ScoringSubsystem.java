@@ -108,6 +108,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
     stateMachineConfiguration
         .configure(ScoringState.Intake)
+        // .configureOnEntryAction(ScoringState.Intake.state::onEntry) // Just tried this line too but it didn't work
         // If autoTransition, go straight to warmup from intake once we're done
         // Otherwise, return to idle
         .permitIf(ScoringTrigger.DoneIntaking, ScoringState.Warmup, () -> autoTransition)
@@ -177,7 +178,7 @@ public class ScoringSubsystem extends SubsystemBase {
 
   public Angle getClawRollerPosition() {
     if (JsonConstants.scoringFeatureFlags.runClaw) {
-      clawMechanism.getIO();
+      return clawMechanism.getIO().getClawMotorPos();
     }
     return Rotations.zero();
   }
@@ -248,6 +249,7 @@ public class ScoringSubsystem extends SubsystemBase {
   public void periodic() {
     boolean fireStartIntaking = SmartDashboard.getBoolean("scoring/fireStartIntaking", false);
     if (fireStartIntaking) {
+      setGamePiece(GamePiece.Coral);
       stateMachine.fire(ScoringTrigger.BeginIntake);
     }
 

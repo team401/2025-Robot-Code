@@ -73,5 +73,11 @@ public class ClawConstants {
      * I couldn't fight the double-layered PerUnit mess to get it to do what I want.
      */
     public final double rotationsPerSecondPerVolt = 1.0;
+
+    /** When piecePos > coralDetectionPoint, the simulated sensor can sense it */
+    public final double coralDetectionPoint = 0.7;
+
+    /** When piecePos < algaeDetectionPoint, the simulated sensor can sense it */
+    public final Double algaeDetectionPoint = 0.7;
   }
 }

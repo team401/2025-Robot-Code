@@ -11,6 +11,7 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
+import org.littletonrobotics.junction.Logger;
 
 public class IntakeState implements PeriodicStateInterface {
   private ScoringSubsystem scoringSubsystem;
@@ -21,7 +22,7 @@ public class IntakeState implements PeriodicStateInterface {
    * <p>The thinking here is that it will operate like a stopwatch: store the initial angle on
    * detect and then get the current angle to see how much it's rotated since then. r
    */
-  private MutAngle detectedAngle;
+  private MutAngle detectedAngle = Rotations.mutable(0.0);
 
   /** Are we currently counting rotations to stop intake */
   private boolean isCounting;
@@ -33,6 +34,7 @@ public class IntakeState implements PeriodicStateInterface {
   public void onEntry(Transition transition) {
     detectedAngle = Rotations.mutable(0.0);
     isCounting = false;
+    Logger.recordOutput("claw/intake/diff", 0.0);
   }
 
   // @Override
@@ -80,6 +82,7 @@ public class IntakeState implements PeriodicStateInterface {
           if (isCounting) {
             // If we're already counting, check if we've rotated far enough
             Angle diff = currentPos.minus(detectedAngle);
+            Logger.recordOutput("claw/intake/diff", diff.in(Rotations));
             if (diff.gt(JsonConstants.clawConstants.intakeAnglePastCoralrange)) {
               scoringSubsystem.setClawRollerVoltage(Volts.zero());
               scoringSubsystem.fireTrigger(ScoringTrigger.DoneIntaking);
@@ -114,5 +117,7 @@ public class IntakeState implements PeriodicStateInterface {
         }
         break;
     }
+
+    Logger.recordOutput("claw/intake/detectedAngle", detectedAngle);
   }
 }
