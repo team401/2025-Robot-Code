@@ -7,19 +7,16 @@ public interface RampIO {
     @AutoLog
     public static class RampInputs {
         public double position = 0.0;
+        public boolean inPosition;
     }
 
     @AutoLog
     public static class RampOutputs {
+        public double targetPosition;
         public double appliedVolts;
     }
 
-    public default void periodic(RampInputsAutoLogged inputs, RampOutputsAutoLogged outputs) {
-        updateInputs(inputs);
-        updateOutputs(outputs);
-    }
+    public void updateInputs(RampInputs inputs);
 
-    public void updateInputs(RampInputsAutoLogged inputs);
-
-    public void updateOutputs(RampOutputsAutoLogged outputs);
+    public void updateOutputs(RampInputs inputs, RampOutputs outputs);
 }

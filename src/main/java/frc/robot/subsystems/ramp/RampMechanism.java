@@ -1,71 +1,48 @@
 package frc.robot.subsystems.ramp;
 
+import org.littletonrobotics.junction.Logger;
+
 public class RampMechanism {
     RampIO io;
-    State state = State.INTAKE;
-    Action action = Action.INTAKE;
     RampInputsAutoLogged inputs = new RampInputsAutoLogged();
     RampOutputsAutoLogged outputs = new RampOutputsAutoLogged();
 
-    public static enum State {
-        INTAKE,
-        TRANSITIONING,
-        CLIMB
-    }
-
-    public static enum Action {
-        INTAKE,
-        CLIMB
-    }
+    public double position = 1.0;
+    public boolean inPosition = false;
+    public boolean holdDirectionPositive = false;
+    public double positionRange = 0.02;
 
     public RampMechanism(RampIO io) {
         this.io = io;
     }
 
     public void periodic() {
-        updateState();
-        if (action == Action.INTAKE) {
-            Intake();
-        } else if (action == Action.CLIMB) {
-            Climb();
-        }
-    }
-
-    public void updateState() {
-        if (inputs.position <= 0) {
-            state = State.INTAKE;
-        } else if (inputs.position >= 270) {
-            state = State.CLIMB;
+        io.updateInputs(inputs);
+        if (position - positionRange <= inputs.position
+                && position + positionRange >= inputs.position) {
+            inPosition = true;
         } else {
-            state = State.TRANSITIONING;
+            inPosition = false;
         }
+        outputs.targetPosition = position;
+        inputs.inPosition = inPosition;
+        io.updateOutputs(inputs, outputs);
+        Logger.processInputs("ramp/inputs", inputs);
+        Logger.processInputs("ramp/outputs", outputs);
     }
 
-    public void Intake() {
-        if (state == State.INTAKE) {
-            outputs.appliedVolts = -0.5;
-        } else {
-            outputs.appliedVolts = -5.0;
-        }
+    public void setHoldDirection(boolean dir) {}
+
+    public void setPosition(double position) {
+        this.position = position;
+        this.inPosition = false;
     }
 
-    public void Climb() {
-        if (state == State.INTAKE) {
-            outputs.appliedVolts = 0.5;
-        } else {
-            outputs.appliedVolts = 5.0;
-        }
-    }
-
-    public void setAction(Action action) {
-        this.action = action;
-    }
-
-    public boolean readyForIntake() {
-        return (state == State.INTAKE && action == Action.INTAKE);
+    public boolean inPosition() {
+        return inPosition;
     }
 
     public boolean inTransition() {
-        return state == State.TRANSITIONING;
+        return !inPosition;
     }
 }
