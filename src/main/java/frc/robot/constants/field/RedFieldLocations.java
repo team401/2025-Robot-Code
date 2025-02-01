@@ -4,6 +4,7 @@ import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 
 public class RedFieldLocations {
@@ -16,10 +17,13 @@ public class RedFieldLocations {
               .toString(),
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
-  public static Translation2d redReefCenterTranslation = new Translation2d(13.058902, 4.0259);
+  public static Translation2d redReefCenterTranslation =
+      new Translation2d(Units.metersToInches(514.13), Units.metersToInches(158.5));
+  ;
   public static Rotation2d redReefCenterRotation = new Rotation2d();
 
-  public static Translation2d redReefAprilTag1Translation = new Translation2d(530.49, 130.17);
+  public static Translation2d redReefAprilTag1Translation =
+      new Translation2d(Units.metersToInches(530.49), Units.metersToInches(130.17));
   public static Rotation2d redReefAprilTag1Rotation = new Rotation2d(Math.toRadians(300));
 
   public static Translation2d redReefAprilTag2Translation = new Translation2d(546.87, 158.5);

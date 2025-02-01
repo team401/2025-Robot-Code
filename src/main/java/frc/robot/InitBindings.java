@@ -20,7 +20,6 @@ import frc.robot.commands.drive.DesiredLocationSelector;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.Drive.DesiredLocation;
 
 public final class InitBindings {
 
@@ -61,19 +60,13 @@ public final class InitBindings {
             JsonConstants.drivetrainConstants.maxAngularSpeed, // type: double (rad/s)
             JsonConstants.drivetrainConstants.joystickDeadband // type: double
             ));
-    if (DriverStation.getAlliance().isPresent()
-        && DriverStation.getAlliance().get() == Alliance.Red) {
-      drive.alignToFieldElement(redReefCenter);
-    } else {
-      drive.alignToFieldElement(blueReefCenter);
-    }
+
     // hold right joystick trigger down to have drive go to desired location
     rightJoystick
         .button(1)
         .onTrue(
             new InstantCommand(
                 () -> {
-                  drive.setDesiredLocation(DesiredLocation.CoralStationRight);
                   drive.setOTF(true);
                 },
                 drive));

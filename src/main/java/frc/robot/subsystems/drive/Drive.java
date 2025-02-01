@@ -32,6 +32,9 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -41,6 +44,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.constants.JsonConstants;
+import frc.robot.constants.field.RedFieldLocations;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -161,6 +165,10 @@ public class Drive implements DriveTemplate {
   private boolean isOTF = false;
   private Command driveToPose = null;
 
+  private NetworkTableInstance inst = NetworkTableInstance.getDefault();
+  private NetworkTable table = inst.getTable("");
+  private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
+
   private boolean isAligningToFieldElement;
   private Translation2d lockedAlignPosition = new Translation2d();
 
@@ -253,6 +261,9 @@ public class Drive implements DriveTemplate {
       }
     }
 
+    // check for update from reef touchscreen
+    this.updateDesiredLocationFromNetworkTables();
+
     // run velocity if not disabled
     if (!DriverStation.isTest() && !DriverStation.isDisabled()) {
       this.runVelocity();
@@ -340,7 +351,9 @@ public class Drive implements DriveTemplate {
 
     if (isOTF) {
       this.driveToPose = this.getDriveToPoseCommand();
-      this.driveToPose.schedule();
+      if (this.driveToPose != null) {
+        this.driveToPose.schedule();
+      }
     }
   }
 
@@ -373,19 +386,18 @@ public class Drive implements DriveTemplate {
     this.desiredLocation = locationArray[locationIndex];
   }
 
-  /**
-   * updates desired path location (for when OTF is already running) this will cancel old command
-   * and generate a new OTF path to run
-   *
-   * @param location desired location for robot to pathfind to
-   */
-  public void updateDesiredLocation(DesiredLocation location) {
-    this.setDesiredLocation(location);
-
-    if (isOTF) {
-      this.driveToPose.cancel();
-      this.driveToPose = this.getDriveToPoseCommand();
-      this.driveToPose.schedule();
+  /** checks for update from reef location network table (SnakeScreen) run periodically in drive */
+  public void updateDesiredLocationFromNetworkTables() {
+    double desiredIndex = reefLocationSelector.get();
+    if (desiredIndex == -1) {
+      return;
+    }
+    if (locationArray[(int) desiredIndex] != desiredLocation) {
+      if (isOTF) {
+        this.updateDesiredLocation((int) desiredIndex);
+      } else {
+        this.setDesiredLocation((int) desiredIndex);
+      }
     }
   }
 
@@ -397,7 +409,17 @@ public class Drive implements DriveTemplate {
    *     DesiredLocationSelector)
    */
   public void updateDesiredLocation(int locationIndex) {
-    this.setDesiredLocation(locationIndex);
+    this.updateDesiredLocation(locationArray[locationIndex]);
+  }
+
+  /**
+   * updates desired path location (for when OTF is already running) this will cancel old command
+   * and generate a new OTF path to run
+   *
+   * @param location desired location for robot to pathfind to
+   */
+  public void updateDesiredLocation(DesiredLocation location) {
+    this.setDesiredLocation(location);
 
     if (isOTF) {
       this.driveToPose.cancel();
@@ -416,9 +438,13 @@ public class Drive implements DriveTemplate {
         // reef 0 and 1 will have the same path
         // NOTE: use PathPlannerPath.getStartingHolonomicPose to find pose for reef lineup if wanted
       case Reef0:
-        return new Pose2d();
+        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+            ? new Pose2d(
+                RedFieldLocations.redReefAprilTag1Translation,
+                RedFieldLocations.redReefAprilTag1Rotation)
+            : new Pose2d();
       case Reef1:
-        return new Pose2d();
+        return new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180)));
       case CoralStationRight:
         return new Pose2d(16.0, 6.6, new Rotation2d(0.0));
         // return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
@@ -427,7 +453,7 @@ public class Drive implements DriveTemplate {
       default:
         // no location set, so don't allow drive to run OTF
         this.setOTF(false);
-        return new Pose2d();
+        return null;
     }
   }
 
@@ -438,6 +464,10 @@ public class Drive implements DriveTemplate {
    */
   public Command getDriveToPoseCommand() {
     Pose2d targetPose = findOTFPoseFromPathLocation();
+
+    if (targetPose == null) {
+      return null;
+    }
 
     // Create the constraints to use while pathfinding
     PathConstraints constraints =
