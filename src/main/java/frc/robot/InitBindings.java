@@ -13,6 +13,7 @@ import frc.robot.commands.drive.DesiredLocationSelector;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DrivetrainConstants;
+import frc.robot.subsystems.ramp.RampSubsystem;
 
 public final class InitBindings {
   // Controller
@@ -21,6 +22,9 @@ public final class InitBindings {
 
   private static final CommandJoystick rightJoystick =
       new CommandJoystick(OperatorConstants.synced.getObject().kRightJoystickPort);
+
+  private static final CommandXboxController m_driverController =
+      new CommandXboxController(OperatorConstants.synced.getObject().kDriverControllerPort);
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private static final CommandXboxController driverController =
@@ -84,6 +88,23 @@ public final class InitBindings {
                   drive.setPose(
                       new Pose2d(
                           Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
+                }));
+  }
+
+  public static void initRampBindings(RampSubsystem rampSubsystem) {
+    m_driverController
+        .a()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.prepareForClimb();
+                }));
+    m_driverController
+        .b()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.prepareForIntake();
                 }));
   }
 }
