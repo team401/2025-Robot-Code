@@ -125,7 +125,9 @@ public class RobotContainer {
     }
   }
 
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    // Logger.recordOutput("feature_flags/drive", FeatureFlags.synced.getObject().runDrive);
+  }
 
   public void disabledInit() {
     CommandScheduler.getInstance().cancelAll();
