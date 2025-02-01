@@ -1,0 +1,65 @@
+{
+  "blueReefCenter": {
+    "rotation": {
+      "radians": 0.0
+    },
+    "translation": {
+      "x": 176.745,
+      "y": 158.5
+    }
+  },
+  "blueReefAprilTag1": {
+    "rotation": {
+      "radians": 300.0
+    },
+    "translation": {
+      "x": 193.1,
+      "y": 130.17
+    }
+  },
+  "blueReefAprilTag2": {
+    "rotation": {
+      "radians": 0.0
+    },
+    "translation": {
+      "x": 209.49,
+      "y": 158.5
+    }
+  },
+  "blueReefAprilTag3": {
+    "rotation": {
+      "radians": 60.0
+    },
+    "translation": {
+      "x": 193.1,
+      "y": 186.83
+    }
+  },
+  "blueReefAprilTag4": {
+    "rotation": {
+      "radians": 120.0
+    },
+    "translation": {
+      "x": 160.39,
+      "y": 186.83
+    }
+  },
+  "blueReefAprilTag5": {
+    "rotation": {
+      "radians": 180.0
+    },
+    "translation": {
+      "x": 144.0,
+      "y": 158.5
+    }
+  },
+  "blueReefAprilTag6": {
+    "rotation": {
+      "radians": 240.0
+    },
+    "translation": {
+      "x": 160.39,
+      "y": 130.17
+    }
+  }
+}

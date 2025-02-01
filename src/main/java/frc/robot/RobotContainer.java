@@ -63,7 +63,7 @@ public class RobotContainer {
   private void configureBindings() {
     // initialize helper commands
     if (FeatureFlags.synced.getObject().runDrive) {
-      InitBindings.initDriveBindings(drive);
+      JsonConstants.initBindings.initDriveBindings(drive);
     }
   }
 

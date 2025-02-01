@@ -30,6 +30,12 @@ public class DrivetrainConstants {
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
   // Both sets of gains need to be tuned to your individual robot.
 
+  public final Double maxLinearSpeed = 6.0;
+  public final Double maxAngularSpeed = Math.PI * 2;
+  public final Double joystickDeadband = 0.1;
+  public final Double maxPIDVelocity = Math.PI * 2;
+  public final Double maxPIDAcceleration = Math.PI;
+
   // The steer motor uses any SwerveModule.SteerRequestType control request with the
   // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
 

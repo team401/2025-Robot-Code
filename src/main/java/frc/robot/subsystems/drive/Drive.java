@@ -12,6 +12,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import coppercore.parameter_tools.json.JSONExclude;
 import coppercore.wpilib_interface.DriveTemplate;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
@@ -109,6 +110,17 @@ public class Drive implements DriveTemplate {
 
   private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
 
+
+  @JSONExclude
+  public ProfiledPIDController angleController =
+      new ProfiledPIDController(
+          5,
+          0.0,
+          0.4,
+          new TrapezoidProfile.Constraints(
+              JsonConstants.drivetrainConstants.maxPIDVelocity,
+              JsonConstants.drivetrainConstants.maxPIDAcceleration));
+
   public enum DesiredLocation {
     Reef0,
     Reef1,
@@ -150,13 +162,8 @@ public class Drive implements DriveTemplate {
   private boolean isOTF = false;
   private Command driveToPose = null;
 
-  private final ProfiledPIDController angleController =
-      new ProfiledPIDController(5, 0.0, 0.4, new TrapezoidProfile.Constraints(1000, 2000));
-
-  private boolean lockRotationToPoint;
-  private Translation2d lockedTargetPosition = new Translation2d();
-  private Translation2d redReefCenter = new Translation2d(4.5, 4);
-  private Translation2d blueReefCenter = new Translation2d(4.5, 4);
+  private boolean isAligningToFieldElement;
+  private Translation2d lockedAlignPosition = new Translation2d();
 
   public Drive(
       GyroIO gyroIO,
@@ -314,14 +321,13 @@ public class Drive implements DriveTemplate {
     }
   }
 
-  public void lockRotationToPosition(Translation2d targetPosition) {
-    lockRotationToPoint = true;
-    lockedTargetPosition = targetPosition;
-    angleController.reset(getRotation().getRadians());
+  public void alignToFieldElement(Translation2d targetPosition) {
+    isAligningToFieldElement = true;
+    lockedAlignPosition = targetPosition;
   }
 
-  public void disableRotationLock() {
-    lockRotationToPoint = false;
+  public void disableAlign() {
+    isAligningToFieldElement = false;
   }
 
   /**
@@ -445,7 +451,7 @@ public class Drive implements DriveTemplate {
     return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0);
   }
 
-  public void rotationallyLockedIn() {
+  public void alignToTarget() {
     double omega = 0.0;
 
     // Get current position
@@ -454,24 +460,20 @@ public class Drive implements DriveTemplate {
     // Calculate desired angle to face the target position
     double targetAngle =
         Math.atan2(
-            lockedTargetPosition.getY() - currentPosition.getY(),
-            lockedTargetPosition.getX() - currentPosition.getX());
+            lockedAlignPosition.getY() - currentPosition.getY(),
+            lockedAlignPosition.getX() - currentPosition.getX());
 
     // Use PID to rotate toward the target angle
     omega = angleController.calculate(getRotation().getRadians(), targetAngle);
     setGoalSpeeds(
         new ChassisSpeeds(goalSpeeds.vxMetersPerSecond, goalSpeeds.vyMetersPerSecond, omega),
         false);
-
-    if (DriverStation.getAlliance().isPresent()
-        && DriverStation.getAlliance().get() == Alliance.Red) lockRotationToPosition(redReefCenter);
-    else lockRotationToPosition(blueReefCenter);
   }
 
   /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
   public void runVelocity() {
-    if (lockRotationToPoint) {
-      rotationallyLockedIn();
+    if (isAligningToFieldElement) {
+      alignToTarget();
     }
 
     // Calculate module setpoints
