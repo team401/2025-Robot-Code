@@ -1,19 +1,19 @@
 package frc.robot.constants;
 
-import coppercore.parameter_tools.JSONExclude;
-import coppercore.parameter_tools.JSONSync;
-import edu.wpi.first.wpilibj.Filesystem;
+import coppercore.parameter_tools.json.JSONExclude;
+import coppercore.parameter_tools.json.JSONSync;
+import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
+import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 
 public final class FeatureFlags {
-    @JSONExclude
-    public static final JSONSync<FeatureFlags> synced =
-            new JSONSync<FeatureFlags>(
-                    new FeatureFlags(),
-                    Filesystem.getDeployDirectory()
-                            .toPath()
-                            .resolve("constants/FeatureFlags.json")
-                            .toString(),
-                    new JSONSync.JSONSyncConfigBuilder().build());
+  @JSONExclude
+  public static final JSONSync<FeatureFlags> synced =
+      new JSONSync<FeatureFlags>(
+          new FeatureFlags(),
+          "FeatureFlags.json",
+          EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
+          new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
-    public final Boolean runElevator = true;
+  public Boolean runElevator = false;
+  public Boolean runDrive = true;
 }

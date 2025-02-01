@@ -1,0 +1,36 @@
+{
+  "environment": "comp",
+  "defaults": "comp",
+  "environments": [
+    {
+      "name": "comp",
+      "filepath": "comp",
+      "files": [
+        "DrivetrainConstants.json",
+        "ElevatorConstants.json",
+        "FeatureFlags.json",
+        "OperatorConstants.json"
+      ]
+    },
+    {
+      "name": "test_drivebase",
+      "filepath": "test_drivebase",
+      "files": [
+        "DrivetrainConstants.json",
+        "ElevatorConstants.json",
+        "FeatureFlags.json",
+        "OperatorConstants.json"
+      ]
+    },
+    {
+      "name": "hitl",
+      "filepath": "hitl",
+      "files": [
+        "DrivetrainConstants.json",
+        "ElevatorConstants.json",
+        "FeatureFlags.json",
+        "OperatorConstants.json"
+      ]
+    }
+  ]
+}
