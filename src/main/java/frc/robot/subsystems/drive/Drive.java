@@ -110,7 +110,6 @@ public class Drive implements DriveTemplate {
 
   private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
 
-
   @JSONExclude
   public ProfiledPIDController angleController =
       new ProfiledPIDController(
