@@ -705,6 +705,7 @@ public class Drive implements DriveTemplate {
     boolean allianceRed = this.isAllianceRed();
     switch (desiredLocation) {
       case Reef0:
+        return 7;
       case Reef1:
         return allianceRed ? 10 : 21;
       case Reef2:
@@ -763,7 +764,7 @@ public class Drive implements DriveTemplate {
   public Rotation2d getRotationForReefSide() {
     switch (desiredLocation) {
       case Reef0:
-        return new Rotation2d();
+        return new Rotation2d(Math.PI);
       case Reef1:
         return new Rotation2d();
       case Reef2:
@@ -802,7 +803,12 @@ public class Drive implements DriveTemplate {
       return;
     }
 
+    System.out.println(tagId);
+
     DistanceToTag observation = alignmentSupplier.get(tagId, cameraIndex, 0, 0);
+
+    Logger.recordOutput("Drive/Lineup/AlongTrackDistance", observation.alongTrackDistance());
+    Logger.recordOutput("Drive/Lineup/CrossTrackDistance", observation.crossTrackDistance());
 
     if (!observation.isValid()) {
       return;
@@ -814,9 +820,6 @@ public class Drive implements DriveTemplate {
     double omega =
         rotationController.calculate(
             this.getRotation().getRadians(), this.getRotationForReefSide().getRadians());
-
-    Logger.recordOutput("Drive/Lineup/AlongTrackDistance", observation.alongTrackDistance());
-    Logger.recordOutput("Drive/Lineup/CrossTrackDistance", observation.crossTrackDistance());
 
     this.setGoalSpeeds(new ChassisSpeeds(vx, vy, omega), false);
   }
