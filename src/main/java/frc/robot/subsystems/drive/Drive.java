@@ -191,7 +191,7 @@ public class Drive implements DriveTemplate {
           "DriveLineupGains/rotationkI", JsonConstants.drivetrainConstants.driveRotationkI);
   private LoggedTunableNumber rotationkD =
       new LoggedTunableNumber(
-          "DriveLineupGains/rotationkP", JsonConstants.drivetrainConstants.driveRotationkD);
+          "DriveLineupGains/rotationkD", JsonConstants.drivetrainConstants.driveRotationkD);
 
   private PIDController driveAlongTrackLineupController =
       new PIDController(
@@ -267,6 +267,8 @@ public class Drive implements DriveTemplate {
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+
+    rotationController.enableContinuousInput(-Math.PI / 2, Math.PI / 2);
   }
 
   @Override
@@ -473,6 +475,7 @@ public class Drive implements DriveTemplate {
       kD = this.rotationController.getD();
     }
     this.rotationController = new PIDController(kP, kI, kD);
+    this.rotationController.enableContinuousInput(-Math.PI / 2, Math.PI / 2);
   }
 
   /**
@@ -764,7 +767,7 @@ public class Drive implements DriveTemplate {
   public Rotation2d getRotationForReefSide() {
     switch (desiredLocation) {
       case Reef0:
-        return new Rotation2d(Math.PI);
+        return new Rotation2d();
       case Reef1:
         return new Rotation2d();
       case Reef2:
@@ -792,6 +795,9 @@ public class Drive implements DriveTemplate {
     }
   }
 
+  private DistanceToTag latestObservation;
+  private int observationAge;
+
   /** take over goal speeds to align to reef exactly */
   public void LineupWithReefLocation() {
     int tagId = this.getTagIdForReef();
@@ -807,15 +813,24 @@ public class Drive implements DriveTemplate {
 
     DistanceToTag observation = alignmentSupplier.get(tagId, cameraIndex, 0, 0);
 
-    Logger.recordOutput("Drive/Lineup/AlongTrackDistance", observation.alongTrackDistance());
-    Logger.recordOutput("Drive/Lineup/CrossTrackDistance", observation.crossTrackDistance());
-
     if (!observation.isValid()) {
-      return;
+      if (latestObservation != null && observationAge < 5) {
+        observation = latestObservation;
+        observationAge++;
+      } else {
+        return;
+      }
+    } else {
+      latestObservation = observation;
+      observationAge = 0;
     }
 
+    Logger.recordOutput("Drive/Lineup/AlongTrackDistance", observation.alongTrackDistance());
+    Logger.recordOutput("Drive/Lineup/CrossTrackDistance", observation.crossTrackDistance());
+    Logger.recordOutput("Drive/Lineup/IsObservationValid", observation.isValid());
+
     // give to PID Controllers and setGoalSpeeds (robotCentric)
-    double vx = driveAlongTrackLineupController.calculate(observation.alongTrackDistance());
+    double vx = -driveAlongTrackLineupController.calculate(observation.alongTrackDistance());
     double vy = driveCrossTrackLineupController.calculate(observation.crossTrackDistance());
     double omega =
         rotationController.calculate(
