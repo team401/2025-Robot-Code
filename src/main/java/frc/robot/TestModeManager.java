@@ -9,6 +9,7 @@ public class TestModeManager {
   public enum TestMode {
     ElevatorTuning,
     ClawTuning,
+    ClawOvershootTuning,
     DriveFeedForwardCharacterization,
     DriveWheelRadiusCharacterization,
     DriveSysIdQuasistaticForward,

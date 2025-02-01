@@ -49,7 +49,7 @@ public class ClawConstants {
   public final Voltage algaeScoreVoltage = Volts.of(-3.0);
 
   /** How far should the motor rotate after the sensor detects a coral to intake? */
-  public final Angle intakeAnglePastCoralrange = Rotations.of(0.2);
+  public final Angle intakeAnglePastCoralrange = Rotations.of(3.375); // 2.275 on 3 volts
 
   /** How far should the motor rotate after the sensor detects an algae to intake? */
   public final Angle intakeAnglePastAlgaerange = Rotations.of(0.1);

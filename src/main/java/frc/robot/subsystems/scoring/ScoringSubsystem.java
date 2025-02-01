@@ -33,6 +33,14 @@ public class ScoringSubsystem extends SubsystemBase {
    */
   private boolean autoTransition = true;
 
+  /**
+   * This boolean exists to temporarily stop the state machine from running
+   *
+   * <p>It is intended to be used for test modes, e.g. ClawOvershootTuning needs to be able to
+   * manually eject an object without forcing the state machine to agree.
+   */
+  private boolean overrideStateMachine = false;
+
   public enum FieldTarget {
     L1,
     L2,
@@ -82,6 +90,7 @@ public class ScoringSubsystem extends SubsystemBase {
     CancelAction,
     ToggleWarmup, // warmup button toggles warmup <-> idle
     ScoredPiece,
+    ReturnToIdle, // Return to idle when a warmup/score state no longer detects a gamepiece
   }
 
   private StateMachineConfiguration<ScoringState, ScoringTrigger> stateMachineConfiguration;
@@ -118,11 +127,13 @@ public class ScoringSubsystem extends SubsystemBase {
 
     stateMachineConfiguration
         .configure(ScoringState.Warmup)
-        .permit(ScoringTrigger.ToggleWarmup, ScoringState.Idle);
+        .permit(ScoringTrigger.ToggleWarmup, ScoringState.Idle)
+        .permit(ScoringTrigger.ReturnToIdle, ScoringState.Idle);
 
     stateMachineConfiguration
         .configure(ScoringState.Score)
-        .permit(ScoringTrigger.ScoredPiece, ScoringState.Idle);
+        .permit(ScoringTrigger.ScoredPiece, ScoringState.Idle)
+        .permit(ScoringTrigger.ReturnToIdle, ScoringState.Idle);
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, ScoringState.Idle);
 
@@ -246,15 +257,32 @@ public class ScoringSubsystem extends SubsystemBase {
     return currentPiece;
   }
 
+  /**
+   * Set whether or not to temporarily override/disable the state machine. This should only be used
+   * by test modes!
+   *
+   * @param doOverrideStateMachine True if the state machine is disabled, and false if the state
+   *     machine should run. This value is false on initialization and will only change when this
+   *     method is called.
+   */
+  public void setOverrideStateMachine(boolean doOverrideStateMachine) {
+    overrideStateMachine = doOverrideStateMachine;
+  }
+
   @Override
   public void periodic() {
     boolean fireStartIntaking = SmartDashboard.getBoolean("scoring/fireStartIntaking", false);
     if (fireStartIntaking) {
       setGamePiece(GamePiece.Coral);
       stateMachine.fire(ScoringTrigger.BeginIntake);
+      if (!stateMachine.getTransitionInfo().wasFail()) {
+        System.out.println(stateMachine.getTransitionInfo().getTransition().isInternal());
+      }
     }
 
-    stateMachine.periodic();
+    if (!overrideStateMachine) {
+      stateMachine.periodic();
+    }
 
     if (JsonConstants.scoringFeatureFlags.runElevator) {
       elevatorMechanism.periodic();

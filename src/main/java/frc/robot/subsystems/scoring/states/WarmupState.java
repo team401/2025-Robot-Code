@@ -6,6 +6,7 @@ import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import frc.robot.constants.ScoringSetpoints;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 
 public class WarmupState implements PeriodicStateInterface {
   private ScoringSubsystem scoringSubsystem;
@@ -20,5 +21,9 @@ public class WarmupState implements PeriodicStateInterface {
 
     scoringSubsystem.setElevatorGoalHeight(setpoint.elevatorHeight());
     scoringSubsystem.setClawRollerVoltage(Volts.zero());
+
+    if (!(scoringSubsystem.isAlgaeDetected() || scoringSubsystem.isCoralDetected())) {
+      scoringSubsystem.fireTrigger(ScoringTrigger.ReturnToIdle);
+    }
   }
 }

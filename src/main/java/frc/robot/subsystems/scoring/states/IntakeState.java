@@ -16,6 +16,12 @@ import org.littletonrobotics.junction.Logger;
 public class IntakeState implements PeriodicStateInterface {
   private ScoringSubsystem scoringSubsystem;
 
+  // Keep track of these so we can update it in tuning modes
+  private static Angle intakeAnglePastCoralRange =
+      JsonConstants.clawConstants.intakeAnglePastCoralrange;
+  private static Angle intakeAnglePastAlgaeRange =
+      JsonConstants.clawConstants.intakeAnglePastAlgaerange;
+
   /**
    * Keep track of what angle the motor was at when the sensor first detected the game piece.
    *
@@ -83,7 +89,9 @@ public class IntakeState implements PeriodicStateInterface {
             // If we're already counting, check if we've rotated far enough
             Angle diff = currentPos.minus(detectedAngle);
             Logger.recordOutput("claw/intake/diff", diff.in(Rotations));
-            if (diff.gt(JsonConstants.clawConstants.intakeAnglePastCoralrange)) {
+            Logger.recordOutput(
+                "claw/intake/anglePastCoralrange", intakeAnglePastCoralRange.in(Rotations));
+            if (diff.gt(intakeAnglePastCoralRange)) {
               scoringSubsystem.setClawRollerVoltage(Volts.zero());
               scoringSubsystem.fireTrigger(ScoringTrigger.DoneIntaking);
             }
@@ -91,6 +99,9 @@ public class IntakeState implements PeriodicStateInterface {
             // If we're not already counting, start counting and record where we started
             detectedAngle.mut_replace(currentPos);
             isCounting = true;
+            Logger.recordOutput("claw/intake/diff", 0.0);
+            Logger.recordOutput(
+                "claw/intake/anglePastCoralrange", intakeAnglePastCoralRange.in(Rotations));
           }
         } else {
           // If gamepiece not detected, we're no longer counting
@@ -103,7 +114,7 @@ public class IntakeState implements PeriodicStateInterface {
           Angle currentPos = scoringSubsystem.getClawRollerPosition();
           if (isCounting) {
             Angle diff = currentPos.minus(detectedAngle);
-            if (diff.gt(JsonConstants.clawConstants.intakeAnglePastAlgaerange)) {
+            if (diff.gt(intakeAnglePastAlgaeRange)) {
               scoringSubsystem.setClawRollerVoltage(Volts.zero());
               scoringSubsystem.fireTrigger(ScoringTrigger.DoneIntaking);
             }
@@ -119,5 +130,13 @@ public class IntakeState implements PeriodicStateInterface {
     }
 
     Logger.recordOutput("claw/intake/detectedAngle", detectedAngle);
+  }
+
+  public static void setIntakeAnglePastCoralrange(Angle newAngle) {
+    intakeAnglePastCoralRange = newAngle;
+  }
+
+  public static void setIntakeAnglePastAlgaerange(Angle newAngle) {
+    intakeAnglePastAlgaeRange = newAngle;
   }
 }

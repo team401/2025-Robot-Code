@@ -1,9 +1,12 @@
 package frc.robot.subsystems.scoring;
 
+import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.parameter_tools.LoggedTunableNumber;
 import frc.robot.TestModeManager;
+import frc.robot.constants.JsonConstants;
+import frc.robot.subsystems.scoring.states.IntakeState;
 import org.littletonrobotics.junction.Logger;
 
 public class ClawMechanism {
@@ -12,9 +15,19 @@ public class ClawMechanism {
   private ClawOutputsAutoLogged outputs = new ClawOutputsAutoLogged();
 
   private LoggedTunableNumber manualTuningVolts;
+  private LoggedTunableNumber coralOvershootRotations;
+  private LoggedTunableNumber algaeOvershootRotations;
 
   public ClawMechanism(ClawIO io) {
     manualTuningVolts = new LoggedTunableNumber("ClawTunables/clawManualVolts", 0.0);
+    coralOvershootRotations =
+        new LoggedTunableNumber(
+            "ClawTunables/coralOvershootRotations",
+            JsonConstants.clawConstants.intakeAnglePastCoralrange.in(Rotations));
+    algaeOvershootRotations =
+        new LoggedTunableNumber(
+            "ClawTunables/algaeOvershootRotations",
+            JsonConstants.clawConstants.intakeAnglePastAlgaerange.in(Rotations));
 
     this.io = io;
   }
@@ -52,6 +65,20 @@ public class ClawMechanism {
               io.setVoltage(Volts.of(volts[0]));
             },
             manualTuningVolts);
+        LoggedTunableNumber.ifChanged(
+            hashCode(),
+            (rotations) -> {
+              IntakeState.setIntakeAnglePastCoralrange(Rotations.of(rotations[0]));
+            },
+            coralOvershootRotations);
+
+        LoggedTunableNumber.ifChanged(
+            hashCode(),
+            (rotations) -> {
+              IntakeState.setIntakeAnglePastAlgaerange(Rotations.of(rotations[0]));
+            },
+            algaeOvershootRotations);
+
         break;
       default:
         break;
