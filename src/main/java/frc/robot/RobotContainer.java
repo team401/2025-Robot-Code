@@ -15,6 +15,9 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.ramp.RampIOSim;
+import frc.robot.subsystems.ramp.RampMechanism;
+import frc.robot.subsystems.ramp.RampSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -25,7 +28,10 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here
   private ElevatorSubsystem elevatorSubsystem;
+  private RampSubsystem rampSubsystem = new RampSubsystem(new RampMechanism(new RampIOSim()));
   private Drive drive;
+
+  // Replace with CommandPS4Controller or CommandJoystick if needed
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -65,6 +71,7 @@ public class RobotContainer {
     if (FeatureFlags.synced.getObject().runDrive) {
       InitBindings.initDriveBindings(drive);
     }
+    InitBindings.initRampBindings(rampSubsystem);
   }
 
   /**
