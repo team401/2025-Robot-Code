@@ -7,30 +7,30 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 // TODO apply current to hold in position
 public class RampSubsystem extends SubsystemBase {
 
-    private RampMechanism mechanism;
+  private RampMechanism mechanism;
 
-    public RampSubsystem(RampMechanism rampMechanism) {
-        mechanism = rampMechanism;
-    }
+  public RampSubsystem(RampMechanism rampMechanism) {
+    mechanism = rampMechanism;
+  }
 
-    @Override
-    public void periodic() {
-        mechanism.periodic();
-    }
+  @Override
+  public void periodic() {
+    mechanism.periodic();
+  }
 
-    public void prepareForClimb() {
-        mechanism.setPosition(0.0);
-    }
+  public void prepareForClimb() {
+    mechanism.setPosition(0.0);
+  }
 
-    public void prepareForIntake() {
-        mechanism.setPosition(3.0);
-    }
+  public void prepareForIntake() {
+    mechanism.setPosition(3.0);
+  }
 
-    public boolean isReadyForClimb() {
-        return isReadyForClimb();
-    }
+  public boolean isReadyForClimb() {
+    return isReadyForClimb();
+  }
 
-    public boolean isReadyForIntake() {
-        return isReadyForIntake();
-    }
+  public boolean isReadyForIntake() {
+    return isReadyForIntake();
+  }
 }

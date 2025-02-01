@@ -26,14 +26,12 @@ import frc.robot.subsystems.ramp.RampSubsystem;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-    // The robot's subsystems and commands are defined here
+  // The robot's subsystems and commands are defined here
   private ElevatorSubsystem elevatorSubsystem;
   private RampSubsystem rampSubsystem = new RampSubsystem(new RampMechanism(new RampIOSim()));
   private Drive drive;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-          new CommandXboxController(OperatorConstants.synced.getObject().kDriverControllerPort);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -73,6 +71,7 @@ public class RobotContainer {
     if (FeatureFlags.synced.getObject().runDrive) {
       InitBindings.initDriveBindings(drive);
     }
+    InitBindings.initRampBindings(rampSubsystem);
   }
 
   /**
