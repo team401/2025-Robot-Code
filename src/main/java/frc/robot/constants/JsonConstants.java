@@ -13,7 +13,6 @@ public class JsonConstants {
     ElevatorConstants.synced.loadData();
     ElevatorConstants.Sim.synced.loadData();
     RedFieldLocations.synced.loadData();
-    VisionConstants.synced.saveData();
     VisionConstants.synced.loadData();
 
     drivetrainConstants = DrivetrainConstants.synced.getObject();
