@@ -9,7 +9,8 @@
         "DrivetrainConstants.json",
         "ElevatorConstants.json",
         "FeatureFlags.json",
-        "OperatorConstants.json"
+        "OperatorConstants.json",
+        "VisionConstants.json"
       ]
     },
     {
@@ -19,7 +20,8 @@
         "DrivetrainConstants.json",
         "ElevatorConstants.json",
         "FeatureFlags.json",
-        "OperatorConstants.json"
+        "OperatorConstants.json",
+        "VisionConstants.json"
       ]
     },
     {

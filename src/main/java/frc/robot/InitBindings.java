@@ -44,7 +44,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  drive.setOTF(true);
+                  drive.setAutoAlignment(true);
                 },
                 drive));
     rightJoystick
@@ -52,7 +52,7 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  drive.setOTF(false);
+                  drive.setAutoAlignment(false);
                 },
                 drive));
 
