@@ -822,7 +822,7 @@ public class Drive implements DriveTemplate {
 
     System.out.println(tagId);
 
-    DistanceToTag observation = alignmentSupplier.get(tagId, cameraIndex, 0, 0.5);
+    DistanceToTag observation = alignmentSupplier.get(tagId, cameraIndex, 0, -0.275);
 
     if (!observation.isValid()) {
       if (latestObservation != null && observationAge < 5) {

@@ -56,8 +56,8 @@ public class DrivetrainConstants {
   public final Double driveAlongTrackkI = 0.0;
   public final Double driveAlongTrackkD = 0.0;
 
-  public final Double driveAlongTrackAcceleration = 5.0;
-  public final Double driveAlongTrackVelocity = 2.0;
+  @JSONExclude public final Double driveAlongTrackAcceleration = 5.0;
+  @JSONExclude public final Double driveAlongTrackVelocity = 2.0;
 
   public final Double driveCrossTrackkP = 0.5;
   public final Double driveCrossTrackkI = 0.0;
