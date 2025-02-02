@@ -8,8 +8,11 @@
       "files": [
         "DrivetrainConstants.json",
         "ElevatorConstants.json",
+        "ClawConstants.json",
         "FeatureFlags.json",
-        "OperatorConstants.json"
+        "OperatorConstants.json",
+        "ScoringFeatureFlags.json",
+        "ScoringSetpoints.json"
       ]
     },
     {
@@ -18,8 +21,11 @@
       "files": [
         "DrivetrainConstants.json",
         "ElevatorConstants.json",
+        "ClawConstants.json",
         "FeatureFlags.json",
-        "OperatorConstants.json"
+        "OperatorConstants.json",
+        "ScoringFeatureFlags.json",
+        "ScoringSetpoints.json"
       ]
     },
     {
@@ -28,8 +34,11 @@
       "files": [
         "DrivetrainConstants.json",
         "ElevatorConstants.json",
+        "ClawConstants.json",
         "FeatureFlags.json",
-        "OperatorConstants.json"
+        "OperatorConstants.json",
+        "ScoringFeatureFlags.json",
+        "ScoringSetpoints.json"
       ]
     }
   ]
