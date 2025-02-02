@@ -12,11 +12,13 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import coppercore.parameter_tools.json.JSONExclude;
 import coppercore.wpilib_interface.DriveTemplate;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,6 +31,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -110,6 +113,16 @@ public class Drive implements DriveTemplate {
 
   private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
 
+  @JSONExclude
+  public ProfiledPIDController angleController =
+      new ProfiledPIDController(
+          15,
+          5.0,
+          0.0,
+          new TrapezoidProfile.Constraints(
+              JsonConstants.drivetrainConstants.maxPIDVelocity,
+              JsonConstants.drivetrainConstants.maxPIDAcceleration));
+
   public enum DesiredLocation {
     Reef0,
     Reef1,
@@ -149,12 +162,14 @@ public class Drive implements DriveTemplate {
   private DesiredLocation desiredLocation = DesiredLocation.Reef0;
 
   private boolean isOTF = false;
-
   private Command driveToPose = null;
 
   private NetworkTableInstance inst = NetworkTableInstance.getDefault();
   private NetworkTable table = inst.getTable("");
   private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
+
+  private boolean isAligningToFieldElement;
+  private Translation2d lockedAlignPosition = new Translation2d();
 
   public Drive(
       GyroIO gyroIO,
@@ -198,7 +213,7 @@ public class Drive implements DriveTemplate {
 
     // warm up java processing for faster pathfind later
     PathfindingCommand.warmupCommand().schedule();
-
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
     // Configure SysId
     sysId =
         new SysIdRoutine(
@@ -315,6 +330,15 @@ public class Drive implements DriveTemplate {
     }
   }
 
+  public void alignToFieldElement(Translation2d targetPosition) {
+    isAligningToFieldElement = true;
+    lockedAlignPosition = targetPosition;
+  }
+
+  public void disableAlign() {
+    isAligningToFieldElement = false;
+  }
+
   /**
    * sets isOTF of robot true will cause robot to create a path from current location to the set
    * PathLocation
@@ -410,21 +434,59 @@ public class Drive implements DriveTemplate {
    */
   public Pose2d findOTFPoseFromPathLocation() {
     switch (this.desiredLocation) {
-        // reef 0 and 1 will have the same path
-        // NOTE: use PathPlannerPath.getStartingHolonomicPose to find pose for reef lineup if wanted
       case Reef0:
         return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
-            ? JsonConstants.redFieldLocations.reef0
-            : new Pose2d();
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefAprilTag1Translation,
+                JsonConstants.redFieldLocations.redReefAprilTag1Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAprilTag1Translation,
+                JsonConstants.blueFieldLocations.blueReefAprilTag1Rotation);
       case Reef1:
-        return new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180)));
+        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefAprilTag2Translation,
+                JsonConstants.redFieldLocations.redReefAprilTag2Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAprilTag2Translation,
+                JsonConstants.blueFieldLocations.blueReefAprilTag2Rotation);
+      case Reef2:
+        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefAprilTag3Translation,
+                JsonConstants.redFieldLocations.redReefAprilTag3Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAprilTag3Translation,
+                JsonConstants.blueFieldLocations.blueReefAprilTag3Rotation);
+      case Reef3:
+        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefAprilTag4Translation,
+                JsonConstants.redFieldLocations.redReefAprilTag4Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAprilTag4Translation,
+                JsonConstants.blueFieldLocations.blueReefAprilTag4Rotation);
+      case Reef4:
+        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefAprilTag5Translation,
+                JsonConstants.redFieldLocations.redReefAprilTag5Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAprilTag5Translation,
+                JsonConstants.blueFieldLocations.blueReefAprilTag5Rotation);
+      case Reef5:
+        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefAprilTag6Translation,
+                JsonConstants.redFieldLocations.redReefAprilTag6Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAprilTag6Translation,
+                JsonConstants.blueFieldLocations.blueReefAprilTag6Rotation);
       case CoralStationRight:
         return new Pose2d(16.0, 6.6, new Rotation2d(0.0));
-        // return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
       case CoralStationLeft:
         return new Pose2d(1.2, 7.0, Rotation2d.fromRadians(-1));
       default:
-        // no location set, so don't allow drive to run OTF
         this.setOTF(false);
         return null;
     }
@@ -453,8 +515,31 @@ public class Drive implements DriveTemplate {
     return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0);
   }
 
+  public void alignToTarget() {
+    double omega = 0.0;
+
+    // Get current position
+    Translation2d currentPosition = getPose().getTranslation();
+
+    // Calculate desired angle to face the target position
+    double targetAngle =
+        Math.atan2(
+            lockedAlignPosition.getY() - currentPosition.getY(),
+            lockedAlignPosition.getX() - currentPosition.getX());
+
+    // Use PID to rotate toward the target angle
+    omega = angleController.calculate(getRotation().getRadians(), targetAngle);
+    setGoalSpeeds(
+        new ChassisSpeeds(goalSpeeds.vxMetersPerSecond, goalSpeeds.vyMetersPerSecond, omega),
+        false);
+  }
+
   /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
   public void runVelocity() {
+    if (isAligningToFieldElement) {
+      alignToTarget();
+    }
+
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(this.goalSpeeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
