@@ -29,13 +29,13 @@
       "unit": "Meter"
     }
   },
-  "l2algae": {
+  "L2algae": {
     "elevatorHeight": {
       "value": 0.2,
       "unit": "Meter"
     }
   },
-  "l3algae": {
+  "L3algae": {
     "elevatorHeight": {
       "value": 0.4,
       "unit": "Meter"

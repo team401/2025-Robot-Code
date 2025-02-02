@@ -1,5 +1,5 @@
 {
-  "runElevator": false,
-  "runClaw": false,
-  "runWrist": false
+  "runElevator": true,
+  "runClaw": true,
+  "runWrist": true
 }

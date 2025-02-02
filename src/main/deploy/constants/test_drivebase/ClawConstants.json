@@ -1,5 +1,52 @@
 {
   "coralCANrangeID": 20,
   "algaeCANrangeID": 21,
-  "clawMotorID": 14
+  "clawMotorID": 14,
+  "kClawMotorInverted": "Clockwise_Positive",
+  "clawSupplyCurrentLimit": {
+    "value": 60.0,
+    "unit": "Amp"
+  },
+  "clawStatorCurrentLimit": {
+    "value": 60.0,
+    "unit": "Amp"
+  },
+  "coralProximityThreshold": {
+    "value": 5.0,
+    "unit": "Centimeter"
+  },
+  "coralProximityHysteresis": {
+    "value": 0.5,
+    "unit": "Centimeter"
+  },
+  "coralMinSignalStrengthForValidMeasurement": 2500.0,
+  "algaeProximityThreshold": {
+    "value": 5.0,
+    "unit": "Centimeter"
+  },
+  "algaeProximityHysteresis": {
+    "value": 0.5,
+    "unit": "Centimeter"
+  },
+  "algaeMinSignalStrengthForValidMeasurement": 2500.0,
+  "intakeVoltage": {
+    "value": 3.0,
+    "unit": "Volt"
+  },
+  "coralScoreVoltage": {
+    "value": 3.0,
+    "unit": "Volt"
+  },
+  "algaeScoreVoltage": {
+    "value": -3.0,
+    "unit": "Volt"
+  },
+  "intakeAnglePastCoralrange": {
+    "value": 3.375,
+    "unit": "Rotation"
+  },
+  "intakeAnglePastAlgaerange": {
+    "value": 2.0,
+    "unit": "Rotation"
+  }
 }
