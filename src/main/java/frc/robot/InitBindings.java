@@ -44,10 +44,13 @@ public final class InitBindings {
   private static final CommandXboxController driverController =
       new CommandXboxController(OperatorConstants.synced.getObject().kDriverControllerPort);
 
-  private static Translation2d redReefCenter =
-      frc.robot.constants.field.RedFieldLocations.redReefCenterTranslation;
-  private static Translation2d blueReefCenter =
-      frc.robot.constants.field.BlueFieldLocations.blueReefCenterTranslation;
+  private Translation2d redReefCenter;
+  private Translation2d blueReefCenter;
+
+  public void initBindingValues() {
+    redReefCenter = JsonConstants.redFieldLocations.redReefCenterTranslation;
+    blueReefCenter = JsonConstants.blueFieldLocations.blueReefCenterTranslation;
+  }
 
   public void initDriveBindings(Drive drive) {
     // Default command, normal field-relative drive

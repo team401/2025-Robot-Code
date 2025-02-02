@@ -44,7 +44,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.constants.JsonConstants;
-import frc.robot.constants.field.RedFieldLocations;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -117,9 +116,9 @@ public class Drive implements DriveTemplate {
   @JSONExclude
   public ProfiledPIDController angleController =
       new ProfiledPIDController(
-          5,
+          15,
+          5.0,
           0.0,
-          0.4,
           new TrapezoidProfile.Constraints(
               JsonConstants.drivetrainConstants.maxPIDVelocity,
               JsonConstants.drivetrainConstants.maxPIDAcceleration));
@@ -435,23 +434,59 @@ public class Drive implements DriveTemplate {
    */
   public Pose2d findOTFPoseFromPathLocation() {
     switch (this.desiredLocation) {
-        // reef 0 and 1 will have the same path
-        // NOTE: use PathPlannerPath.getStartingHolonomicPose to find pose for reef lineup if wanted
       case Reef0:
         return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
             ? new Pose2d(
-                RedFieldLocations.redReefAprilTag1Translation,
-                RedFieldLocations.redReefAprilTag1Rotation)
-            : new Pose2d();
+                JsonConstants.redFieldLocations.redReefAprilTag1Translation,
+                JsonConstants.redFieldLocations.redReefAprilTag1Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAprilTag1Translation,
+                JsonConstants.blueFieldLocations.blueReefAprilTag1Rotation);
       case Reef1:
-        return new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180)));
+        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefAprilTag2Translation,
+                JsonConstants.redFieldLocations.redReefAprilTag2Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAprilTag2Translation,
+                JsonConstants.blueFieldLocations.blueReefAprilTag2Rotation);
+      case Reef2:
+        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefAprilTag3Translation,
+                JsonConstants.redFieldLocations.redReefAprilTag3Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAprilTag3Translation,
+                JsonConstants.blueFieldLocations.blueReefAprilTag3Rotation);
+      case Reef3:
+        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefAprilTag4Translation,
+                JsonConstants.redFieldLocations.redReefAprilTag4Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAprilTag4Translation,
+                JsonConstants.blueFieldLocations.blueReefAprilTag4Rotation);
+      case Reef4:
+        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefAprilTag5Translation,
+                JsonConstants.redFieldLocations.redReefAprilTag5Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAprilTag5Translation,
+                JsonConstants.blueFieldLocations.blueReefAprilTag5Rotation);
+      case Reef5:
+        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefAprilTag6Translation,
+                JsonConstants.redFieldLocations.redReefAprilTag6Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAprilTag6Translation,
+                JsonConstants.blueFieldLocations.blueReefAprilTag6Rotation);
       case CoralStationRight:
         return new Pose2d(16.0, 6.6, new Rotation2d(0.0));
-        // return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
       case CoralStationLeft:
         return new Pose2d(1.2, 7.0, Rotation2d.fromRadians(-1));
       default:
-        // no location set, so don't allow drive to run OTF
         this.setOTF(false);
         return null;
     }

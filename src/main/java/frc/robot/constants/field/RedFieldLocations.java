@@ -17,27 +17,37 @@ public class RedFieldLocations {
               .toString(),
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
-  public static Translation2d redReefCenterTranslation =
-      new Translation2d(Units.metersToInches(514.13), Units.metersToInches(158.5));
-  ;
-  public static Rotation2d redReefCenterRotation = new Rotation2d();
+  public Translation2d redReefCenterTranslation =
+      new Translation2d(Units.inchesToMeters(514.13), Units.inchesToMeters(158.5));
+  public Rotation2d redReefCenterRotation = new Rotation2d();
 
-  public static Translation2d redReefAprilTag1Translation =
-      new Translation2d(Units.metersToInches(530.49), Units.metersToInches(130.17));
-  public static Rotation2d redReefAprilTag1Rotation = new Rotation2d(Math.toRadians(300));
+  public Translation2d redReefAprilTag1Translation =
+      new Translation2d(Units.inchesToMeters(530.49), Units.inchesToMeters(130.17));
+  public Rotation2d redReefAprilTag1Rotation = new Rotation2d(Math.toRadians(300));
 
-  public static Translation2d redReefAprilTag2Translation = new Translation2d(546.87, 158.5);
-  public static Rotation2d redReefAprilTag2Rotation = new Rotation2d(Math.toRadians(0));
+  public Translation2d redReefAprilTag2Translation =
+      new Translation2d(Units.inchesToMeters(546.87), Units.inchesToMeters(158.5));
+  public Rotation2d redReefAprilTag2Rotation = new Rotation2d(Math.toRadians(0));
 
-  public static Translation2d redReefAprilTag3Translation = new Translation2d(530.49, 186.83);
-  public static Rotation2d redReefAprilTag3Rotation = new Rotation2d(Math.toRadians(60));
+  public Translation2d redReefAprilTag3Translation =
+      new Translation2d(Units.inchesToMeters(530.49), Units.inchesToMeters(186.83));
+  public Rotation2d redReefAprilTag3Rotation = new Rotation2d(Math.toRadians(60));
 
-  public static Translation2d redReefAprilTag4Translation = new Translation2d(497.77, 186.83);
-  public static Rotation2d redReefAprilTag4Rotation = new Rotation2d(Math.toRadians(120));
+  public Translation2d redReefAprilTag4Translation =
+      new Translation2d(Units.inchesToMeters(497.77), Units.inchesToMeters(186.83));
+  public Rotation2d redReefAprilTag4Rotation = new Rotation2d(Math.toRadians(120));
 
-  public static Translation2d redReefAprilTag5Translation = new Translation2d(481.39, 158.5);
-  public static Rotation2d redReefAprilTag5Rotation = new Rotation2d(Math.toRadians(180));
+  public Translation2d redReefAprilTag5Translation =
+      new Translation2d(Units.inchesToMeters(481.39), Units.inchesToMeters(158.5));
+  public Rotation2d redReefAprilTag5Rotation = new Rotation2d(Math.toRadians(180));
 
-  public static Translation2d redReefAprilTag6Translation = new Translation2d(497.77, 130.17);
-  public static Rotation2d redReefAprilTag6Rotation = new Rotation2d(Math.toRadians(240));
+  public Translation2d redReefAprilTag6Translation =
+      new Translation2d(Units.inchesToMeters(497.77), Units.inchesToMeters(130.17));
+  public Rotation2d redReefAprilTag6Rotation = new Rotation2d(Math.toRadians(240));
+
+  public Translation2d redCoralStationRightTranslation = new Translation2d();
+  public Rotation2d redCoralStationRightRotation = new Rotation2d();
+
+  public Translation2d redCoralStationLeftTranslation = new Translation2d();
+  public Rotation2d redCoralStationLeftRotation = new Rotation2d();
 }

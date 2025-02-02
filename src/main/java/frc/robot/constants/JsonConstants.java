@@ -13,8 +13,6 @@ public class JsonConstants {
   public static void loadConstants() {
     EnvironmentHandler.getEnvironmentHandler(
         Filesystem.getDeployDirectory().toPath().resolve("constants/config.json").toString());
-    DrivetrainConstants.synced.saveData();
-    InitBindings.synced.saveData();
     DrivetrainConstants.synced.loadData();
     ElevatorConstants.synced.loadData();
     ElevatorConstants.Sim.synced.loadData();
