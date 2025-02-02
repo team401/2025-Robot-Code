@@ -79,7 +79,7 @@ public class ClawIOSim implements ClawIO {
             .times(Seconds.of(0.02)));
 
     if (has == HasState.NONE) {
-      if (outputVoltage.in(Volts) < 0.0 && algaeAvailable) {
+      if (outputVoltage.in(Volts) > 0.0 && algaeAvailable) {
         has = HasState.ALGAE;
         piecePos = 1.0;
       }
@@ -94,7 +94,8 @@ public class ClawIOSim implements ClawIO {
                           * JsonConstants.clawConstantsSim.rotationsPerSecondPerVolt)
                   .times(Seconds.of(0.02))
                   .in(Rotations)
-              * 0.05;
+              * 0.05
+              * (has == HasState.ALGAE ? -1.0 : 1.0);
 
       if (piecePos > 1.0) {
         has = HasState.NONE;

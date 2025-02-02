@@ -70,6 +70,7 @@ public class IntakeState implements PeriodicStateInterface {
             setpoint = JsonConstants.scoringSetpoints.L3algae;
             break;
         }
+        break;
       default:
         System.out.println(
             "ERROR: Unkown GamePiece "
@@ -110,17 +111,24 @@ public class IntakeState implements PeriodicStateInterface {
         break;
       case Algae:
         if (scoringSubsystem.isAlgaeDetected()) {
-          scoringSubsystem.setClawRollerVoltage(Volts.zero());
           Angle currentPos = scoringSubsystem.getClawRollerPosition();
           if (isCounting) {
+            // If we're already counting, check if we've rotated far enough
             Angle diff = currentPos.minus(detectedAngle);
+            Logger.recordOutput("claw/intake/diff", diff.in(Rotations));
+            Logger.recordOutput(
+                "claw/intake/anglePastAlgaerange", intakeAnglePastAlgaeRange.in(Rotations));
             if (diff.gt(intakeAnglePastAlgaeRange)) {
               scoringSubsystem.setClawRollerVoltage(Volts.zero());
               scoringSubsystem.fireTrigger(ScoringTrigger.DoneIntaking);
             }
           } else {
+            // If we're not already counting, start counting and record where we started
             detectedAngle.mut_replace(currentPos);
             isCounting = true;
+            Logger.recordOutput("claw/intake/diff", 0.0);
+            Logger.recordOutput(
+                "claw/intake/anglePastAlgaerange", intakeAnglePastAlgaeRange.in(Rotations));
           }
         } else {
           // If gamepiece not detected, we're no longer counting

@@ -52,7 +52,7 @@ public class ClawConstants {
   public final Angle intakeAnglePastCoralrange = Rotations.of(3.375); // 2.275 on 3 volts
 
   /** How far should the motor rotate after the sensor detects an algae to intake? */
-  public final Angle intakeAnglePastAlgaerange = Rotations.of(0.1);
+  public final Angle intakeAnglePastAlgaerange = Rotations.of(2.0);
 
   public static final class Sim {
     @JSONExclude

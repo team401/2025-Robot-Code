@@ -273,7 +273,8 @@ public class ScoringSubsystem extends SubsystemBase {
   public void periodic() {
     boolean fireStartIntaking = SmartDashboard.getBoolean("scoring/fireStartIntaking", false);
     if (fireStartIntaking) {
-      setGamePiece(GamePiece.Coral);
+      setGamePiece(GamePiece.Algae);
+      setTarget(FieldTarget.L2);
       stateMachine.fire(ScoringTrigger.BeginIntake);
       if (!stateMachine.getTransitionInfo().wasFail()) {
         System.out.println(stateMachine.getTransitionInfo().getTransition().isInternal());
