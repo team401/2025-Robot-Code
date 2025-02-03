@@ -92,15 +92,15 @@ public final class InitBindings {
   }
 
   public static void initRampBindings(RampSubsystem rampSubsystem) {
-    m_driverController
-        .a()
+    rightJoystick
+        .button(2)
         .onTrue(
             new InstantCommand(
                 () -> {
                   rampSubsystem.prepareForClimb();
                 }));
-    m_driverController
-        .b()
+    rightJoystick
+        .button(3)
         .onTrue(
             new InstantCommand(
                 () -> {
