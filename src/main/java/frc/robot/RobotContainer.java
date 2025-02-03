@@ -15,7 +15,7 @@ import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -25,7 +25,7 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here
-  private ElevatorSubsystem elevatorSubsystem;
+  private ScoringSubsystem scoringSubsystem;
   private Drive drive;
   private VisionLocalizer vision;
 
@@ -45,8 +45,8 @@ public class RobotContainer {
   }
 
   public void configureSubsystems() {
-    if (FeatureFlags.synced.getObject().runElevator) {
-      elevatorSubsystem = InitSubsystems.initElevatorSubsystem();
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem = InitSubsystems.initScoringSubsystem();
     }
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
@@ -127,15 +127,17 @@ public class RobotContainer {
 
   /** This method must be called from the robot, as it isn't called automatically. */
   public void testPeriodic() {
-    if (FeatureFlags.synced.getObject().runElevator) {
-      elevatorSubsystem.testPeriodic();
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem.testPeriodic();
     }
     if (FeatureFlags.synced.getObject().runDrive) {
       drive.testPeriodic();
     }
   }
 
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    // Logger.recordOutput("feature_flags/drive", FeatureFlags.synced.getObject().runDrive);
+  }
 
   public void disabledInit() {
     CommandScheduler.getInstance().cancelAll();

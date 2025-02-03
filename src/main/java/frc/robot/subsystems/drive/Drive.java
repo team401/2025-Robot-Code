@@ -816,6 +816,7 @@ public class Drive implements DriveTemplate {
 
     // Log optimized setpoints (runSetpoint mutates each state)
     Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+    Logger.recordOutput("desired_location", desiredLocation);
   }
 
   /** Runs the drive in a straight line with the specified drive output. */

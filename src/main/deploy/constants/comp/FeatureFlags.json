@@ -1,4 +1,4 @@
 {
-  "runElevator": true,
+  "runScoring": false,
   "runDrive": true
 }

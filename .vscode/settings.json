@@ -69,5 +69,8 @@
     "edu.wpi.first.math.**.struct.*",
     null
   ],
-  "java.compile.nullAnalysis.mode": "automatic"
+  "java.compile.nullAnalysis.mode": "automatic",
+  "cSpell.words": [
+    "Intaking"
+  ]
 }
