@@ -8,7 +8,7 @@ import org.littletonrobotics.junction.Logger;
 // TODO make pid constants
 public class RampIOSim implements RampIO {
 
-  private PidAutoTuner tuner = new PidAutoTuner();
+  private PIDTuner tuner = new PIDTuner(PIDTuner.ControlType.PID);
 
   // private PIDController controller = new PIDController(7.5, 0.001, 0.0);
   // private PIDController controller =
@@ -32,37 +32,18 @@ public class RampIOSim implements RampIO {
   public void updateOutputs(RampInputs inputs, RampOutputs outputs) {
     time += 0.02;
     controller.setSetpoint(outputs.targetPosition);
-    tuner.addData(controller.getError(), 0.02);
-    if (count < 10) {
-      if (time % 5.0 < 0.02) {
-        tuner.update();
-        Logger.recordOutput("Kp", tuner.getP());
-        Logger.recordOutput("Ki", tuner.getI());
-        Logger.recordOutput("Kd", tuner.getD());
-        controller.setP(tuner.getP());
-        controller.setI(tuner.getI());
-        controller.setD(tuner.getD());
-        controller.reset();
-        // tuner.reset();
-        // sim.setState(Math.PI, 0);
-      }
-      if (time > 15.0) {
-        tuner.update();
-        Logger.recordOutput("Kp", tuner.getP());
-        Logger.recordOutput("Ki", tuner.getI());
-        Logger.recordOutput("Kd", tuner.getD());
-        controller.setP(tuner.getP());
-        controller.setI(tuner.getI());
-        controller.setD(tuner.getD());
-        controller.reset();
-        tuner.reset();
-        sim.setState(Math.PI, 0);
-        time = 0;
-        count++;
-      }
-    }
+    tuner.recordData(controller.getError(), 0.02);
+    tuner.tune();
+    PIDTuner.PID pid = tuner.getPIDToUse();
+    controller.setP(pid.P());
+    controller.setI(pid.I());
+    controller.setD(pid.D());
     Logger.recordOutput("Error", controller.getError());
     Logger.recordOutput("Time", time);
+    Logger.recordOutput("Finished", tuner.hasFinished());
+    Logger.recordOutput("Kp", pid.P());
+    Logger.recordOutput("Ki", pid.I());
+    Logger.recordOutput("Kd", pid.D());
 
     double volts = controller.calculate(inputs.position);
     outputs.appliedVolts = volts;
