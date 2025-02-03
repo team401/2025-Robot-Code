@@ -18,8 +18,6 @@ public class ClimbSubsystem extends SubsystemBase {
 
     private BooleanSupplier rampClear = () -> true;
 
-    static ClimbSubsystem instance;
-
     public enum ClimbAction {
         NONE, // do nothing
         START_CLIMB, // start automated climb sequence
@@ -30,7 +28,7 @@ public class ClimbSubsystem extends SubsystemBase {
 
     ClimbAction currentAction = ClimbAction.NONE;
 
-    private static enum ClimbState implements StateContainer {
+    private enum ClimbState implements StateContainer {
         IDLE(new IdleState()), // do nothing
         WAITING(new WaitingState()), // waiting for system to be ready for climb
         SEARCHING(new SearchingState()), // searching for target
@@ -79,8 +77,8 @@ public class ClimbSubsystem extends SubsystemBase {
         }
     }
 
-    public static StateMachineConfiguration<ClimbState, ClimbAction> climbMachineConfiguration;
-    public static StateMachine<ClimbState, ClimbAction> climbMachine;
+    public StateMachineConfiguration<ClimbState, ClimbAction> climbMachineConfiguration;
+    public StateMachine<ClimbState, ClimbAction> climbMachine;
 
     public ClimbSubsystem(ClimbIO io) {
         this.io = io;
