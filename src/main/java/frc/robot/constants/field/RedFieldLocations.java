@@ -23,27 +23,27 @@ public class RedFieldLocations {
 
   public Translation2d redReefAprilTag1Translation =
       new Translation2d(Units.inchesToMeters(530.49), Units.inchesToMeters(130.17));
-  public Rotation2d redReefAprilTag1Rotation = new Rotation2d(Math.toRadians(300));
+  public Rotation2d redReefAprilTag1Rotation = new Rotation2d(Math.toRadians(300) + Math.PI);
 
   public Translation2d redReefAprilTag2Translation =
       new Translation2d(Units.inchesToMeters(546.87), Units.inchesToMeters(158.5));
-  public Rotation2d redReefAprilTag2Rotation = new Rotation2d(Math.toRadians(0));
+  public Rotation2d redReefAprilTag2Rotation = new Rotation2d(Math.toRadians(0) + Math.PI);
 
   public Translation2d redReefAprilTag3Translation =
       new Translation2d(Units.inchesToMeters(530.49), Units.inchesToMeters(186.83));
-  public Rotation2d redReefAprilTag3Rotation = new Rotation2d(Math.toRadians(60));
+  public Rotation2d redReefAprilTag3Rotation = new Rotation2d(Math.toRadians(60) + Math.PI);
 
   public Translation2d redReefAprilTag4Translation =
       new Translation2d(Units.inchesToMeters(497.77), Units.inchesToMeters(186.83));
-  public Rotation2d redReefAprilTag4Rotation = new Rotation2d(Math.toRadians(120));
+  public Rotation2d redReefAprilTag4Rotation = new Rotation2d(Math.toRadians(120) + Math.PI);
 
   public Translation2d redReefAprilTag5Translation =
       new Translation2d(Units.inchesToMeters(481.39), Units.inchesToMeters(158.5));
-  public Rotation2d redReefAprilTag5Rotation = new Rotation2d(Math.toRadians(180));
+  public Rotation2d redReefAprilTag5Rotation = new Rotation2d(Math.toRadians(180) + Math.PI);
 
   public Translation2d redReefAprilTag6Translation =
       new Translation2d(Units.inchesToMeters(497.77), Units.inchesToMeters(130.17));
-  public Rotation2d redReefAprilTag6Rotation = new Rotation2d(Math.toRadians(240));
+  public Rotation2d redReefAprilTag6Rotation = new Rotation2d(Math.toRadians(240) + Math.PI);
 
   public Translation2d redCoralStationRightTranslation = new Translation2d();
   public Rotation2d redCoralStationRightRotation = new Rotation2d();
