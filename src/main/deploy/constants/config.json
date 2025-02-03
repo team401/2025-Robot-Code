@@ -1,5 +1,5 @@
 {
-  "environment": "test_drivebase",
+  "environment": "comp",
   "defaults": "comp",
   "environments": [
     {
@@ -8,9 +8,12 @@
       "files": [
         "DrivetrainConstants.json",
         "ElevatorConstants.json",
+        "ClawConstants.json",
         "FeatureFlags.json",
         "OperatorConstants.json",
-        "VisionConstants.json"
+        "VisionConstants.json",
+        "ScoringFeatureFlags.json",
+        "ScoringSetpoints.json"
       ]
     },
     {
@@ -19,9 +22,12 @@
       "files": [
         "DrivetrainConstants.json",
         "ElevatorConstants.json",
+        "ClawConstants.json",
         "FeatureFlags.json",
         "OperatorConstants.json",
-        "VisionConstants.json"
+        "VisionConstants.json",
+        "ScoringFeatureFlags.json",
+        "ScoringSetpoints.json"
       ]
     },
     {
@@ -30,8 +36,11 @@
       "files": [
         "DrivetrainConstants.json",
         "ElevatorConstants.json",
+        "ClawConstants.json",
         "FeatureFlags.json",
-        "OperatorConstants.json"
+        "OperatorConstants.json",
+        "ScoringFeatureFlags.json",
+        "ScoringSetpoints.json"
       ]
     }
   ]

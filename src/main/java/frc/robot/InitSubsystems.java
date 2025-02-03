@@ -18,24 +18,42 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.elevator.ElevatorIOSim;
-import frc.robot.subsystems.elevator.ElevatorIOTalonFX;
-import frc.robot.subsystems.elevator.ElevatorMechanism;
-import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.scoring.ClawIOSim;
+import frc.robot.subsystems.scoring.ClawIOTalonFX;
+import frc.robot.subsystems.scoring.ClawMechanism;
+import frc.robot.subsystems.scoring.ElevatorIOSim;
+import frc.robot.subsystems.scoring.ElevatorIOTalonFX;
+import frc.robot.subsystems.scoring.ElevatorMechanism;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
 
 public final class InitSubsystems {
-  public static ElevatorSubsystem initElevatorSubsystem() {
+  public static ScoringSubsystem initScoringSubsystem() {
+    ElevatorMechanism elevatorMechanism = null;
+    ClawMechanism clawMechanism = null;
     switch (ModeConstants.currentMode) {
       case REAL:
-        return new ElevatorSubsystem(new ElevatorMechanism(new ElevatorIOTalonFX()));
+        if (JsonConstants.scoringFeatureFlags.runElevator) {
+          elevatorMechanism = new ElevatorMechanism(new ElevatorIOTalonFX());
+        }
+        if (JsonConstants.scoringFeatureFlags.runClaw) {
+          clawMechanism = new ClawMechanism(new ClawIOTalonFX());
+        }
+        break;
       case SIM:
-        return new ElevatorSubsystem(new ElevatorMechanism(new ElevatorIOSim()));
+        if (JsonConstants.scoringFeatureFlags.runElevator) {
+          elevatorMechanism = new ElevatorMechanism(new ElevatorIOSim());
+        }
+        if (JsonConstants.scoringFeatureFlags.runClaw) {
+          clawMechanism = new ClawMechanism(new ClawIOSim());
+        }
+        break;
       case REPLAY:
-        throw new UnsupportedOperationException("Elevator replay is not yet implemented.");
+        throw new UnsupportedOperationException("Scoring replay is not yet implemented.");
       default:
         throw new UnsupportedOperationException(
             "Non-exhaustive list of mode types supported in InitSubsystems");
     }
+    return new ScoringSubsystem(elevatorMechanism, clawMechanism);
   }
 
   public static Drive initDriveSubsystem() {

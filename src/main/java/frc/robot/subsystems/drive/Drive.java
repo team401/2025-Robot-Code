@@ -436,15 +436,6 @@ public class Drive implements DriveTemplate {
    * @param kD derivative gain
    */
   public void setAlongTrackPID(double kP, double kI, double kD) {
-    if (kP < 0) {
-      kP = this.driveAlongTrackLineupController.getP();
-    }
-    if (kI < 0) {
-      kI = this.driveAlongTrackLineupController.getI();
-    }
-    if (kD < 0) {
-      kD = this.driveAlongTrackLineupController.getD();
-    }
     this.driveAlongTrackLineupController = new PIDController(kP, kI, kD);
   }
 
@@ -456,15 +447,6 @@ public class Drive implements DriveTemplate {
    * @param kD derivative gain
    */
   public void setCrossTrackPID(double kP, double kI, double kD) {
-    if (kP < 0) {
-      kP = this.driveCrossTrackLineupController.getP();
-    }
-    if (kI < 0) {
-      kI = this.driveCrossTrackLineupController.getI();
-    }
-    if (kD < 0) {
-      kD = this.driveCrossTrackLineupController.getD();
-    }
     this.driveCrossTrackLineupController = new PIDController(kP, kI, kD);
   }
 
@@ -476,15 +458,6 @@ public class Drive implements DriveTemplate {
    * @param kD derivative gain
    */
   public void setRotationLineupPID(double kP, double kI, double kD) {
-    if (kP < 0) {
-      kP = this.rotationController.getP();
-    }
-    if (kI < 0) {
-      kI = this.rotationController.getI();
-    }
-    if (kD < 0) {
-      kD = this.rotationController.getD();
-    }
     this.rotationController = new PIDController(kP, kI, kD);
     this.rotationController.enableContinuousInput(-Math.PI / 2, Math.PI / 2);
   }
@@ -881,6 +854,7 @@ public class Drive implements DriveTemplate {
 
     // Log optimized setpoints (runSetpoint mutates each state)
     Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+    Logger.recordOutput("desired_location", desiredLocation);
   }
 
   /** Runs the drive in a straight line with the specified drive output. */
