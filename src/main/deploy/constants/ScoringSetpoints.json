@@ -1,0 +1,68 @@
+{
+  "idle": {
+    "elevatorHeight": {
+      "value": 1.5,
+      "unit": "Inch"
+    }
+  },
+  "L1": {
+    "elevatorHeight": {
+      "value": 0.05,
+      "unit": "Meter"
+    }
+  },
+  "L2": {
+    "elevatorHeight": {
+      "value": 0.25,
+      "unit": "Meter"
+    }
+  },
+  "L3": {
+    "elevatorHeight": {
+      "value": 0.5,
+      "unit": "Meter"
+    }
+  },
+  "L4": {
+    "elevatorHeight": {
+      "value": 0.75,
+      "unit": "Meter"
+    }
+  },
+  "L2algae": {
+    "elevatorHeight": {
+      "value": 0.2,
+      "unit": "Meter"
+    }
+  },
+  "L3algae": {
+    "elevatorHeight": {
+      "value": 0.4,
+      "unit": "Meter"
+    }
+  },
+  "coralStation": {
+    "elevatorHeight": {
+      "value": 1.0,
+      "unit": "Meter"
+    }
+  },
+  "processor": {
+    "elevatorHeight": {
+      "value": 0.1,
+      "unit": "Meter"
+    }
+  },
+  "net": {
+    "elevatorHeight": {
+      "value": 1.25,
+      "unit": "Meter"
+    }
+  },
+  "ground": {
+    "elevatorHeight": {
+      "value": 0.0,
+      "unit": "Meter"
+    }
+  }
+}

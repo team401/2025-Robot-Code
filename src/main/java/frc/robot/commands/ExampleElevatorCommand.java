@@ -6,7 +6,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.subsystems.ElevatorConstants;
-import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -15,7 +15,7 @@ import org.littletonrobotics.junction.Logger;
  * the elevator, and then wraps its setpoints around the max position to control back to the bottom.
  */
 public class ExampleElevatorCommand extends Command {
-  ElevatorSubsystem elevatorSubsystem;
+  ScoringSubsystem scoringSubsystem;
 
   MutDistance currentGoalHeight = Meters.mutable(0.0);
   // Start with getting max range of elevator (max height - min height), then divide by 3 to
@@ -36,10 +36,10 @@ public class ExampleElevatorCommand extends Command {
    */
   final double setpointThresholdMeters = 0.01;
 
-  public ExampleElevatorCommand(ElevatorSubsystem elevatorSubsystem) {
-    this.elevatorSubsystem = elevatorSubsystem;
+  public ExampleElevatorCommand(ScoringSubsystem scoringSubsystem) {
+    this.scoringSubsystem = scoringSubsystem;
 
-    addRequirements(elevatorSubsystem);
+    addRequirements(scoringSubsystem);
   }
 
   @Override
@@ -47,13 +47,13 @@ public class ExampleElevatorCommand extends Command {
 
   @Override
   public void execute() {
-    if (Math.abs(elevatorSubsystem.getElevatorHeight().in(Meters) - currentGoalHeight.in(Meters))
+    if (Math.abs(scoringSubsystem.getElevatorHeight().in(Meters) - currentGoalHeight.in(Meters))
         < setpointThresholdMeters) {
       // We're at the setpoint, so increment it.
       incrementGoalHeight();
     }
 
-    elevatorSubsystem.setElevatorGoalHeight(currentGoalHeight);
+    scoringSubsystem.setElevatorGoalHeight(currentGoalHeight);
 
     Logger.recordOutput("ExampleElevatorCommand/goalHeight", currentGoalHeight);
   }
