@@ -662,48 +662,48 @@ public class Drive implements DriveTemplate {
                 JsonConstants.redFieldLocations.redReef01Translation,
                 JsonConstants.redFieldLocations.redReef01Rotation)
             : new Pose2d(
-                JsonConstants.blueFieldLocations.blueReefAprilTag1Translation,
-                JsonConstants.blueFieldLocations.blueReefAprilTag1Rotation);
+                JsonConstants.blueFieldLocations.blueReef01Translation,
+                JsonConstants.blueFieldLocations.blueReef01Rotation);
       case Reef1:
         return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReef23Translation,
                 JsonConstants.redFieldLocations.redReef23Rotation)
             : new Pose2d(
-                JsonConstants.blueFieldLocations.blueReefAprilTag2Translation,
-                JsonConstants.blueFieldLocations.blueReefAprilTag2Rotation);
+                JsonConstants.blueFieldLocations.blueReef23Translation,
+                JsonConstants.blueFieldLocations.blueReef23Rotation);
       case Reef2:
         return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReef45Translation,
                 JsonConstants.redFieldLocations.redReef45Rotation)
             : new Pose2d(
-                JsonConstants.blueFieldLocations.blueReefAprilTag3Translation,
-                JsonConstants.blueFieldLocations.blueReefAprilTag3Rotation);
+                JsonConstants.blueFieldLocations.blueReef45Translation,
+                JsonConstants.blueFieldLocations.blueReef45Rotation);
       case Reef3:
         return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReef67Translation,
                 JsonConstants.redFieldLocations.redReef67Rotation)
             : new Pose2d(
-                JsonConstants.blueFieldLocations.blueReefAprilTag4Translation,
-                JsonConstants.blueFieldLocations.blueReefAprilTag4Rotation);
+                JsonConstants.blueFieldLocations.blueReef67Translation,
+                JsonConstants.blueFieldLocations.blueReef67Rotation);
       case Reef4:
         return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReef89Translation,
                 JsonConstants.redFieldLocations.redReef89Rotation)
             : new Pose2d(
-                JsonConstants.blueFieldLocations.blueReefAprilTag5Translation,
-                JsonConstants.blueFieldLocations.blueReefAprilTag5Rotation);
+                JsonConstants.blueFieldLocations.blueReef89Translation,
+                JsonConstants.blueFieldLocations.blueReef89Rotation);
       case Reef5:
         return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReef1011Translation,
                 JsonConstants.redFieldLocations.redReef1011Rotation)
             : new Pose2d(
-                JsonConstants.blueFieldLocations.blueReefAprilTag6Translation,
-                JsonConstants.blueFieldLocations.blueReefAprilTag6Rotation);
+                JsonConstants.blueFieldLocations.blueReef1011Translation,
+                JsonConstants.blueFieldLocations.blueReef1011Rotation);
       case CoralStationRight:
         return new Pose2d(16.0, 6.6, new Rotation2d(0.0));
       case CoralStationLeft:
