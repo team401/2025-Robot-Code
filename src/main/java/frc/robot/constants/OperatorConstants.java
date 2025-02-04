@@ -2,18 +2,19 @@ package frc.robot.constants;
 
 import coppercore.parameter_tools.JSONExclude;
 import coppercore.parameter_tools.JSONSync;
-import edu.wpi.first.wpilibj.Filesystem;
+import coppercore.parameter_tools.JSONSyncConfigBuilder;
+import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 
 public final class OperatorConstants {
-    @JSONExclude
-    public static final JSONSync<OperatorConstants> synced =
-            new JSONSync<OperatorConstants>(
-                    new OperatorConstants(),
-                    Filesystem.getDeployDirectory()
-                            .toPath()
-                            .resolve("constants/OperatorConstants.json")
-                            .toString(),
-                    new JSONSync.JSONSyncConfigBuilder().build());
+  @JSONExclude
+  public static final JSONSync<OperatorConstants> synced =
+      new JSONSync<OperatorConstants>(
+          new OperatorConstants(),
+          "OperatorConstants.json",
+          EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
+          new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
-    public final Integer kDriverControllerPort = 0;
+  public Integer kDriverControllerPort = 2;
+  public Integer kLeftJoystickPort = 0;
+  public Integer kRightJoystickPort = 1;
 }
