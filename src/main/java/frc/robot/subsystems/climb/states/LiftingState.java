@@ -6,14 +6,14 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 
 public class LiftingState implements PeriodicStateInterface {
 
-    private ClimbSubsystem climbSubsystem;
+  private ClimbSubsystem climbSubsystem;
 
-    public LiftingState(ClimbSubsystem climbSubsystem) {
-        this.climbSubsystem = climbSubsystem;
-    }
+  public LiftingState(ClimbSubsystem climbSubsystem) {
+    this.climbSubsystem = climbSubsystem;
+  }
 
-    @Override
-    public void periodic() {
-        climbSubsystem.setGoalAngle(ClimbConstants.finalHangingAngle);
-    }
+  @Override
+  public void periodic() {
+    climbSubsystem.setGoalAngle(ClimbConstants.finalHangingAngle);
+  }
 }

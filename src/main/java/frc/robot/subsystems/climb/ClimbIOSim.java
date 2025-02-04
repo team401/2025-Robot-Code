@@ -13,68 +13,67 @@ import java.util.function.BooleanSupplier;
 
 public class ClimbIOSim implements ClimbIO {
 
-    private SingleJointedArmSim climb =
-            new SingleJointedArmSim(
-                    DCMotor.getKrakenX60(2),
-                    75,
-                    SingleJointedArmSim.estimateMOI(0.5, 0.5),
-                    0.5,
-                    0,
-                    2 * Math.PI,
-                    false,
-                    0,
-                    0.005,
-                    0);
+  private SingleJointedArmSim climb =
+      new SingleJointedArmSim(
+          DCMotor.getKrakenX60(2),
+          75,
+          SingleJointedArmSim.estimateMOI(0.5, 0.5),
+          0.5,
+          0,
+          2 * Math.PI,
+          false,
+          0,
+          0.005,
+          0);
 
-    private final PIDController angleController = new PIDController(5, 0, 0);
+  private final PIDController angleController = new PIDController(5, 0, 0);
 
-    private BooleanSupplier lockedToCage = () -> true;
+  private BooleanSupplier lockedToCage = () -> true;
 
-    private MutAngle goalAngle = Radians.mutable(0);
-    private MutVoltage overrideVoltage = Volts.mutable(0.0);
+  private MutAngle goalAngle = Radians.mutable(0);
+  private MutVoltage overrideVoltage = Volts.mutable(0.0);
 
-    private boolean override = false;
+  private boolean override = false;
 
-    public ClimbIOSim() {}
+  public ClimbIOSim() {}
 
-    @Override
-    public void updateInputs(ClimbInputs inputs) {
+  @Override
+  public void updateInputs(ClimbInputs inputs) {
 
-        inputs.lockedToCage = this.lockedToCage.getAsBoolean();
-        inputs.goalAngle.mut_replace(goalAngle);
-        inputs.motorAngle.mut_replace(Radians.of(climb.getAngleRads()));
+    inputs.lockedToCage = this.lockedToCage.getAsBoolean();
+    inputs.goalAngle.mut_replace(goalAngle);
+    inputs.motorAngle.mut_replace(Radians.of(climb.getAngleRads()));
+  }
+
+  @Override
+  public void applyOutputs(ClimbOutputs outputs) {
+    Voltage appliedVolts;
+    if (override) {
+      appliedVolts = overrideVoltage;
+    } else {
+      appliedVolts =
+          Volts.of(angleController.calculate(climb.getAngleRads(), goalAngle.in(Radians)));
     }
 
-    @Override
-    public void applyOutputs(ClimbOutputs outputs) {
-        Voltage appliedVolts;
-        if (override) {
-            appliedVolts = overrideVoltage;
-        } else {
-            appliedVolts =
-                    Volts.of(
-                            angleController.calculate(climb.getAngleRads(), goalAngle.in(Radians)));
-        }
+    outputs.appliedVoltage.mut_replace(appliedVolts);
+    climb.setInputVoltage(appliedVolts.in(Volts));
+    climb.update(0.02);
+  }
 
-        outputs.appliedVoltage.mut_replace(appliedVolts);
-        climb.setInputVoltage(appliedVolts.in(Volts));
-        climb.update(0.02);
-    }
+  @Override
+  public void setGoalAngle(Angle angle) {
+    override = false;
+    goalAngle.mut_replace(angle);
+  }
 
-    @Override
-    public void setGoalAngle(Angle angle) {
-        override = false;
-        goalAngle.mut_replace(angle);
-    }
+  @Override
+  public void setOverrideVoltage(Voltage voltage) {
+    override = true;
+    overrideVoltage.mut_replace(voltage);
+  }
 
-    @Override
-    public void setOverrideVoltage(Voltage voltage) {
-        override = true;
-        overrideVoltage.mut_replace(voltage);
-    }
-
-    @Override
-    public void setPID(double p, double i, double d) {
-        angleController.setPID(p, i, d);
-    }
+  @Override
+  public void setPID(double p, double i, double d) {
+    angleController.setPID(p, i, d);
+  }
 }

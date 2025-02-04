@@ -6,16 +6,15 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem.ClimbAction;
 
 public class SearchingState implements PeriodicStateInterface {
-    private ClimbSubsystem climbSubsystem;
+  private ClimbSubsystem climbSubsystem;
 
-    public SearchingState(ClimbSubsystem climbSubsystem) {
-        this.climbSubsystem = climbSubsystem;
-    }
+  public SearchingState(ClimbSubsystem climbSubsystem) {
+    this.climbSubsystem = climbSubsystem;
+  }
 
-    @Override
-    public void periodic() {
-        climbSubsystem.setGoalAngle(ClimbConstants.searchingAngle);
-        if (climbSubsystem.getLockedToCage())
-            climbSubsystem.fireTrigger(ClimbAction.READY_FOR_CLIMB);
-    }
+  @Override
+  public void periodic() {
+    climbSubsystem.setGoalAngle(ClimbConstants.searchingAngle);
+    if (climbSubsystem.getLockedToCage()) climbSubsystem.fireTrigger(ClimbAction.READY_FOR_CLIMB);
+  }
 }

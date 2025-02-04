@@ -10,27 +10,27 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface ClimbIO {
 
-    @AutoLog
-    public static class ClimbInputs {
-        boolean lockedToCage = false;
+  @AutoLog
+  public static class ClimbInputs {
+    boolean lockedToCage = true;
 
-        MutAngle motorAngle = Radians.mutable(0);
-        MutAngle goalAngle = Radians.mutable(0);
-    }
+    MutAngle motorAngle = Radians.mutable(0);
+    MutAngle goalAngle = Radians.mutable(0);
+  }
 
-    @AutoLog
-    public static class ClimbOutputs {
-        MutVoltage appliedVoltage = Volts.mutable(0);
-        // MutAngle goalAngle = Radians.mutable(0);
-    }
+  @AutoLog
+  public static class ClimbOutputs {
+    MutVoltage appliedVoltage = Volts.mutable(0);
+    // MutAngle goalAngle = Radians.mutable(0);
+  }
 
-    public default void updateInputs(ClimbInputs inputs) {}
+  public default void updateInputs(ClimbInputs inputs) {}
 
-    public default void applyOutputs(ClimbOutputs outputs) {}
+  public default void applyOutputs(ClimbOutputs outputs) {}
 
-    public default void setGoalAngle(Angle angle) {}
+  public default void setGoalAngle(Angle angle) {}
 
-    public default void setOverrideVoltage(Voltage voltage) {}
+  public default void setOverrideVoltage(Voltage voltage) {}
 
-    public default void setPID(double p, double i, double d) {}
+  public default void setPID(double p, double i, double d) {}
 }

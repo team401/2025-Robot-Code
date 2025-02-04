@@ -30,21 +30,19 @@ public final class InitSubsystems {
     }
   }
 
-    public static ClimbSubsystem initClimbSubsystem() {
-        switch (ModeConstants.currentMode) {
-            case REAL:
-                throw new UnsupportedOperationException(
-                        "Climb real functions are not yet implemented.");
-            case SIM:
-                return new ClimbSubsystem(new ClimbIOSim());
-            case REPLAY:
-                throw new UnsupportedOperationException("Climb replay is not yet implemented.");
-            default:
-                throw new UnsupportedOperationException(
-                        "Non-exhaustive list of mode types supported in InitSubsystems");
-        }
+  public static ClimbSubsystem initClimbSubsystem() {
+    switch (ModeConstants.currentMode) {
+      case REAL:
+        throw new UnsupportedOperationException("Climb real functions are not yet implemented.");
+      case SIM:
+        return new ClimbSubsystem(new ClimbIOSim());
+      case REPLAY:
+        throw new UnsupportedOperationException("Climb replay is not yet implemented.");
+      default:
+        throw new UnsupportedOperationException(
+            "Non-exhaustive list of mode types supported in InitSubsystems");
+    }
   }
-  
 
   public static Drive initDriveSubsystem() {
     switch (Constants.currentMode) {

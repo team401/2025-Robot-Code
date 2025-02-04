@@ -6,15 +6,15 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem.ClimbAction;
 
 public class WaitingState implements PeriodicStateInterface {
-    private ClimbSubsystem climbSubsystem;
+  private ClimbSubsystem climbSubsystem;
 
-    public WaitingState(ClimbSubsystem climbSubsystem) {
-        this.climbSubsystem = climbSubsystem;
-    }
+  public WaitingState(ClimbSubsystem climbSubsystem) {
+    this.climbSubsystem = climbSubsystem;
+  }
 
-    @Override
-    public void periodic() {
-        climbSubsystem.setGoalAngle(ClimbConstants.restingAngle);
-        if (climbSubsystem.getRampClear()) climbSubsystem.fireTrigger(ClimbAction.SYSTEM_READY);
-    }
+  @Override
+  public void periodic() {
+    climbSubsystem.setGoalAngle(ClimbConstants.restingAngle);
+    if (climbSubsystem.getRampClear()) climbSubsystem.fireTrigger(ClimbAction.SYSTEM_READY);
+  }
 }

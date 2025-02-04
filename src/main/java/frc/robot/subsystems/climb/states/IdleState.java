@@ -5,14 +5,14 @@ import frc.robot.constants.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 
 public class IdleState implements PeriodicStateInterface {
-    private ClimbSubsystem climbSubsystem;
+  private ClimbSubsystem climbSubsystem;
 
-    public IdleState(ClimbSubsystem climbSubsystem) {
-        this.climbSubsystem = climbSubsystem;
-    }
+  public IdleState(ClimbSubsystem climbSubsystem) {
+    this.climbSubsystem = climbSubsystem;
+  }
 
-    @Override
-    public void periodic() {
-        climbSubsystem.setGoalAngle(ClimbConstants.restingAngle);
-    }
+  @Override
+  public void periodic() {
+    climbSubsystem.setGoalAngle(ClimbConstants.restingAngle);
+  }
 }
