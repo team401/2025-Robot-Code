@@ -34,7 +34,6 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -716,6 +715,19 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * gets cross track offset for lineup
+   *
+   * @param cameraIndex camera to check offset
+   * @return offset for camera
+   */
+  public Double getCrossTrackOffset(int cameraIndex) {
+    if (cameraIndex == 0) {
+      return JsonConstants.drivetrainConstants.driveCrossTrackFrontRightOffset;
+    }
+    return 0.0; // front left offset (not added)
+  }
+
+  /**
    * gets camera index for vision single tag lineup
    *
    * @return 0 for Front Left camera; 1 for Front Right camera
@@ -795,7 +807,12 @@ public class Drive implements DriveTemplate {
 
     System.out.println(tagId);
 
-    DistanceToTag observation = alignmentSupplier.get(tagId, cameraIndex, 0, -0.275);
+    DistanceToTag observation =
+        alignmentSupplier.get(
+            tagId,
+            cameraIndex,
+            this.getCrossTrackOffset(cameraIndex),
+            JsonConstants.drivetrainConstants.driveAlongTrackOffset);
 
     if (!observation.isValid()) {
       if (latestObservation != null && observationAge < 5) {
@@ -814,19 +831,21 @@ public class Drive implements DriveTemplate {
     Logger.recordOutput("Drive/Lineup/IsObservationValid", observation.isValid());
 
     // give to PID Controllers and setGoalSpeeds (robotCentric)
-    // double vx = -driveAlongTrackLineupController.calculate(observation.alongTrackDistance());
-    ChassisSpeeds speeds = getChassisSpeeds();
-    Pose2d pose = getPose();
+    double vx =
+        JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
+            * driveAlongTrackLineupController.calculate(observation.alongTrackDistance());
+    // ChassisSpeeds speeds = getChassisSpeeds();
+    // Pose2d pose = getPose();
     // double velocityToTarget = (pose.getX() * speeds.vxMetersPerSecond + pose.getY() *
     // speeds.vyMetersPerSecond) / Math.sqrt(pose.getX() * pose.getX() + pose.getY() * pose.getY());
-    double velocityToTarget = -getChassisSpeeds().vxMetersPerSecond;
-    Logger.recordOutput("Drive/Lineup/velocityToTarget", velocityToTarget);
-    double vx =
-        -driveAlongTrackProfile.calculate(
-                0.02,
-                new State(observation.alongTrackDistance(), velocityToTarget),
-                new State(0, 0))
-            .velocity;
+    // double velocityToTarget = -getChassisSpeeds().vxMetersPerSecond;
+    // Logger.recordOutput("Drive/Lineup/velocityToTarget", velocityToTarget);
+    // double vx =
+    //     -driveAlongTrackProfile.calculate(
+    //             0.02,
+    //             new State(observation.alongTrackDistance(), velocityToTarget),
+    //             new State(0, 0))
+    //         .velocity;
     double vy = driveCrossTrackLineupController.calculate(observation.crossTrackDistance());
     double omega =
         rotationController.calculate(
