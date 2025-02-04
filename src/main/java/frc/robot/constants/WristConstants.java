@@ -1,0 +1,69 @@
+package frc.robot.constants;
+
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
+import coppercore.parameter_tools.json.JSONExclude;
+import coppercore.parameter_tools.json.JSONSync;
+import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
+import coppercore.parameter_tools.path_provider.EnvironmentHandler;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+
+public class WristConstants {
+  @JSONExclude
+  public static final JSONSync<WristConstants> synced =
+      new JSONSync<WristConstants>(
+          new WristConstants(),
+          "WristConstants.json",
+          EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
+          new JSONSyncConfigBuilder().build());
+
+  public final Integer wristMotorId = 13;
+  public final Integer wristCANcoderId = 22;
+
+  /**
+   * FusedCANcoder sensor to mechanism ratio
+   *
+   * <p>see talonFX docs:
+   * https://api.ctr-electronics.com/phoenix6/latest/java/com/ctre/phoenix6/configs/FeedbackConfigs.html#SensorToMechanismRatio
+   */
+  public final Double sensorToMechanismRatio = 1.0; // TODO: Actual value
+
+  public final Double rotorToSensorRatio = 20.0; // TODO: Actual value
+
+  public final InvertedValue wristMotorInvertedValue = InvertedValue.Clockwise_Positive;
+
+  public final NeutralModeValue wristNeutralModeValue = NeutralModeValue.Brake;
+
+  public final Current wristSupplyCurrentLimit = Amps.of(40.0);
+  public final Current wristStatorCurrentLimit = Amps.of(40.0);
+
+  /** Peak forward and reverse current for FieldOriented */
+  public final Current peakFOCCurrent = Amps.of(40.0);
+
+  public final Double wristKG = 0.0; // TODO: Automatic feedforward characterization
+  public final Double wristKS = 0.0;
+  public final Double wristKV = 0.0;
+  public final Double wristKA = 0.0;
+
+  public final Double wristKP = 0.0; // TODO: Tune these
+  public final Double wristKI = 0.0;
+  public final Double wristKD = 0.0;
+
+  public final AngularVelocity wristMotionMagicCruiseVelocity =
+      RotationsPerSecond.of(0.1); // TODO: Tune this!
+  public final Double wristMotionMagicExpo_kA = 6.0; //
+  public final Double wristMotionMagicExpo_kV = 6.0; //
+
+  public final Angle wristCANcoderAbsoluteSensorDiscontinuityPoint =
+      Rotations.of(0.3); // TODO: Confirm this
+  public final Angle wristCANcoderMagnetOffset = Rotations.of(0.0); // TODO: Tune this value
+  public final SensorDirectionValue wristCANcoderSensorDirection =
+      SensorDirectionValue.CounterClockwise_Positive;
+}
