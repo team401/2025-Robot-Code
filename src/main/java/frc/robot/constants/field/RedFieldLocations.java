@@ -38,9 +38,9 @@ public class RedFieldLocations {
   public Translation2d redReef1011Translation = new Translation2d(12.2, 2.6);
   public Rotation2d redReef1011Rotation = new Rotation2d(Math.toRadians(60));
 
-  public Translation2d redCoralStationRightTranslation = new Translation2d(16.3,7);
+  public Translation2d redCoralStationRightTranslation = new Translation2d(16.3, 7);
   public Rotation2d redCoralStationRightRotation = new Rotation2d(Units.degreesToRadians(-120));
 
-  public Translation2d redCoralStationLeftTranslation = new Translation2d(16.3,1);
+  public Translation2d redCoralStationLeftTranslation = new Translation2d(16.3, 1);
   public Rotation2d redCoralStationLeftRotation = new Rotation2d(Units.degreesToRadians(120));
 }

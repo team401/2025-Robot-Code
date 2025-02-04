@@ -1,65 +1,65 @@
 {
   "blueReefCenterTranslation": {
-    "x": 4.48945,
-    "y": 4.0259
+    "x": 176.75,
+    "y": 158.5
   },
   "blueReefCenterRotation": {
     "radians": 0.0
   },
-  "blueReefAprilTag1Translation": {
-    "x": 4.904739999999999,
-    "y": 3.3063179999999996
+  "blueReef01Translation": {
+    "x": 6.56,
+    "y": 4.0
   },
-  "blueReefAprilTag1Rotation": {
-    "radians": 5.235987755982989
+  "blueReef01Rotation": {
+    "radians": -3.141592653589793
   },
-  "blueReefAprilTag2Translation": {
-    "x": 5.321046,
-    "y": 4.0259
+  "blueReef23Translation": {
+    "x": 5.5,
+    "y": 2.3
   },
-  "blueReefAprilTag2Rotation": {
-    "radians": 0.0
-  },
-  "blueReefAprilTag3Translation": {
-    "x": 4.904739999999999,
-    "y": 4.745482
-  },
-  "blueReefAprilTag3Rotation": {
-    "radians": 1.0471975511965976
-  },
-  "blueReefAprilTag4Translation": {
-    "x": 4.073905999999999,
-    "y": 4.745482
-  },
-  "blueReefAprilTag4Rotation": {
+  "blueReef23Rotation": {
     "radians": 2.0943951023931953
   },
-  "blueReefAprilTag5Translation": {
-    "x": 3.6576,
-    "y": 4.0259
+  "blueReef45Translation": {
+    "x": 3.5,
+    "y": 2.5
   },
-  "blueReefAprilTag5Rotation": {
-    "radians": 3.141592653589793
+  "blueReef45Rotation": {
+    "radians": 1.0471975511965976
   },
-  "blueReefAprilTag6Translation": {
-    "x": 4.073905999999999,
-    "y": 3.3063179999999996
+  "blueReef67Translation": {
+    "x": 2.64,
+    "y": 4.0
   },
-  "blueReefAprilTag6Rotation": {
-    "radians": 4.1887902047863905
+  "blueReef67Rotation": {
+    "radians": 0.0
+  },
+  "blueReef89Translation": {
+    "x": 3.5,
+    "y": 5.6
+  },
+  "blueReef89Rotation": {
+    "radians": -1.0471975511965976
+  },
+  "blueReef1011Translation": {
+    "x": 5.5,
+    "y": 5.6
+  },
+  "blueReef1011Rotation": {
+    "radians": -2.0943951023931953
   },
   "blueCoralStationRightTranslation": {
-    "x": 0.0,
-    "y": 0.0
+    "x": 1.3,
+    "y": 1.0
   },
   "blueCoralStationRightRotation": {
-    "radians": 0.0
+    "radians": 1.0471975511965976
   },
   "blueCoralStationLeftTranslation": {
-    "x": 0.0,
-    "y": 0.0
+    "x": 1.2,
+    "y": 7.0
   },
   "blueCoralStationLeftRotation": {
-    "radians": 0.0
+    "radians": -1.0471975511965976
   }
 }
