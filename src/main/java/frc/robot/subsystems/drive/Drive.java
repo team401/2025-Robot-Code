@@ -657,47 +657,53 @@ public class Drive implements DriveTemplate {
         // NOTE: pairs of reef sides (ie 0 and 1) will have the same otf pose (approximately 0.5-1
         // meter away from center of tag)
       case Reef0:
-        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+      case Reef1:
+        return isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReef01Translation,
                 JsonConstants.redFieldLocations.redReef01Rotation)
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueReef01Translation,
                 JsonConstants.blueFieldLocations.blueReef01Rotation);
-      case Reef1:
-        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+      case Reef2:
+      case Reef3:
+        return isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReef23Translation,
                 JsonConstants.redFieldLocations.redReef23Rotation)
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueReef23Translation,
                 JsonConstants.blueFieldLocations.blueReef23Rotation);
-      case Reef2:
-        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+      case Reef4:
+      case Reef5:
+        return isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReef45Translation,
                 JsonConstants.redFieldLocations.redReef45Rotation)
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueReef45Translation,
                 JsonConstants.blueFieldLocations.blueReef45Rotation);
-      case Reef3:
-        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+      case Reef6:
+      case Reef7:
+        return isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReef67Translation,
                 JsonConstants.redFieldLocations.redReef67Rotation)
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueReef67Translation,
                 JsonConstants.blueFieldLocations.blueReef67Rotation);
-      case Reef4:
-        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+      case Reef8:
+      case Reef9:
+        return isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReef89Translation,
                 JsonConstants.redFieldLocations.redReef89Rotation)
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueReef89Translation,
                 JsonConstants.blueFieldLocations.blueReef89Rotation);
-      case Reef5:
-        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+      case Reef10:
+      case Reef11:
+        return isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReef1011Translation,
                 JsonConstants.redFieldLocations.redReef1011Rotation)
@@ -705,9 +711,21 @@ public class Drive implements DriveTemplate {
                 JsonConstants.blueFieldLocations.blueReef1011Translation,
                 JsonConstants.blueFieldLocations.blueReef1011Rotation);
       case CoralStationRight:
-        return new Pose2d(16.0, 6.6, new Rotation2d(0.0));
+      return isAllianceRed()
+      ? new Pose2d(
+          JsonConstants.redFieldLocations.redCoralStationRightTranslation,
+          JsonConstants.redFieldLocations.redCoralStationRightRotation)
+      : new Pose2d(
+          JsonConstants.blueFieldLocations.blueCoralStationRightTranslation,
+          JsonConstants.blueFieldLocations.blueCoralStationRightRotation);
       case CoralStationLeft:
-        return new Pose2d(1.2, 7.0, Rotation2d.fromRadians(-1));
+      return isAllianceRed()
+      ? new Pose2d(
+          JsonConstants.redFieldLocations.redCoralStationLeftTranslation,
+          JsonConstants.redFieldLocations.redCoralStationLeftRotation)
+      : new Pose2d(
+          JsonConstants.blueFieldLocations.blueCoralStationLeftTranslation,
+          JsonConstants.blueFieldLocations.blueCoralStationLeftRotation);
       default:
         this.setOTF(false);
         return null;
