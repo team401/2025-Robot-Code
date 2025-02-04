@@ -87,10 +87,14 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
+                  drive.angleController.reset(drive.getRotation().getRadians());
                   if (DriverStation.getAlliance().isPresent()
                       && DriverStation.getAlliance().get() == Alliance.Red) {
+
+                    drive.getPose();
                     drive.alignToFieldElement(redReefCenter);
                   } else {
+                    drive.getPose();
                     drive.alignToFieldElement(blueReefCenter);
                   }
                 },
