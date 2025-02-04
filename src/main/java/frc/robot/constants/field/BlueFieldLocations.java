@@ -18,7 +18,7 @@ public class BlueFieldLocations {
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
   public Translation2d blueReefCenterTranslation =
-      new Translation2d(Units.inchesToMeters(176.75), Units.inchesToMeters(158.5));
+      new Translation2d(176.75, (158.5));
   public Rotation2d blueReefCenterRotation = new Rotation2d();
 
   public Translation2d blueReef01Translation =
