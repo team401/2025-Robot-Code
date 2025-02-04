@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.hardware.*;
-import com.ctre.phoenix6.signals.*;
 import com.ctre.phoenix6.swerve.*;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.*;
 import coppercore.parameter_tools.json.JSONExclude;
@@ -51,6 +50,28 @@ public class DrivetrainConstants {
   public final Double driveKv = 0.83161;
   public final Double driveKa = 0.0;
   public final Double driveKg = 0.0;
+
+  // lineup PID gains
+  public final Double driveAlongTrackkP = 0.5;
+  public final Double driveAlongTrackkI = 0.0;
+  public final Double driveAlongTrackkD = 0.0;
+
+  @JSONExclude public final Double driveAlongTrackAcceleration = 5.0;
+  @JSONExclude public final Double driveAlongTrackVelocity = 2.0;
+
+  public final Double driveCrossTrackkP = 0.5;
+  public final Double driveCrossTrackkI = 0.0;
+  public final Double driveCrossTrackkD = 0.0;
+
+  public final Double driveRotationkP = 0.5;
+  public final Double driveRotationkI = 0.0;
+  public final Double driveRotationkD = 0.0;
+
+  public final Double driveAlongTrackMultiplier = -1.0;
+  public final Double driveAlongTrackOffset = 0.25;
+  public final Double driveCrossTrackFrontRightOffset = 0.25;
+
+  public final Double otfPoseDistanceLimit = 0.1;
 
   // The closed-loop output type to use for the steer motors;
   // This affects the PID/FF gains for the steer motors
@@ -132,45 +153,45 @@ public class DrivetrainConstants {
   public final Integer kFrontLeftDriveMotorId = 7;
   public final Integer kFrontLeftSteerMotorId = 8;
   public final Integer kFrontLeftEncoderId = 9;
-  @JSONExclude public final Angle kFrontLeftEncoderOffset = Rotations.of(-0.153076171875);
+  public final Angle kFrontLeftEncoderOffset = Rotations.of(-0.153076171875);
   public final Boolean kFrontLeftSteerMotorInverted = false;
   public final Boolean kFrontLeftEncoderInverted = false;
 
-  @JSONExclude public final Distance kFrontLeftXPos = Inches.of(13);
-  @JSONExclude public final Distance kFrontLeftYPos = Inches.of(11.5);
+  public final Distance kFrontLeftXPos = Inches.of(13);
+  public final Distance kFrontLeftYPos = Inches.of(11.5);
 
   // Front Right
   public final Integer kFrontRightDriveMotorId = 1;
   public final Integer kFrontRightSteerMotorId = 2;
   public final Integer kFrontRightEncoderId = 12;
-  @JSONExclude public final Angle kFrontRightEncoderOffset = Rotations.of(-0.23583984375);
+  public final Angle kFrontRightEncoderOffset = Rotations.of(-0.23583984375);
   public final Boolean kFrontRightSteerMotorInverted = false;
   public final Boolean kFrontRightEncoderInverted = false;
 
-  @JSONExclude public final Distance kFrontRightXPos = Inches.of(13);
-  @JSONExclude public final Distance kFrontRightYPos = Inches.of(-11.5);
+  public final Distance kFrontRightXPos = Inches.of(13);
+  public final Distance kFrontRightYPos = Inches.of(-11.5);
 
   // Back Left
   public final Integer kBackLeftDriveMotorId = 5;
   public final Integer kBackLeftSteerMotorId = 6;
   public final Integer kBackLeftEncoderId = 10;
-  @JSONExclude public final Angle kBackLeftEncoderOffset = Rotations.of(-0.448486328125);
+  public final Angle kBackLeftEncoderOffset = Rotations.of(-0.448486328125);
   public final Boolean kBackLeftSteerMotorInverted = false;
   public final Boolean kBackLeftEncoderInverted = false;
 
-  @JSONExclude public final Distance kBackLeftXPos = Inches.of(-13);
-  @JSONExclude public final Distance kBackLeftYPos = Inches.of(11.5);
+  public final Distance kBackLeftXPos = Inches.of(-13);
+  public final Distance kBackLeftYPos = Inches.of(11.5);
 
   // Back Right
   public final Integer kBackRightDriveMotorId = 3;
   public final Integer kBackRightSteerMotorId = 4;
   public final Integer kBackRightEncoderId = 11;
-  @JSONExclude public final Angle kBackRightEncoderOffset = Rotations.of(-0.282958984375);
+  public final Angle kBackRightEncoderOffset = Rotations.of(-0.282958984375);
   public final Boolean kBackRightSteerMotorInverted = false;
   public final Boolean kBackRightEncoderInverted = false;
 
-  @JSONExclude public final Distance kBackRightXPos = Inches.of(-13);
-  @JSONExclude public final Distance kBackRightYPos = Inches.of(-11.5);
+  public final Distance kBackRightXPos = Inches.of(-13);
+  public final Distance kBackRightYPos = Inches.of(-11.5);
 
   /**
    * Creates a CommandSwerveDrivetrain instance. This should only be called once in your robot

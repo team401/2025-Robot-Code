@@ -1,7 +1,7 @@
 {
   "steerKp": 40.0,
   "steerKi": 0.0,
-  "steerKd": 0.5,
+  "steerKd": 0.0,
   "steerKs": 0.18753,
   "steerKv": 2.49773,
   "steerKa": 0.0,
@@ -13,6 +13,19 @@
   "driveKv": 0.83161,
   "driveKa": 0.0,
   "driveKg": 0.0,
+  "driveAlongTrackkP": 0.5,
+  "driveAlongTrackkI": 0.0,
+  "driveAlongTrackkD": 0.0,
+  "driveCrossTrackkP": 0.5,
+  "driveCrossTrackkI": 0.0,
+  "driveCrossTrackkD": 0.0,
+  "driveRotationkP": 0.5,
+  "driveRotationkI": 0.0,
+  "driveRotationkD": 0.0,
+  "driveAlongTrackMultiplier": -1,
+  "driveAlongTrackOffset": 0.25,
+  "driveCrossTrackFrontRightOffset": 0.0,
+  "otfPoseDistanceLimit": 0.1,
   "kSteerClosedLoopOutput": "Voltage",
   "kDriveClosedLoopOutput": "TorqueCurrentFOC",
   "kDriveMotorType": "TalonFX_Integrated",
@@ -322,21 +335,69 @@
   "kFrontLeftDriveMotorId": 7,
   "kFrontLeftSteerMotorId": 8,
   "kFrontLeftEncoderId": 9,
+  "kFrontLeftEncoderOffset": {
+    "unit": "Rotation",
+    "value": 0.044677734375
+  },
+  "kFrontLeftXPos": {
+    "unit": "Inch",
+    "value": 13.125
+  },
+  "kFrontLeftYPos": {
+    "unit": "Inch",
+    "value": 11.625
+  },
   "kFrontLeftSteerMotorInverted": true,
   "kFrontLeftEncoderInverted": false,
   "kFrontRightDriveMotorId": 1,
   "kFrontRightSteerMotorId": 2,
   "kFrontRightEncoderId": 12,
+  "kFrontRightEncoderOffset": {
+    "unit": "Rotation",
+    "value": -0.397216796875
+  },
+  "kFrontRightXPos": {
+    "unit": "Inch",
+    "value": 13.125
+  },
+  "kFrontRightYPos": {
+    "unit": "Inch",
+    "value": -11.625
+  },
   "kFrontRightSteerMotorInverted": true,
   "kFrontRightEncoderInverted": false,
   "kBackLeftDriveMotorId": 5,
   "kBackLeftSteerMotorId": 6,
   "kBackLeftEncoderId": 10,
+  "kBackLeftEncoderOffset": {
+    "unit": "Rotation",
+    "value": -0.404296875
+  },
+  "kBackLeftXPos": {
+    "unit": "Inch",
+    "value": -13.125
+  },
+  "kBackLeftYPos": {
+    "unit": "Inch",
+    "value": 11.625
+  },
   "kBackLeftSteerMotorInverted": true,
   "kBackLeftEncoderInverted": false,
   "kBackRightDriveMotorId": 3,
   "kBackRightSteerMotorId": 4,
   "kBackRightEncoderId": 11,
+  "kBackRightEncoderOffset": {
+    "unit": "Rotation",
+    "value": 0.4794921875
+  },
+  "kBackRightXPos": {
+    "unit": "Inch",
+    "value": -13.125
+  },
+  "kBackRightYPos": {
+    "unit": "Inch",
+    "value": -11.625
+  },
   "kBackRightSteerMotorInverted": true,
   "kBackRightEncoderInverted": false
 }
