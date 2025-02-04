@@ -21,29 +21,29 @@ public class BlueFieldLocations {
       new Translation2d(Units.inchesToMeters(176.75), Units.inchesToMeters(158.5));
   public Rotation2d blueReefCenterRotation = new Rotation2d();
 
-  public Translation2d blueReefAprilTag1Translation =
-      new Translation2d(Units.inchesToMeters(193.10), Units.inchesToMeters(130.17));
-  public Rotation2d blueReefAprilTag1Rotation = new Rotation2d(Math.toRadians(300));
+  public Translation2d blueReef01Translation =
+      new Translation2d(6.56, 4);
+  public Rotation2d blueReef01Rotation = new Rotation2d(Math.toRadians(-180));
 
-  public Translation2d blueReefAprilTag2Translation =
-      new Translation2d(Units.inchesToMeters(209.49), Units.inchesToMeters(158.5));
-  public Rotation2d blueReefAprilTag2Rotation = new Rotation2d(Math.toRadians(0));
+  public Translation2d blueReef23Translation =
+      new Translation2d(5.5,2.3);
+  public Rotation2d blueReef23Rotation = new Rotation2d(Math.toRadians(120));
 
-  public Translation2d blueReefAprilTag3Translation =
-      new Translation2d(Units.inchesToMeters(193.10), Units.inchesToMeters(186.83));
-  public Rotation2d blueReefAprilTag3Rotation = new Rotation2d(Math.toRadians(60));
+  public Translation2d blueReef45Translation =
+      new Translation2d(3.5, 2.5);
+  public Rotation2d blueReef45Rotation = new Rotation2d(Math.toRadians(60));
 
-  public Translation2d blueReefAprilTag4Translation =
-      new Translation2d(Units.inchesToMeters(160.39), Units.inchesToMeters(186.83));
-  public Rotation2d blueReefAprilTag4Rotation = new Rotation2d(Math.toRadians(120));
+  public Translation2d blueReef67Translation =
+      new Translation2d(2.64,4);
+  public Rotation2d blueReef67Rotation = new Rotation2d(Math.toRadians(0));
 
-  public Translation2d blueReefAprilTag5Translation =
-      new Translation2d(Units.inchesToMeters(144.00), Units.inchesToMeters(158.5));
-  public Rotation2d blueReefAprilTag5Rotation = new Rotation2d(Math.toRadians(180));
+  public Translation2d blueReef89Translation =
+      new Translation2d(3.5, 5.6);
+  public Rotation2d blueReef89Rotation = new Rotation2d(Math.toRadians(-60));
 
-  public Translation2d blueReefAprilTag6Translation =
-      new Translation2d(Units.inchesToMeters(160.39), Units.inchesToMeters(130.17));
-  public Rotation2d blueReefAprilTag6Rotation = new Rotation2d(Math.toRadians(240));
+  public Translation2d blueReef1011Translation =
+      new Translation2d(5.5, 5.6);
+  public Rotation2d blueReef1011Rotation = new Rotation2d(Math.toRadians(-120));
 
   public Translation2d blueCoralStationRightTranslation = new Translation2d();
   public Rotation2d blueCoralStationRightRotation = new Rotation2d();
