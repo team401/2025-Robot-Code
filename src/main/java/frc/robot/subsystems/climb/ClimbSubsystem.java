@@ -5,12 +5,18 @@ import coppercore.controls.state_machine.StateMachineConfiguration;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.state.StateContainer;
 import edu.wpi.first.units.Units.*;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.ClimbConstants;
+import frc.robot.subsystems.climb.states.IdleState;
+import frc.robot.subsystems.climb.states.LiftingState;
+import frc.robot.subsystems.climb.states.SearchingState;
+import frc.robot.subsystems.climb.states.WaitingState;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class ClimbSubsystem extends SubsystemBase {
+
+    private static ClimbSubsystem instance;
 
     private ClimbIO io;
     private ClimbInputsAutoLogged inputs = new ClimbInputsAutoLogged();
@@ -29,10 +35,10 @@ public class ClimbSubsystem extends SubsystemBase {
     ClimbAction currentAction = ClimbAction.NONE;
 
     private enum ClimbState implements StateContainer {
-        IDLE(new IdleState()), // do nothing
-        WAITING(new WaitingState()), // waiting for system to be ready for climb
-        SEARCHING(new SearchingState()), // searching for target
-        LIFTING(new LiftingState()), // moving arm to hang
+        IDLE(new IdleState(instance)), // do nothing
+        WAITING(new WaitingState(instance)), // waiting for system to be ready for climb
+        SEARCHING(new SearchingState(instance)), // searching for target
+        LIFTING(new LiftingState(instance)), // moving arm to hang
         OVERRIDE(new PeriodicStateInterface() {});
 
         private final PeriodicStateInterface state;
@@ -47,40 +53,11 @@ public class ClimbSubsystem extends SubsystemBase {
         }
     }
 
-    public class IdleState implements PeriodicStateInterface {
-        @Override
-        public void periodic() {
-            io.setGoalAngle(ClimbConstants.restingAngle);
-        }
-    }
-
-    public class WaitingState implements PeriodicStateInterface {
-        @Override
-        public void periodic() {
-            io.setGoalAngle(ClimbConstants.restingAngle);
-            if (rampClear.getAsBoolean()) climbMachine.fire(ClimbAction.SYSTEM_READY);
-        }
-    }
-
-    public class SearchingState implements PeriodicStateInterface {
-        @Override
-        public void periodic() {
-            io.setGoalAngle(ClimbConstants.searchingAngle);
-            if (inputs.lockedToCage) climbMachine.fire(ClimbAction.READY_FOR_CLIMB);
-        }
-    }
-
-    public class LiftingState implements PeriodicStateInterface {
-        @Override
-        public void periodic() {
-            io.setGoalAngle(ClimbConstants.finalHangingAngle);
-        }
-    }
-
     public StateMachineConfiguration<ClimbState, ClimbAction> climbMachineConfiguration;
     public StateMachine<ClimbState, ClimbAction> climbMachine;
 
     public ClimbSubsystem(ClimbIO io) {
+        instance = this;
         this.io = io;
 
         climbMachineConfiguration = new StateMachineConfiguration<>();
@@ -109,6 +86,18 @@ public class ClimbSubsystem extends SubsystemBase {
 
     public void fireTrigger(ClimbAction action) {
         climbMachine.fire(action);
+    }
+
+    public void setGoalAngle(Angle angle) {
+        io.setGoalAngle(angle);
+    }
+
+    public boolean getRampClear() {
+        return rampClear.getAsBoolean();
+    }
+
+    public boolean getLockedToCage() {
+        return inputs.lockedToCage();
     }
 
     @Override
