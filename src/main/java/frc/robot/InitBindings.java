@@ -44,7 +44,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  drive.setAutoAlignment(true);
+                  // TODO: schedule otf and lineup states
                 },
                 drive));
     rightJoystick
@@ -52,7 +52,7 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  drive.setAutoAlignment(false);
+                  // TODO: cancel otf and lineup states
                 },
                 drive));
 
