@@ -12,11 +12,14 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import coppercore.parameter_tools.LoggedTunableNumber;
+import coppercore.vision.VisionLocalizer.DistanceToTag;
 import coppercore.wpilib_interface.DriveTemplate;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,7 +32,11 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -38,6 +45,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
@@ -55,18 +63,18 @@ public class Drive implements DriveTemplate {
       Math.max(
           Math.max(
               Math.hypot(
-                  JsonConstants.drivetrainConstants.FrontLeft.LocationX,
-                  JsonConstants.drivetrainConstants.FrontLeft.LocationY),
+                  DriveConfiguration.getInstance().FrontLeft.LocationX,
+                  DriveConfiguration.getInstance().FrontLeft.LocationY),
               Math.hypot(
-                  JsonConstants.drivetrainConstants.FrontRight.LocationX,
-                  JsonConstants.drivetrainConstants.FrontRight.LocationY)),
+                  DriveConfiguration.getInstance().FrontRight.LocationX,
+                  DriveConfiguration.getInstance().FrontRight.LocationY)),
           Math.max(
               Math.hypot(
-                  JsonConstants.drivetrainConstants.BackLeft.LocationX,
-                  JsonConstants.drivetrainConstants.BackLeft.LocationY),
+                  DriveConfiguration.getInstance().BackLeft.LocationX,
+                  DriveConfiguration.getInstance().BackLeft.LocationY),
               Math.hypot(
-                  JsonConstants.drivetrainConstants.BackRight.LocationX,
-                  JsonConstants.drivetrainConstants.BackRight.LocationY)));
+                  DriveConfiguration.getInstance().BackRight.LocationX,
+                  DriveConfiguration.getInstance().BackRight.LocationY)));
 
   // PathPlanner config constants
   private static final double ROBOT_MASS_KG = 74.088;
@@ -77,12 +85,12 @@ public class Drive implements DriveTemplate {
           ROBOT_MASS_KG,
           ROBOT_MOI,
           new ModuleConfig(
-              JsonConstants.drivetrainConstants.FrontLeft.WheelRadius,
+              DriveConfiguration.getInstance().FrontLeft.WheelRadius,
               JsonConstants.drivetrainConstants.kSpeedAt12Volts.in(MetersPerSecond),
               WHEEL_COF,
               DCMotor.getKrakenX60Foc(1)
-                  .withReduction(JsonConstants.drivetrainConstants.FrontLeft.DriveMotorGearRatio),
-              JsonConstants.drivetrainConstants.FrontLeft.SlipCurrent,
+                  .withReduction(DriveConfiguration.getInstance().FrontLeft.DriveMotorGearRatio),
+              DriveConfiguration.getInstance().FrontLeft.SlipCurrent,
               1),
           getModuleTranslations());
 
@@ -148,7 +156,72 @@ public class Drive implements DriveTemplate {
 
   private boolean isOTF = false;
 
+  private boolean isLiningUp = false;
+
   private Command driveToPose = null;
+
+  private VisionAlignment alignmentSupplier;
+
+  // along track pid test mode
+  private LoggedTunableNumber alongTrackkP =
+      new LoggedTunableNumber(
+          "DriveLineupGains/AlongTrackkP", JsonConstants.drivetrainConstants.driveAlongTrackkP);
+  private LoggedTunableNumber alongTrackkI =
+      new LoggedTunableNumber(
+          "DriveLineupGains/AlongTrackkI", JsonConstants.drivetrainConstants.driveAlongTrackkI);
+  private LoggedTunableNumber alongTrackkD =
+      new LoggedTunableNumber(
+          "DriveLineupGains/AlongTrackkD", JsonConstants.drivetrainConstants.driveAlongTrackkD);
+
+  // cross tack pid test mode
+  private LoggedTunableNumber crossTrackkP =
+      new LoggedTunableNumber(
+          "DriveLineupGains/CrossTrackkP", JsonConstants.drivetrainConstants.driveCrossTrackkP);
+  private LoggedTunableNumber crossTrackkI =
+      new LoggedTunableNumber(
+          "DriveLineupGains/CrossTrackkI", JsonConstants.drivetrainConstants.driveCrossTrackkI);
+  private LoggedTunableNumber crossTrackkD =
+      new LoggedTunableNumber(
+          "DriveLineupGains/CrossTrackkD", JsonConstants.drivetrainConstants.driveCrossTrackkD);
+
+  // rotation pid test mode
+  private LoggedTunableNumber rotationkP =
+      new LoggedTunableNumber(
+          "DriveLineupGains/rotationkP", JsonConstants.drivetrainConstants.driveRotationkP);
+  private LoggedTunableNumber rotationkI =
+      new LoggedTunableNumber(
+          "DriveLineupGains/rotationkI", JsonConstants.drivetrainConstants.driveRotationkI);
+  private LoggedTunableNumber rotationkD =
+      new LoggedTunableNumber(
+          "DriveLineupGains/rotationkD", JsonConstants.drivetrainConstants.driveRotationkD);
+
+  private PIDController driveAlongTrackLineupController =
+      new PIDController(
+          JsonConstants.drivetrainConstants.driveAlongTrackkP,
+          JsonConstants.drivetrainConstants.driveAlongTrackkI,
+          JsonConstants.drivetrainConstants.driveAlongTrackkD);
+  private PIDController driveCrossTrackLineupController =
+      new PIDController(
+          JsonConstants.drivetrainConstants.driveCrossTrackkP,
+          JsonConstants.drivetrainConstants.driveCrossTrackkI,
+          JsonConstants.drivetrainConstants.driveCrossTrackkD);
+
+  private Constraints driveAlongTrackProfileConstraints =
+      new Constraints(
+          JsonConstants.drivetrainConstants.driveAlongTrackVelocity,
+          JsonConstants.drivetrainConstants.driveAlongTrackVelocity);
+  private TrapezoidProfile driveAlongTrackProfile =
+      new TrapezoidProfile(driveAlongTrackProfileConstraints);
+
+  private PIDController rotationController =
+      new PIDController(
+          JsonConstants.drivetrainConstants.driveRotationkP,
+          JsonConstants.drivetrainConstants.driveRotationkI,
+          JsonConstants.drivetrainConstants.driveRotationkD);
+
+  private NetworkTableInstance inst = NetworkTableInstance.getDefault();
+  private NetworkTable table = inst.getTable("");
+  private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
 
   public Drive(
       GyroIO gyroIO,
@@ -156,11 +229,12 @@ public class Drive implements DriveTemplate {
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
       ModuleIO brModuleIO) {
+    this.alignmentSupplier = null;
     this.gyroIO = gyroIO;
-    modules[0] = new Module(flModuleIO, 0, JsonConstants.drivetrainConstants.FrontLeft);
-    modules[1] = new Module(frModuleIO, 1, JsonConstants.drivetrainConstants.FrontRight);
-    modules[2] = new Module(blModuleIO, 2, JsonConstants.drivetrainConstants.BackLeft);
-    modules[3] = new Module(brModuleIO, 3, JsonConstants.drivetrainConstants.BackRight);
+    modules[0] = new Module(flModuleIO, 0, DriveConfiguration.getInstance().FrontLeft);
+    modules[1] = new Module(frModuleIO, 1, DriveConfiguration.getInstance().FrontRight);
+    modules[2] = new Module(blModuleIO, 2, DriveConfiguration.getInstance().BackLeft);
+    modules[3] = new Module(brModuleIO, 3, DriveConfiguration.getInstance().BackRight);
 
     // Usage reporting for swerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
@@ -203,6 +277,8 @@ public class Drive implements DriveTemplate {
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+
+    rotationController.enableContinuousInput(-Math.PI / 2, Math.PI / 2);
   }
 
   @Override
@@ -229,15 +305,27 @@ public class Drive implements DriveTemplate {
     }
 
     // OTF Command
-    Logger.recordOutput("Drive/OnTheFly", isOTF);
     if (driveToPose != null) {
-      Logger.recordOutput("Drive/OnTheFlyCommandStatus", this.driveToPose.isScheduled());
+      Logger.recordOutput("Drive/OTF/OnTheFlyCommandStatus", this.driveToPose.isScheduled());
 
       // cancel path following command once OTF cancelled (likely via trigger)
       if (!isOTF) {
         driveToPose.cancel();
       }
     }
+
+    if (isDriveCloseToFinalLineupPose() && isOTF) {
+      this.setOTF(false);
+      driveToPose.cancel();
+      this.setLiningUp(true);
+    }
+
+    if (isLiningUp) {
+      this.LineupWithReefLocation();
+    }
+
+    // check for update from reef touchscreen
+    this.updateDesiredLocationFromNetworkTables();
 
     // run velocity if not disabled
     if (!DriverStation.isTest() && !DriverStation.isDisabled()) {
@@ -280,6 +368,39 @@ public class Drive implements DriveTemplate {
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
   }
 
+  public void testPeriodic() {
+    switch (TestModeManager.getTestMode()) {
+      case DriveLineupTuning:
+        LoggedTunableNumber.ifChanged(
+            hashCode(),
+            (pid) -> {
+              this.setAlongTrackPID(pid[0], pid[1], pid[2]);
+            },
+            alongTrackkP,
+            alongTrackkI,
+            alongTrackkD);
+        LoggedTunableNumber.ifChanged(
+            hashCode(),
+            (pid) -> {
+              this.setCrossTrackPID(pid[0], pid[1], pid[2]);
+            },
+            crossTrackkP,
+            crossTrackkI,
+            crossTrackkD);
+        LoggedTunableNumber.ifChanged(
+            hashCode(),
+            (pid) -> {
+              this.setRotationLineupPID(pid[0], pid[1], pid[2]);
+            },
+            rotationkP,
+            rotationkI,
+            rotationkD);
+        break;
+      default:
+        break;
+    }
+  }
+
   /**
    * sets desired speeds of robot
    *
@@ -301,9 +422,52 @@ public class Drive implements DriveTemplate {
 
       this.goalSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, robotRotation);
     } else {
-      Logger.recordOutput("Drive/DesiredOTFSpeeds", speeds);
+      Logger.recordOutput("Drive/DesiredRobotCentricSpeeds", speeds);
       this.goalSpeeds = speeds;
     }
+  }
+
+  /**
+   * sets lineup along track pid gains
+   *
+   * @param kP proportional gain
+   * @param kI integral gain
+   * @param kD derivative gain
+   */
+  public void setAlongTrackPID(double kP, double kI, double kD) {
+    this.driveAlongTrackLineupController = new PIDController(kP, kI, kD);
+  }
+
+  /**
+   * sets lineup cross track pid gains
+   *
+   * @param kP proportional gain
+   * @param kI integral gain
+   * @param kD derivative gain
+   */
+  public void setCrossTrackPID(double kP, double kI, double kD) {
+    this.driveCrossTrackLineupController = new PIDController(kP, kI, kD);
+  }
+
+  /**
+   * sets lineup rotation pid gains
+   *
+   * @param kP proportional gain
+   * @param kI integral gain
+   * @param kD derivative gain
+   */
+  public void setRotationLineupPID(double kP, double kI, double kD) {
+    this.rotationController = new PIDController(kP, kI, kD);
+    this.rotationController.enableContinuousInput(-Math.PI / 2, Math.PI / 2);
+  }
+
+  /**
+   * sets the supplier for landing zone alignment help
+   *
+   * @param alignmentSupplier from vision.getDistanceErrorToTag; helps drive align to reef
+   */
+  public void setAlignmentSupplier(VisionAlignment alignmentSupplier) {
+    this.alignmentSupplier = alignmentSupplier;
   }
 
   /**
@@ -317,7 +481,9 @@ public class Drive implements DriveTemplate {
 
     if (isOTF) {
       this.driveToPose = this.getDriveToPoseCommand();
-      this.driveToPose.schedule();
+      if (this.driveToPose != null) {
+        this.driveToPose.schedule();
+      }
     }
   }
 
@@ -326,8 +492,73 @@ public class Drive implements DriveTemplate {
    *
    * @return state of OTF following
    */
+  @AutoLogOutput(key = "Drive/OTF/isOTF")
   public boolean isDriveOTF() {
     return isOTF;
+  }
+
+  /**
+   * checks if robot pose is sufficiently close to desired pose
+   *
+   * @return true if robot pose is close to desired pose
+   */
+  public boolean isDriveCloseToFinalLineupPose() {
+    // relative to transforms first pose into distance from desired pose
+    // then get distance between poses (if less than 0.1 meters we are good)
+    return this.getPose()
+            .relativeTo(this.findOTFPoseFromDesiredLocation())
+            .getTranslation()
+            .getNorm()
+        < JsonConstants.drivetrainConstants.otfPoseDistanceLimit;
+  }
+
+  /**
+   * sets isLiningUp of robot true will cause robot to gather distance from reef tag and drive
+   * towards it PathLocation
+   *
+   * @param isLiningUp boolean telling robot if it should create a OTF path
+   */
+  public void setLiningUp(boolean isLiningUp) {
+    this.isLiningUp = isLiningUp;
+  }
+
+  /**
+   * checks if drive is currently lining up to a reef
+   *
+   * @return state of lining up
+   */
+  @AutoLogOutput(key = "Drive/Lineup/isLiningUp")
+  public boolean isDriveLiningUp() {
+    return isLiningUp;
+  }
+
+  /**
+   * checks if desired locaiton is set to a reef location
+   *
+   * @return true if location is reef; false otherwise (processor / coral station)
+   */
+  public boolean isDesiredLocationReef() {
+    return !(desiredLocation == DesiredLocation.CoralStationLeft
+        || desiredLocation == DesiredLocation.CoralStationRight
+        || desiredLocation == DesiredLocation.Processor);
+  }
+
+  /**
+   * allows drive to be controlled by on the fly / landing zone alignment
+   *
+   * @param autoAlignment true allows drive to go into otf and alignment
+   */
+  public void setAutoAlignment(boolean autoAlignment) {
+    if (autoAlignment) {
+      if (isDriveCloseToFinalLineupPose() && isDesiredLocationReef()) {
+        this.setLiningUp(true);
+      } else {
+        this.setOTF(true);
+      }
+    } else {
+      setOTF(false);
+      setLiningUp(false);
+    }
   }
 
   /**
@@ -350,27 +581,72 @@ public class Drive implements DriveTemplate {
     this.desiredLocation = locationArray[locationIndex];
   }
 
+  /** checks for update from reef location network table (SnakeScreen) run periodically in drive */
+  public void updateDesiredLocationFromNetworkTables() {
+    double desiredIndex = reefLocationSelector.get();
+    if (desiredIndex == -1) {
+      return;
+    }
+    if (locationArray[(int) desiredIndex] != desiredLocation) {
+      if (isOTF) {
+        this.updateDesiredLocation((int) desiredIndex);
+      } else {
+        this.setDesiredLocation((int) desiredIndex);
+      }
+    }
+  }
+
+  /**
+   * updates desired path location (for when OTF is already running) this will cancel old command
+   * and generate a new OTF path to run
+   *
+   * @param locationIndex desired location index for robot to pathfind to (sent from
+   *     DesiredLocationSelector)
+   */
+  public void updateDesiredLocation(int locationIndex) {
+    this.updateDesiredLocation(locationArray[locationIndex]);
+  }
+
+  /**
+   * updates desired path location (for when OTF is already running) this will cancel old command
+   * and generate a new OTF path to run
+   *
+   * @param location desired location for robot to pathfind to
+   */
+  public void updateDesiredLocation(DesiredLocation location) {
+    this.setDesiredLocation(location);
+
+    if (isOTF) {
+      this.driveToPose.cancel();
+      this.driveToPose = this.getDriveToPoseCommand();
+      this.driveToPose.schedule();
+    }
+  }
+
   /**
    * finds a pose to pathfind to based on desiredLocation enum
    *
    * @return a pose representing the corresponding scoring location
    */
-  public Pose2d findOTFPoseFromPathLocation() {
+  public Pose2d findOTFPoseFromDesiredLocation() {
     switch (this.desiredLocation) {
-        // reef 0 and 1 will have the same path
-        // NOTE: use PathPlannerPath.getStartingHolonomicPose to find pose for reef lineup if wanted
+        // NOTE: pairs of reef sides (ie 0 and 1) will have the same otf pose (approximately 0.5-1
+        // meter away from center of tag)
       case Reef0:
-        return new Pose2d();
+        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
+            ? JsonConstants.redFieldLocations.reef0
+            : new Pose2d();
       case Reef1:
-        return new Pose2d();
+        return new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180)));
       case CoralStationRight:
-        return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
+        return new Pose2d(16.0, 6.6, new Rotation2d(0.0));
+        // return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
       case CoralStationLeft:
         return new Pose2d(1.2, 7.0, Rotation2d.fromRadians(-1));
       default:
         // no location set, so don't allow drive to run OTF
         this.setOTF(false);
-        return new Pose2d();
+        return null;
     }
   }
 
@@ -380,13 +656,202 @@ public class Drive implements DriveTemplate {
    * @return command that drive can schedule to follow the path found
    */
   public Command getDriveToPoseCommand() {
-    Pose2d targetPose = findOTFPoseFromPathLocation();
+    Pose2d targetPose = findOTFPoseFromDesiredLocation();
+
+    if (targetPose == null) {
+      return null;
+    }
 
     // Create the constraints to use while pathfinding
     PathConstraints constraints =
-        new PathConstraints(3.0, 4.0, Units.degreesToRadians(540), Units.degreesToRadians(720));
+        new PathConstraints(
+            JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
+            JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
+            JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
+            JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
 
     return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0);
+  }
+
+  /**
+   * checks if driver station alliance is red
+   *
+   * @return true if alliance is red
+   */
+  public boolean isAllianceRed() {
+    return DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Red);
+  }
+
+  /**
+   * gets tag to use for final alignment with vision
+   *
+   * @return int representing tag id to use
+   */
+  public int getTagIdForReef() {
+    boolean allianceRed = this.isAllianceRed();
+    switch (desiredLocation) {
+      case Reef0:
+        return 7;
+      case Reef1:
+        return allianceRed ? 10 : 21;
+      case Reef2:
+      case Reef3:
+        return allianceRed ? 9 : 22;
+      case Reef4:
+      case Reef5:
+        return allianceRed ? 8 : 17;
+      case Reef6:
+      case Reef7:
+        return allianceRed ? 7 : 18;
+      case Reef8:
+      case Reef9:
+        return allianceRed ? 6 : 19;
+      case Reef10:
+      case Reef11:
+        return allianceRed ? 11 : 20;
+      default:
+        return -1;
+    }
+  }
+
+  /**
+   * gets cross track offset for lineup
+   *
+   * @param cameraIndex camera to check offset
+   * @return offset for camera
+   */
+  public Double getCrossTrackOffset(int cameraIndex) {
+    if (cameraIndex == 0) {
+      return JsonConstants.drivetrainConstants.driveCrossTrackFrontRightOffset;
+    }
+    return 0.0; // front left offset (not added)
+  }
+
+  /**
+   * gets camera index for vision single tag lineup
+   *
+   * @return 0 for Front Left camera; 1 for Front Right camera
+   */
+  public int getCameraIndexForLineup() {
+    switch (desiredLocation) {
+        // Right Side of reef side (align to left camera)
+      case Reef0:
+      case Reef2:
+      case Reef4:
+      case Reef6:
+      case Reef8:
+      case Reef10:
+        return JsonConstants.visionConstants.FrontLeftCameraIndex;
+        // Left side of reef side (align to right camera)
+      case Reef1:
+      case Reef3:
+      case Reef5:
+      case Reef7:
+      case Reef9:
+      case Reef11:
+        return JsonConstants.visionConstants.FrontRightCameraIndex;
+      default:
+        return -1;
+    }
+  }
+
+  /**
+   * gets rotation for each side of hexagonal reef for lineup
+   *
+   * @return Rotation2d representing desired rotation for lineup
+   */
+  public Rotation2d getRotationForReefSide() {
+    switch (desiredLocation) {
+      case Reef0:
+        return new Rotation2d();
+      case Reef1:
+        return new Rotation2d();
+      case Reef2:
+        return new Rotation2d();
+      case Reef3:
+        return new Rotation2d();
+      case Reef4:
+        return new Rotation2d();
+      case Reef5:
+        return new Rotation2d();
+      case Reef6:
+        return new Rotation2d();
+      case Reef7:
+        return new Rotation2d();
+      case Reef8:
+        return new Rotation2d();
+      case Reef9:
+        return new Rotation2d();
+      case Reef10:
+        return new Rotation2d();
+      case Reef11:
+        return new Rotation2d();
+      default:
+        return new Rotation2d();
+    }
+  }
+
+  private DistanceToTag latestObservation;
+  private int observationAge;
+
+  /** take over goal speeds to align to reef exactly */
+  public void LineupWithReefLocation() {
+    int tagId = this.getTagIdForReef();
+    int cameraIndex = this.getCameraIndexForLineup();
+
+    if (tagId == -1 || cameraIndex == -1 || alignmentSupplier == null) {
+      // cancel lineup or whatever
+      this.setLiningUp(false);
+      return;
+    }
+
+    System.out.println(tagId);
+
+    DistanceToTag observation =
+        alignmentSupplier.get(
+            tagId,
+            cameraIndex,
+            this.getCrossTrackOffset(cameraIndex),
+            JsonConstants.drivetrainConstants.driveAlongTrackOffset);
+
+    if (!observation.isValid()) {
+      if (latestObservation != null && observationAge < 5) {
+        observation = latestObservation;
+        observationAge++;
+      } else {
+        return;
+      }
+    } else {
+      latestObservation = observation;
+      observationAge = 0;
+    }
+
+    Logger.recordOutput("Drive/Lineup/AlongTrackDistance", observation.alongTrackDistance());
+    Logger.recordOutput("Drive/Lineup/CrossTrackDistance", observation.crossTrackDistance());
+    Logger.recordOutput("Drive/Lineup/IsObservationValid", observation.isValid());
+
+    // give to PID Controllers and setGoalSpeeds (robotCentric)
+    double vx =
+        JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
+            * driveAlongTrackLineupController.calculate(observation.alongTrackDistance());
+    // ChassisSpeeds speeds = getChassisSpeeds();
+    // Pose2d pose = getPose();
+    // double velocityToTarget = (pose.getX() * speeds.vxMetersPerSecond + pose.getY() *
+    // speeds.vyMetersPerSecond) / Math.sqrt(pose.getX() * pose.getX() + pose.getY() * pose.getY());
+    // double velocityToTarget = -getChassisSpeeds().vxMetersPerSecond;
+    // Logger.recordOutput("Drive/Lineup/velocityToTarget", velocityToTarget);
+    // double vx =
+    //     -driveAlongTrackProfile.calculate(
+    //             0.02,
+    //             new State(observation.alongTrackDistance(), velocityToTarget),
+    //             new State(0, 0))
+    //         .velocity;
+    double vy = driveCrossTrackLineupController.calculate(observation.crossTrackDistance());
+    double omega =
+        rotationController.calculate(
+            this.getRotation().getRadians(), this.getRotationForReefSide().getRadians());
+
+    this.setGoalSpeeds(new ChassisSpeeds(vx, vy, omega), false);
   }
 
   /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
@@ -408,6 +873,7 @@ public class Drive implements DriveTemplate {
 
     // Log optimized setpoints (runSetpoint mutates each state)
     Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+    Logger.recordOutput("desired_location", desiredLocation);
   }
 
   /** Runs the drive in a straight line with the specified drive output. */
@@ -544,17 +1010,26 @@ public class Drive implements DriveTemplate {
   public static Translation2d[] getModuleTranslations() {
     return new Translation2d[] {
       new Translation2d(
-          JsonConstants.drivetrainConstants.FrontLeft.LocationX,
-          JsonConstants.drivetrainConstants.FrontLeft.LocationY),
+          DriveConfiguration.getInstance().FrontLeft.LocationX,
+          DriveConfiguration.getInstance().FrontLeft.LocationY),
       new Translation2d(
-          JsonConstants.drivetrainConstants.FrontRight.LocationX,
-          JsonConstants.drivetrainConstants.FrontRight.LocationY),
+          DriveConfiguration.getInstance().FrontRight.LocationX,
+          DriveConfiguration.getInstance().FrontRight.LocationY),
       new Translation2d(
-          JsonConstants.drivetrainConstants.BackLeft.LocationX,
-          JsonConstants.drivetrainConstants.BackLeft.LocationY),
+          DriveConfiguration.getInstance().BackLeft.LocationX,
+          DriveConfiguration.getInstance().BackLeft.LocationY),
       new Translation2d(
-          JsonConstants.drivetrainConstants.BackRight.LocationX,
-          JsonConstants.drivetrainConstants.BackRight.LocationY)
+          DriveConfiguration.getInstance().BackRight.LocationX,
+          DriveConfiguration.getInstance().BackRight.LocationY)
     };
+  }
+
+  @FunctionalInterface
+  public static interface VisionAlignment {
+    public DistanceToTag get(
+        int tagId,
+        int desiredCameraIndex,
+        double crossTrackOffsetMeters,
+        double alongTrackOffsetMeters);
   }
 }

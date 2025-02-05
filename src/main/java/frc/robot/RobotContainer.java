@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -16,7 +17,7 @@ import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem.ClimbAction;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -26,9 +27,14 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here
+<<<<<<< HEAD
   private ElevatorSubsystem elevatorSubsystem;
   private ClimbSubsystem climbSubsystem;
+=======
+  private ScoringSubsystem scoringSubsystem;
+>>>>>>> main
   private Drive drive;
+  private VisionLocalizer vision;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_buttonMasher = new CommandXboxController(2);
@@ -51,11 +57,17 @@ public class RobotContainer {
   }
 
   public void configureSubsystems() {
-    if (FeatureFlags.synced.getObject().runElevator) {
-      elevatorSubsystem = InitSubsystems.initElevatorSubsystem();
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem = InitSubsystems.initScoringSubsystem();
     }
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
+
+      if (FeatureFlags.synced.getObject().runVision) {
+        vision = InitSubsystems.initVisionSubsystem(drive);
+
+        drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
+      }
     }
     if (FeatureFlags.synced.getObject().runClimb) {
       climbSubsystem = InitSubsystems.initClimbSubsystem();
@@ -116,7 +128,6 @@ public class RobotContainer {
         CommandScheduler.getInstance()
             .schedule(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         break;
-
       default:
         break;
     }
@@ -124,12 +135,17 @@ public class RobotContainer {
 
   /** This method must be called from the robot, as it isn't called automatically. */
   public void testPeriodic() {
-    if (FeatureFlags.synced.getObject().runElevator) {
-      elevatorSubsystem.testPeriodic();
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem.testPeriodic();
+    }
+    if (FeatureFlags.synced.getObject().runDrive) {
+      drive.testPeriodic();
     }
   }
 
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    // Logger.recordOutput("feature_flags/drive", FeatureFlags.synced.getObject().runDrive);
+  }
 
   public void disabledInit() {
     CommandScheduler.getInstance().cancelAll();

@@ -5,16 +5,16 @@ import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
 import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 
-public final class OperatorConstants {
+public class ScoringFeatureFlags {
   @JSONExclude
-  public static final JSONSync<OperatorConstants> synced =
-      new JSONSync<OperatorConstants>(
-          new OperatorConstants(),
-          "OperatorConstants.json",
+  public static final JSONSync<ScoringFeatureFlags> synced =
+      new JSONSync<ScoringFeatureFlags>(
+          new ScoringFeatureFlags(),
+          "ScoringFeatureFlags.json",
           EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
-  public Integer kDriverControllerPort = 2;
-  public Integer kLeftJoystickPort = 0;
-  public Integer kRightJoystickPort = 1;
+  public final Boolean runElevator = true;
+  public final Boolean runClaw = true;
+  public final Boolean runWrist = true;
 }

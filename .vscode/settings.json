@@ -33,7 +33,7 @@
   "spotlessGradle.diagnostics.enable": false,
   "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle",
   "[json]": {
-    "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle"
+    "editor.defaultFormatter": "vscode.json-language-features"
   },
   "[java]": {
     "editor.defaultFormatter": "richardwillis.vscode-spotless-gradle"
@@ -68,5 +68,9 @@
     "edu.wpi.first.math.**.proto.*",
     "edu.wpi.first.math.**.struct.*",
     null
+  ],
+  "java.compile.nullAnalysis.mode": "automatic",
+  "cSpell.words": [
+    "Intaking"
   ]
 }
