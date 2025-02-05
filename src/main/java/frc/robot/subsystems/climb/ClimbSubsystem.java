@@ -81,7 +81,8 @@ public class ClimbSubsystem extends SubsystemBase {
         .configure(ClimbState.LIFTING)
         .permit(ClimbAction.NONE, ClimbState.IDLE);
 
-    climbMachine = new StateMachine(climbMachineConfiguration, ClimbAction.NONE);
+    climbMachine =
+        new StateMachine<ClimbState, ClimbAction>(climbMachineConfiguration, ClimbState.IDLE);
   }
 
   public void fireTrigger(ClimbAction action) {
@@ -110,6 +111,7 @@ public class ClimbSubsystem extends SubsystemBase {
     io.updateInputs(inputs);
     io.applyOutputs(outputs);
 
+    System.out.println(climbMachine.getCurrentState());
     Logger.processInputs("climb/inputs", inputs);
     Logger.processInputs("climb/outputs", outputs);
     Logger.recordOutput("climb/Action", currentAction);
