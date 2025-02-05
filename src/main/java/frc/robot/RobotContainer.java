@@ -18,6 +18,7 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem.ClimbAction;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import coppercore.vision.VisionLocalizer;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -27,12 +28,8 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here
-<<<<<<< HEAD
-  private ElevatorSubsystem elevatorSubsystem;
   private ClimbSubsystem climbSubsystem;
-=======
   private ScoringSubsystem scoringSubsystem;
->>>>>>> main
   private Drive drive;
   private VisionLocalizer vision;
 
