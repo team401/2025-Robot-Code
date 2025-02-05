@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DriveTrigger;
 
 public class OTFState implements PeriodicStateInterface {
   private Drive drive;
@@ -28,6 +29,9 @@ public class OTFState implements PeriodicStateInterface {
   public void onEntry(Transition transition) {
     PathfindingCommand.warmupCommand().cancel();
     driveToPose = this.getDriveToPoseCommand();
+    if(driveToPose == null) {
+      drive.fireTrigger(DriveTrigger.CancelOTF);
+    }
     this.driveToPose.schedule();
   }
 

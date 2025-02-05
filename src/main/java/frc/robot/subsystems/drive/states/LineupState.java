@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.drive.Drive.VisionAlignment;
 import org.littletonrobotics.junction.Logger;
 
@@ -212,7 +213,8 @@ public class LineupState implements PeriodicStateInterface {
     int cameraIndex = this.getCameraIndexForLineup();
 
     if (tagId == -1 || cameraIndex == -1 || alignmentSupplier == null) {
-      // switch back to another state?
+      // TODO: check if this might be false first time, but on another loop true
+      drive.fireTrigger(DriveTrigger.CancelLineup);
       return;
     }
 

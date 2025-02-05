@@ -494,6 +494,14 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * attempts to change state of state machine
+   * @param trigger trigger to give to state for transition
+   */
+  public void fireTrigger(DriveTrigger trigger) {
+    stateMachine.fire(trigger);
+  }
+
+  /**
    * checks if driver station alliance is red
    *
    * @return true if alliance is red
