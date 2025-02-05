@@ -29,7 +29,7 @@ public class OTFState implements PeriodicStateInterface {
   public void onEntry(Transition transition) {
     PathfindingCommand.warmupCommand().cancel();
     driveToPose = this.getDriveToPoseCommand();
-    if(driveToPose == null) {
+    if (driveToPose == null) {
       drive.fireTrigger(DriveTrigger.CancelOTF);
     }
     this.driveToPose.schedule();
@@ -90,5 +90,9 @@ public class OTFState implements PeriodicStateInterface {
     return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0);
   }
 
-  public void periodic() {}
+  public void periodic() {
+    if (drive.isDriveCloseToFinalLineupPose()) {
+      drive.fireTrigger(DriveTrigger.FinishOTF);
+    }
+  }
 }

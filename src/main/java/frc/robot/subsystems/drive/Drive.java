@@ -45,12 +45,14 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.constants.JsonConstants;
+import frc.robot.subsystems.drive.states.IdleState;
 import frc.robot.subsystems.drive.states.JoystickDrive;
 import frc.robot.subsystems.drive.states.LineupState;
 import frc.robot.subsystems.drive.states.OTFState;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -159,9 +161,12 @@ public class Drive implements DriveTemplate {
   private NetworkTable table = inst.getTable("");
   private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
 
+  private BooleanSupplier waitOnScore = () -> false;
+
   private static Drive instance;
 
   private enum DriveState implements StateContainer {
+    Idle(new IdleState(instance)),
     OTF(new OTFState(instance)),
     Lineup(new LineupState(instance)),
     Joystick(new JoystickDrive(instance));
@@ -185,6 +190,7 @@ public class Drive implements DriveTemplate {
     BeginLineup,
     CancelLineup,
     FinishLineup,
+    WaitForScore,
   }
 
   private StateMachineConfiguration<DriveState, DriveTrigger> stateMachineConfiguration;
@@ -276,7 +282,8 @@ public class Drive implements DriveTemplate {
     stateMachineConfiguration
         .configure(DriveState.Lineup)
         .permit(DriveTrigger.CancelLineup, DriveState.Joystick)
-        .permit(DriveTrigger.FinishLineup, DriveState.Joystick);
+        .permitIf(DriveTrigger.FinishLineup, DriveState.Idle, () -> this.isWaitingOnScore())
+        .permitIf(DriveTrigger.FinishLineup, DriveState.Joystick, () -> !this.isWaitingOnScore());
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, DriveState.Joystick);
   }
@@ -378,6 +385,25 @@ public class Drive implements DriveTemplate {
       Logger.recordOutput("Drive/DesiredRobotCentricSpeeds", speeds);
       this.goalSpeeds = speeds;
     }
+  }
+
+  /**
+   * set supplier that interfaces with scoring used to make drive set 0 speeds once lined up (so no
+   * error movement occurs)
+   *
+   * @param waitOnScore BooleanSupplier to let drive know if scoring is done scoring
+   */
+  public void setWaitOnScoreSupplier(BooleanSupplier waitOnScore) {
+    this.waitOnScore = waitOnScore;
+  }
+
+  /**
+   * checks if drive needs to wait on scoring subsystem
+   *
+   * @return true if drive is waiting
+   */
+  public boolean isWaitingOnScore() {
+    return waitOnScore.getAsBoolean();
   }
 
   /**
@@ -495,6 +521,7 @@ public class Drive implements DriveTemplate {
 
   /**
    * attempts to change state of state machine
+   *
    * @param trigger trigger to give to state for transition
    */
   public void fireTrigger(DriveTrigger trigger) {

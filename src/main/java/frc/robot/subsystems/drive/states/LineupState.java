@@ -91,11 +91,20 @@ public class LineupState implements PeriodicStateInterface {
     // cancel rotation lock on center
   }
 
+  public boolean lineupFinished() {
+    return latestObservation.alongTrackDistance() < 0.01
+        && latestObservation.crossTrackDistance() < 0.01;
+  }
+
   public void periodic() {
-    if(DriverStation.isTest()) {
+    if (DriverStation.isTest()) {
       this.testPeriodic();
     }
     this.LineupWithReefLocation();
+
+    if (lineupFinished()) {
+      drive.fireTrigger(DriveTrigger.FinishLineup);
+    }
   }
 
   /**
