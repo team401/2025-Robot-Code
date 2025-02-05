@@ -25,7 +25,7 @@
     "y": 5.5
   },
   "redReef45Rotation": {
-    "radians": 2.0943951023931953
+    "radians": -2.0943951023931953
   },
   "redReef67Translation": {
     "x": 14.7,
@@ -39,7 +39,7 @@
     "y": 2.5
   },
   "redReef89Rotation": {
-    "radians": -2.0943951023931953
+    "radians": 2.0943951023931953
   },
   "redReef1011Translation": {
     "x": 12.2,

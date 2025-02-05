@@ -844,29 +844,35 @@ public class Drive implements DriveTemplate {
   public Rotation2d getRotationForReefSide() {
     switch (desiredLocation) {
       case Reef0:
-        return new Rotation2d();
       case Reef1:
-        return new Rotation2d();
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef01Rotation
+            : JsonConstants.blueFieldLocations.blueReef01Rotation;
       case Reef2:
-        return new Rotation2d();
       case Reef3:
-        return new Rotation2d();
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef23Rotation
+            : JsonConstants.blueFieldLocations.blueReef23Rotation;
       case Reef4:
-        return new Rotation2d();
       case Reef5:
-        return new Rotation2d();
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef45Rotation
+            : JsonConstants.blueFieldLocations.blueReef45Rotation;
       case Reef6:
-        return new Rotation2d();
       case Reef7:
-        return new Rotation2d();
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef67Rotation
+            : JsonConstants.blueFieldLocations.blueReef67Rotation;
       case Reef8:
-        return new Rotation2d();
       case Reef9:
-        return new Rotation2d();
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef89Rotation
+            : JsonConstants.blueFieldLocations.blueReef89Rotation;
       case Reef10:
-        return new Rotation2d();
       case Reef11:
-        return new Rotation2d();
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef1011Rotation
+            : JsonConstants.blueFieldLocations.blueReef1011Rotation;
       default:
         return new Rotation2d();
     }
