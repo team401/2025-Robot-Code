@@ -22,6 +22,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class ScoringSubsystem extends SubsystemBase {
   private ElevatorMechanism elevatorMechanism;
+  private WristMechanism wristMechanism;
   private ClawMechanism clawMechanism;
 
   // Keep track of an instance to pass to state machine
@@ -97,8 +98,12 @@ public class ScoringSubsystem extends SubsystemBase {
 
   private StateMachine<ScoringState, ScoringTrigger> stateMachine;
 
-  public ScoringSubsystem(ElevatorMechanism elevatorMechanism, ClawMechanism clawMechanism) {
+  public ScoringSubsystem(
+      ElevatorMechanism elevatorMechanism,
+      WristMechanism wristMechanism,
+      ClawMechanism clawMechanism) {
     this.elevatorMechanism = elevatorMechanism;
+    this.wristMechanism = wristMechanism;
     this.clawMechanism = clawMechanism;
 
     setDefaultCommand(new ExampleElevatorCommand(this));
@@ -289,6 +294,10 @@ public class ScoringSubsystem extends SubsystemBase {
       elevatorMechanism.periodic();
     }
 
+    if (JsonConstants.scoringFeatureFlags.runWrist) {
+      wristMechanism.periodic();
+    }
+
     if (JsonConstants.scoringFeatureFlags.runClaw) {
       clawMechanism.periodic();
     }
@@ -300,6 +309,10 @@ public class ScoringSubsystem extends SubsystemBase {
   public void testPeriodic() {
     if (JsonConstants.scoringFeatureFlags.runElevator) {
       elevatorMechanism.testPeriodic();
+    }
+
+    if (JsonConstants.scoringFeatureFlags.runWrist) {
+      wristMechanism.testPeriodic();
     }
 
     if (JsonConstants.scoringFeatureFlags.runClaw) {

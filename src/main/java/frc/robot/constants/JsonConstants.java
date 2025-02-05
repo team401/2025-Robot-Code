@@ -15,6 +15,7 @@ public class JsonConstants {
     ClawConstants.synced.loadData();
     ClawConstants.Sim.synced.loadData();
     WristConstants.synced.loadData();
+    WristConstants.Sim.synced.loadData();
     ScoringFeatureFlags.synced.loadData();
     ScoringSetpoints.synced.loadData();
     RedFieldLocations.synced.loadData();
@@ -22,9 +23,10 @@ public class JsonConstants {
     drivetrainConstants = DrivetrainConstants.synced.getObject();
     elevatorConstants = ElevatorConstants.synced.getObject();
     elevatorConstantsSim = ElevatorConstants.Sim.synced.getObject();
+    wristConstants = WristConstants.synced.getObject();
+    wristConstantsSim = WristConstants.Sim.synced.getObject();
     clawConstants = ClawConstants.synced.getObject();
     clawConstantsSim = ClawConstants.Sim.synced.getObject();
-    wristConstants = WristConstants.synced.getObject();
     scoringFeatureFlags = ScoringFeatureFlags.synced.getObject();
     scoringSetpoints = ScoringSetpoints.synced.getObject();
     redFieldLocations = RedFieldLocations.synced.getObject();
@@ -33,9 +35,10 @@ public class JsonConstants {
   public static DrivetrainConstants drivetrainConstants;
   public static ElevatorConstants elevatorConstants;
   public static ElevatorConstants.Sim elevatorConstantsSim;
+  public static WristConstants wristConstants;
+  public static WristConstants.Sim wristConstantsSim;
   public static ClawConstants clawConstants;
   public static ClawConstants.Sim clawConstantsSim;
-  public static WristConstants wristConstants;
   public static ScoringFeatureFlags scoringFeatureFlags;
   public static ScoringSetpoints scoringSetpoints;
   public static RedFieldLocations redFieldLocations;

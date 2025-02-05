@@ -1,6 +1,8 @@
 package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.KilogramSquareMeters;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
@@ -14,6 +16,9 @@ import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.MomentOfInertia;
+import edu.wpi.first.wpilibj.Filesystem;
 
 public class WristConstants {
   @JSONExclude
@@ -35,7 +40,9 @@ public class WristConstants {
    */
   public final Double sensorToMechanismRatio = 1.0; // TODO: Actual value
 
-  public final Double rotorToSensorRatio = 20.0; // TODO: Actual value
+  public final Double wristReduction = 20.0;
+
+  @JSONExclude public final Double rotorToSensorRatio = wristReduction;
 
   public final InvertedValue wristMotorInvertedValue = InvertedValue.Clockwise_Positive;
 
@@ -56,8 +63,13 @@ public class WristConstants {
   public final Double wristKI = 0.0;
   public final Double wristKD = 0.0;
 
+  // This value is a a Double because RotationsPerSecond doesn't serialize properly with JSONSync
+  public final Double wristMotionMagicCruiseVelocityRotationsPerSecond = 0.1;
+
+  @JSONExclude
   public final AngularVelocity wristMotionMagicCruiseVelocity =
-      RotationsPerSecond.of(0.1); // TODO: Tune this!
+      RotationsPerSecond.of(wristMotionMagicCruiseVelocityRotationsPerSecond); // TODO: Tune this!
+
   public final Double wristMotionMagicExpo_kA = 6.0; //
   public final Double wristMotionMagicExpo_kV = 6.0; //
 
@@ -66,4 +78,35 @@ public class WristConstants {
   public final Angle wristCANcoderMagnetOffset = Rotations.of(0.0); // TODO: Tune this value
   public final SensorDirectionValue wristCANcoderSensorDirection =
       SensorDirectionValue.CounterClockwise_Positive;
+
+  // These clamps are the default clamps for the wrist, as well as limiting the moving clamps of the
+  // wrist themselves.
+  public final Angle wristMinMinAngle = Rotations.of(-0.75);
+  public final Angle wristMaxMaxAngle = Rotations.of(0.25);
+
+  public static final class Sim {
+    @JSONExclude
+    public static final JSONSync<WristConstants.Sim> synced =
+        new JSONSync<WristConstants.Sim>(
+            new WristConstants.Sim(),
+            Filesystem.getDeployDirectory() // Don't use environment handler for sim constants
+                .toPath()
+                .resolve("constants/WristConstants.Sim.json")
+                .toString(),
+            new JSONSyncConfigBuilder().build());
+
+    // This value is a Double because MomentOfInertia units don't serialize properly with JSONSync
+    public final Double wristMomentOfInertiaKgM2 = 0.229;
+
+    @JSONExclude
+    public final MomentOfInertia wristMomentOfInertia =
+        KilogramSquareMeters.of(wristMomentOfInertiaKgM2);
+
+    public final Distance wristArmLength = Meters.of(0.5);
+
+    public final Angle wristMinAngle = Rotations.of(-0.80);
+    public final Angle wristMaxAngle = Rotations.of(0.30);
+
+    public final Angle wristStartingAngle = Rotations.of(0.0);
+  }
 }

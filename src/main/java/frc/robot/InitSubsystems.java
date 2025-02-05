@@ -16,15 +16,23 @@ import frc.robot.subsystems.scoring.ElevatorIOSim;
 import frc.robot.subsystems.scoring.ElevatorIOTalonFX;
 import frc.robot.subsystems.scoring.ElevatorMechanism;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.WristIOSim;
+import frc.robot.subsystems.scoring.WristIOTalonFX;
+import frc.robot.subsystems.scoring.WristMechanism;
 
 public final class InitSubsystems {
   public static ScoringSubsystem initScoringSubsystem() {
     ElevatorMechanism elevatorMechanism = null;
+    WristMechanism wristMechanism = null;
     ClawMechanism clawMechanism = null;
+
     switch (ModeConstants.currentMode) {
       case REAL:
         if (JsonConstants.scoringFeatureFlags.runElevator) {
           elevatorMechanism = new ElevatorMechanism(new ElevatorIOTalonFX());
+        }
+        if (JsonConstants.scoringFeatureFlags.runWrist) {
+          wristMechanism = new WristMechanism(new WristIOTalonFX());
         }
         if (JsonConstants.scoringFeatureFlags.runClaw) {
           clawMechanism = new ClawMechanism(new ClawIOTalonFX());
@@ -33,6 +41,9 @@ public final class InitSubsystems {
       case SIM:
         if (JsonConstants.scoringFeatureFlags.runElevator) {
           elevatorMechanism = new ElevatorMechanism(new ElevatorIOSim());
+        }
+        if (JsonConstants.scoringFeatureFlags.runWrist) {
+          wristMechanism = new WristMechanism(new WristIOSim());
         }
         if (JsonConstants.scoringFeatureFlags.runClaw) {
           clawMechanism = new ClawMechanism(new ClawIOSim());
@@ -44,7 +55,8 @@ public final class InitSubsystems {
         throw new UnsupportedOperationException(
             "Non-exhaustive list of mode types supported in InitSubsystems");
     }
-    return new ScoringSubsystem(elevatorMechanism, clawMechanism);
+
+    return new ScoringSubsystem(elevatorMechanism, wristMechanism, clawMechanism);
   }
 
   public static Drive initDriveSubsystem() {

@@ -11,6 +11,7 @@ import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutCurrent;
@@ -43,7 +44,7 @@ public interface WristIO {
      * doesn't use a unit for this value (as it can be a Voltage or a Current depending on whether
      * or not FOC is used).
      */
-    public double wristClosedLoopOutput = 0.0;
+    public double wristOutput = 0.0;
   }
 
   /**
@@ -94,4 +95,22 @@ public interface WristIO {
 
   /** Set whether or not the wrist motor should be disabled. */
   public default void setMotorsDisabled(boolean disabled) {}
+
+  /**
+   * Sets whether or not the wrist is in 'override' mode
+   *
+   * @param override True if override, false if normal. This value defaults/is initialized to false
+   *     until changed
+   */
+  public default void setOverrideMode(boolean override) {}
+
+  /**
+   * Set the current to apply in override mode.
+   *
+   * <p>This is a current because the wrist uses TorqueCurrentFOC for control instead of voltage.
+   *
+   * @param current The current to apply. This will only be applied after setOverrideMode(true) is
+   *     called.
+   */
+  public default void setOverrideCurrent(Current current) {}
 }

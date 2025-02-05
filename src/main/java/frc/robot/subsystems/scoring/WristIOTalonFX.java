@@ -1,5 +1,6 @@
 package frc.robot.subsystems.scoring;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
@@ -12,23 +13,27 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.Per;
 import frc.robot.constants.JsonConstants;
 
 public class WristIOTalonFX implements WristIO {
-  private TalonFX wristMotor = new TalonFX(JsonConstants.wristConstants.wristMotorId);
-  private CANcoder wristCANcoder = new CANcoder(JsonConstants.wristConstants.wristCANcoderId);
+  TalonFX wristMotor = new TalonFX(JsonConstants.wristConstants.wristMotorId);
+  CANcoder wristCANcoder = new CANcoder(JsonConstants.wristConstants.wristCANcoderId);
 
   // Keep track of talonFX configs and only update FF/PID when necessary to avoid unnecessary object
   // creation
@@ -40,6 +45,9 @@ public class WristIOTalonFX implements WristIO {
       new MotionMagicExpoTorqueCurrentFOC(wristGoalPosition);
 
   private boolean motorsDisabled = false;
+
+  private boolean isOverriding = false;
+  private MutCurrent overrideCurrent = Amps.mutable(0.0);
 
   public WristIOTalonFX() {
     talonFXConfigs =
@@ -71,7 +79,8 @@ public class WristIOTalonFX implements WristIO {
                     .withKA(JsonConstants.wristConstants.wristKA)
                     .withKP(JsonConstants.wristConstants.wristKP)
                     .withKI(JsonConstants.wristConstants.wristKI)
-                    .withKD(JsonConstants.wristConstants.wristKD))
+                    .withKD(JsonConstants.wristConstants.wristKD)
+                    .withGravityType(GravityTypeValue.Arm_Cosine))
             .withMotionMagic(
                 new MotionMagicConfigs()
                     .withMotionMagicCruiseVelocity(
@@ -107,13 +116,18 @@ public class WristIOTalonFX implements WristIO {
   public void applyOutputs(WristOutputs outputs) {
     if (motorsDisabled) {
       wristMotor.setControl(new VoltageOut(0.0));
+      outputs.wristOutput = 0.0;
+
+      return;
+    } else if (isOverriding) {
+      wristMotor.setControl(new TorqueCurrentFOC(overrideCurrent));
+      outputs.wristOutput = overrideCurrent.in(Amps);
 
       return;
     }
 
     wristMotor.setControl(request.withPosition(wristGoalPosition));
-
-    outputs.wristClosedLoopOutput = wristMotor.getClosedLoopOutput().getValue();
+    outputs.wristOutput = wristMotor.getClosedLoopOutput().getValue();
   }
 
   public void setWristGoalPos(Angle goalPos) {
@@ -168,5 +182,13 @@ public class WristIOTalonFX implements WristIO {
 
   public void setMotorsDisabled(boolean disabled) {
     motorsDisabled = disabled;
+  }
+
+  public void setOverrideMode(boolean override) {
+    isOverriding = override;
+  }
+
+  public void setOverrideCurrent(Current current) {
+    overrideCurrent.mut_replace(current);
   }
 }
