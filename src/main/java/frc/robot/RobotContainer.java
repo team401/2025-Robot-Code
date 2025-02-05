@@ -18,7 +18,6 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem.ClimbAction;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
-import coppercore.vision.VisionLocalizer;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
