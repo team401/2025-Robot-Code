@@ -21,8 +21,6 @@ public class JsonConstants {
     ClawConstants.Sim.synced.loadData();
     ScoringFeatureFlags.synced.loadData();
     ScoringSetpoints.synced.loadData();
-    RedFieldLocations.synced.saveData();
-    BlueFieldLocations.synced.saveData();
     RedFieldLocations.synced.loadData();
     BlueFieldLocations.synced.loadData();
     DrivetrainConstants.synced.loadData();

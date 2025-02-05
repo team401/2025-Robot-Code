@@ -711,21 +711,21 @@ public class Drive implements DriveTemplate {
                 JsonConstants.blueFieldLocations.blueReef1011Translation,
                 JsonConstants.blueFieldLocations.blueReef1011Rotation);
       case CoralStationRight:
-      return isAllianceRed()
-      ? new Pose2d(
-          JsonConstants.redFieldLocations.redCoralStationRightTranslation,
-          JsonConstants.redFieldLocations.redCoralStationRightRotation)
-      : new Pose2d(
-          JsonConstants.blueFieldLocations.blueCoralStationRightTranslation,
-          JsonConstants.blueFieldLocations.blueCoralStationRightRotation);
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redCoralStationRightTranslation,
+                JsonConstants.redFieldLocations.redCoralStationRightRotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueCoralStationRightTranslation,
+                JsonConstants.blueFieldLocations.blueCoralStationRightRotation);
       case CoralStationLeft:
-      return isAllianceRed()
-      ? new Pose2d(
-          JsonConstants.redFieldLocations.redCoralStationLeftTranslation,
-          JsonConstants.redFieldLocations.redCoralStationLeftRotation)
-      : new Pose2d(
-          JsonConstants.blueFieldLocations.blueCoralStationLeftTranslation,
-          JsonConstants.blueFieldLocations.blueCoralStationLeftRotation);
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redCoralStationLeftTranslation,
+                JsonConstants.redFieldLocations.redCoralStationLeftRotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueCoralStationLeftTranslation,
+                JsonConstants.blueFieldLocations.blueCoralStationLeftRotation);
       default:
         this.setOTF(false);
         return null;
@@ -773,7 +773,6 @@ public class Drive implements DriveTemplate {
     boolean allianceRed = this.isAllianceRed();
     switch (desiredLocation) {
       case Reef0:
-        return 7;
       case Reef1:
         return allianceRed ? 10 : 21;
       case Reef2:

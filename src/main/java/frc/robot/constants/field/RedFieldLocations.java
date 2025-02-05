@@ -27,7 +27,7 @@ public class RedFieldLocations {
   public Rotation2d redReef23Rotation = new Rotation2d(Math.toRadians(-60));
 
   public Translation2d redReef45Translation = new Translation2d(14, 5.5);
-  public Rotation2d redReef45Rotation = new Rotation2d(Math.toRadians(120));
+  public Rotation2d redReef45Rotation = new Rotation2d(Math.toRadians(60));
 
   public Translation2d redReef67Translation = new Translation2d(14.7, 4);
   public Rotation2d redReef67Rotation = new Rotation2d(Math.toRadians(180));
