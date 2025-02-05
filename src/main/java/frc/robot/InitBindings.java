@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.drive.DesiredLocationSelector;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.DrivetrainConstants;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
+import frc.robot.subsystems.drive.DrivetrainConstants;
 
 public final class InitBindings {
   // Controller

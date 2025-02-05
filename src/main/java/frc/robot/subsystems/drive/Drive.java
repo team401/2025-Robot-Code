@@ -261,8 +261,14 @@ public class Drive implements DriveTemplate {
 
     stateMachineConfiguration
         .configure(DriveState.Joystick)
-        .permitIf(DriveTrigger.BeginAutoAlignment, DriveState.OTF, () -> !this.isDriveCloseToFinalLineupPose())
-        .permitIf(DriveTrigger.BeginAutoAlignment, DriveState.Lineup, () -> this.isDriveCloseToFinalLineupPose() && this.isDesiredLocationReef());
+        .permitIf(
+            DriveTrigger.BeginAutoAlignment,
+            DriveState.OTF,
+            () -> !this.isDriveCloseToFinalLineupPose())
+        .permitIf(
+            DriveTrigger.BeginAutoAlignment,
+            DriveState.Lineup,
+            () -> this.isDriveCloseToFinalLineupPose() && this.isDesiredLocationReef());
 
     stateMachineConfiguration
         .configure(DriveState.OTF)
@@ -303,6 +309,8 @@ public class Drive implements DriveTemplate {
         module.stop();
       }
     }
+
+    stateMachine.periodic();
 
     // Log empty setpoint states when disabled
     if (DriverStation.isDisabled()) {

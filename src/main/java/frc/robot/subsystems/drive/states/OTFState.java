@@ -3,6 +3,8 @@ package frc.robot.subsystems.drive.states;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.path.PathConstraints;
@@ -31,9 +33,6 @@ public class OTFState implements PeriodicStateInterface {
   public void onEntry(Transition transition) {
     PathfindingCommand.warmupCommand().cancel();
 
-    if(driveToPose != null) {
-      driveToPose.cancel();
-    }
     driveToPose = this.getDriveToPoseCommand();
     if (driveToPose == null) {
       drive.fireTrigger(DriveTrigger.CancelOTF);
@@ -98,7 +97,7 @@ public class OTFState implements PeriodicStateInterface {
 
   public void periodic() {
     // checks if location has changed (so path can be rescheduled)
-    if(otfPose.equals(findOTFPoseFromDesiredLocation(drive))) {
+    if (otfPose == null || otfPose.equals(findOTFPoseFromDesiredLocation(drive))) {
       this.onEntry(null);
     }
 
