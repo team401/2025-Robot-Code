@@ -11,6 +11,10 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import coppercore.controls.state_machine.StateMachine;
+import coppercore.controls.state_machine.StateMachineConfiguration;
+import coppercore.controls.state_machine.state.PeriodicStateInterface;
+import coppercore.controls.state_machine.state.StateContainer;
 import coppercore.vision.VisionLocalizer.DistanceToTag;
 import coppercore.wpilib_interface.DriveTemplate;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -41,6 +45,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import frc.robot.constants.JsonConstants;
+import frc.robot.subsystems.drive.states.JoystickDrive;
+import frc.robot.subsystems.drive.states.LineupState;
 import frc.robot.subsystems.drive.states.OTFState;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
@@ -153,6 +159,38 @@ public class Drive implements DriveTemplate {
   private NetworkTable table = inst.getTable("");
   private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
 
+  private static Drive instance;
+
+  private enum DriveState implements StateContainer {
+    OTF(new OTFState(instance)),
+    Lineup(new LineupState(instance)),
+    Joystick(new JoystickDrive(instance));
+    private final PeriodicStateInterface state;
+
+    DriveState(PeriodicStateInterface state) {
+      this.state = state;
+    }
+
+    @Override
+    public PeriodicStateInterface getState() {
+      return state;
+    }
+  }
+
+  public enum DriveTrigger {
+    ManualJoysticks,
+    BeginOTF,
+    FinishOTF,
+    CancelOTF,
+    BeginLineup,
+    CancelLineup,
+    FinishLineup,
+  }
+
+  private StateMachineConfiguration<DriveState, DriveTrigger> stateMachineConfiguration;
+
+  private StateMachine<DriveState, DriveTrigger> stateMachine;
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -206,6 +244,41 @@ public class Drive implements DriveTemplate {
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+
+    configureStates();
+  }
+
+  public void configureStates() {
+    instance = this;
+
+    stateMachineConfiguration = new StateMachineConfiguration<>();
+
+    stateMachineConfiguration
+        .configure(DriveState.Joystick)
+        .permit(DriveTrigger.BeginOTF, DriveState.OTF);
+
+    stateMachineConfiguration
+        .configure(DriveState.OTF)
+        .permit(DriveTrigger.CancelOTF, DriveState.Joystick)
+        .permitIf(
+            DriveTrigger.FinishOTF,
+            DriveState.Joystick,
+            () -> this.isDriveCloseToFinalLineupPose() && !this.isDesiredLocationReef())
+        .permitIf(
+            DriveTrigger.FinishOTF,
+            DriveState.Lineup,
+            () -> this.isDriveCloseToFinalLineupPose() && (this.isDesiredLocationReef()))
+        .permitIf(
+            DriveTrigger.BeginLineup,
+            DriveState.Lineup,
+            () -> this.isDriveCloseToFinalLineupPose() && this.isDesiredLocationReef());
+
+    stateMachineConfiguration
+        .configure(DriveState.Lineup)
+        .permit(DriveTrigger.CancelLineup, DriveState.Joystick)
+        .permit(DriveTrigger.FinishLineup, DriveState.Joystick);
+
+    stateMachine = new StateMachine<>(stateMachineConfiguration, DriveState.Joystick);
   }
 
   @Override

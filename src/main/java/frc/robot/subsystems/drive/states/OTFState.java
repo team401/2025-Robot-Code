@@ -4,14 +4,12 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.path.PathConstraints;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.DoubleSubscriber;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,10 +19,6 @@ import frc.robot.subsystems.drive.Drive;
 public class OTFState implements PeriodicStateInterface {
   private Drive drive;
 
-  private NetworkTableInstance inst = NetworkTableInstance.getDefault();
-  private NetworkTable table = inst.getTable("");
-  private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
-
   private Command driveToPose = null;
 
   public OTFState(Drive drive) {
@@ -32,6 +26,7 @@ public class OTFState implements PeriodicStateInterface {
   }
 
   public void onEntry(Transition transition) {
+    PathfindingCommand.warmupCommand().cancel();
     driveToPose = this.getDriveToPoseCommand();
     this.driveToPose.schedule();
   }
