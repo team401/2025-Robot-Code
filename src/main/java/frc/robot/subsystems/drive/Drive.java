@@ -184,10 +184,10 @@ public class Drive implements DriveTemplate {
 
   public enum DriveTrigger {
     ManualJoysticks,
-    BeginOTF,
+    BeginAutoAlignment,
+    CancelAutoAlignment,
     FinishOTF,
     CancelOTF,
-    BeginLineup,
     CancelLineup,
     FinishLineup,
     WaitForScore,
@@ -261,7 +261,8 @@ public class Drive implements DriveTemplate {
 
     stateMachineConfiguration
         .configure(DriveState.Joystick)
-        .permit(DriveTrigger.BeginOTF, DriveState.OTF);
+        .permitIf(DriveTrigger.BeginAutoAlignment, DriveState.OTF, () -> !this.isDriveCloseToFinalLineupPose())
+        .permitIf(DriveTrigger.BeginAutoAlignment, DriveState.Lineup, () -> this.isDriveCloseToFinalLineupPose() && this.isDesiredLocationReef());
 
     stateMachineConfiguration
         .configure(DriveState.OTF)
@@ -274,16 +275,14 @@ public class Drive implements DriveTemplate {
             DriveTrigger.FinishOTF,
             DriveState.Lineup,
             () -> this.isDriveCloseToFinalLineupPose() && (this.isDesiredLocationReef()))
-        .permitIf(
-            DriveTrigger.BeginLineup,
-            DriveState.Lineup,
-            () -> this.isDriveCloseToFinalLineupPose() && this.isDesiredLocationReef());
+        .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick);
 
     stateMachineConfiguration
         .configure(DriveState.Lineup)
         .permit(DriveTrigger.CancelLineup, DriveState.Joystick)
         .permitIf(DriveTrigger.FinishLineup, DriveState.Idle, () -> this.isWaitingOnScore())
-        .permitIf(DriveTrigger.FinishLineup, DriveState.Joystick, () -> !this.isWaitingOnScore());
+        .permitIf(DriveTrigger.FinishLineup, DriveState.Joystick, () -> !this.isWaitingOnScore())
+        .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick);
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, DriveState.Joystick);
   }
@@ -363,7 +362,7 @@ public class Drive implements DriveTemplate {
    *     control), false for auto (robot centric)
    */
   public void setGoalSpeeds(ChassisSpeeds speeds, boolean fieldCentric) {
-    if (fieldCentric) {
+    if (fieldCentric && stateMachine.inState(DriveState.Joystick)) {
       // Adjust for field-centric control
       boolean isFlipped =
           DriverStation.getAlliance().isPresent()
