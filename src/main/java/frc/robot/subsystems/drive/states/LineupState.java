@@ -9,6 +9,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.VisionAlignment;
@@ -89,6 +91,9 @@ public class LineupState implements PeriodicStateInterface {
   }
 
   public void periodic() {
+    if(DriverStation.isTest()) {
+      this.testPeriodic();
+    }
     this.LineupWithReefLocation();
   }
 
@@ -299,5 +304,38 @@ public class LineupState implements PeriodicStateInterface {
    */
   public void setAlignmentSupplier(VisionAlignment alignmentSupplier) {
     this.alignmentSupplier = alignmentSupplier;
+  }
+
+  public void testPeriodic() {
+    switch (TestModeManager.getTestMode()) {
+      case DriveLineupTuning:
+        LoggedTunableNumber.ifChanged(
+            hashCode(),
+            (pid) -> {
+              this.setAlongTrackPID(pid[0], pid[1], pid[2]);
+            },
+            alongTrackkP,
+            alongTrackkI,
+            alongTrackkD);
+        LoggedTunableNumber.ifChanged(
+            hashCode(),
+            (pid) -> {
+              this.setCrossTrackPID(pid[0], pid[1], pid[2]);
+            },
+            crossTrackkP,
+            crossTrackkI,
+            crossTrackkD);
+        LoggedTunableNumber.ifChanged(
+            hashCode(),
+            (pid) -> {
+              this.setRotationLineupPID(pid[0], pid[1], pid[2]);
+            },
+            rotationkP,
+            rotationkI,
+            rotationkD);
+        break;
+      default:
+        break;
+    }
   }
 }
