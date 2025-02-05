@@ -91,6 +91,10 @@ public class LineupState implements PeriodicStateInterface {
     // cancel rotation lock on center
   }
 
+  /**
+   * checks if lineup is within 0.01 of tag + offsets
+   * @return true if error is small enoguh
+   */
   public boolean lineupFinished() {
     return latestObservation.alongTrackDistance() < 0.01
         && latestObservation.crossTrackDistance() < 0.01;

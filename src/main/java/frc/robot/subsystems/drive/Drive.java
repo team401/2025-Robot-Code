@@ -311,12 +311,6 @@ public class Drive implements DriveTemplate {
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
 
-    if (isDriveCloseToFinalLineupPose() && isDriveOTF()) {
-      // transition to Lineup if at reef
-      // otherwise transitions to joystick state
-      stateMachine.fire(DriveTrigger.FinishOTF);
-    }
-
     // check for update from reef touchscreen
     this.updateDesiredLocationFromNetworkTables();
 
