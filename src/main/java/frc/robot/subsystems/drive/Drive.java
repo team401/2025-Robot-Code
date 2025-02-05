@@ -305,7 +305,9 @@ public class Drive implements DriveTemplate {
     }
 
     if (isDriveCloseToFinalLineupPose() && isDriveOTF()) {
-      // TODO: auto transition to LineupState?
+      // transition to Lineup if at reef
+      // otherwise transitions to joystick state
+      stateMachine.fire(DriveTrigger.FinishOTF);
     }
 
     // check for update from reef touchscreen
@@ -385,8 +387,7 @@ public class Drive implements DriveTemplate {
    */
   @AutoLogOutput(key = "Drive/OTF/isOTF")
   public boolean isDriveOTF() {
-    // TODO: check for state
-    return false;
+    return stateMachine.inState(DriveState.OTF);
   }
 
   /**
@@ -411,8 +412,7 @@ public class Drive implements DriveTemplate {
    */
   @AutoLogOutput(key = "Drive/Lineup/isLiningUp")
   public boolean isDriveLiningUp() {
-    // TODO: return state if lining up
-    return false;
+    return stateMachine.inState(DriveState.Lineup);
   }
 
   /**
