@@ -22,12 +22,18 @@ public class OTFState implements PeriodicStateInterface {
 
   private Command driveToPose = null;
 
+  private Pose2d otfPose = null;
+
   public OTFState(Drive drive) {
     this.drive = drive;
   }
 
   public void onEntry(Transition transition) {
     PathfindingCommand.warmupCommand().cancel();
+
+    if(driveToPose != null) {
+      driveToPose.cancel();
+    }
     driveToPose = this.getDriveToPoseCommand();
     if (driveToPose == null) {
       drive.fireTrigger(DriveTrigger.CancelOTF);
@@ -73,9 +79,9 @@ public class OTFState implements PeriodicStateInterface {
    * @return command that drive can schedule to follow the path found
    */
   public Command getDriveToPoseCommand() {
-    Pose2d targetPose = findOTFPoseFromDesiredLocation(drive);
+    otfPose = findOTFPoseFromDesiredLocation(drive);
 
-    if (targetPose == null) {
+    if (otfPose == null) {
       return null;
     }
 
@@ -87,10 +93,16 @@ public class OTFState implements PeriodicStateInterface {
             JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
             JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
 
-    return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0);
+    return AutoBuilder.pathfindToPose(otfPose, constraints, 0.0);
   }
 
   public void periodic() {
+    // checks if location has changed (so path can be rescheduled)
+    if(otfPose.equals(findOTFPoseFromDesiredLocation(drive))) {
+      this.onEntry(null);
+    }
+
+    // finishes otf when we are 0.1 meters away
     if (drive.isDriveCloseToFinalLineupPose()) {
       drive.fireTrigger(DriveTrigger.FinishOTF);
     }
