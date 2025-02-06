@@ -17,7 +17,7 @@ public class BlueFieldLocations {
               .toString(),
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
-  public Translation2d blueReefCenterTranslation = new Translation2d(176.75, (158.5));
+  public Translation2d blueReefCenterTranslation = new Translation2d(4.5,4);
   public Rotation2d blueReefCenterRotation = new Rotation2d();
 
   public Translation2d blueReef01Translation = new Translation2d(6.56, 4);
@@ -27,7 +27,7 @@ public class BlueFieldLocations {
   public Rotation2d blueReef23Rotation = new Rotation2d(Math.toRadians(120));
 
   public Translation2d blueReef45Translation = new Translation2d(3.5, 2.5);
-  public Rotation2d blueReef45Rotation = new Rotation2d(Math.toRadians(-120));
+  public Rotation2d blueReef45Rotation = new Rotation2d(Math.toRadians(60));
 
   public Translation2d blueReef67Translation = new Translation2d(2.64, 4);
   public Rotation2d blueReef67Rotation = new Rotation2d(Math.toRadians(0));
