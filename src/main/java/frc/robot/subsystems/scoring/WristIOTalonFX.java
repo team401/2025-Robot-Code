@@ -105,9 +105,14 @@ public class WristIOTalonFX implements WristIO {
 
   public void updateInputs(WristInputs inputs) {
     inputs.wristGoalPosition.mut_replace(wristGoalPosition);
+    inputs.wristSetpointPosition.mut_replace(
+        Rotations.of(wristMotor.getClosedLoopReference().getValue()));
 
     inputs.wristPosition.mut_replace(wristCANcoder.getPosition().getValue());
     inputs.wristVelocity.mut_replace(wristCANcoder.getVelocity().getValue());
+
+    inputs.wristTargetVelocity.mut_setMagnitude(
+        wristMotor.getClosedLoopReferenceSlope().getValue());
 
     inputs.wristSupplyCurrent.mut_replace(wristMotor.getSupplyCurrent().getValue());
     inputs.wristStatorCurrent.mut_replace(wristMotor.getStatorCurrent().getValue());

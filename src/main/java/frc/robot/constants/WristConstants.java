@@ -96,7 +96,7 @@ public class WristConstants {
             new JSONSyncConfigBuilder().build());
 
     // This value is a Double because MomentOfInertia units don't serialize properly with JSONSync
-    public final Double wristMomentOfInertiaKgM2 = 0.229;
+    public final Double wristMomentOfInertiaKgM2 = 0.0672304487;
 
     @JSONExclude
     public final MomentOfInertia wristMomentOfInertia =

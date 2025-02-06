@@ -73,6 +73,7 @@ public class WristIOSim extends WristIOTalonFX {
     updateSimState();
 
     wristSim.update(SimConstants.simDeltaTime.in(Seconds));
+
     super.updateInputs(inputs);
   }
 }

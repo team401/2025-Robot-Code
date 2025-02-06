@@ -1,7 +1,6 @@
 package frc.robot.subsystems.scoring;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Rotation;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
@@ -28,7 +27,13 @@ public interface WristIO {
     public MutAngularVelocity wristVelocity = RotationsPerSecond.mutable(0.0);
 
     /** Goal angle of the wrist, as seen by the wrist CANcoder */
-    public MutAngle wristGoalPosition = Rotation.mutable(0.0);
+    public MutAngle wristGoalPosition = Rotations.mutable(0.0);
+
+    /** The setpoint target position from Motion Magic Expo */
+    public MutAngle wristSetpointPosition = Rotations.mutable(0.0);
+
+    /** The target angular velocity of the wrist */
+    public MutAngularVelocity wristTargetVelocity = RotationsPerSecond.mutable(0.0);
 
     /** Supply current of the wrist motor */
     public MutCurrent wristSupplyCurrent = Amps.mutable(0.0);
