@@ -1,7 +1,6 @@
 package frc.robot.subsystems.drive.states;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.path.PathConstraints;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
@@ -23,8 +22,6 @@ public class OTFState implements PeriodicStateInterface {
   }
 
   public void onEntry(Transition transition) {
-    PathfindingCommand.warmupCommand().cancel();
-
     driveToPose = this.getDriveToPoseCommand();
     if (driveToPose == null) {
       drive.fireTrigger(DriveTrigger.CancelOTF);
@@ -33,8 +30,8 @@ public class OTFState implements PeriodicStateInterface {
   }
 
   public void onExit(Transition transition) {
+    otfPose = null;
     if (driveToPose != null) {
-      otfPose = null;
       this.driveToPose.cancel();
     }
   }
@@ -154,7 +151,6 @@ public class OTFState implements PeriodicStateInterface {
 
     // finishes otf when we are 0.1 meters away
     if (drive.isDriveCloseToFinalLineupPose()) {
-      this.onExit(null);
       drive.fireTrigger(DriveTrigger.FinishOTF);
     }
   }

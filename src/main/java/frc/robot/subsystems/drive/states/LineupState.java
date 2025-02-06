@@ -233,7 +233,7 @@ public class LineupState implements PeriodicStateInterface {
 
     if (tagId == -1 || cameraIndex == -1 || alignmentSupplier == null) {
       // TODO: check if this might be false first time, but on another loop true
-      drive.fireTrigger(DriveTrigger.CancelLineup);
+      // drive.fireTrigger(DriveTrigger.CancelLineup);
       return;
     }
 

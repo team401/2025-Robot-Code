@@ -282,7 +282,7 @@ public class Drive implements DriveTemplate {
         .permitIf(
             DriveTrigger.BeginAutoAlignment,
             DriveState.Lineup,
-            () -> this.isDriveCloseToFinalLineupPose() && this.isDesiredLocationReef());
+            () -> this.isDriveCloseToFinalLineupPose());
 
     stateMachineConfiguration
         .configure(DriveState.OTF)
@@ -294,7 +294,7 @@ public class Drive implements DriveTemplate {
         .permitIf(
             DriveTrigger.FinishOTF,
             DriveState.Lineup,
-            () -> this.isDriveCloseToFinalLineupPose() && (this.isDesiredLocationReef()))
+            () -> (this.isDriveCloseToFinalLineupPose() && this.isDesiredLocationReef()))
         .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick);
 
     stateMachineConfiguration
@@ -451,6 +451,7 @@ public class Drive implements DriveTemplate {
    *
    * @return true if robot pose is close to desired pose
    */
+  @AutoLogOutput(key = "Drive/OTF/isDriveCloseToFinalLineupPose")
   public boolean isDriveCloseToFinalLineupPose() {
     // relative to transforms first pose into distance from desired pose
     // then get distance between poses (if less than 0.1 meters we are good)
@@ -495,6 +496,7 @@ public class Drive implements DriveTemplate {
   /**
    * @return the desired location for otf and lineup
    */
+  @AutoLogOutput(key = "Drive//DesiredLocation")
   public DesiredLocation getDesiredLocation() {
     return this.desiredLocation;
   }
@@ -546,6 +548,8 @@ public class Drive implements DriveTemplate {
 
     if (isDriveOTF()) {
       // TODO: deal with state (re run on entry?)
+      stateMachine.fire(DriveTrigger.ManualJoysticks);
+      stateMachine.fire(DriveTrigger.BeginAutoAlignment);
     }
   }
 
