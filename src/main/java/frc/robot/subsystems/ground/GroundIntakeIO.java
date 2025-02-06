@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.MutVoltage;
@@ -13,31 +14,21 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface GroundIntakeIO {
   @AutoLog
-  public static class GroundIntake {
-    /**
-     * Whether or not the sensor detects a coral
-     *
-     * <p>This is left intentionally vague until we decide on CANrange vs. beam break vs. something
-     * else
-     */
-    boolean coralDetected = false;
-
-    /** Whether or not the sensor detects an algae */
-    boolean algaeDetected = false;
-
-    MutAngle clawMotorPos = Rotations.mutable(0.0);
-
-    /* Supply current of the claw motor */
-    MutCurrent clawSupplyCurrent = Amps.mutable(0.0);
-
-    /* Stator current of the claw motor */
-    MutCurrent clawStatorCurrent = Amps.mutable(0.0);
+  public static class GroundIntakeInputs {
+    
+    MutAngle shoulderMotorPos = Rotations.mutable(0.0);
+    MutAngle shoulderMotorGoalPos = Rotations.mutable(0.0);
+    MutCurrent shoulderMotorSupplyCurrent = Amps.mutable(0.0);
+    MutCurrent shoulderMotorStatorCurrent = Amps.mutable(0.0);
+    MutCurrent rollerMotorSupplyCurrent = Amps.mutable(0.0);
+    MutCurrent rollerMotorStatorCurrent = Amps.mutable(0.0);
   }
 
   @AutoLog
   public static class GroundIntakeOutputs {
     /** The voltage applied to the claw motor */
-    MutVoltage clawAppliedVolts = Volts.mutable(0.0);
+    MutVoltage rollerAppliedVolts = Volts.mutable(0.0);
+    MutCurrent shoulderAppliedCurrent = Amps.mutable(0.0);
   }
 
   /**
@@ -47,7 +38,7 @@ public interface GroundIntakeIO {
    *
    * @param inputs The ClawInputs to update with the latest information
    */
-  public default void updateInputs(GroundIntake inputs) {}
+  public default void updateInputs(GroundIntakeInputs inputs) {}
 
   /**
    * Applies requests to motors and updates a ClawOutputs object with information about motor
@@ -64,7 +55,11 @@ public interface GroundIntakeIO {
    *
    * @param volts The voltage to run the claw wheels at
    */
-  public default void setVoltage(Voltage volts) {}
+  public default void setRollerVoltage(Voltage volts) {}
+  public default void setShoulderTunerCurrent(Current amps) {}
+
+
+  public default void setShoulderGoalPosition(Angle goalAngle){}
 
   /**
    * Get the current position of the claw motor

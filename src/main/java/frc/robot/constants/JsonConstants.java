@@ -17,6 +17,7 @@ public class JsonConstants {
     ScoringFeatureFlags.synced.loadData();
     ScoringSetpoints.synced.loadData();
     RedFieldLocations.synced.loadData();
+    GroundIntakeConstants.synced.loadData();
 
     drivetrainConstants = DrivetrainConstants.synced.getObject();
     elevatorConstants = ElevatorConstants.synced.getObject();
@@ -26,6 +27,7 @@ public class JsonConstants {
     scoringFeatureFlags = ScoringFeatureFlags.synced.getObject();
     scoringSetpoints = ScoringSetpoints.synced.getObject();
     redFieldLocations = RedFieldLocations.synced.getObject();
+    groundIntakeConstants = GroundIntakeConstants.synced.getObject();
   }
 
   public static DrivetrainConstants drivetrainConstants;
@@ -36,4 +38,5 @@ public class JsonConstants {
   public static ScoringFeatureFlags scoringFeatureFlags;
   public static ScoringSetpoints scoringSetpoints;
   public static RedFieldLocations redFieldLocations;
+  public static GroundIntakeConstants groundIntakeConstants;
 }
