@@ -12,7 +12,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.MutCurrent;
-import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.units.measure.MutVoltage; 
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.ground.GroundIntakeIO.GroundIntakeInputs;
@@ -20,7 +20,7 @@ import frc.robot.subsystems.ground.GroundIntakeIO.GroundIntakeOutputs;
 import frc.robot.subsystems.scoring.ClawIO.ClawInputs;
 import frc.robot.subsystems.scoring.ClawIO.ClawOutputs;
 
-public class GroundIntakeIOTalonFX {
+public class GroundIntakeIOTalonFX implements GroundIntakeIO{
     TalonFX rollerMotor = new TalonFX(JsonConstants.groundIntakeConstants.rollerMotorID);
     TalonFX shoulderMotor = new TalonFX(JsonConstants.groundIntakeConstants.shoulderMotorID);
 
@@ -29,7 +29,7 @@ public class GroundIntakeIOTalonFX {
     private VoltageOut voltageRequest = new VoltageOut(outputVoltage);
     
 
-    public GroundIntakeTalonFX() {
+    public GroundIntakeIOTalonFX() {
         TalonFXConfiguration shoulderTalonFXConfigs =
         new TalonFXConfiguration()
             .withMotorOutput(
@@ -59,12 +59,13 @@ public class GroundIntakeIOTalonFX {
       rollerMotor.setNeutralMode(NeutralModeValue.Brake);
     }
 
-      public void updateInputs(GroundIntakeInputs inputs) {
+    public void updateInputs(GroundIntakeInputs inputs) {
 
     inputs.shoulderMotorPos.mut_replace(shoulderMotor.getPosition().getValue());
 
     inputs.shoulderMotorStatorCurrent.mut_replace(shoulderMotor.getStatorCurrent().getValue());
     inputs.shoulderMotorSupplyCurrent.mut_replace(shoulderMotor.getSupplyCurrent().getValue());
+
   }
 
   public void applyOutputs(GroundIntakeOutputs outputs) {
