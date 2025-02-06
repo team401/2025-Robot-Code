@@ -14,7 +14,6 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
-import frc.robot.subsystems.drive.DrivetrainConstants;
 
 public final class InitBindings {
   // Controller

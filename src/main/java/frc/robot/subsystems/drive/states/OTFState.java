@@ -1,19 +1,11 @@
 package frc.robot.subsystems.drive.states;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-
-import org.littletonrobotics.junction.Logger;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.path.PathConstraints;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -56,18 +48,76 @@ public class OTFState implements PeriodicStateInterface {
         // NOTE: pairs of reef sides (ie 0 and 1) will have the same otf pose (approximately 0.5-1
         // meter away from center of tag)
       case Reef0:
-        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
-            ? JsonConstants.redFieldLocations.reef0
-            : new Pose2d();
       case Reef1:
-        return new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180)));
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef01Translation,
+                JsonConstants.redFieldLocations.redReef01Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef01Translation,
+                JsonConstants.blueFieldLocations.blueReef01Rotation);
+      case Reef2:
+      case Reef3:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef23Translation,
+                JsonConstants.redFieldLocations.redReef23Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef23Translation,
+                JsonConstants.blueFieldLocations.blueReef23Rotation);
+      case Reef4:
+      case Reef5:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef45Translation,
+                JsonConstants.redFieldLocations.redReef45Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef45Translation,
+                JsonConstants.blueFieldLocations.blueReef45Rotation);
+      case Reef6:
+      case Reef7:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef67Translation,
+                JsonConstants.redFieldLocations.redReef67Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef67Translation,
+                JsonConstants.blueFieldLocations.blueReef67Rotation);
+      case Reef8:
+      case Reef9:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef89Translation,
+                JsonConstants.redFieldLocations.redReef89Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef89Translation,
+                JsonConstants.blueFieldLocations.blueReef89Rotation);
+      case Reef10:
+      case Reef11:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef1011Translation,
+                JsonConstants.redFieldLocations.redReef1011Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef1011Translation,
+                JsonConstants.blueFieldLocations.blueReef1011Rotation);
       case CoralStationRight:
-        return new Pose2d(16.0, 6.6, new Rotation2d(0.0));
-        // return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redCoralStationRightTranslation,
+                JsonConstants.redFieldLocations.redCoralStationRightRotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueCoralStationRightTranslation,
+                JsonConstants.blueFieldLocations.blueCoralStationRightRotation);
       case CoralStationLeft:
-        return new Pose2d(1.2, 7.0, Rotation2d.fromRadians(-1));
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redCoralStationLeftTranslation,
+                JsonConstants.redFieldLocations.redCoralStationLeftRotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueCoralStationLeftTranslation,
+                JsonConstants.blueFieldLocations.blueCoralStationLeftRotation);
       default:
-        // no location set, exit state?
         return null;
     }
   }
@@ -103,6 +153,7 @@ public class OTFState implements PeriodicStateInterface {
 
     // finishes otf when we are 0.1 meters away
     if (drive.isDriveCloseToFinalLineupPose()) {
+      this.onExit(null);
       drive.fireTrigger(DriveTrigger.FinishOTF);
     }
   }
