@@ -20,24 +20,24 @@ public interface ClawIO {
      * <p>This is left intentionally vague until we decide on CANrange vs. beam break vs. something
      * else
      */
-    boolean coralDetected = false;
+    public boolean coralDetected = false;
 
     /** Whether or not the sensor detects an algae */
-    boolean algaeDetected = false;
+    public boolean algaeDetected = false;
 
-    MutAngle clawMotorPos = Rotations.mutable(0.0);
+    public MutAngle clawMotorPos = Rotations.mutable(0.0);
 
     /* Supply current of the claw motor */
-    MutCurrent clawSupplyCurrent = Amps.mutable(0.0);
+    public MutCurrent clawSupplyCurrent = Amps.mutable(0.0);
 
     /* Stator current of the claw motor */
-    MutCurrent clawStatorCurrent = Amps.mutable(0.0);
+    public MutCurrent clawStatorCurrent = Amps.mutable(0.0);
   }
 
   @AutoLog
   public static class ClawOutputs {
     /** The voltage applied to the claw motor */
-    MutVoltage clawAppliedVolts = Volts.mutable(0.0);
+    public MutVoltage clawAppliedVolts = Volts.mutable(0.0);
   }
 
   /**

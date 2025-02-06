@@ -21,6 +21,11 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+<<<<<<< HEAD
+=======
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+>>>>>>> origin
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -119,6 +124,15 @@ public class Drive implements DriveTemplate {
 
   private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
 
+  public ProfiledPIDController angleController =
+      new ProfiledPIDController(
+          JsonConstants.drivetrainConstants.angleControllerKp,
+          JsonConstants.drivetrainConstants.angleControllerKi,
+          JsonConstants.drivetrainConstants.angleControllerKd,
+          new TrapezoidProfile.Constraints(
+              JsonConstants.drivetrainConstants.maxPIDVelocity,
+              JsonConstants.drivetrainConstants.maxPIDAcceleration));
+
   public enum DesiredLocation {
     Reef0,
     Reef1,
@@ -161,6 +175,7 @@ public class Drive implements DriveTemplate {
   private NetworkTable table = inst.getTable("");
   private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
 
+<<<<<<< HEAD
   private BooleanSupplier waitOnScore = () -> false;
 
   private static Drive instance;
@@ -196,6 +211,10 @@ public class Drive implements DriveTemplate {
   private StateMachineConfiguration<DriveState, DriveTrigger> stateMachineConfiguration;
 
   private StateMachine<DriveState, DriveTrigger> stateMachine;
+=======
+  private boolean isAligningToFieldElement = false;
+  private Translation2d lockedAlignPosition = new Translation2d();
+>>>>>>> origin
 
   public Drive(
       GyroIO gyroIO,
@@ -239,7 +258,7 @@ public class Drive implements DriveTemplate {
 
     // warm up java processing for faster pathfind later
     PathfindingCommand.warmupCommand().schedule();
-
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
     // Configure SysId
     sysId =
         new SysIdRoutine(
@@ -388,6 +407,20 @@ public class Drive implements DriveTemplate {
     }
   }
 
+  public void alignToFieldElement() {
+    if (isDesiredLocationReef()) {
+      lockedAlignPosition =
+          isAllianceRed()
+              ? JsonConstants.redFieldLocations.redReefCenterTranslation
+              : JsonConstants.blueFieldLocations.blueReefCenterTranslation;
+      isAligningToFieldElement = true;
+    }
+  }
+
+  public void disableAlign() {
+    isAligningToFieldElement = false;
+  }
+
   /**
    * set supplier that interfaces with scoring used to make drive set 0 speeds once lined up (so no
    * error movement occurs)
@@ -525,8 +558,112 @@ public class Drive implements DriveTemplate {
    *
    * @param trigger trigger to give to state for transition
    */
+<<<<<<< HEAD
   public void fireTrigger(DriveTrigger trigger) {
     stateMachine.fire(trigger);
+=======
+  public Pose2d findOTFPoseFromDesiredLocation() {
+    switch (this.desiredLocation) {
+        // NOTE: pairs of reef sides (ie 0 and 1) will have the same otf pose (approximately 0.5-1
+        // meter away from center of tag)
+      case Reef0:
+      case Reef1:
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef01Translation,
+                JsonConstants.redFieldLocations.redReef01Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef01Translation,
+                JsonConstants.blueFieldLocations.blueReef01Rotation);
+      case Reef2:
+      case Reef3:
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef23Translation,
+                JsonConstants.redFieldLocations.redReef23Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef23Translation,
+                JsonConstants.blueFieldLocations.blueReef23Rotation);
+      case Reef4:
+      case Reef5:
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef45Translation,
+                JsonConstants.redFieldLocations.redReef45Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef45Translation,
+                JsonConstants.blueFieldLocations.blueReef45Rotation);
+      case Reef6:
+      case Reef7:
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef67Translation,
+                JsonConstants.redFieldLocations.redReef67Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef67Translation,
+                JsonConstants.blueFieldLocations.blueReef67Rotation);
+      case Reef8:
+      case Reef9:
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef89Translation,
+                JsonConstants.redFieldLocations.redReef89Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef89Translation,
+                JsonConstants.blueFieldLocations.blueReef89Rotation);
+      case Reef10:
+      case Reef11:
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef1011Translation,
+                JsonConstants.redFieldLocations.redReef1011Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef1011Translation,
+                JsonConstants.blueFieldLocations.blueReef1011Rotation);
+      case CoralStationRight:
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redCoralStationRightTranslation,
+                JsonConstants.redFieldLocations.redCoralStationRightRotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueCoralStationRightTranslation,
+                JsonConstants.blueFieldLocations.blueCoralStationRightRotation);
+      case CoralStationLeft:
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redCoralStationLeftTranslation,
+                JsonConstants.redFieldLocations.redCoralStationLeftRotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueCoralStationLeftTranslation,
+                JsonConstants.blueFieldLocations.blueCoralStationLeftRotation);
+      default:
+        this.setOTF(false);
+        return null;
+    }
+  }
+
+  /**
+   * gets the path from current pose to the desired pose found from location
+   *
+   * @return command that drive can schedule to follow the path found
+   */
+  public Command getDriveToPoseCommand() {
+    Pose2d targetPose = findOTFPoseFromDesiredLocation();
+
+    if (targetPose == null) {
+      return null;
+    }
+
+    // Create the constraints to use while pathfinding
+    PathConstraints constraints =
+        new PathConstraints(
+            JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
+            JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
+            JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
+            JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
+
+    return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0);
+>>>>>>> origin
   }
 
   /**
@@ -538,8 +675,211 @@ public class Drive implements DriveTemplate {
     return DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Red);
   }
 
+<<<<<<< HEAD
+=======
+  /**
+   * gets tag to use for final alignment with vision
+   *
+   * @return int representing tag id to use
+   */
+  public int getTagIdForReef() {
+    boolean allianceRed = this.isAllianceRed();
+    switch (desiredLocation) {
+      case Reef0:
+      case Reef1:
+        return allianceRed ? 10 : 21;
+      case Reef2:
+      case Reef3:
+        return allianceRed ? 9 : 22;
+      case Reef4:
+      case Reef5:
+        return allianceRed ? 8 : 17;
+      case Reef6:
+      case Reef7:
+        return allianceRed ? 7 : 18;
+      case Reef8:
+      case Reef9:
+        return allianceRed ? 6 : 19;
+      case Reef10:
+      case Reef11:
+        return allianceRed ? 11 : 20;
+      default:
+        return -1;
+    }
+  }
+
+  /**
+   * gets cross track offset for lineup
+   *
+   * @param cameraIndex camera to check offset
+   * @return offset for camera
+   */
+  public Double getCrossTrackOffset(int cameraIndex) {
+    if (cameraIndex == 0) {
+      return JsonConstants.drivetrainConstants.driveCrossTrackFrontRightOffset;
+    }
+    return 0.0; // front left offset (not added)
+  }
+
+  /**
+   * gets camera index for vision single tag lineup
+   *
+   * @return 0 for Front Left camera; 1 for Front Right camera
+   */
+  public int getCameraIndexForLineup() {
+    switch (desiredLocation) {
+        // Right Side of reef side (align to left camera)
+      case Reef0:
+      case Reef2:
+      case Reef4:
+      case Reef6:
+      case Reef8:
+      case Reef10:
+        return JsonConstants.visionConstants.FrontLeftCameraIndex;
+        // Left side of reef side (align to right camera)
+      case Reef1:
+      case Reef3:
+      case Reef5:
+      case Reef7:
+      case Reef9:
+      case Reef11:
+        return JsonConstants.visionConstants.FrontRightCameraIndex;
+      default:
+        return -1;
+    }
+  }
+
+  /**
+   * gets rotation for each side of hexagonal reef for lineup
+   *
+   * @return Rotation2d representing desired rotation for lineup
+   */
+  public Rotation2d getRotationForReefSide() {
+    switch (desiredLocation) {
+      case Reef0:
+      case Reef1:
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef01Rotation
+            : JsonConstants.blueFieldLocations.blueReef01Rotation;
+      case Reef2:
+      case Reef3:
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef23Rotation
+            : JsonConstants.blueFieldLocations.blueReef23Rotation;
+      case Reef4:
+      case Reef5:
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef45Rotation
+            : JsonConstants.blueFieldLocations.blueReef45Rotation;
+      case Reef6:
+      case Reef7:
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef67Rotation
+            : JsonConstants.blueFieldLocations.blueReef67Rotation;
+      case Reef8:
+      case Reef9:
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef89Rotation
+            : JsonConstants.blueFieldLocations.blueReef89Rotation;
+      case Reef10:
+      case Reef11:
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef1011Rotation
+            : JsonConstants.blueFieldLocations.blueReef1011Rotation;
+      default:
+        return new Rotation2d();
+    }
+  }
+
+  private DistanceToTag latestObservation;
+  private int observationAge;
+
+  /** take over goal speeds to align to reef exactly */
+  public void LineupWithReefLocation() {
+    int tagId = this.getTagIdForReef();
+    int cameraIndex = this.getCameraIndexForLineup();
+
+    if (tagId == -1 || cameraIndex == -1 || alignmentSupplier == null) {
+      // cancel lineup or whatever
+      this.setLiningUp(false);
+      return;
+    }
+
+    System.out.println(tagId);
+
+    DistanceToTag observation =
+        alignmentSupplier.get(
+            tagId,
+            cameraIndex,
+            this.getCrossTrackOffset(cameraIndex),
+            JsonConstants.drivetrainConstants.driveAlongTrackOffset);
+
+    if (!observation.isValid()) {
+      if (latestObservation != null && observationAge < 5) {
+        observation = latestObservation;
+        observationAge++;
+      } else {
+        return;
+      }
+    } else {
+      latestObservation = observation;
+      observationAge = 0;
+    }
+
+    Logger.recordOutput("Drive/Lineup/AlongTrackDistance", observation.alongTrackDistance());
+    Logger.recordOutput("Drive/Lineup/CrossTrackDistance", observation.crossTrackDistance());
+    Logger.recordOutput("Drive/Lineup/IsObservationValid", observation.isValid());
+
+    // give to PID Controllers and setGoalSpeeds (robotCentric)
+    double vx =
+        JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
+            * driveAlongTrackLineupController.calculate(observation.alongTrackDistance());
+    // ChassisSpeeds speeds = getChassisSpeeds();
+    // Pose2d pose = getPose();
+    // double velocityToTarget = (pose.getX() * speeds.vxMetersPerSecond + pose.getY() *
+    // speeds.vyMetersPerSecond) / Math.sqrt(pose.getX() * pose.getX() + pose.getY() * pose.getY());
+    // double velocityToTarget = -getChassisSpeeds().vxMetersPerSecond;
+    // Logger.recordOutput("Drive/Lineup/velocityToTarget", velocityToTarget);
+    // double vx =
+    //     -driveAlongTrackProfile.calculate(
+    //             0.02,
+    //             new State(observation.alongTrackDistance(), velocityToTarget),
+    //             new State(0, 0))
+    //         .velocity;
+    double vy = driveCrossTrackLineupController.calculate(observation.crossTrackDistance());
+    double omega =
+        rotationController.calculate(
+            this.getRotation().getRadians(), this.getRotationForReefSide().getRadians());
+
+    this.setGoalSpeeds(new ChassisSpeeds(vx, vy, omega), false);
+  }
+
+  public void alignToTarget() {
+    double omega = 0.0;
+
+    // Get current position
+    Translation2d currentPosition = getPose().getTranslation();
+
+    // Calculate desired angle to face the target position
+    double targetAngle =
+        Math.atan2(
+            lockedAlignPosition.getY() - currentPosition.getY(),
+            lockedAlignPosition.getX() - currentPosition.getX());
+
+    // Use PID to rotate toward the target angle
+    omega = angleController.calculate(getRotation().getRadians(), targetAngle);
+    setGoalSpeeds(
+        new ChassisSpeeds(goalSpeeds.vxMetersPerSecond, goalSpeeds.vyMetersPerSecond, omega),
+        false);
+  }
+
+>>>>>>> origin
   /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
   public void runVelocity() {
+    if (isAligningToFieldElement) {
+      alignToTarget();
+    }
+
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(this.goalSpeeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);

@@ -23,58 +23,58 @@ public interface ElevatorIO {
   @AutoLog
   public static class ElevatorInputs {
     /** The angle of the 19 tooth-gear-encoder. Counts total rotations, not absolute position. */
-    MutAngle largeEncoderPos = Rotations.mutable(0.0);
+    public MutAngle largeEncoderPos = Rotations.mutable(0.0);
 
     /** The angle of the 17 tooth-gear-encoder. Counts total rotations, not absolute position. */
-    MutAngle smallEncoderPos = Rotations.mutable(0.0);
+    public MutAngle smallEncoderPos = Rotations.mutable(0.0);
 
-    /** Absolute position of the 19 tooth-gear-encocer. Wraps around after 1 rotation */
-    MutAngle largeEncoderAbsolutePos = Rotations.mutable(0.0);
+    /** Absolute position of the 19 tooth-gear-encoder. Wraps around after 1 rotation */
+    public MutAngle largeEncoderAbsolutePos = Rotations.mutable(0.0);
 
-    /** Absolute position of the 17 tooth-gear-encocer. Wraps around after 1 rotation */
-    MutAngle smallEncoderAbsolutePos = Rotations.mutable(0.0);
+    /** Absolute position of the 17 tooth-gear-encoder. Wraps around after 1 rotation */
+    public MutAngle smallEncoderAbsolutePos = Rotations.mutable(0.0);
 
     /** Goal position of the elevator */
-    MutAngle largeEncoderGoalPos = Rotations.mutable(0.0);
+    public MutAngle largeEncoderGoalPos = Rotations.mutable(0.0);
 
     /** Profile setpoint goal position of the elevator */
-    MutAngle largeEncoderSetpointPos = Rotations.mutable(0.0);
+    public MutAngle largeEncoderSetpointPos = Rotations.mutable(0.0);
 
     /** Stator current of the lead elevator motor */
-    MutCurrent elevatorLeadMotorStatorCurrent = Amps.mutable(0.0);
+    public MutCurrent elevatorLeadMotorStatorCurrent = Amps.mutable(0.0);
 
     /** Supply current of the lead elevator motor */
-    MutCurrent elevatorLeadMotorSupplyCurrent = Amps.mutable(0.0);
+    public MutCurrent elevatorLeadMotorSupplyCurrent = Amps.mutable(0.0);
 
     /** Stator current of the follower elevator motor */
-    MutCurrent elevatorFollowerMotorStatorCurrent = Amps.mutable(0.0);
+    public MutCurrent elevatorFollowerMotorStatorCurrent = Amps.mutable(0.0);
 
     /** Supply current of the follower elevator motor */
-    MutCurrent elevatorFollowerMotorSupplyCurrent = Amps.mutable(0.0);
+    public MutCurrent elevatorFollowerMotorSupplyCurrent = Amps.mutable(0.0);
 
     /**
      * Current closed-loop error (distance from setpoint position) as reported by the lead motor
      * TalonFX, in rotations.
      */
-    double motionMagicError = 0.0;
+    public double motionMagicError = 0.0;
 
     /** Velocity of the mechanism, as reported by the lead motor TalonFX */
-    MutAngularVelocity elevatorMechanismVelocity = RotationsPerSecond.mutable(0.0);
+    public MutAngularVelocity elevatorMechanismVelocity = RotationsPerSecond.mutable(0.0);
   }
 
   @AutoLog
   public static class ElevatorOutputs {
     /** The voltage applied to the elevator motor */
-    MutVoltage elevatorAppliedVolts = Volts.mutable(0.0);
+    public MutVoltage elevatorAppliedVolts = Volts.mutable(0.0);
 
     /** Contribution of the p-term to motor output */
-    MutVoltage pContrib = Volts.mutable(0.0);
+    public MutVoltage pContrib = Volts.mutable(0.0);
 
     /** Contribution of the i-term to motor output */
-    MutVoltage iContrib = Volts.mutable(0.0);
+    public MutVoltage iContrib = Volts.mutable(0.0);
 
-    /** Contribution of the d-term to motor outdut */
-    MutVoltage dContrib = Volts.mutable(0.0);
+    /** Contribution of the d-term to motor output */
+    public MutVoltage dContrib = Volts.mutable(0.0);
   }
 
   /**

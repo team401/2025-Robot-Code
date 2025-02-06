@@ -1,4 +1,9 @@
 {
+  "maxLinearSpeed": 6.0,
+  "maxAngularSpeed": 6.283185307179586,
+  "joystickDeadband": 0.1,
+  "maxPIDVelocity": 6.283185307179586,
+  "maxPIDAcceleration": 3.141592653589793,
   "steerKp": 40.0,
   "steerKi": 0.0,
   "steerKd": 0.0,
