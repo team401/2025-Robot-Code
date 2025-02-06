@@ -92,6 +92,48 @@ public class LineupState implements PeriodicStateInterface {
   }
 
   /**
+   * gets rotation for each side of hexagonal reef for lineup
+   *
+   * @return Rotation2d representing desired rotation for lineup
+   */
+  public Rotation2d getRotationForReefSide() {
+    switch (drive.getDesiredLocation()) {
+      case Reef0:
+      case Reef1:
+        return drive.isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef01Rotation
+            : JsonConstants.blueFieldLocations.blueReef01Rotation;
+      case Reef2:
+      case Reef3:
+        return drive.isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef23Rotation
+            : JsonConstants.blueFieldLocations.blueReef23Rotation;
+      case Reef4:
+      case Reef5:
+        return drive.isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef45Rotation
+            : JsonConstants.blueFieldLocations.blueReef45Rotation;
+      case Reef6:
+      case Reef7:
+        return drive.isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef67Rotation
+            : JsonConstants.blueFieldLocations.blueReef67Rotation;
+      case Reef8:
+      case Reef9:
+        return drive.isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef89Rotation
+            : JsonConstants.blueFieldLocations.blueReef89Rotation;
+      case Reef10:
+      case Reef11:
+        return drive.isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef1011Rotation
+            : JsonConstants.blueFieldLocations.blueReef1011Rotation;
+      default:
+        return new Rotation2d();
+    }
+  }
+
+  /**
    * checks if lineup is within 0.01 of tag + offsets
    *
    * @return true if error is small enoguh
@@ -121,7 +163,6 @@ public class LineupState implements PeriodicStateInterface {
     boolean allianceRed = drive.isAllianceRed();
     switch (drive.getDesiredLocation()) {
       case Reef0:
-        return 7;
       case Reef1:
         return allianceRed ? 10 : 21;
       case Reef2:
@@ -182,42 +223,6 @@ public class LineupState implements PeriodicStateInterface {
         return JsonConstants.visionConstants.FrontRightCameraIndex;
       default:
         return -1;
-    }
-  }
-
-  /**
-   * gets rotation for each side of hexagonal reef for lineup
-   *
-   * @return Rotation2d representing desired rotation for lineup
-   */
-  public Rotation2d getRotationForReefSide() {
-    switch (drive.getDesiredLocation()) {
-      case Reef0:
-        return new Rotation2d();
-      case Reef1:
-        return new Rotation2d();
-      case Reef2:
-        return new Rotation2d();
-      case Reef3:
-        return new Rotation2d();
-      case Reef4:
-        return new Rotation2d();
-      case Reef5:
-        return new Rotation2d();
-      case Reef6:
-        return new Rotation2d();
-      case Reef7:
-        return new Rotation2d();
-      case Reef8:
-        return new Rotation2d();
-      case Reef9:
-        return new Rotation2d();
-      case Reef10:
-        return new Rotation2d();
-      case Reef11:
-        return new Rotation2d();
-      default:
-        return new Rotation2d();
     }
   }
 

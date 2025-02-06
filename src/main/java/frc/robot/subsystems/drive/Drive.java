@@ -325,6 +325,7 @@ public class Drive implements DriveTemplate {
     }
 
     stateMachine.periodic();
+    Logger.recordOutput("Drive/State", stateMachine.getCurrentState());
 
     // Log empty setpoint states when disabled
     if (DriverStation.isDisabled()) {
