@@ -173,6 +173,7 @@ public class Drive implements DriveTemplate {
   private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
 
   private BooleanSupplier waitOnScore = () -> false;
+  private VisionAlignment alignmentSupplier = null;
 
   private static Drive instance;
 
@@ -425,6 +426,24 @@ public class Drive implements DriveTemplate {
    */
   public void setWaitOnScoreSupplier(BooleanSupplier waitOnScore) {
     this.waitOnScore = waitOnScore;
+  }
+
+  /**
+   * sets the supplier for landing zone alignment help
+   *
+   * @param alignmentSupplier from vision.getDistanceErrorToTag; helps drive align to reef
+   */
+  public void setAlignmentSupplier(VisionAlignment alignmentSupplier) {
+    this.alignmentSupplier = alignmentSupplier;
+  }
+
+  /**
+   * gets the alignment supplier for use in lineup state
+   *
+   * @return VisionAlignment supplier (possibly null)
+   */
+  public VisionAlignment getVisionAlignment() {
+    return alignmentSupplier;
   }
 
   /**

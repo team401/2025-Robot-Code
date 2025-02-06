@@ -54,7 +54,7 @@ public class RobotContainer {
       if (FeatureFlags.synced.getObject().runVision) {
         vision = InitSubsystems.initVisionSubsystem(drive);
 
-        // TODO: set alignment supplier for LineupState
+        drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
       }
     }
   }

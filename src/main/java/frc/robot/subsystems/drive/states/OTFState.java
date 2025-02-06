@@ -31,6 +31,7 @@ public class OTFState implements PeriodicStateInterface {
 
   public void onExit(Transition transition) {
     otfPose = null;
+    System.out.println("Cancelling command");
     if (driveToPose != null) {
       this.driveToPose.cancel();
     }

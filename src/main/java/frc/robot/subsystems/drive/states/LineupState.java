@@ -20,8 +20,6 @@ import org.littletonrobotics.junction.Logger;
 public class LineupState implements PeriodicStateInterface {
   private Drive drive;
 
-  private VisionAlignment alignmentSupplier;
-
   private DistanceToTag latestObservation;
   private int observationAge;
 
@@ -139,8 +137,9 @@ public class LineupState implements PeriodicStateInterface {
    * @return true if error is small enoguh
    */
   public boolean lineupFinished() {
-    return latestObservation.alongTrackDistance() < 0.01
-        && latestObservation.crossTrackDistance() < 0.01;
+    return latestObservation != null
+        && (latestObservation.alongTrackDistance() < 0.01
+            && latestObservation.crossTrackDistance() < 0.01);
   }
 
   public void periodic() {
@@ -231,9 +230,15 @@ public class LineupState implements PeriodicStateInterface {
     int tagId = this.getTagIdForReef();
     int cameraIndex = this.getCameraIndexForLineup();
 
-    if (tagId == -1 || cameraIndex == -1 || alignmentSupplier == null) {
+    if (tagId == -1 || cameraIndex == -1) {
       // TODO: check if this might be false first time, but on another loop true
       // drive.fireTrigger(DriveTrigger.CancelLineup);
+      return;
+    }
+
+    VisionAlignment alignmentSupplier = drive.getVisionAlignment();
+
+    if (alignmentSupplier == null) {
       return;
     }
 
@@ -316,15 +321,6 @@ public class LineupState implements PeriodicStateInterface {
   public void setRotationLineupPID(double kP, double kI, double kD) {
     this.rotationController = new PIDController(kP, kI, kD);
     this.rotationController.enableContinuousInput(-Math.PI / 2, Math.PI / 2);
-  }
-
-  /**
-   * sets the supplier for landing zone alignment help
-   *
-   * @param alignmentSupplier from vision.getDistanceErrorToTag; helps drive align to reef
-   */
-  public void setAlignmentSupplier(VisionAlignment alignmentSupplier) {
-    this.alignmentSupplier = alignmentSupplier;
   }
 
   public void testPeriodic() {
