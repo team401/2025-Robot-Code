@@ -34,6 +34,7 @@ public class OTFState implements PeriodicStateInterface {
 
   public void onExit(Transition transition) {
     if (driveToPose != null) {
+      otfPose = null;
       this.driveToPose.cancel();
     }
   }
@@ -147,7 +148,7 @@ public class OTFState implements PeriodicStateInterface {
 
   public void periodic() {
     // checks if location has changed (so path can be rescheduled)
-    if (otfPose == null || otfPose.equals(findOTFPoseFromDesiredLocation(drive))) {
+    if (otfPose == null || !otfPose.equals(findOTFPoseFromDesiredLocation(drive))) {
       this.onEntry(null);
     }
 
