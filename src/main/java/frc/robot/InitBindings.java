@@ -13,6 +13,7 @@ import frc.robot.commands.drive.DesiredLocationSelector;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DriveTrigger;
 
 public final class InitBindings {
   // Controller
@@ -44,7 +45,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  drive.setAutoAlignment(true);
+                  drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
                 },
                 drive));
     rightJoystick
@@ -52,7 +53,7 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  drive.setAutoAlignment(false);
+                  drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
                 },
                 drive));
 
