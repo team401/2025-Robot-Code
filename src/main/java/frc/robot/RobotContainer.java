@@ -7,13 +7,15 @@ package frc.robot;
 import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.drive.AkitDriveCommands;
 import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
+import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem.ClimbAction;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 
@@ -25,9 +27,15 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here
+  private ClimbSubsystem climbSubsystem;
   private ScoringSubsystem scoringSubsystem;
   private Drive drive;
   private VisionLocalizer vision;
+
+  // Replace with CommandPS4Controller or CommandJoystick if needed
+  private final CommandXboxController m_buttonMasher = new CommandXboxController(2);
+
+  // The robot's subsystems and commands are defined here
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -57,29 +65,25 @@ public class RobotContainer {
         drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
       }
     }
+    if (FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem = InitSubsystems.initClimbSubsystem();
+    }
   }
 
-  /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
-   */
   private void configureBindings() {
     // initialize helper commands
     if (FeatureFlags.synced.getObject().runDrive) {
       InitBindings.initDriveBindings(drive);
     }
+
+    if (FeatureFlags.synced.getObject().runClimb) {
+      m_buttonMasher
+          .a()
+          .onTrue(Commands.runOnce(() -> climbSubsystem.fireTrigger(ClimbAction.START_CLIMB)))
+          .onFalse(Commands.runOnce(() -> climbSubsystem.fireTrigger(ClimbAction.NONE)));
+    }
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     return AkitDriveCommands.feedforwardCharacterization(drive);
