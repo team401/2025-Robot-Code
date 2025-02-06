@@ -16,5 +16,6 @@
   "climbP": 5,
   "climbI": 0,
   "climbD": 0,
+  "climbCurrentLimit": 60,
   "invertFollowerClimbMotor": false
 }

@@ -111,9 +111,9 @@ public class ClimbSubsystem extends SubsystemBase {
     io.updateInputs(inputs);
     io.applyOutputs(outputs);
 
-    System.out.println(climbMachine.getCurrentState());
     Logger.processInputs("climb/inputs", inputs);
     Logger.processInputs("climb/outputs", outputs);
+    Logger.recordOutput("climb/State", climbMachine.getCurrentState());
     Logger.recordOutput("climb/Action", currentAction);
   }
 }

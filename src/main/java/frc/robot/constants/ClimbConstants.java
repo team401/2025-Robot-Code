@@ -28,6 +28,8 @@ public class ClimbConstants {
   public final double climbI = 0;
   public final double climbD = 0;
 
+  public final double climbCurrentLimit = 60;
+
   public final boolean invertFollowerClimbMotor = false;
 
   public static final class Sim {

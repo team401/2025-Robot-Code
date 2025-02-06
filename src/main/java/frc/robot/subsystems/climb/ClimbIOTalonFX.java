@@ -2,10 +2,15 @@ package frc.robot.subsystems.climb;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicExpoDutyCycle;
+import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.math.controller.PIDController;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutVoltage;
@@ -18,11 +23,7 @@ public class ClimbIOTalonFX implements ClimbIO {
   TalonFX leadMotor;
   TalonFX followerMotor;
 
-  private final PIDController angleController =
-      new PIDController(
-          ClimbConstants.synced.getObject().climbP,
-          ClimbConstants.synced.getObject().climbI,
-          ClimbConstants.synced.getObject().climbD);
+  TalonFXConfiguration talonFXConfigs;
 
   // TODO: replace when sensors become available
   private BooleanSupplier lockedToCage = () -> true;
@@ -32,7 +33,8 @@ public class ClimbIOTalonFX implements ClimbIO {
 
   private boolean override = false;
 
-  private MotionMagicExpoDutyCycle calculator;
+  private MotionMagicTorqueCurrentFOC calculator =
+      new MotionMagicTorqueCurrentFOC(ClimbConstants.synced.getObject().restingAngle);
 
   public ClimbIOTalonFX() {
     leadMotor = new TalonFX(ClimbConstants.synced.getObject().leadClimbMotorId);
@@ -42,8 +44,27 @@ public class ClimbIOTalonFX implements ClimbIO {
         new Follower(
             leadMotor.getDeviceID(), ClimbConstants.synced.getObject().invertFollowerClimbMotor));
 
-    // TODO: set lockedToCage when ramp becomes available
+    talonFXConfigs =
+        new TalonFXConfiguration()
+            .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimitEnable(true)
+                    .withStatorCurrentLimit(ClimbConstants.synced.getObject().climbCurrentLimit))
+            .withSlot0(
+                new Slot0Configs()
+                    .withKP(ClimbConstants.synced.getObject().climbP)
+                    .withKI(ClimbConstants.synced.getObject().climbI)
+                    .withKD(ClimbConstants.synced.getObject().climbD))
+            .withMotionMagic(
+                new MotionMagicConfigs()
+                    .withMotionMagicAcceleration(5)
+                    .withMotionMagicCruiseVelocity(5));
 
+    leadMotor.getConfigurator().apply(talonFXConfigs);
+    followerMotor.getConfigurator().apply(talonFXConfigs);
+
+    // TODO: set lockedToCage when ramp becomes available
   }
 
   @Override
@@ -57,20 +78,15 @@ public class ClimbIOTalonFX implements ClimbIO {
   @Override
   public void applyOutputs(ClimbOutputs outputs) {
 
-    calculator.withPosition(leadMotor.getPosition().getValue().in(Radians));
+    calculator.withPosition(goalAngle);
 
-    Voltage appliedVolts;
     if (override) {
-      appliedVolts = overrideVoltage;
+      leadMotor.setVoltage(0);
     } else {
-      appliedVolts =
-          Volts.of(
-              angleController.calculate(
-                  leadMotor.getPosition().getValue().in(Radians), goalAngle.in(Radians)));
+      leadMotor.setControl(calculator);
     }
 
-    outputs.appliedVoltage.mut_replace(appliedVolts);
-    leadMotor.setVoltage(appliedVolts.in(Volts));
+    outputs.appliedVoltage.mut_replace(leadMotor.getMotorVoltage().getValue());
   }
 
   @Override
@@ -87,6 +103,13 @@ public class ClimbIOTalonFX implements ClimbIO {
 
   @Override
   public void setPID(double p, double i, double d) {
-    angleController.setPID(p, i, d);
+    Slot0Configs configs = talonFXConfigs.Slot0;
+
+    configs.kP = p;
+    configs.kI = i;
+    configs.kD = d;
+
+    leadMotor.getConfigurator().apply(configs);
+    followerMotor.getConfigurator().apply(configs);
   }
 }
