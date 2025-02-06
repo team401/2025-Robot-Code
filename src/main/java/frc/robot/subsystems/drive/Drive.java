@@ -13,7 +13,6 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import coppercore.parameter_tools.LoggedTunableNumber;
-import coppercore.parameter_tools.json.JSONExclude;
 import coppercore.vision.VisionLocalizer.DistanceToTag;
 import coppercore.wpilib_interface.DriveTemplate;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -118,7 +117,6 @@ public class Drive implements DriveTemplate {
 
   private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
 
-  @JSONExclude
   public ProfiledPIDController angleController =
       new ProfiledPIDController(
           JsonConstants.drivetrainConstants.angleControllerKp,
@@ -235,7 +233,7 @@ public class Drive implements DriveTemplate {
   private NetworkTable table = inst.getTable("");
   private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
 
-  private boolean isAligningToFieldElement;
+  private boolean isAligningToFieldElement = false;
   private Translation2d lockedAlignPosition = new Translation2d();
 
   public Drive(
@@ -442,9 +440,14 @@ public class Drive implements DriveTemplate {
     }
   }
 
-  public void alignToFieldElement(Translation2d targetPosition) {
-    isAligningToFieldElement = true;
-    lockedAlignPosition = targetPosition;
+  public void alignToFieldElement() {
+    if (isDesiredLocationReef()) {
+      lockedAlignPosition =
+          isAllianceRed()
+              ? JsonConstants.redFieldLocations.redReefCenterTranslation
+              : JsonConstants.blueFieldLocations.blueReefCenterTranslation;
+      isAligningToFieldElement = true;
+    }
   }
 
   public void disableAlign() {

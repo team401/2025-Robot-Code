@@ -2,7 +2,6 @@ package frc.robot.constants;
 
 import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 import edu.wpi.first.wpilibj.Filesystem;
-import frc.robot.InitBindings;
 import frc.robot.constants.field.BlueFieldLocations;
 import frc.robot.constants.field.RedFieldLocations;
 import frc.robot.constants.subsystems.DrivetrainConstants;
@@ -21,12 +20,9 @@ public class JsonConstants {
     ClawConstants.Sim.synced.loadData();
     ScoringFeatureFlags.synced.loadData();
     ScoringSetpoints.synced.loadData();
-    RedFieldLocations.synced.saveData();
-    BlueFieldLocations.synced.saveData();
     RedFieldLocations.synced.loadData();
     BlueFieldLocations.synced.loadData();
     DrivetrainConstants.synced.loadData();
-    InitBindings.synced.loadData();
     VisionConstants.synced.loadData();
 
     elevatorConstants = ElevatorConstants.synced.getObject();
@@ -38,7 +34,6 @@ public class JsonConstants {
     redFieldLocations = RedFieldLocations.synced.getObject();
     blueFieldLocations = BlueFieldLocations.synced.getObject();
     drivetrainConstants = DrivetrainConstants.synced.getObject();
-    initBindings = InitBindings.synced.getObject();
     visionConstants = VisionConstants.synced.getObject();
   }
 
@@ -51,6 +46,5 @@ public class JsonConstants {
   public static RedFieldLocations redFieldLocations;
   public static BlueFieldLocations blueFieldLocations;
   public static DrivetrainConstants drivetrainConstants;
-  public static InitBindings initBindings;
   public static VisionConstants visionConstants;
 }
