@@ -86,6 +86,7 @@ public class LineupState implements PeriodicStateInterface {
 
   public void onEntry(Transition transition) {
     // cancel rotation lock on center
+    drive.disableAlign();
   }
 
   /**
