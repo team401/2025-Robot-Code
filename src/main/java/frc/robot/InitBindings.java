@@ -13,6 +13,7 @@ import frc.robot.commands.drive.DesiredLocationSelector;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 
 public final class InitBindings {
@@ -102,5 +103,13 @@ public final class InitBindings {
                       new Pose2d(
                           Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
                 }));
+    rightJoystick
+        .top()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  drive.setDesiredLocation(DesiredLocation.CoralStationRight);
+                },
+                drive));
   }
 }
