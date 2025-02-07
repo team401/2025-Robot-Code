@@ -609,12 +609,30 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * checks if drive is in intake mode
+   *
+   * @return true if drive is going to a coral station
+   */
+  public boolean isGoingToIntake() {
+    return goToIntake;
+  }
+
+  /**
    * attempts to change state of state machine
    *
    * @param trigger trigger to give to state for transition
    */
   public void fireTrigger(DriveTrigger trigger) {
     stateMachine.fire(trigger);
+  }
+
+  /**
+   * checks if alignment has run
+   *
+   * @return true if current state is joystick (assumes alignment has gone through)
+   */
+  public boolean isDriveAlignmentFinished() {
+    return this.stateMachine.getCurrentState().equals(DriveState.Joystick);
   }
 
   /**

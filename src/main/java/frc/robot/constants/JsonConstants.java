@@ -23,6 +23,7 @@ public class JsonConstants {
     RedFieldLocations.synced.loadData();
     BlueFieldLocations.synced.loadData();
     VisionConstants.synced.loadData();
+    AutoPath.synced.loadData();
 
     elevatorConstants = ElevatorConstants.synced.getObject();
     elevatorConstantsSim = ElevatorConstants.Sim.synced.getObject();
@@ -46,4 +47,5 @@ public class JsonConstants {
   public static BlueFieldLocations blueFieldLocations;
   public static DrivetrainConstants drivetrainConstants;
   public static VisionConstants visionConstants;
+  public static AutoPath autoPath;
 }
