@@ -50,9 +50,7 @@ public class AutoCommand extends Command {
     return JsonConstants.autoPath.scoringLocations.size() > (scoringLocationIndex + 1);
   }
 
-  /**
-   * sets next location for drive and fires trigger for auto alignment
-   */
+  /** sets next location for drive and fires trigger for auto alignment */
   public void prepareDrive() {
     drive.setGoToIntake(shouldGoToIntake);
 
