@@ -1,7 +1,6 @@
 package frc.robot.commands.strategies;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
@@ -23,7 +22,6 @@ public class AutoScore extends Command {
 
   public void initialize() {
     drive.setDesiredLocation(currentScoringLocation);
-    drive.setDesiredIntakeLocation(JsonConstants.autoPath.intakeLocation);
     drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
   }
 

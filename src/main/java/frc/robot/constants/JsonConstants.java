@@ -2,12 +2,23 @@ package frc.robot.constants;
 
 import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 import edu.wpi.first.wpilibj.Filesystem;
+import frc.robot.constants.autoStrategies.ExampleAutoPath;
 import frc.robot.constants.field.BlueFieldLocations;
 import frc.robot.constants.field.RedFieldLocations;
 import frc.robot.constants.subsystems.DrivetrainConstants;
 import frc.robot.constants.subsystems.ElevatorConstants;
+import java.util.LinkedList;
+import java.util.List;
 
 public class JsonConstants {
+
+  public static void loadAutoStrategies() {
+    autoPaths = new LinkedList<>();
+
+    ExampleAutoPath.synced.loadData();
+
+    autoPaths.add(ExampleAutoPath.synced.getObject());
+  }
 
   public static void loadConstants() {
     EnvironmentHandler.getEnvironmentHandler(
@@ -23,7 +34,6 @@ public class JsonConstants {
     RedFieldLocations.synced.loadData();
     BlueFieldLocations.synced.loadData();
     VisionConstants.synced.loadData();
-    AutoPath.synced.loadData();
 
     elevatorConstants = ElevatorConstants.synced.getObject();
     elevatorConstantsSim = ElevatorConstants.Sim.synced.getObject();
@@ -35,6 +45,8 @@ public class JsonConstants {
     blueFieldLocations = BlueFieldLocations.synced.getObject();
     drivetrainConstants = DrivetrainConstants.synced.getObject();
     visionConstants = VisionConstants.synced.getObject();
+
+    loadAutoStrategies();
   }
 
   public static ElevatorConstants elevatorConstants;
@@ -47,5 +59,5 @@ public class JsonConstants {
   public static BlueFieldLocations blueFieldLocations;
   public static DrivetrainConstants drivetrainConstants;
   public static VisionConstants visionConstants;
-  public static AutoPath autoPath;
+  public static List<AutoPath> autoPaths;
 }
