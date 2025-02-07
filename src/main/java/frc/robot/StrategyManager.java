@@ -1,20 +1,130 @@
+package frc.robot;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.commands.strategies.AutoIntake;
+import frc.robot.commands.strategies.AutoScore;
+import frc.robot.constants.AutoStrategy;
+import frc.robot.constants.AutoStrategy.Action;
+import frc.robot.constants.AutoStrategy.ActionType;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import frc.robot.constants.AutoPath.Action;
-
 public class StrategyManager {
-    private Queue<Action> actions = null;
+  public enum AutonomyMode {
+    Full,
+    Teleop,
+    Manual,
+  }
 
-    public StrategyManager () {
-        actions = new LinkedList<>();
-    }
+  private Queue<Action> actions = null;
+  private Command currentCommand = null;
+  private Drive drive;
+  private ScoringSubsystem scoringSubsysttem;
+  private AutonomyMode autonomyMode = AutonomyMode.Full;
 
-    public void addAction(Action action) {
-        actions.add(action);
-    }
+  public StrategyManager(Drive drive, ScoringSubsystem scoringSubsystem) {
+    actions = new LinkedList<>();
+    this.drive = drive;
+    this.scoringSubsysttem = scoringSubsystem;
+  }
 
-    public Action getNextAction() {
-        return actions.remove();
+  /**
+   * sets the desired level of autonomy
+   *
+   * @param mode enum representing how autonomous to be
+   */
+  public void setAutonomyMode(AutonomyMode mode) {
+    this.autonomyMode = mode;
+  }
+
+  /**
+   * gets the current level of autonomy running
+   *
+   * @return level of autonomy
+   */
+  public AutonomyMode getAutonomyMode() {
+    return autonomyMode;
+  }
+
+  /** clears queue */
+  public void clearActions() {
+    actions.clear();
+  }
+
+  /**
+   * adds an Action to the queue to be performed
+   *
+   * @param action the action to add to queue
+   */
+  public void addAction(Action action) {
+    actions.add(action);
+  }
+
+  /**
+   * removes the next action in queue
+   *
+   * @return the next action in queue
+   */
+  public Action getNextAction() {
+    return actions.remove();
+  }
+
+  /**
+   * adds actions to queue based on an AutoStrategy
+   *
+   * @param strategy AutoStrategy defined in java and json
+   */
+  public void addActionsFromAutoStrategy(AutoStrategy strategy) {
+    this.addAction(new Action(ActionType.Intake, GamePiece.Coral, strategy.intakeLocation, null));
+
+    for (int i = 0; i < strategy.scoringLocations.size(); i++) {
+      // add scoring
+      this.addAction(
+          new Action(
+              ActionType.Score,
+              GamePiece.Coral,
+              strategy.scoringLocations.get(i),
+              strategy.scoringLevels.get(i)));
+
+      // intake after each score
+      this.addAction(new Action(ActionType.Intake, GamePiece.Coral, strategy.intakeLocation, null));
     }
+  }
+
+  /**
+   * makes a command based on inputted action
+   *
+   * @param action action to base command on
+   * @return a command to be scheduled
+   */
+  public Command getCommandFromAction(Action action) {
+    if (action.type() == ActionType.Intake) {
+      switch (this.autonomyMode) {
+        case Full:
+        case Teleop:
+        case Manual:
+          return new AutoIntake(drive, scoringSubsysttem, action.location());
+      }
+    } else if (action.type() == ActionType.Score) {
+      switch (this.autonomyMode) {
+        case Full:
+        case Teleop:
+        case Manual:
+          return new AutoScore(drive, scoringSubsysttem, action.location());
+      }
+    }
+    return null;
+  }
+
+  public void periodic() {
+    if (currentCommand == null || currentCommand.isFinished()) {
+      currentCommand = getCommandFromAction(getNextAction());
+      if (currentCommand != null) {
+        currentCommand.schedule();
+      }
+    }
+  }
 }

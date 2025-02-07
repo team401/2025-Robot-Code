@@ -11,8 +11,6 @@ public class AutoIntake extends Command {
   private ScoringSubsystem scoringSubsystem;
 
   private DesiredLocation intakeLocation;
-  private int scoringLocationIndex = 0;
-  private boolean shouldGoToIntake = false;
 
   public AutoIntake(Drive drive, ScoringSubsystem scoring, DesiredLocation intakeLocation) {
     this.drive = drive;
@@ -23,9 +21,11 @@ public class AutoIntake extends Command {
   }
 
   public void initialize() {
-    drive.setDesiredIntakeLocation(intakeLocation);
-    drive.setGoToIntake(true);
-    drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+    if (drive != null) {
+      drive.setDesiredIntakeLocation(intakeLocation);
+      drive.setGoToIntake(true);
+      drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+    }
   }
 
   /**
@@ -34,11 +34,14 @@ public class AutoIntake extends Command {
    * @return true if we are ready for next path
    */
   public boolean isReadyForNextAction() {
-    return drive.isDriveAlignmentFinished() && !scoringSubsystem.shouldWaitOnIntake();
+    return (drive != null && drive.isDriveAlignmentFinished())
+        && (scoringSubsystem != null && !scoringSubsystem.shouldWaitOnIntake());
   }
 
   public void end(boolean interrupted) {
-    drive.setGoToIntake(false);
+    if (drive != null) {
+      drive.setGoToIntake(false);
+    }
   }
 
   public boolean isFinished() {

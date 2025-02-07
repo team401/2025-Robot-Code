@@ -13,11 +13,11 @@ import java.util.List;
 public class JsonConstants {
 
   public static void loadAutoStrategies() {
-    autoPaths = new LinkedList<>();
+    autoStrategies = new LinkedList<>();
 
     ExampleAutoPath.synced.loadData();
 
-    autoPaths.add(ExampleAutoPath.synced.getObject());
+    autoStrategies.add(ExampleAutoPath.synced.getObject());
   }
 
   public static void loadConstants() {
@@ -59,5 +59,5 @@ public class JsonConstants {
   public static BlueFieldLocations blueFieldLocations;
   public static DrivetrainConstants drivetrainConstants;
   public static VisionConstants visionConstants;
-  public static List<AutoPath> autoPaths;
+  public static List<AutoStrategy> autoStrategies;
 }

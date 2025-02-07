@@ -21,8 +21,10 @@ public class AutoScore extends Command {
   }
 
   public void initialize() {
-    drive.setDesiredLocation(currentScoringLocation);
-    drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+    if (drive != null) {
+      drive.setDesiredLocation(currentScoringLocation);
+      drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+    }
   }
 
   /**
@@ -31,7 +33,8 @@ public class AutoScore extends Command {
    * @return true if we are ready for next path
    */
   public boolean isReadyForNextAction() {
-    return drive.isDriveAlignmentFinished() && !scoringSubsystem.shouldWaitOnScore();
+    return (drive != null && drive.isDriveAlignmentFinished())
+        && (scoringSubsystem != null && !scoringSubsystem.shouldWaitOnScore());
   }
 
   public boolean isFinished() {

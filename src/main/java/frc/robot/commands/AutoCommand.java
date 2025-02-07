@@ -3,7 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.strategies.AutoIntake;
 import frc.robot.commands.strategies.AutoScore;
-import frc.robot.constants.AutoPath;
+import frc.robot.constants.AutoStrategy;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
@@ -15,11 +15,11 @@ public class AutoCommand extends Command {
   private DesiredLocation currentScoringLocation;
   private int scoringLocationIndex = 0;
   private boolean shouldGoToIntake = false;
-  private AutoPath path = null;
+  private AutoStrategy path = null;
   private AutoIntake intakeCommand = null;
   private AutoScore scoreCommand = null;
 
-  public AutoCommand(Drive drive, ScoringSubsystem scoring, AutoPath path) {
+  public AutoCommand(Drive drive, ScoringSubsystem scoring, AutoStrategy path) {
     this.drive = drive;
     this.scoringSubsystem = scoring;
     this.path = path;

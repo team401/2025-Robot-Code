@@ -11,8 +11,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.StrategyManager.AutonomyMode;
 import frc.robot.commands.drive.AkitDriveCommands;
-import frc.robot.constants.AutoPath;
+import frc.robot.constants.AutoStrategy;
 import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
@@ -27,9 +28,10 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here
-  private ScoringSubsystem scoringSubsystem;
-  private Drive drive;
-  private VisionLocalizer vision;
+  private ScoringSubsystem scoringSubsystem = null;
+  private Drive drive = null;
+  private VisionLocalizer vision = null;
+  private StrategyManager strategyManager = null;
 
   private SendableChooser<String> autoChooser = new SendableChooser<>();
 
@@ -50,8 +52,8 @@ public class RobotContainer {
   }
 
   public void configureAutos() {
-    for (AutoPath path : JsonConstants.autoPaths) {
-      autoChooser.addOption(path.autoPathName, path.autoPathName);
+    for (AutoStrategy strategy : JsonConstants.autoStrategies) {
+      autoChooser.addOption(strategy.autoStrategyName, strategy.autoStrategyName);
     }
   }
 
@@ -68,6 +70,8 @@ public class RobotContainer {
         drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
       }
     }
+
+    strategyManager = new StrategyManager(drive, scoringSubsystem);
   }
 
   /**
@@ -94,6 +98,28 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     return AkitDriveCommands.feedforwardCharacterization(drive);
+  }
+
+  public void periodic() {
+    strategyManager.periodic();
+  }
+
+  public void autonomousInit() {
+    strategyManager.setAutonomyMode(AutonomyMode.Full);
+
+    // load chosen strategy
+    for (AutoStrategy strategy : JsonConstants.autoStrategies) {
+      if (autoChooser.getSelected().equalsIgnoreCase(strategy.autoStrategyName)) {
+        strategyManager.addActionsFromAutoStrategy(strategy);
+        break;
+      }
+    }
+  }
+
+  public void teleopInit() {
+    strategyManager.setAutonomyMode(AutonomyMode.Teleop);
+    // clear leftover actions from auto
+    strategyManager.clearActions();
   }
 
   /** This method must be called from robot, as it isn't called automatically */
