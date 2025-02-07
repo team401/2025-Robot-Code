@@ -174,7 +174,12 @@ public class Drive implements DriveTemplate {
   private NetworkTable table = inst.getTable("");
   private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
 
+  @AutoLogOutput(key = "Drive/waitOnScore")
   private BooleanSupplier waitOnScore = () -> false;
+
+  @AutoLogOutput(key = "Drive/waitOnIntake")
+  private BooleanSupplier waitOnIntake = () -> false;
+
   private VisionAlignment alignmentSupplier = null;
 
   private static Drive instance;
@@ -423,13 +428,22 @@ public class Drive implements DriveTemplate {
   }
 
   /**
-   * set supplier that interfaces with scoring used to make drive set 0 speeds once lined up (so no
-   * error movement occurs)
+   * set supplier that interfaces with scoring used to make drive wait until setting next location
+   * in auto
    *
    * @param waitOnScore BooleanSupplier to let drive know if scoring is done scoring
    */
   public void setWaitOnScoreSupplier(BooleanSupplier waitOnScore) {
     this.waitOnScore = waitOnScore;
+  }
+
+  /**
+   * set supplier that interfaces with intake to make drive wait until setting next location in auto
+   *
+   * @param waitOnIntake BooleanSupplier to let drive know if intake has a coral for auto
+   */
+  public void setWaitOnIntakeSupplier(BooleanSupplier waitOnIntake) {
+    this.waitOnIntake = waitOnIntake;
   }
 
   /**
