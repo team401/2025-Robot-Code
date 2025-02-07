@@ -276,8 +276,7 @@ public class Drive implements DriveTemplate {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(
-        !gyroInputs.connected
-            && ModeConstants.currentMode != frc.robot.constants.ModeConstants.Mode.SIM);
+        !gyroInputs.connected && ModeConstants.currentMode == ModeConstants.Mode.REAL);
   }
 
   /**

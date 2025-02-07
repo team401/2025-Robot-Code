@@ -2,7 +2,6 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.constants.ModeConstants;
-import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConfiguration;
 import frc.robot.subsystems.drive.GyroIO;
@@ -64,12 +63,17 @@ public final class InitSubsystems {
         SimulatedArena.getInstance().addDriveTrainSimulation(RobotContainer.driveSim);
         return new Drive(
             new GyroIOMapleSim(RobotContainer.driveSim.getGyroSimulation()),
-            new ModuleIOMapleSim(RobotContainer.driveSim.getModules()[0], TunerConstants.FrontLeft),
             new ModuleIOMapleSim(
-                RobotContainer.driveSim.getModules()[1], TunerConstants.FrontRight),
-            new ModuleIOMapleSim(RobotContainer.driveSim.getModules()[2], TunerConstants.BackLeft),
+                RobotContainer.driveSim.getModules()[0],
+                DriveConfiguration.getInstance().FrontLeft),
             new ModuleIOMapleSim(
-                RobotContainer.driveSim.getModules()[3], TunerConstants.BackRight));
+                RobotContainer.driveSim.getModules()[1],
+                DriveConfiguration.getInstance().FrontRight),
+            new ModuleIOMapleSim(
+                RobotContainer.driveSim.getModules()[2], DriveConfiguration.getInstance().BackLeft),
+            new ModuleIOMapleSim(
+                RobotContainer.driveSim.getModules()[3],
+                DriveConfiguration.getInstance().BackRight));
 
       default:
         // Replayed robot, disable IO implementations
