@@ -41,12 +41,23 @@ public class AutoCommand extends Command {
             : scoringSubsystem.shouldWaitOnIntake());
   }
 
+  /**
+   * checks if we have another path
+   *
+   * @return true if scoringLocationIndex + 1 is less than the size of locations
+   */
+  public boolean hasNextPath() {
+    return JsonConstants.autoPath.scoringLocations.size() > (scoringLocationIndex + 1);
+  }
+
+  /**
+   * sets next location for drive and fires trigger for auto alignment
+   */
   public void prepareDrive() {
     drive.setGoToIntake(shouldGoToIntake);
 
     // if intake is false, go to next scoring location
     if (!shouldGoToIntake) {
-      scoringLocationIndex++;
       currentScoringLocation = JsonConstants.autoPath.scoringLocations.get(scoringLocationIndex);
       drive.setDesiredLocation(currentScoringLocation);
     }
@@ -55,10 +66,17 @@ public class AutoCommand extends Command {
   }
 
   public void execute() {
-    if (isReadyForNextPath()) { // if alignment finished, we move on to next location
+    if (isReadyForNextPath()
+        && hasNextPath()) { // if alignment finished, we move on to next location
       // toggle intake
       shouldGoToIntake = !shouldGoToIntake;
+      // increment to next scoring (drive + score level)
+      scoringLocationIndex++;
       prepareDrive();
+    } else if (isReadyForNextPath() && !hasNextPath()) {
+      // we are finished with scoring paths
+      // TODO: should we go to intake one last time?
+      this.cancel();
     }
   }
 }
