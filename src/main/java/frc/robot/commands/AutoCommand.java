@@ -5,19 +5,22 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
 
 public class AutoCommand extends Command {
   private Drive drive;
+  private ScoringSubsystem scoringSubsystem;
 
   private DesiredLocation currentScoringLocation;
   private int scoringLocationIndex = 0;
   private boolean shouldGoToIntake = false;
 
-  public AutoCommand(Drive drive) {
+  public AutoCommand(Drive drive, ScoringSubsystem scoring) {
     this.drive = drive;
+    this.scoringSubsystem = scoring;
     this.currentScoringLocation = JsonConstants.autoPath.scoringLocations.get(scoringLocationIndex);
 
-    addRequirements(drive);
+    addRequirements(drive, scoringSubsystem);
   }
 
   public void initialize() {
@@ -26,8 +29,16 @@ public class AutoCommand extends Command {
     drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
   }
 
+  /**
+   * determines when everything has finished (scoring / intake and drive at location)
+   *
+   * @return true if we are ready for next path
+   */
   public boolean isReadyForNextPath() {
-    return drive.isDriveAlignmentFinished();
+    return drive.isDriveAlignmentFinished()
+        && (shouldGoToIntake
+            ? scoringSubsystem.shouldWaitOnIntake()
+            : scoringSubsystem.shouldWaitOnIntake());
   }
 
   public void prepareDrive() {
