@@ -20,6 +20,66 @@ import frc.robot.subsystems.scoring.states.ScoreState;
 import frc.robot.subsystems.scoring.states.WarmupState;
 import org.littletonrobotics.junction.Logger;
 
+/**
+ * The scoring subsystem contains the elevator and the wrist, which need to be able to avoid each
+ * other and the ground intake.
+ *
+ * <p>This subsystem functions with a state machine, which uses a series of setpoints defined by
+ * ScoringSetpoints.java to configure itself physically for each task required. It uses closed-loop
+ * control for the wrist and the elevator, and both the wrist and the elevator implement a system of
+ * 'moving clamps' where their position can be 'clamped' regardless of their goal position to ensure
+ * that they are out of the way and avoiding collisions when necessary.
+ *
+ * <p>The general strategy for collision avoidance is as follows:
+ *
+ * <p>Avoiding collisions with the crossbar:
+ *
+ * <ul>
+ *   <li>If the elevator is below the crossbar and the wrist is in a position where it would
+ *       collide, the elevator is clamped to be below the crossbar.
+ *   <li>If the elevator is above the crossbar, the wrist is clamped to be in a position where it
+ *       cannot collide.
+ *   <li>While these rules do next explicitly force the claw to go to a non-colliding position when
+ *       elevator is going up, there will be no setpoint above the crossbar where the wrist is in a
+ *       colliding position. Therefore, the wrist will always be moving to a non-colliding position
+ *       while the elevator is going up, and the elevator will wait for it to be safe before going
+ *       up.
+ * </ul>
+ *
+ * <p>Avoiding collisions with the ground: (this part may or may not be necessary, depending on
+ * configuration)
+ *
+ * <ul>
+ *   <li>If the elevator is below a certain height, clamp the wrist angle to be above a certain
+ *       value (could be calculated with sin(wristAngle))
+ *   <li>If the wrist is below a certain angle, clamp the elevator to be above a certain height to
+ *       avoid pushing wrist into ground (could be calculated with sin(wristAngle))
+ * </ul>
+ *
+ * <p>Avoiding collisions with the ground intake:
+ *
+ * <p>For context, the ground intake should be safely tucked against the elevator except when: 1)
+ * elevator is moving past, 2) it is ground intaking
+ *
+ * <ul>
+ *   <li>If the elevator is below the collision point and its goal is to be above the collision
+ *       point, clamp the ground intake to be swung out in a non-colliding location
+ *   <li>If the elevator is above the collision point and its goal is to be below the collision
+ *       point, do the same
+ *   <li>When the ground intake is in and the elevator is up, clamp the elevator above it.
+ *   <li>When the ground intake is in and the elevator is down, clamp the elevator below it.
+ *   <li>These clamps will be automatically reverted as soon as the elevator is past, resulting in,
+ *       1) elevator moves as close as it can to the intake 2) intake swings out of the way 3)
+ *       elevator moves past 4) intake swings back into place
+ * </ul>
+ *
+ * <p>This multi-clamp system can pose an interesting challenge: how do we choose which clamp to
+ * apply? The correct way to solve this is to structure the if-statements in a way that the most
+ * restrictive clamps are checked first, so that when those clamps aren't set, the less restrictive
+ * clamps are checked. After all of the clamp conditions are checked, we can finally put a call to
+ * reset the clamps in an 'else,' allowing a full range of motion when no protection conditions are
+ * met.
+ */
 public class ScoringSubsystem extends SubsystemBase {
   private ElevatorMechanism elevatorMechanism;
   private WristMechanism wristMechanism;
