@@ -142,7 +142,7 @@ public class DrivetrainConstants {
 
   // OTF Max speed / accel
   public final Double OTFMaxLinearVelocity = 3.5;
-  public final Double OTFMaxLinearAccel = 0.5;
+  public final Double OTFMaxLinearAccel = 2.0;
   public final Double OTFMaxAngularVelocity = Math.PI;
   public final Double OTFMaxAngularAccel = Math.PI / 2;
 

@@ -22,7 +22,6 @@ public class JsonConstants {
     ScoringSetpoints.synced.loadData();
     RedFieldLocations.synced.loadData();
     BlueFieldLocations.synced.loadData();
-    DrivetrainConstants.synced.loadData();
     VisionConstants.synced.loadData();
 
     elevatorConstants = ElevatorConstants.synced.getObject();
