@@ -143,6 +143,7 @@ public class LineupState implements PeriodicStateInterface {
   }
 
   public void periodic() {
+    // run test through here if in test mode
     if (DriverStation.isTest()) {
       this.testPeriodic();
     }

@@ -130,9 +130,6 @@ public class RobotContainer {
     if (FeatureFlags.synced.getObject().runScoring) {
       scoringSubsystem.testPeriodic();
     }
-    if (FeatureFlags.synced.getObject().runDrive) {
-      // TODO: run lineup state test periodic
-    }
   }
 
   public void disabledPeriodic() {
