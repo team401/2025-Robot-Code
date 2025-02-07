@@ -1,12 +1,12 @@
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import coppercore.vision.VisionIO;
 import coppercore.vision.VisionIOPhotonReal;
 import coppercore.vision.VisionIOPhotonSim;
 import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
@@ -21,9 +21,6 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMapleSim;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import frc.robot.subsystems.scoring.ClawIOSim;
 import frc.robot.subsystems.scoring.ClawIOTalonFX;
 import frc.robot.subsystems.scoring.ClawMechanism;
@@ -31,6 +28,9 @@ import frc.robot.subsystems.scoring.ElevatorIOSim;
 import frc.robot.subsystems.scoring.ElevatorIOTalonFX;
 import frc.robot.subsystems.scoring.ElevatorMechanism;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
 public final class InitSubsystems {
   public static ScoringSubsystem initScoringSubsystem() {

@@ -2,11 +2,11 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -16,8 +16,8 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -64,8 +64,7 @@ public class RobotContainer {
         drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
       }
     }
-    }
-  
+  }
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
@@ -142,5 +141,4 @@ public class RobotContainer {
   public void disabledInit() {
     CommandScheduler.getInstance().cancelAll();
   }
-
 }
