@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -51,7 +53,8 @@ public class RobotContainer {
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
       if (ModeConstants.simMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
-        drive.setPose(new Pose2d(3, 5, new Rotation2d()));
+        drive.setPose(
+            new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
       }
     }
   }
