@@ -167,6 +167,8 @@ public class Drive implements DriveTemplate {
   };
 
   private DesiredLocation desiredLocation = DesiredLocation.Reef0;
+  private DesiredLocation intakeLocation = DesiredLocation.CoralStationLeft;
+  private boolean goToIntake = false;
 
   private NetworkTableInstance inst = NetworkTableInstance.getDefault();
   private NetworkTable table = inst.getTable("");
@@ -500,8 +502,19 @@ public class Drive implements DriveTemplate {
    */
   public boolean isDesiredLocationReef() {
     return !(desiredLocation == DesiredLocation.CoralStationLeft
-        || desiredLocation == DesiredLocation.CoralStationRight
-        || desiredLocation == DesiredLocation.Processor);
+            || desiredLocation == DesiredLocation.CoralStationRight
+            || desiredLocation == DesiredLocation.Processor)
+        && !goToIntake; // only want reef if intake is false
+  }
+
+  /**
+   * checks if location is a scoring location
+   *
+   * @return true if location is scoring (reef / processor)
+   */
+  public boolean isLocationScoring(DesiredLocation location) {
+    return !(location == DesiredLocation.CoralStationLeft
+        || location == DesiredLocation.CoralStationRight);
   }
 
   /**
@@ -511,7 +524,9 @@ public class Drive implements DriveTemplate {
    * @param location desired location for robot to pathfind to
    */
   public void setDesiredLocation(DesiredLocation location) {
-    this.desiredLocation = location;
+    if (isLocationScoring(location)) {
+      this.desiredLocation = location;
+    }
   }
 
   /**
@@ -519,7 +534,7 @@ public class Drive implements DriveTemplate {
    */
   @AutoLogOutput(key = "Drive//DesiredLocation")
   public DesiredLocation getDesiredLocation() {
-    return this.desiredLocation;
+    return goToIntake ? this.intakeLocation : this.desiredLocation;
   }
 
   /**
@@ -568,10 +583,29 @@ public class Drive implements DriveTemplate {
     this.setDesiredLocation(location);
 
     if (isDriveOTF()) {
-      // TODO: deal with state (re run on entry?)
       stateMachine.fire(DriveTrigger.ManualJoysticks);
       stateMachine.fire(DriveTrigger.BeginAutoAlignment);
     }
+  }
+
+  /**
+   * set which intake to go to
+   *
+   * @param location coral station location (left v right)
+   */
+  public void setDesiredIntakeLocation(DesiredLocation location) {
+    if (!isLocationScoring(location)) {
+      this.intakeLocation = location;
+    }
+  }
+
+  /**
+   * tells drive to otf to intake instead of reef
+   *
+   * @param goToIntake true if drive should go to coral stations
+   */
+  public void setGoToIntake(boolean goToIntake) {
+    this.goToIntake = goToIntake;
   }
 
   /**
