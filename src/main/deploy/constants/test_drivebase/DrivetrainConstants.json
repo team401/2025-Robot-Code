@@ -30,7 +30,7 @@
   "driveAlongTrackMultiplier": -1,
   "driveAlongTrackOffset": 0.25,
   "driveCrossTrackFrontRightOffset": 0.0,
-  "otfPoseDistanceLimit": 0.1,
+  "otfPoseDistanceLimit": 0.2,
   "kSteerClosedLoopOutput": "Voltage",
   "kDriveClosedLoopOutput": "TorqueCurrentFOC",
   "kDriveMotorType": "TalonFX_Integrated",

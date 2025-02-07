@@ -200,6 +200,7 @@ public class Drive implements DriveTemplate {
     CancelAutoAlignment,
     FinishOTF,
     CancelOTF,
+    BeginLineup,
     CancelLineup,
     FinishLineup,
     WaitForScore,
@@ -296,7 +297,8 @@ public class Drive implements DriveTemplate {
             DriveTrigger.FinishOTF,
             DriveState.Lineup,
             () -> (this.isDriveCloseToFinalLineupPose() && this.isDesiredLocationReef()))
-        .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick);
+        .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick)
+        .permitIf(DriveTrigger.BeginLineup, DriveState.Lineup, () -> this.isDesiredLocationReef());
 
     stateMachineConfiguration
         .configure(DriveState.Lineup)

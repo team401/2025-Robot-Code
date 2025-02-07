@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drive.states;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.path.PathConstraints;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
@@ -9,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
+import org.littletonrobotics.junction.Logger;
 
 public class OTFState implements PeriodicStateInterface {
   private Drive drive;
@@ -22,6 +24,9 @@ public class OTFState implements PeriodicStateInterface {
   }
 
   public void onEntry(Transition transition) {
+    if (PathfindingCommand.warmupCommand().isScheduled()) {
+      PathfindingCommand.warmupCommand().cancel();
+    }
     driveToPose = this.getDriveToPoseCommand();
     if (driveToPose == null) {
       drive.fireTrigger(DriveTrigger.CancelOTF);
@@ -153,6 +158,15 @@ public class OTFState implements PeriodicStateInterface {
     // finishes otf when we are 0.1 meters away
     if (drive.isDriveCloseToFinalLineupPose()) {
       drive.fireTrigger(DriveTrigger.FinishOTF);
+    }
+
+    if (driveToPose != null) {
+      Logger.recordOutput("Drive/OTF/commandScheduled", driveToPose.isScheduled());
+
+      // this runs when we accidentally go into otf (too close to reef for final pose to be true)
+      if (driveToPose.isFinished()) {
+        drive.fireTrigger(DriveTrigger.BeginLineup);
+      }
     }
   }
 }
