@@ -18,7 +18,7 @@ public class RedFieldLocations {
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
   public Translation2d redReefCenterTranslation =
-      new Translation2d(Units.inchesToMeters(176.75), Units.inchesToMeters(158.5));
+      new Translation2d(12.5, 4.0259);
   public Rotation2d redReefCenterRotation = new Rotation2d();
 
   public Translation2d redReef01Translation = new Translation2d(11.5, 4.1);
