@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.drive.Drive.VisionAlignment;
 import org.littletonrobotics.junction.Logger;
 
@@ -149,9 +150,9 @@ public class LineupState implements PeriodicStateInterface {
     }
     this.LineupWithReefLocation();
 
-    // if (lineupFinished()) {
-    //   drive.fireTrigger(DriveTrigger.FinishLineup);
-    // }
+    if (lineupFinished()) {
+      drive.fireTrigger(DriveTrigger.FinishLineup);
+    }
   }
 
   /**

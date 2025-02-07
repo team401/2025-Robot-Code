@@ -643,10 +643,13 @@ public class Drive implements DriveTemplate {
   /**
    * checks if alignment has run
    *
-   * @return true if current state is joystick (assumes alignment has gone through)
+   * @return true if we are close to otf for intake OR we have finished lineup for reef
    */
   public boolean isDriveAlignmentFinished() {
-    return this.stateMachine.getCurrentState().equals(DriveState.Joystick);
+    return goToIntake
+        ? this.isDriveCloseToFinalLineupPose()
+        : (this.stateMachine.getCurrentState().equals(DriveState.Joystick)
+            || this.stateMachine.getCurrentState().equals(DriveState.Idle));
   }
 
   /**
