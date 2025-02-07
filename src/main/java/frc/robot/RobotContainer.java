@@ -5,12 +5,14 @@
 package frc.robot;
 
 import coppercore.vision.VisionLocalizer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.drive.AkitDriveCommands;
+import frc.robot.constants.AutoPath;
 import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
@@ -29,6 +31,8 @@ public class RobotContainer {
   private Drive drive;
   private VisionLocalizer vision;
 
+  private SendableChooser<String> autoChooser = new SendableChooser<>();
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     loadConstants();
@@ -36,12 +40,19 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
     TestModeManager.testInit();
+    configureAutos();
   }
 
   public void loadConstants() {
     JsonConstants.loadConstants();
     FeatureFlags.synced.loadData();
     OperatorConstants.synced.loadData();
+  }
+
+  public void configureAutos() {
+    for (AutoPath path : JsonConstants.autoPaths) {
+      autoChooser.addOption(path.autoPathName, path.autoPathName);
+    }
   }
 
   public void configureSubsystems() {
