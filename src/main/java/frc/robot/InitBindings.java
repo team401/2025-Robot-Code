@@ -10,10 +10,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.drive.DesiredLocationSelector;
+import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.Drive.DesiredLocation;
-import frc.robot.subsystems.drive.DrivetrainConstants;
 
 public final class InitBindings {
   // Controller
@@ -34,9 +33,9 @@ public final class InitBindings {
             drive, // type: DriveTemplate
             leftJoystick, // type: CommandJoystick
             rightJoystick, // type: CommandJoystick
-            DrivetrainConstants.maxLinearSpeed, // type: double (m/s)
-            DrivetrainConstants.maxAngularSpeed, // type: double (rad/s)
-            DrivetrainConstants.joystickDeadband // type: double
+            JsonConstants.drivetrainConstants.maxLinearSpeed, // type: double (m/s)
+            JsonConstants.drivetrainConstants.maxAngularSpeed, // type: double (rad/s)
+            JsonConstants.drivetrainConstants.joystickDeadband // type: double
             ));
 
     // hold right joystick trigger down to have drive go to desired location
@@ -45,8 +44,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  drive.setDesiredLocation(DesiredLocation.CoralStationRight);
-                  drive.setOTF(true);
+                  drive.setAutoAlignment(true);
                 },
                 drive));
     rightJoystick
@@ -54,11 +52,27 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  drive.setOTF(false);
+                  drive.setAutoAlignment(false);
                 },
                 drive));
 
-    // pov right (reef 0-11 -> processor left -> processor right )
+    leftJoystick
+        .button(1)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  drive.angleController.reset(drive.getRotation().getRadians());
+                  drive.alignToFieldElement();
+                },
+                drive));
+    leftJoystick
+        .button(1)
+        .onFalse(
+            new InstantCommand(
+                () -> {
+                  drive.disableAlign();
+                },
+                drive)); // pov right (reef 0-11 -> processor left -> processor right )
     // pov left (goes backwards of right)
     driverController
         .povRight()

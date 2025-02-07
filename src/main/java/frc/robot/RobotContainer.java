@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -15,8 +16,8 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -26,8 +27,9 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here
-  private ElevatorSubsystem elevatorSubsystem;
+  private ScoringSubsystem scoringSubsystem;
   private Drive drive;
+  private VisionLocalizer vision;
 
   public static SwerveDriveSimulation driveSim = null;
 
@@ -47,8 +49,8 @@ public class RobotContainer {
   }
 
   public void configureSubsystems() {
-    if (FeatureFlags.synced.getObject().runElevator) {
-      elevatorSubsystem = InitSubsystems.initElevatorSubsystem();
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem = InitSubsystems.initScoringSubsystem();
     }
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
@@ -56,8 +58,14 @@ public class RobotContainer {
         drive.setPose(
             new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
       }
+      if (FeatureFlags.synced.getObject().runVision) {
+        vision = InitSubsystems.initVisionSubsystem(drive);
+
+        drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
+      }
     }
-  }
+    }
+  
 
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
@@ -112,7 +120,6 @@ public class RobotContainer {
         CommandScheduler.getInstance()
             .schedule(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         break;
-
       default:
         break;
     }
@@ -120,14 +127,20 @@ public class RobotContainer {
 
   /** This method must be called from the robot, as it isn't called automatically. */
   public void testPeriodic() {
-    if (FeatureFlags.synced.getObject().runElevator) {
-      elevatorSubsystem.testPeriodic();
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem.testPeriodic();
     }
+    if (FeatureFlags.synced.getObject().runDrive) {
+      drive.testPeriodic();
+    }
+  }
+
+  public void disabledPeriodic() {
+    // Logger.recordOutput("feature_flags/drive", FeatureFlags.synced.getObject().runDrive);
   }
 
   public void disabledInit() {
     CommandScheduler.getInstance().cancelAll();
   }
 
-  public void disabledPeriodic() {}
 }

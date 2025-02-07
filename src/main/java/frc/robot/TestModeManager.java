@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class TestModeManager {
   public enum TestMode {
     ElevatorTuning,
+    ClawTuning,
+    ClawOvershootTuning,
     DriveFeedForwardCharacterization,
     DriveWheelRadiusCharacterization,
     DriveSysIdQuasistaticForward,
@@ -15,6 +17,7 @@ public class TestModeManager {
     DriveSysIdQuasistaticBackward,
     DriveSysIdDynamicForward,
     DriveSysIdDynamicBackward,
+    DriveLineupTuning,
     None, // Default test mode that does nothing until a new one is selected.
   }
 
@@ -30,6 +33,7 @@ public class TestModeManager {
     testModeChooser.setDefaultOption("None", TestMode.None);
     // Elevator Test Modes
     testModeChooser.addOption("Elevator Tuning", TestMode.ElevatorTuning);
+    testModeChooser.addOption("Claw Tuning", TestMode.ClawTuning);
     // Drive Test Modes
     testModeChooser.addOption(
         "Drive FeedForward Characterization", TestMode.DriveFeedForwardCharacterization);
@@ -43,6 +47,7 @@ public class TestModeManager {
         "Drive SysId (Quasistatic Reverse)", TestMode.DriveSysIdQuasistaticBackward);
     testModeChooser.addOption("Drive SysId (Dynamic Forward)", TestMode.DriveSysIdDynamicForward);
     testModeChooser.addOption("Drive SysId (Dynamic Reverse)", TestMode.DriveSysIdDynamicBackward);
+    testModeChooser.addOption("Drive Lineup Tuning", TestMode.DriveLineupTuning);
 
     SmartDashboard.putData("Test Mode Selector", testModeChooser);
   }

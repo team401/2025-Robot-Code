@@ -1,0 +1,65 @@
+{
+  "redReefCenterTranslation": {
+    "x": 176.75,
+    "y": 158.5
+  },
+  "redReefCenterRotation": {
+    "radians": 0.0
+  },
+  "redReef01Translation": {
+    "x": 11.5,
+    "y": 4.1
+  },
+  "redReef01Rotation": {
+    "radians": 0.0
+  },
+  "redReef23Translation": {
+    "x": 12.2,
+    "y": 5.3
+  },
+  "redReef23Rotation": {
+    "radians": -1.0471975511965976
+  },
+  "redReef45Translation": {
+    "x": 14.0,
+    "y": 5.5
+  },
+  "redReef45Rotation": {
+    "radians": -2.0943951023931953
+  },
+  "redReef67Translation": {
+    "x": 14.7,
+    "y": 4.0
+  },
+  "redReef67Rotation": {
+    "radians": 3.141592653589793
+  },
+  "redReef89Translation": {
+    "x": 14.0,
+    "y": 2.5
+  },
+  "redReef89Rotation": {
+    "radians": 2.0943951023931953
+  },
+  "redReef1011Translation": {
+    "x": 12.2,
+    "y": 2.6
+  },
+  "redReef1011Rotation": {
+    "radians": 1.0471975511965976
+  },
+  "redCoralStationRightTranslation": {
+    "x": 16.3,
+    "y": 7.0
+  },
+  "redCoralStationRightRotation": {
+    "radians": -2.0943951023931953
+  },
+  "redCoralStationLeftTranslation": {
+    "x": 16.3,
+    "y": 1.0
+  },
+  "redCoralStationLeftRotation": {
+    "radians": 2.0943951023931953
+  }
+}
