@@ -1,4 +1,6 @@
 {
-  "runScoring": false,
-  "runDrive": true
+  "runElevator": false,
+  "runDrive": true,
+  "runClimb": true,
+  "runScoring": false
 }

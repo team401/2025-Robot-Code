@@ -13,7 +13,8 @@
         "OperatorConstants.json",
         "VisionConstants.json",
         "ScoringFeatureFlags.json",
-        "ScoringSetpoints.json"
+        "ScoringSetpoints.json",
+        "ClimbConstants.json"
       ]
     },
     {
@@ -27,7 +28,8 @@
         "OperatorConstants.json",
         "VisionConstants.json",
         "ScoringFeatureFlags.json",
-        "ScoringSetpoints.json"
+        "ScoringSetpoints.json",
+        "ClimbConstants.json"
       ]
     },
     {
@@ -40,7 +42,8 @@
         "FeatureFlags.json",
         "OperatorConstants.json",
         "ScoringFeatureFlags.json",
-        "ScoringSetpoints.json"
+        "ScoringSetpoints.json",
+        "ClimbConstants.json"
       ]
     }
   ]
