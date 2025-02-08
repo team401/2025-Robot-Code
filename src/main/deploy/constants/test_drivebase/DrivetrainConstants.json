@@ -30,7 +30,7 @@
   "driveAlongTrackMultiplier": -1,
   "driveAlongTrackOffset": 0.25,
   "driveCrossTrackFrontRightOffset": 0.0,
-  "otfPoseDistanceLimit": 0.1,
+  "otfPoseDistanceLimit": 0.2,
   "kSteerClosedLoopOutput": "Voltage",
   "kDriveClosedLoopOutput": "TorqueCurrentFOC",
   "kDriveMotorType": "TalonFX_Integrated",
@@ -330,7 +330,7 @@
   "kInvertRightSide": true,
   "kPigeonId": 20,
   "OTFMaxLinearVelocity": 3.5,
-  "OTFMaxLinearAccel": 0.5,
+  "OTFMaxLinearAccel": 2.0,
   "OTFMaxAngularVelocity": 3.141592653589793,
   "OTFMaxAngularAccel": 1.5707963267948966,
   "DrivetrainConstants": {
