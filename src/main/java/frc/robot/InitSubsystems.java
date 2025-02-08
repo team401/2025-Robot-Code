@@ -1,7 +1,6 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
-import org.ironmaple.simulation.drivesims.COTS;
 import static edu.wpi.first.units.Units.Meters;
 
 import coppercore.vision.VisionIO;
@@ -34,9 +33,9 @@ import frc.robot.subsystems.scoring.ElevatorIOTalonFX;
 import frc.robot.subsystems.scoring.ElevatorMechanism;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
-import org.ironmaple.simulation.drivesims.COTS;
 
 public final class InitSubsystems {
   public static ScoringSubsystem initScoringSubsystem() {
