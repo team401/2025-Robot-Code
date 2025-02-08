@@ -33,6 +33,7 @@ public class AutoStrategyContainer {
                   .resolve("auto/" + strategyNames[i].getName())
                   .toString(),
               new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
+      synced.loadData();
       AutoStrategy strat = synced.getObject();
       strat.autoStrategyName = strategyNames[i].getName().replace(".json", "");
       strategies.add(strat);

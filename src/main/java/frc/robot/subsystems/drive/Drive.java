@@ -627,6 +627,7 @@ public class Drive implements DriveTemplate {
    *
    * @return true if drive is going to a coral station
    */
+  @AutoLogOutput(key = "Drive/goToIntake")
   public boolean isGoingToIntake() {
     return goToIntake;
   }

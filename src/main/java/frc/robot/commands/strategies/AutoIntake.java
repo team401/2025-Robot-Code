@@ -17,7 +17,13 @@ public class AutoIntake extends Command {
     this.scoringSubsystem = scoring;
     this.intakeLocation = intakeLocation;
 
-    addRequirements(drive, scoringSubsystem);
+    if (drive != null && scoringSubsystem != null) {
+      addRequirements(drive, scoringSubsystem);
+    } else if (drive != null) {
+      addRequirements(drive);
+    } else if (scoringSubsystem != null) {
+      addRequirements(scoringSubsystem);
+    }
   }
 
   public void initialize() {
@@ -34,13 +40,14 @@ public class AutoIntake extends Command {
    * @return true if we are ready for next path
    */
   public boolean isReadyForNextAction() {
-    return (drive != null && drive.isDriveAlignmentFinished())
-        && (scoringSubsystem != null && !scoringSubsystem.shouldWaitOnIntake());
+    return (drive == null || drive.isDriveAlignmentFinished())
+        && (scoringSubsystem == null || !scoringSubsystem.shouldWaitOnIntake());
   }
 
   public void end(boolean interrupted) {
     if (drive != null) {
       drive.setGoToIntake(false);
+      drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
     }
   }
 

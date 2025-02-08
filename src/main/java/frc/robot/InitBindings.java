@@ -13,6 +13,7 @@ import frc.robot.commands.drive.DesiredLocationSelector;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 
 public final class InitBindings {
@@ -107,6 +108,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
+                  drive.setDesiredIntakeLocation(DesiredLocation.CoralStationRight);
                   drive.setGoToIntake(true);
                   drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
                 },

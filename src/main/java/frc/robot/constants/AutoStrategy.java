@@ -7,7 +7,7 @@ import java.util.List;
 
 public class AutoStrategy {
   @JSONExclude public String autoStrategyName = "";
-  public final List<DesiredLocation> scoringLocations = null;
-  public final List<FieldTarget> scoringLevels = null;
+  public List<DesiredLocation> scoringLocations = null;
+  public List<FieldTarget> scoringLevels = null;
   public final DesiredLocation intakeLocation = null;
 }

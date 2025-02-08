@@ -26,6 +26,7 @@ public class StrategyManager {
   private Drive drive;
   private ScoringSubsystem scoringSubsysttem;
   private AutonomyMode autonomyMode = AutonomyMode.Full;
+  private Action currentAction = null;
 
   public StrategyManager(Drive drive, ScoringSubsystem scoringSubsystem) {
     actions = new LinkedList<>();
@@ -54,6 +55,9 @@ public class StrategyManager {
   /** clears queue */
   public void clearActions() {
     actions.clear();
+    if (currentCommand != null) {
+      currentCommand.cancel();
+    }
   }
 
   /**
@@ -71,7 +75,7 @@ public class StrategyManager {
    * @return the next action in queue
    */
   public Action getNextAction() {
-    return actions.remove();
+    return actions.size() > 0 ? actions.remove() : null;
   }
 
   /**
@@ -81,7 +85,16 @@ public class StrategyManager {
    */
   public void logActions() {
     Logger.recordOutput(
-        "StrategyManager/ActionQueue", this.actions.toArray(new Action[this.actions.size()]));
+        "StrategyManager/DesiredLocation",
+        this.currentAction != null ? this.currentAction.location() : null);
+    Logger.recordOutput(
+        "StrategyManager/currentAction",
+        this.currentAction != null ? this.currentAction.type() : null);
+    Logger.recordOutput(
+        "StrategyManager/currentCommandStatus",
+        this.currentCommand != null ? this.currentCommand.isFinished() : false);
+    // Logger.recordOutput(
+    //     "StrategyManager/ActionQueue", this.actions.toArray(new Action[this.actions.size()]));
   }
 
   /**
@@ -90,8 +103,6 @@ public class StrategyManager {
    * @param strategy AutoStrategy defined in java and json
    */
   public void addActionsFromAutoStrategy(AutoStrategy strategy) {
-    this.addAction(new Action(ActionType.Intake, GamePiece.Coral, strategy.intakeLocation, null));
-
     for (int i = 0; i < strategy.scoringLocations.size(); i++) {
       FieldTarget scoringLevel =
           strategy.scoringLevels.size() > i ? strategy.scoringLevels.get(i) : FieldTarget.L1;
@@ -112,11 +123,15 @@ public class StrategyManager {
    * @return a command to be scheduled
    */
   public Command getCommandFromAction(Action action) {
+    if (action == null) {
+      return null;
+    }
     if (action.type() == ActionType.Intake) {
       switch (this.autonomyMode) {
         case Full:
         case Teleop:
         case Manual:
+        default:
           return new AutoIntake(drive, scoringSubsysttem, action.location());
       }
     } else if (action.type() == ActionType.Score) {
@@ -124,19 +139,29 @@ public class StrategyManager {
         case Full:
         case Teleop:
         case Manual:
+        default:
           return new AutoScore(drive, scoringSubsysttem, action.location());
       }
+    } else {
+      return null;
     }
-    return null;
   }
 
   public void periodic() {
     if (currentCommand == null || currentCommand.isFinished()) {
-      currentCommand = getCommandFromAction(getNextAction());
+      currentAction = getNextAction();
+      currentCommand = getCommandFromAction(currentAction);
+      System.out.println(currentCommand == null ? "command not found" : "command is found");
       if (currentCommand != null) {
         currentCommand.schedule();
       }
     }
+
+    Logger.recordOutput(
+        "StrategyManager/commandScheduled",
+        currentCommand != null ? currentCommand.isScheduled() : false);
+
+    Logger.recordOutput("StrategyManager/actionSize", this.actions.size());
 
     this.logActions();
   }
