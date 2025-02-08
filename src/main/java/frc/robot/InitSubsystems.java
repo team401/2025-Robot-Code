@@ -1,5 +1,9 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import org.ironmaple.simulation.drivesims.COTS;
+import static edu.wpi.first.units.Units.Meters;
+
 import coppercore.vision.VisionIO;
 import coppercore.vision.VisionIOPhotonReal;
 import coppercore.vision.VisionIOPhotonSim;
@@ -7,6 +11,7 @@ import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
@@ -31,6 +36,7 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
+import org.ironmaple.simulation.drivesims.COTS;
 
 public final class InitSubsystems {
   public static ScoringSubsystem initScoringSubsystem() {
@@ -86,7 +92,9 @@ public final class InitSubsystems {
 
         // Sim robot, instantiate physics sim IO implementations
         RobotContainer.driveSim =
-            new SwerveDriveSimulation(DriveTrainSimulationConfig.Default(), new Pose2d());
+            new SwerveDriveSimulation(
+                DriveTrainSimulationConfig.Default().withGyro(COTS.ofPigeon2()),
+                new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
         // DrivetrainConstants.SimConstants.driveSimConfig, new Pose2d());
         SimulatedArena.getInstance().addDriveTrainSimulation(RobotContainer.driveSim);
         return new Drive(
