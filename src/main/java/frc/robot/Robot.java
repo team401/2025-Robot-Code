@@ -160,7 +160,6 @@ public class Robot extends LoggedRobot {
   public void simulationPeriodic() {
     if (ModeConstants.currentMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
       SimulatedArena.getInstance().simulationPeriodic();
-      RobotContainer.drive.setPose(RobotContainer.driveSim.getSimulatedDriveTrainPose());
       Logger.recordOutput("FieldSimulation/RobotPosition", RobotContainer.driveSim.getSimulatedDriveTrainPose());
 
       Logger.recordOutput(
