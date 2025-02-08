@@ -8,9 +8,11 @@ import frc.robot.constants.AutoStrategy.Action;
 import frc.robot.constants.AutoStrategy.ActionType;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import java.util.LinkedList;
 import java.util.Queue;
+import org.littletonrobotics.junction.Logger;
 
 public class StrategyManager {
   public enum AutonomyMode {
@@ -73,6 +75,16 @@ public class StrategyManager {
   }
 
   /**
+   * logs current action queue
+   *
+   * <p>NOTE: call in periodic
+   */
+  public void logActions() {
+    Logger.recordOutput(
+        "StrategyManager/ActionQueue", this.actions.toArray(new Action[this.actions.size()]));
+  }
+
+  /**
    * adds actions to queue based on an AutoStrategy
    *
    * @param strategy AutoStrategy defined in java and json
@@ -81,13 +93,12 @@ public class StrategyManager {
     this.addAction(new Action(ActionType.Intake, GamePiece.Coral, strategy.intakeLocation, null));
 
     for (int i = 0; i < strategy.scoringLocations.size(); i++) {
+      FieldTarget scoringLevel =
+          strategy.scoringLevels.size() > i ? strategy.scoringLevels.get(i) : FieldTarget.L1;
       // add scoring
       this.addAction(
           new Action(
-              ActionType.Score,
-              GamePiece.Coral,
-              strategy.scoringLocations.get(i),
-              strategy.scoringLevels.get(i)));
+              ActionType.Score, GamePiece.Coral, strategy.scoringLocations.get(i), scoringLevel));
 
       // intake after each score
       this.addAction(new Action(ActionType.Intake, GamePiece.Coral, strategy.intakeLocation, null));
@@ -126,5 +137,7 @@ public class StrategyManager {
         currentCommand.schedule();
       }
     }
+
+    this.logActions();
   }
 }

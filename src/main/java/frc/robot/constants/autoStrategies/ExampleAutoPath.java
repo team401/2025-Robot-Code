@@ -6,6 +6,7 @@ import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.constants.AutoStrategy;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;
+import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,11 +17,11 @@ public class ExampleAutoPath implements AutoStrategy {
           new ExampleAutoPath(),
           Filesystem.getDeployDirectory()
               .toPath()
-              .resolve("constants/autoStrategies" + autoStrategyName + "/.json")
+              .resolve("constants/autoStrategies/" + autoStrategyName + ".json")
               .toString(),
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
   public final List<DesiredLocation> scoringLocations = new LinkedList<>();
-  public final List<Integer> scoringLevels = new LinkedList<>();
+  public final List<FieldTarget> scoringLevels = new LinkedList<>();
   public final DesiredLocation intakeLocation = DesiredLocation.CoralStationLeft;
 }
