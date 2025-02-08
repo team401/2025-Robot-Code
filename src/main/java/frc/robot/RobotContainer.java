@@ -28,7 +28,7 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here
   private ScoringSubsystem scoringSubsystem;
-  private Drive drive;
+  public static  Drive drive;
   private VisionLocalizer vision;
 
   public static SwerveDriveSimulation driveSim = null;
