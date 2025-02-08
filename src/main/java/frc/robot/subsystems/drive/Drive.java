@@ -674,6 +674,8 @@ public class Drive implements DriveTemplate {
             lockedAlignPosition.getY() - currentPosition.getY(),
             lockedAlignPosition.getX() - currentPosition.getX());
 
+    Logger.recordOutput("Drive/targetAngle", targetAngle);
+
     // Use PID to rotate toward the target angle
     omega = angleController.calculate(getRotation().getRadians(), targetAngle);
     setGoalSpeeds(

@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.strategies.AutoIntake;
 import frc.robot.commands.strategies.AutoScore;
 import frc.robot.constants.AutoStrategy;
@@ -153,10 +154,11 @@ public class StrategyManager {
       currentCommand = getCommandFromAction(currentAction);
       System.out.println(currentCommand == null ? "command not found" : "command is found");
       if (currentCommand != null) {
-        currentCommand.schedule();
+        CommandScheduler.getInstance().schedule(currentCommand);
       }
     }
 
+    Logger.recordOutput("StrategyManager/commandNull", currentCommand == null);
     Logger.recordOutput(
         "StrategyManager/commandScheduled",
         currentCommand != null ? currentCommand.isScheduled() : false);

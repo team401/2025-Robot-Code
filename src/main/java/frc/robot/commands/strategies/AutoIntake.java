@@ -18,11 +18,11 @@ public class AutoIntake extends Command {
     this.intakeLocation = intakeLocation;
 
     if (drive != null && scoringSubsystem != null) {
-      addRequirements(drive, scoringSubsystem);
+      // addRequirements(drive, scoringSubsystem);
     } else if (drive != null) {
-      addRequirements(drive);
+      // addRequirements(drive);
     } else if (scoringSubsystem != null) {
-      addRequirements(scoringSubsystem);
+      // addRequirements(scoringSubsystem);
     }
   }
 

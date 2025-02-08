@@ -20,11 +20,11 @@ public class AutoScore extends Command {
     this.currentScoringLocation = scoringLocation;
 
     if (drive != null && scoringSubsystem != null) {
-      addRequirements(drive, scoringSubsystem);
+      // addRequirements(drive, scoringSubsystem);
     } else if (drive != null) {
-      addRequirements(drive);
+      // addRequirements(drive);
     } else if (scoringSubsystem != null) {
-      addRequirements(scoringSubsystem);
+      // addRequirements(scoringSubsystem);
     }
   }
 
@@ -33,6 +33,7 @@ public class AutoScore extends Command {
       drive.setGoToIntake(false);
       drive.setDesiredLocation(currentScoringLocation);
       drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+      drive.alignToFieldElement();
     }
   }
 
