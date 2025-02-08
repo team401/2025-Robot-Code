@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 // TODO make pid constants
 public class RampIOSim implements RampIO {
 
-  private PIDController controller = new PIDController(7.5, 0.001, 0.0);
+  private final PIDController controller = new PIDController(7.5, 0.001, 0.0);
 
   private SingleJointedArmSim sim =
       new SingleJointedArmSim(
@@ -21,12 +21,9 @@ public class RampIOSim implements RampIO {
 
   @Override
   public void updateOutputs(RampInputs inputs, RampOutputs outputs) {
-    setMotorVolts();
     controller.setSetpoint(outputs.targetPosition);
     double volts = controller.calculate(inputs.position);
     outputs.appliedVolts = volts;
     sim.setInputVoltage(volts);
   }
-
-  private void setMotorVolts() {}
 }

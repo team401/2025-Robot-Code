@@ -1,6 +1,7 @@
 package frc.robot.subsystems.ramp;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.constants.JsonConstants;
 
 // TODO make use PID
 // TODO make positions constants
@@ -19,11 +20,11 @@ public class RampSubsystem extends SubsystemBase {
   }
 
   public void prepareForClimb() {
-    mechanism.setPosition(0.0);
+    mechanism.setPosition(JsonConstants.rampConstants.climbPosition);
   }
 
   public void prepareForIntake() {
-    mechanism.setPosition(3.0);
+    mechanism.setPosition(JsonConstants.rampConstants.intakePosition);
   }
 
   public boolean isReadyForClimb() {

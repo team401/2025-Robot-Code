@@ -1,0 +1,34 @@
+package frc.robot.subsystems.ramp;
+
+import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.math.controller.PIDController;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
+import frc.robot.constants.JsonConstants;
+
+// TODO make pid constants
+public class RampIOTalonFX implements RampIO {
+
+  private final PIDController controller = new PIDController(7.5, 0.001, 0.0);
+
+  private TalonFX talon;
+
+  public RampIOTalonFX(){
+    talon = new TalonFX(JsonConstants.rampConstants.motorId);
+  }
+
+  @Override
+  public void updateInputs(RampInputs inputs) {
+    inputs.position = Rotations.of(talon.getPosition().getValueAsDouble()).in(Radians);
+  }
+
+  @Override
+  public void updateOutputs(RampInputs inputs, RampOutputs outputs) {
+    controller.setSetpoint(outputs.targetPosition);
+    double volts = controller.calculate(inputs.position);
+    volts = Math.clamp(volts, -12.0, 12.0);
+    outputs.appliedVolts = volts;
+    talon.setVoltage(volts);
+  }
+}
