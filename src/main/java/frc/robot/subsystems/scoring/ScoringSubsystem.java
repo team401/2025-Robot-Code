@@ -306,4 +306,15 @@ public class ScoringSubsystem extends SubsystemBase {
       clawMechanism.testPeriodic();
     }
   }
+
+  /**
+   * Get the Scoring subsystem's ElevatorMechanism instance.
+   *
+   * <p>This should ONLY be used to create Tunable commands from the elevator.
+   *
+   * @return the ElevatorMechanism that scoring uses
+   */
+  public ElevatorMechanism getElevatorMechanismForTuning() {
+    return elevatorMechanism;
+  }
 }

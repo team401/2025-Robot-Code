@@ -16,7 +16,6 @@ import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Per;
-import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
@@ -124,8 +123,11 @@ public interface ElevatorIO {
    */
   public default void setSmallCANCoderPosition(Angle newAngle) {}
 
-  /** Set the static voltage that will be applied when the elevator is in override mode. */
-  public default void setOverrideVolts(Voltage volts) {}
+  /**
+   * Set the static current (because of FOC) that will be applied when the elevator is in override
+   * mode.
+   */
+  public default void setOverrideCurrent(Current current) {}
 
   /**
    * Set whether the override voltage should be applied or whether the elevator should control to

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class TestModeManager {
   public enum TestMode {
     ElevatorTuning,
+    ElevatorCharacterization,
     ClawTuning,
     ClawOvershootTuning,
     DriveFeedForwardCharacterization,
@@ -33,6 +34,7 @@ public class TestModeManager {
     testModeChooser.setDefaultOption("None", TestMode.None);
     // Elevator Test Modes
     testModeChooser.addOption("Elevator Tuning", TestMode.ElevatorTuning);
+    testModeChooser.addOption("Elevator Characterization", TestMode.ElevatorCharacterization);
     testModeChooser.addOption("Claw Tuning", TestMode.ClawTuning);
     // Drive Test Modes
     testModeChooser.addOption(

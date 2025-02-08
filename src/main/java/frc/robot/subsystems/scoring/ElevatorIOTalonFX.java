@@ -12,6 +12,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -26,7 +27,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.Per;
-import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.subsystems.ElevatorConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -35,7 +35,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   MutAngle largeEncoderSetpointPosition = Rotations.mutable(0.0);
   MutAngle spoolGoalAngle = Rotations.mutable(0.0);
 
-  Voltage overrideVolts;
+  Current overrideCurrent;
   boolean isOverriding;
 
   /* TODO: name this left/right or front/back
@@ -57,6 +57,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   MotionMagicExpoTorqueCurrentFOC motionMagicExpoTorqueCurrentFOC =
       new MotionMagicExpoTorqueCurrentFOC(0.0);
   VoltageOut voltageOut = new VoltageOut(0.0);
+  TorqueCurrentFOC currentOut = new TorqueCurrentFOC(0.0);
 
   public ElevatorIOTalonFX() {
     // Initialize TalonFXs  and CANcoders with their correct IDs
@@ -160,8 +161,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
       leadMotor.setControl(voltageOut.withOutput(0.0));
       outputs.elevatorAppliedVolts.mut_replace(Volts.of(0.0));
     } else if (isOverriding) {
-      leadMotor.setControl(voltageOut.withOutput(overrideVolts));
-      outputs.elevatorAppliedVolts.mut_replace(overrideVolts);
+      leadMotor.setControl(currentOut.withOutput(overrideCurrent));
+      outputs.elevatorAppliedVolts.mut_replace(leadMotor.getMotorVoltage().getValue());
     } else {
       leadMotor.setControl(motionMagicExpoTorqueCurrentFOC);
 
@@ -209,8 +210,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   }
 
   @Override
-  public void setOverrideVolts(Voltage volts) {
-    overrideVolts = volts;
+  public void setOverrideCurrent(Current current) {
+    overrideCurrent = current;
   }
 
   @Override

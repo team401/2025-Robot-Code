@@ -4,9 +4,15 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
 import coppercore.vision.VisionLocalizer;
+import coppercore.wpilib_interface.tuning.TuneG;
+import coppercore.wpilib_interface.tuning.TuneS;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -88,6 +94,21 @@ public class RobotContainer {
   /** This method must be called from robot, as it isn't called automatically */
   public void testInit() {
     switch (TestModeManager.getTestMode()) {
+      case ElevatorCharacterization:
+        CommandScheduler.getInstance()
+            .schedule(
+                new SequentialCommandGroup(
+                    new WaitCommand(2.0),
+                    new TuneS(
+                        scoringSubsystem.getElevatorMechanismForTuning(),
+                        RotationsPerSecond.of(0.001),
+                        0.1),
+                    new WaitCommand(3.0),
+                    new TuneG(scoringSubsystem.getElevatorMechanismForTuning(), 0.1)));
+        // new WaitCommand(3.0),
+        // new TuneV(
+        //     scoringSubsystem.getElevatorMechanismForTuning(), 0.0, Rotations.of(3.0))));
+        break;
       case DriveFeedForwardCharacterization:
         CommandScheduler.getInstance()
             .schedule(AkitDriveCommands.feedforwardCharacterization(drive));

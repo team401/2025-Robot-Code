@@ -1,5 +1,6 @@
 package frc.robot.subsystems.scoring;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
@@ -10,15 +11,22 @@ import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
 
 import coppercore.parameter_tools.LoggedTunableNumber;
 import coppercore.wpilib_interface.UnitUtils;
+import coppercore.wpilib_interface.tuning.Tunable;
+import edu.wpi.first.units.AngularAccelerationUnit;
+import edu.wpi.first.units.AngularVelocityUnit;
+import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutDistance;
-import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.units.measure.Per;
 import frc.robot.TestModeManager;
 import frc.robot.constants.subsystems.ElevatorConstants;
 import org.littletonrobotics.junction.Logger;
 
-public class ElevatorMechanism {
+public class ElevatorMechanism implements Tunable {
   ElevatorIO io;
   ElevatorInputsAutoLogged inputs = new ElevatorInputsAutoLogged();
   ElevatorOutputsAutoLogged outputs = new ElevatorOutputsAutoLogged();
@@ -154,7 +162,7 @@ public class ElevatorMechanism {
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (setpoint) -> {
-              io.setOverrideVolts(Volts.of(setpoint[0]));
+              io.setOverrideCurrent(Amps.of(setpoint[0]));
             },
             elevatorTuningOverrideVolts);
         break;
@@ -319,9 +327,9 @@ public class ElevatorMechanism {
     io.setOverrideMode(override);
   }
 
-  /** Set the static voltage that will be applied when the elevator is in override mode. */
-  public void setOverrideVolts(Voltage volts) {
-    io.setOverrideVolts(volts);
+  /** Set the static current that will be applied when the elevator is in override mode. */
+  public void setOverrideVolts(Current current) {
+    io.setOverrideCurrent(current);
   }
 
   /**
@@ -338,5 +346,40 @@ public class ElevatorMechanism {
   /** Set whether or not the motors on the elevator should be disabled. */
   public void setMotorsDisabled(boolean disabled) {
     io.setMotorsDisabled(disabled);
+  }
+
+  // ===== Tunable definitions: =====
+  // As a 'tunable', elevator is in terms of Large CANcoder, since thats its remote sensor for
+  // FusedCANcoder
+  public Angle getPosition() {
+    return inputs.largeEncoderPos;
+  }
+
+  public AngularVelocity getVelocity() {
+    return inputs.elevatorMechanismVelocity;
+  }
+
+  public void setOutput(double output) {
+    io.setOverrideMode(true);
+    io.setOverrideCurrent(Amps.of(output));
+  }
+
+  public void setPID(double p, double i, double d) {
+    io.setPID(p, i, d);
+  }
+
+  public void setFF(double kS, double kV, double kA, double kG) {
+    io.setFF(kS, kV, kA, kG);
+  }
+
+  public void setMaxProfileProperties(
+      AngularVelocity maxVelocity, AngularAcceleration maxAcceleration) {
+    Per<VoltageUnit, AngularAccelerationUnit> kA = Volts.of(12.0).div(maxAcceleration);
+    Per<VoltageUnit, AngularVelocityUnit> kV = Volts.of(12.0).div(maxVelocity);
+    io.setMaxProfile(maxVelocity, kA, kV);
+  }
+
+  public void runToPosition(Angle position) {
+    io.setLargeCANCoderGoalPos(position);
   }
 }
