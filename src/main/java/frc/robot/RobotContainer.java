@@ -5,17 +5,24 @@
 package frc.robot;
 
 import coppercore.vision.VisionLocalizer;
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.StrategyManager.AutonomyMode;
 import frc.robot.commands.drive.AkitDriveCommands;
+import frc.robot.constants.AutoStrategy;
+import frc.robot.constants.AutoStrategyContainer;
 import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import java.io.File;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -25,9 +32,13 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here
-  private ScoringSubsystem scoringSubsystem;
-  private Drive drive;
-  private VisionLocalizer vision;
+  private ScoringSubsystem scoringSubsystem = null;
+  private Drive drive = null;
+  private VisionLocalizer vision = null;
+  private StrategyManager strategyManager = null;
+  private AutoStrategyContainer strategyContainer = null;
+
+  private SendableChooser<AutoStrategy> autoChooser = new SendableChooser<>();
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -36,12 +47,30 @@ public class RobotContainer {
     // Configure the trigger bindings
     configureBindings();
     TestModeManager.testInit();
+    configureAutos();
   }
 
   public void loadConstants() {
     JsonConstants.loadConstants();
     FeatureFlags.synced.loadData();
     OperatorConstants.synced.loadData();
+  }
+
+  public void configureAutos() {
+    boolean firstDefault = false;
+    File autoDirectory =
+        new File(Filesystem.getDeployDirectory().toPath().resolve("auto").toString());
+    strategyContainer = new AutoStrategyContainer(autoDirectory.listFiles());
+    for (AutoStrategy strategy : strategyContainer.getStrategies()) {
+      if (!firstDefault) {
+        autoChooser.setDefaultOption(strategy.autoStrategyName, strategy);
+        firstDefault = true;
+      } else {
+        autoChooser.addOption(strategy.autoStrategyName, strategy);
+      }
+    }
+
+    SmartDashboard.putData("Auto Chooser", autoChooser);
   }
 
   public void configureSubsystems() {
@@ -57,6 +86,8 @@ public class RobotContainer {
         drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
       }
     }
+
+    strategyManager = new StrategyManager(drive, scoringSubsystem);
   }
 
   /**
@@ -83,6 +114,23 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     return AkitDriveCommands.feedforwardCharacterization(drive);
+  }
+
+  public void periodic() {
+    strategyManager.periodic();
+  }
+
+  public void autonomousInit() {
+    strategyManager.setAutonomyMode(AutonomyMode.Full);
+
+    // load chosen strategy
+    strategyManager.addActionsFromAutoStrategy(autoChooser.getSelected());
+  }
+
+  public void teleopInit() {
+    strategyManager.setAutonomyMode(AutonomyMode.Teleop);
+    // clear leftover actions from auto
+    strategyManager.clearActions();
   }
 
   /** This method must be called from robot, as it isn't called automatically */

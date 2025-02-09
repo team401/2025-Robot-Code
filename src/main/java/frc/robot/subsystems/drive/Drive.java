@@ -174,7 +174,12 @@ public class Drive implements DriveTemplate {
   private NetworkTable table = inst.getTable("");
   private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
 
+  @AutoLogOutput(key = "Drive/waitOnScore")
   private BooleanSupplier waitOnScore = () -> false;
+
+  @AutoLogOutput(key = "Drive/waitOnIntake")
+  private BooleanSupplier waitOnIntake = () -> false;
+
   private VisionAlignment alignmentSupplier = null;
 
   private static Drive instance;
@@ -423,13 +428,22 @@ public class Drive implements DriveTemplate {
   }
 
   /**
-   * set supplier that interfaces with scoring used to make drive set 0 speeds once lined up (so no
-   * error movement occurs)
+   * set supplier that interfaces with scoring used to make drive wait until setting next location
+   * in auto
    *
    * @param waitOnScore BooleanSupplier to let drive know if scoring is done scoring
    */
   public void setWaitOnScoreSupplier(BooleanSupplier waitOnScore) {
     this.waitOnScore = waitOnScore;
+  }
+
+  /**
+   * set supplier that interfaces with intake to make drive wait until setting next location in auto
+   *
+   * @param waitOnIntake BooleanSupplier to let drive know if intake has a coral for auto
+   */
+  public void setWaitOnIntakeSupplier(BooleanSupplier waitOnIntake) {
+    this.waitOnIntake = waitOnIntake;
   }
 
   /**
@@ -609,12 +623,34 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * checks if drive is in intake mode
+   *
+   * @return true if drive is going to a coral station
+   */
+  @AutoLogOutput(key = "Drive/goToIntake")
+  public boolean isGoingToIntake() {
+    return goToIntake;
+  }
+
+  /**
    * attempts to change state of state machine
    *
    * @param trigger trigger to give to state for transition
    */
   public void fireTrigger(DriveTrigger trigger) {
     stateMachine.fire(trigger);
+  }
+
+  /**
+   * checks if alignment has run
+   *
+   * @return true if we are close to otf for intake OR we have finished lineup for reef
+   */
+  public boolean isDriveAlignmentFinished() {
+    return goToIntake
+        ? this.isDriveCloseToFinalLineupPose()
+        : (this.stateMachine.getCurrentState().equals(DriveState.Joystick)
+            || this.stateMachine.getCurrentState().equals(DriveState.Idle));
   }
 
   /**
@@ -637,6 +673,8 @@ public class Drive implements DriveTemplate {
         Math.atan2(
             lockedAlignPosition.getY() - currentPosition.getY(),
             lockedAlignPosition.getX() - currentPosition.getX());
+
+    Logger.recordOutput("Drive/targetAngle", targetAngle);
 
     // Use PID to rotate toward the target angle
     omega = angleController.calculate(getRotation().getRadians(), targetAngle);
