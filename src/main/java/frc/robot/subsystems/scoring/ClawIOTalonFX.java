@@ -4,12 +4,14 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.HardwareLimitSwitchConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.ProximityParamsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANrange;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.ForwardLimitTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MutVoltage;
@@ -25,8 +27,10 @@ public class ClawIOTalonFX implements ClawIO {
   private MutVoltage outputVoltage = Volts.mutable(0.0);
   private VoltageOut voltageRequest = new VoltageOut(outputVoltage);
 
+  TalonFXConfiguration talonFXConfigs;
+
   public ClawIOTalonFX() {
-    TalonFXConfiguration talonFXConfigs =
+    talonFXConfigs =
         new TalonFXConfiguration()
             .withMotorOutput(
                 new MotorOutputConfigs()
@@ -34,7 +38,11 @@ public class ClawIOTalonFX implements ClawIO {
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withSupplyCurrentLimit(JsonConstants.clawConstants.clawSupplyCurrentLimit)
-                    .withStatorCurrentLimit(JsonConstants.clawConstants.clawStatorCurrentLimit));
+                    .withStatorCurrentLimit(JsonConstants.clawConstants.clawStatorCurrentLimit))
+            .withHardwareLimitSwitch(
+                new HardwareLimitSwitchConfigs()
+                    .withForwardLimitRemoteSensorID(JsonConstants.clawConstants.coralCANrangeID)
+                    .withForwardLimitType(ForwardLimitTypeValue.NormallyOpen));
 
     rollerMotor.getConfigurator().apply(talonFXConfigs);
 
@@ -92,5 +100,10 @@ public class ClawIOTalonFX implements ClawIO {
 
   public boolean isAlgaeDetected() {
     return algaeRange.getIsDetected().getValue();
+  }
+
+  public void setForwardLimitSwitchEnabled(boolean enable) {
+    talonFXConfigs.HardwareLimitSwitch.ForwardLimitEnable = enable;
+    rollerMotor.getConfigurator().apply(talonFXConfigs.HardwareLimitSwitch);
   }
 }

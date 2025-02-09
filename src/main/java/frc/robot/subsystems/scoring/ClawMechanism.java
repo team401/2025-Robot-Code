@@ -84,4 +84,8 @@ public class ClawMechanism {
         break;
     }
   }
+
+  public void setForwardLimitSwitchEnabled(boolean enable) {
+    io.setForwardLimitSwitchEnabled(enable);
+  }
 }

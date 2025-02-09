@@ -92,4 +92,12 @@ public interface ClawIO {
   public default boolean isAlgaeDetected() {
     return false;
   }
+
+  /**
+   * Enable or disable the hardware limit switch for the CANrange to automatically stop the roller
+   * motors
+   *
+   * @param enable True if enabled, false if disabled
+   */
+  public default void setForwardLimitSwitchEnabled(boolean enable) {}
 }

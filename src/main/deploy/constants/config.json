@@ -1,5 +1,5 @@
 {
-  "environment": "test_drivebase",
+  "environment": "hitl",
   "defaults": "comp",
   "environments": [
     {

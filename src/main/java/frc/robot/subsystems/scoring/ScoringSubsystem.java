@@ -273,8 +273,8 @@ public class ScoringSubsystem extends SubsystemBase {
   public void periodic() {
     boolean fireStartIntaking = SmartDashboard.getBoolean("scoring/fireStartIntaking", false);
     if (fireStartIntaking) {
-      setGamePiece(GamePiece.Algae);
-      setTarget(FieldTarget.L2);
+      setGamePiece(GamePiece.Coral);
+      // setTarget(FieldTarget.L2);
       stateMachine.fire(ScoringTrigger.BeginIntake);
       if (!stateMachine.getTransitionInfo().wasFail()) {
         System.out.println(stateMachine.getTransitionInfo().getTransition().isInternal());
@@ -305,5 +305,14 @@ public class ScoringSubsystem extends SubsystemBase {
     if (JsonConstants.scoringFeatureFlags.runClaw) {
       clawMechanism.testPeriodic();
     }
+  }
+
+  /**
+   * Should only be called by the IntakeState
+   *
+   * @param enable
+   */
+  public void setForwardLimitSwitchEnabled(boolean enable) {
+    clawMechanism.setForwardLimitSwitchEnabled(enable);
   }
 }

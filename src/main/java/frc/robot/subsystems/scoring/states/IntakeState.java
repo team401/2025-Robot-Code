@@ -41,6 +41,7 @@ public class IntakeState implements PeriodicStateInterface {
     detectedAngle = Rotations.mutable(0.0);
     isCounting = false;
     Logger.recordOutput("claw/intake/diff", 0.0);
+    scoringSubsystem.setForwardLimitSwitchEnabled(true);
   }
 
   // @Override
@@ -85,25 +86,29 @@ public class IntakeState implements PeriodicStateInterface {
     switch (scoringSubsystem.getGamePiece()) {
       case Coral:
         if (scoringSubsystem.isCoralDetected()) {
-          Angle currentPos = scoringSubsystem.getClawRollerPosition();
-          if (isCounting) {
-            // If we're already counting, check if we've rotated far enough
-            Angle diff = currentPos.minus(detectedAngle);
-            Logger.recordOutput("claw/intake/diff", diff.in(Rotations));
-            Logger.recordOutput(
-                "claw/intake/anglePastCoralrange", intakeAnglePastCoralRange.in(Rotations));
-            if (diff.gt(intakeAnglePastCoralRange)) {
-              scoringSubsystem.setClawRollerVoltage(Volts.zero());
-              scoringSubsystem.fireTrigger(ScoringTrigger.DoneIntaking);
-            }
-          } else {
-            // If we're not already counting, start counting and record where we started
-            detectedAngle.mut_replace(currentPos);
-            isCounting = true;
-            Logger.recordOutput("claw/intake/diff", 0.0);
-            Logger.recordOutput(
-                "claw/intake/anglePastCoralrange", intakeAnglePastCoralRange.in(Rotations));
-          }
+          scoringSubsystem.setClawRollerVoltage(Volts.of(0.2));
+          scoringSubsystem.fireTrigger(ScoringTrigger.DoneIntaking);
+
+          scoringSubsystem.setForwardLimitSwitchEnabled(false);
+          // Angle currentPos = scoringSubsystem.getClawRollerPosition();
+          // if (isCounting) {
+          //   // If we're already counting, check if we've rotated far enough
+          //   Angle diff = currentPos.minus(detectedAngle);
+          //   Logger.recordOutput("claw/intake/diff", diff.in(Rotations));
+          //   Logger.recordOutput(
+          //       "claw/intake/anglePastCoralrange", intakeAnglePastCoralRange.in(Rotations));
+          //   if (diff.gt(intakeAnglePastCoralRange)) {
+          //     scoringSubsystem.setClawRollerVoltage(Volts.zero());
+          //     scoringSubsystem.fireTrigger(ScoringTrigger.DoneIntaking);
+          //   }
+          // } else {
+          //   // If we're not already counting, start counting and record where we started
+          //   detectedAngle.mut_replace(currentPos);
+          //   isCounting = true;
+          //   Logger.recordOutput("claw/intake/diff", 0.0);
+          //   Logger.recordOutput(
+          //       "claw/intake/anglePastCoralrange", intakeAnglePastCoralRange.in(Rotations));
+          // }
         } else {
           // If gamepiece not detected, we're no longer counting
           isCounting = false;
