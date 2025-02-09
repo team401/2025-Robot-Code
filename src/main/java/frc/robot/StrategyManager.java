@@ -94,8 +94,12 @@ public class StrategyManager {
     Logger.recordOutput(
         "StrategyManager/currentCommandStatus",
         this.currentCommand != null ? this.currentCommand.isFinished() : false);
-    // Logger.recordOutput(
-    //     "StrategyManager/ActionQueue", this.actions.toArray(new Action[this.actions.size()]));
+    Logger.recordOutput("StrategyManager/commandNull", currentCommand == null);
+    Logger.recordOutput(
+        "StrategyManager/commandScheduled",
+        currentCommand != null ? currentCommand.isScheduled() : false);
+
+    Logger.recordOutput("StrategyManager/actionSize", this.actions.size());
   }
 
   /**
@@ -152,18 +156,10 @@ public class StrategyManager {
     if (currentCommand == null || currentCommand.isFinished()) {
       currentAction = getNextAction();
       currentCommand = getCommandFromAction(currentAction);
-      System.out.println(currentCommand == null ? "command not found" : "command is found");
       if (currentCommand != null) {
         CommandScheduler.getInstance().schedule(currentCommand);
       }
     }
-
-    Logger.recordOutput("StrategyManager/commandNull", currentCommand == null);
-    Logger.recordOutput(
-        "StrategyManager/commandScheduled",
-        currentCommand != null ? currentCommand.isScheduled() : false);
-
-    Logger.recordOutput("StrategyManager/actionSize", this.actions.size());
 
     this.logActions();
   }

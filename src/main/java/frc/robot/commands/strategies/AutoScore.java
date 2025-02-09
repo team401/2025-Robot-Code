@@ -18,14 +18,7 @@ public class AutoScore extends Command {
     this.drive = drive;
     this.scoringSubsystem = scoring;
     this.currentScoringLocation = scoringLocation;
-
-    if (drive != null && scoringSubsystem != null) {
-      // addRequirements(drive, scoringSubsystem);
-    } else if (drive != null) {
-      // addRequirements(drive);
-    } else if (scoringSubsystem != null) {
-      // addRequirements(scoringSubsystem);
-    }
+    // we dont want to require subsystems (it prevents drive otf from running)
   }
 
   public void initialize() {
@@ -33,7 +26,6 @@ public class AutoScore extends Command {
       drive.setGoToIntake(false);
       drive.setDesiredLocation(currentScoringLocation);
       drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
-      drive.alignToFieldElement();
     }
   }
 
@@ -49,9 +41,8 @@ public class AutoScore extends Command {
    * @return true if we are ready for next path
    */
   public boolean isReadyForNextAction() {
-    return false;
-    // return (drive == null || drive.isDriveAlignmentFinished())
-    //     && (scoringSubsystem == null || !scoringSubsystem.shouldWaitOnScore());
+    return (drive == null || drive.isDriveAlignmentFinished())
+        && (scoringSubsystem == null || !scoringSubsystem.shouldWaitOnScore());
   }
 
   public boolean isFinished() {

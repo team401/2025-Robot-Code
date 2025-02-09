@@ -16,14 +16,7 @@ public class AutoIntake extends Command {
     this.drive = drive;
     this.scoringSubsystem = scoring;
     this.intakeLocation = intakeLocation;
-
-    if (drive != null && scoringSubsystem != null) {
-      // addRequirements(drive, scoringSubsystem);
-    } else if (drive != null) {
-      // addRequirements(drive);
-    } else if (scoringSubsystem != null) {
-      // addRequirements(scoringSubsystem);
-    }
+    // we dont want to require subsystems (it prevents drive otf from running)
   }
 
   public void initialize() {

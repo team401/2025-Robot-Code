@@ -256,7 +256,7 @@ public class LineupState implements PeriodicStateInterface {
         observation = latestObservation;
         observationAge++;
       } else {
-        return;
+        drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
       }
     } else {
       latestObservation = observation;
