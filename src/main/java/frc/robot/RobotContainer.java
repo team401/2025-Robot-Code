@@ -7,7 +7,6 @@ package frc.robot;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import coppercore.vision.VisionLocalizer;
-import coppercore.wpilib_interface.tuning.TuneG;
 import coppercore.wpilib_interface.tuning.TuneS;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -102,9 +101,8 @@ public class RobotContainer {
                     new TuneS(
                         scoringSubsystem.getElevatorMechanismForTuning(),
                         RotationsPerSecond.of(0.001),
-                        0.1),
-                    new WaitCommand(3.0),
-                    new TuneG(scoringSubsystem.getElevatorMechanismForTuning(), 0.1)));
+                        0.1)));
+        // Can't put a TuneV in a sequential group for some reason :(
         // new WaitCommand(3.0),
         // new TuneV(
         //     scoringSubsystem.getElevatorMechanismForTuning(), 0.0, Rotations.of(3.0))));
