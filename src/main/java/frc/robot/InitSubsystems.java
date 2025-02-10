@@ -146,6 +146,16 @@ public final class InitSubsystems {
                 JsonConstants.visionConstants.FrontRightTransform,
                 drive::getPose,
                 tagLayout));
+      case MAPLESIM:
+        return new VisionLocalizer(
+            drive::addVisionMeasurement,
+            tagLayout,
+            new double[0],
+            new VisionIOPhotonSim(
+                "Front-Right",
+                JsonConstants.visionConstants.FrontRightTransform,
+                RobotContainer.driveSim::getSimulatedDriveTrainPose,
+                tagLayout));
       default:
         return new VisionLocalizer(
             drive::addVisionMeasurement,
