@@ -3,12 +3,11 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import coppercore.vision.VisionLocalizer;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,8 +23,8 @@ import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import java.io.File;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
