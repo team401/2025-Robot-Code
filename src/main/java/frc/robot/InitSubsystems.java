@@ -1,11 +1,16 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+
 import coppercore.vision.VisionIO;
 import coppercore.vision.VisionIOPhotonReal;
 import coppercore.vision.VisionIOPhotonSim;
 import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
@@ -14,8 +19,10 @@ import frc.robot.constants.ModeConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConfiguration;
 import frc.robot.subsystems.drive.GyroIO;
+import frc.robot.subsystems.drive.GyroIOMapleSim;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
+import frc.robot.subsystems.drive.ModuleIOMapleSim;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.scoring.ClawIOSim;
@@ -25,6 +32,10 @@ import frc.robot.subsystems.scoring.ElevatorIOSim;
 import frc.robot.subsystems.scoring.ElevatorIOTalonFX;
 import frc.robot.subsystems.scoring.ElevatorMechanism;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
 public final class InitSubsystems {
   public static ScoringSubsystem initScoringSubsystem() {
@@ -57,7 +68,7 @@ public final class InitSubsystems {
   }
 
   public static Drive initDriveSubsystem() {
-    switch (Constants.currentMode) {
+    switch (ModeConstants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         return new Drive(
@@ -76,6 +87,29 @@ public final class InitSubsystems {
             new ModuleIOSim(DriveConfiguration.getInstance().BackLeft),
             new ModuleIOSim(DriveConfiguration.getInstance().BackRight));
 
+      case MAPLESIM:
+
+        // Sim robot, instantiate physics sim IO implementations
+        RobotContainer.driveSim =
+            new SwerveDriveSimulation(
+                DriveTrainSimulationConfig.Default().withGyro(COTS.ofPigeon2()),
+                new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
+        // DrivetrainConstants.SimConstants.driveSimConfig, new Pose2d());
+        SimulatedArena.getInstance().addDriveTrainSimulation(RobotContainer.driveSim);
+        return new Drive(
+            new GyroIOMapleSim(RobotContainer.driveSim.getGyroSimulation()),
+            new ModuleIOMapleSim(
+                RobotContainer.driveSim.getModules()[0],
+                DriveConfiguration.getInstance().FrontLeft),
+            new ModuleIOMapleSim(
+                RobotContainer.driveSim.getModules()[1],
+                DriveConfiguration.getInstance().FrontRight),
+            new ModuleIOMapleSim(
+                RobotContainer.driveSim.getModules()[2], DriveConfiguration.getInstance().BackLeft),
+            new ModuleIOMapleSim(
+                RobotContainer.driveSim.getModules()[3],
+                DriveConfiguration.getInstance().BackRight));
+
       default:
         // Replayed robot, disable IO implementations
         return new Drive(
@@ -89,7 +123,7 @@ public final class InitSubsystems {
 
   public static VisionLocalizer initVisionSubsystem(Drive drive) {
     AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-    switch (Constants.currentMode) {
+    switch (ModeConstants.currentMode) {
       case REAL:
         return new VisionLocalizer(
             drive::addVisionMeasurement,
@@ -111,6 +145,16 @@ public final class InitSubsystems {
                 "Front-Right",
                 JsonConstants.visionConstants.FrontRightTransform,
                 drive::getPose,
+                tagLayout));
+      case MAPLESIM:
+        return new VisionLocalizer(
+            drive::addVisionMeasurement,
+            tagLayout,
+            new double[0],
+            new VisionIOPhotonSim(
+                "Front-Right",
+                JsonConstants.visionConstants.FrontRightTransform,
+                RobotContainer.driveSim::getSimulatedDriveTrainPose,
                 tagLayout));
       default:
         return new VisionLocalizer(
