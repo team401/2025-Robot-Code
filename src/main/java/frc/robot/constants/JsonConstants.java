@@ -8,7 +8,6 @@ import frc.robot.constants.subsystems.DrivetrainConstants;
 import frc.robot.constants.subsystems.ElevatorConstants;
 
 public class JsonConstants {
-
   public static void loadConstants() {
     EnvironmentHandler.getEnvironmentHandler(
         Filesystem.getDeployDirectory().toPath().resolve("constants/config.json").toString());
