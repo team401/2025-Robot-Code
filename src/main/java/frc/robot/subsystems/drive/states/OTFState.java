@@ -146,7 +146,8 @@ public class OTFState implements PeriodicStateInterface {
             JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
             JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
 
-    return AutoBuilder.pathfindToPose(otfPose, constraints, 0.0);
+    return AutoBuilder.pathfindToPose(
+        otfPose, constraints, JsonConstants.drivetrainConstants.otfPoseEndingVelocity);
   }
 
   public void periodic() {
