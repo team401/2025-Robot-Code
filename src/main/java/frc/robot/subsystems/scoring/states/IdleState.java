@@ -3,7 +3,6 @@ package frc.robot.subsystems.scoring.states;
 import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
-import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 
 public class IdleState implements PeriodicStateInterface {
@@ -15,7 +14,8 @@ public class IdleState implements PeriodicStateInterface {
 
   @Override
   public void periodic() {
-    scoringSubsystem.setElevatorGoalHeight(JsonConstants.scoringSetpoints.idle.elevatorHeight());
+    // TODO: Dont merge this
+    // scoringSubsystem.setElevatorGoalHeight(JsonConstants.scoringSetpoints.idle.elevatorHeight());
     scoringSubsystem.setClawRollerVoltage(Volts.zero());
   }
 }

@@ -21,6 +21,8 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ElevatorIO {
   @AutoLog
   public static class ElevatorInputs {
+    public boolean largeEncoderConnected = false;
+
     /** The angle of the 19 tooth-gear-encoder. Counts total rotations, not absolute position. */
     public MutAngle largeEncoderPos = Rotations.mutable(0.0);
 
@@ -29,6 +31,8 @@ public interface ElevatorIO {
 
     /** Absolute position of the 19 tooth-gear-encoder. Wraps around after 1 rotation */
     public MutAngle largeEncoderAbsolutePos = Rotations.mutable(0.0);
+
+    public double largeAbsPosRot = 0.0;
 
     /** Absolute position of the 17 tooth-gear-encoder. Wraps around after 1 rotation */
     public MutAngle smallEncoderAbsolutePos = Rotations.mutable(0.0);

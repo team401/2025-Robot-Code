@@ -71,7 +71,7 @@ public final class ElevatorConstants {
   public final Double elevatorCANCoderDiscontinuityPoint = 1.0;
 
   // TODO: Tune encoder directions!
-  public final int elevatorLargeCANCoderID = 11;
+  public final Integer elevatorLargeCANCoderID = 11;
   public final Boolean isLargeCANcoderClockwisePositive = true;
 
   @JSONExclude
@@ -80,8 +80,8 @@ public final class ElevatorConstants {
           ? SensorDirectionValue.CounterClockwise_Positive
           : SensorDirectionValue.Clockwise_Positive;
 
-  public final int elevatorSmallCANCoderID = 12;
-  public final Boolean isSmallCANcoderClockwisePositive = true;
+  public final Integer elevatorSmallCANCoderID = 12;
+  public final Boolean isSmallCANcoderClockwisePositive = false;
 
   @JSONExclude
   public final SensorDirectionValue elevatorSmallCANCoderDirection =
@@ -100,14 +100,14 @@ public final class ElevatorConstants {
       elevatorReduction * (double) largeCANCoderTeeth / (double) spoolTeeth;
 
   // TODO: Tune elevator
-  public final Double elevatorkP = 20.0;
-  public final Double elevatorkI = 1.0;
+  public final Double elevatorkP = 60.0;
+  public final Double elevatorkI = 0.0;
   public final Double elevatorkD = 0.0;
 
   public final Double elevatorkS = 0.0;
-  public final Double elevatorkV = 0.0;
+  public final Double elevatorkV = 0.1;
   public final Double elevatorkA = 0.0;
-  public final Double elevatorkG = 8.7;
+  public final Double elevatorkG = 11.0;
 
   // TODO: Actual ratios
   @JSONExclude
@@ -151,7 +151,7 @@ public final class ElevatorConstants {
   public final Double minElevatorHeightMeters = 0.0;
   @JSONExclude public final Distance minElevatorHeight = Meters.of(minElevatorHeightMeters);
   /* Maximum elevator height in meters, stored as a double so it can be synced by JSONSync */
-  public final Double maxElevatorHeightMeters = 3.0;
+  public final Double maxElevatorHeightMeters = 1.9;
   @JSONExclude public final Distance maxElevatorHeight = Meters.of(maxElevatorHeightMeters);
 
   // TODO: Tune this value

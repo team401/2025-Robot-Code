@@ -1,4 +1,4 @@
 {
-  "runScoring": false,
-  "runDrive": true
+  "runScoring": true,
+  "runDrive": false
 }

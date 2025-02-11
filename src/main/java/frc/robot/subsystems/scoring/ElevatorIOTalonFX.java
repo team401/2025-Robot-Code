@@ -3,6 +3,9 @@ package frc.robot.subsystems.scoring;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -53,6 +56,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   boolean motorDisabled = false;
 
+  StatusSignal<Angle> largeCANcoderAbsolutePosition;
+
   // Reuse the same motion magic request to avoid garbage collector having to clean them up.
   MotionMagicExpoTorqueCurrentFOC motionMagicExpoTorqueCurrentFOC =
       new MotionMagicExpoTorqueCurrentFOC(0.0);
@@ -61,11 +66,14 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   public ElevatorIOTalonFX() {
     // Initialize TalonFXs  and CANcoders with their correct IDs
-    leadMotor = new TalonFX(ElevatorConstants.synced.getObject().leadElevatorMotorId);
-    followerMotor = new TalonFX(ElevatorConstants.synced.getObject().followerElevatorMotorId);
+    leadMotor = new TalonFX(ElevatorConstants.synced.getObject().leadElevatorMotorId, "canivore");
+    followerMotor =
+        new TalonFX(ElevatorConstants.synced.getObject().followerElevatorMotorId, "canivore");
 
-    largeCANCoder = new CANcoder(ElevatorConstants.synced.getObject().elevatorLargeCANCoderID);
-    smallCANCoder = new CANcoder(ElevatorConstants.synced.getObject().elevatorSmallCANCoderID);
+    largeCANCoder =
+        new CANcoder(ElevatorConstants.synced.getObject().elevatorLargeCANCoderID, "canivore");
+    smallCANCoder =
+        new CANcoder(ElevatorConstants.synced.getObject().elevatorSmallCANCoderID, "canivore");
 
     // Create one CANcoder configuration that will be modified slightly and applied to both
     // CANcoders
@@ -76,12 +84,16 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     // Update with large CANcoder direction and apply
     cancoderConfiguration.MagnetSensor.SensorDirection =
         ElevatorConstants.synced.getObject().elevatorLargeCANCoderDirection;
-    largeCANCoder.getConfigurator().apply(cancoderConfiguration);
+    // largeCANCoder.getConfigurator().apply(cancoderConfiguration);
+
+    largeCANcoderAbsolutePosition = largeCANCoder.getAbsolutePosition();
+
+    BaseStatusSignal.setUpdateFrequencyForAll(50.0, largeCANcoderAbsolutePosition);
 
     // Update with small CANcoder direction and apply
-    cancoderConfiguration.MagnetSensor.SensorDirection =
-        ElevatorConstants.synced.getObject().elevatorSmallCANCoderDirection;
-    smallCANCoder.getConfigurator().apply(cancoderConfiguration);
+    // cancoderConfiguration.MagnetSensor.SensorDirection =
+    //     ElevatorConstants.synced.getObject().elevatorSmallCANCoderDirection;
+    // smallCANCoder.getConfigurator().apply(cancoderConfiguration);
 
     // Initialize talonFXConfigs to use FusedCANCoder and Motion Magic Expo and have correct PID
     // gains and current limits.
@@ -95,7 +107,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                         ElevatorConstants.synced.getObject().largeCANCoderToMechanismRatio)
                     .withRotorToSensorRatio(
                         ElevatorConstants.synced.getObject().rotorToLargeCANCoderRatio))
-            .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
+            .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
@@ -134,8 +146,14 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     inputs.largeEncoderPos.mut_replace(largeCANCoder.getPosition().getValue());
     inputs.smallEncoderPos.mut_replace(smallCANCoder.getPosition().getValue());
 
-    inputs.largeEncoderAbsolutePos.mut_replace(largeCANCoder.getAbsolutePosition().getValue());
-    inputs.smallEncoderAbsolutePos.mut_replace(smallCANCoder.getAbsolutePosition().getValue());
+    StatusCode refreshStatus = BaseStatusSignal.refreshAll(largeCANcoderAbsolutePosition);
+
+    inputs.largeEncoderConnected = refreshStatus.isOK();
+    inputs.largeEncoderAbsolutePos.mut_replace(largeCANcoderAbsolutePosition.getValue());
+
+    inputs.largeAbsPosRot = largeCANCoder.getAbsolutePosition().getValueAsDouble();
+    inputs.smallEncoderAbsolutePos.mut_replace(
+        smallCANCoder.getAbsolutePosition().refresh().getValue());
 
     inputs.largeEncoderGoalPos.mut_replace(largeEncoderGoalAngle);
     inputs.largeEncoderSetpointPos.mut_replace(largeEncoderSetpointPosition);

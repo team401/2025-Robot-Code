@@ -97,6 +97,8 @@ public class ElevatorMechanism implements Tunable {
 
     this.io = io;
 
+    periodic();
+
     // Seed elevator height using CRT on initialize
     seedWithCRT();
   }
@@ -111,6 +113,7 @@ public class ElevatorMechanism implements Tunable {
     io.updateInputs(inputs);
     io.applyOutputs(outputs);
 
+    Logger.recordOutput("elevator/height", getElevatorHeight());
     Logger.recordOutput("elevator/goalHeight", goalHeight);
     Logger.recordOutput("elevator/clampedGoalHeight", clampedGoalHeight);
 
@@ -187,18 +190,23 @@ public class ElevatorMechanism implements Tunable {
     long ticksSmall = Math.round(io.getSmallCANCoderAbsPos().in(Rotations) * ticks * smallTeeth);
     long ticksLarge = Math.round(io.getLargeCANCoderAbsPos().in(Rotations) * ticks * largeTeeth);
 
-    long solutionTicks = -1;
+    Logger.recordOutput("elevator/CRT/ticksSmall", ticksSmall);
+    Logger.recordOutput("elevator/CRT/ticksLarge", ticksLarge);
+
+    // long solutionTicks = -1;
+    long solutionTicks = 0;
 
     for (int i = 0; i < ticksSmall; i++) {
-      // Try the offset of each multiple of 19 * ticks
-      long potentialPosition = i * largeTeeth * ticks + ticksLarge;
-      // Check whether that potential position is encoder 17's remainder away from a
-      // multiple of 17
-      if ((potentialPosition - ticksSmall) % (smallTeeth * ticks) == 0) {
-        // If both conditions are met, we have a solution.
-        solutionTicks = potentialPosition;
-        break;
-      }
+      break;
+      // // Try the offset of each multiple of 19 * ticks
+      // long potentialPosition = i * largeTeeth * ticks + ticksLarge;
+      // // Check whether that potential position is encoder 17's remainder away from a
+      // // multiple of 17
+      // if ((potentialPosition - ticksSmall) % (smallTeeth * ticks) == 0) {
+      //   // If both conditions are met, we have a solution.
+      //   solutionTicks = potentialPosition;
+      //   break;
+      // }
     }
 
     if (solutionTicks != -1) {
