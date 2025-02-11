@@ -12,7 +12,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.ExampleElevatorCommand;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.scoring.states.IdleState;
 import frc.robot.subsystems.scoring.states.IntakeState;
@@ -101,7 +100,7 @@ public class ScoringSubsystem extends SubsystemBase {
     this.elevatorMechanism = elevatorMechanism;
     this.clawMechanism = clawMechanism;
 
-    setDefaultCommand(new ExampleElevatorCommand(this));
+    // setDefaultCommand(new ExampleElevatorCommand(this));
 
     instance = this;
 
@@ -156,7 +155,7 @@ public class ScoringSubsystem extends SubsystemBase {
    */
   public void setElevatorGoalHeight(Distance goalHeight) {
     if (JsonConstants.scoringFeatureFlags.runElevator) {
-      elevatorMechanism.setGoalHeight(goalHeight);
+      // elevatorMechanism.setGoalHeight(goalHeight);
     }
   }
 
