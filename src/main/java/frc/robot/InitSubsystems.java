@@ -50,6 +50,7 @@ public final class InitSubsystems {
           clawMechanism = new ClawMechanism(new ClawIOTalonFX());
         }
         break;
+      case MAPLESIM:
       case SIM:
         if (JsonConstants.scoringFeatureFlags.runElevator) {
           elevatorMechanism = new ElevatorMechanism(new ElevatorIOSim());

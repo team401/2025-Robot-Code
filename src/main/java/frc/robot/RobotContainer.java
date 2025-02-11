@@ -4,9 +4,13 @@ import static edu.wpi.first.units.Units.*;
 
 import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -25,6 +29,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import java.io.File;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -43,6 +48,27 @@ public class RobotContainer {
   private SendableChooser<AutoStrategy> autoChooser = new SendableChooser<>();
 
   public static SwerveDriveSimulation driveSim = null;
+
+  public void robotPeriodic() {
+    // double height = 1.05*Math.sin(Timer.getTimestamp()) + 1.05;
+    double height = scoringSubsystem.getElevatorHeight().magnitude();
+    double stage_one_height = Math.max(height - 0.55, 0.0);
+    double stage_two_height = Math.max(stage_one_height - 0.8, 0.0);
+    double claw_rotation = 2 * Math.sin(Timer.getTimestamp() * 1.0 / 3.0) + 2.0;
+    double ramp_rotation = Math.sin(Timer.getTimestamp() * 1.5) + 1.0;
+    Logger.recordOutput(
+        "componetPositions",
+        new Pose3d[] {
+          new Pose3d(new Translation3d(0.05, 0.01, 0.9), new Rotation3d(0.0, ramp_rotation, 0.0)),
+          new Pose3d(),
+          new Pose3d(
+              new Translation3d(0.34, 0.12, height + 0.35),
+              new Rotation3d(0.0, claw_rotation, 0.0)),
+          new Pose3d(new Translation3d(0.0, 0.0, height), new Rotation3d(0.0, 0.0, 0.0)),
+          new Pose3d(new Translation3d(0.0, 0.0, stage_two_height), new Rotation3d(0.0, 0.0, 0.0)),
+          new Pose3d(new Translation3d(0.0, 0.0, stage_one_height), new Rotation3d(0.0, 0.0, 0.0))
+        });
+  }
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
