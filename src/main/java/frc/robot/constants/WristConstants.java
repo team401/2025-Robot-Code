@@ -82,7 +82,7 @@ public class WristConstants {
 
   // These clamps are the default clamps for the wrist, as well as limiting the moving clamps of the
   // wrist themselves.
-  public final Angle wristMinMinAngle = Rotations.of(-0.75);
+  public final Angle wristMinMinAngle = Rotations.of(-0.8);
   public final Angle wristMaxMaxAngle = Rotations.of(0.25);
 
   /** The maximum angle the wrist can be at while passing by the crossbar without hitting it. */

@@ -420,8 +420,8 @@ public class ScoringSubsystem extends SubsystemBase {
     if (clawMechanism.isCoralDetected()) {
       setGamePiece(GamePiece.Coral);
       setTarget(FieldTarget.L4);
+      stateMachine.fire(ScoringTrigger.StartWarmup);
     }
-    ;
 
     // ===== END TESTING CODE =====
 

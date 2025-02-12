@@ -1,5 +1,5 @@
 {
-  "runDrive": true,
-  "runVision": true,
+  "runDrive": false,
+  "runVision": false,
   "runScoring": true
 }

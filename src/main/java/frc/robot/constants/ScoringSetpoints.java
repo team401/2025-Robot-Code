@@ -57,7 +57,7 @@ public class ScoringSetpoints {
   public final ScoringSetpoint processor =
       new ScoringSetpoint("processor", Meters.of(0.1), Rotations.of(-0.75));
   public final ScoringSetpoint net =
-      new ScoringSetpoint("net", Meters.of(1.25), Rotations.of(-0.85));
+      new ScoringSetpoint("net", Meters.of(1.25), Rotations.of(-0.75));
 
   public final ScoringSetpoint ground =
       new ScoringSetpoint("ground", Meters.of(0.2), Rotations.of(-0.75));

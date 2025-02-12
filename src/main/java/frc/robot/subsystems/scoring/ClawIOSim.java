@@ -119,6 +119,8 @@ public class ClawIOSim implements ClawIO {
 
     switch (has) {
       case NONE:
+        coralSensed = false;
+        algaeSensed = false;
         break;
       case CORAL:
         coralSensed = piecePos > JsonConstants.clawConstantsSim.coralDetectionPoint;
@@ -130,6 +132,7 @@ public class ClawIOSim implements ClawIO {
         break;
     }
 
+    Logger.recordOutput("clawSim/has", has);
     Logger.recordOutput("clawSim/hasCoral", hasCoral);
     Logger.recordOutput("clawSim/hasAlgae", hasAlgae);
     Logger.recordOutput("clawSim/piecePos", piecePos);
