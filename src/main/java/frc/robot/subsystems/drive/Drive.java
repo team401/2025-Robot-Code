@@ -122,12 +122,12 @@ public class Drive implements DriveTemplate {
 
   public ProfiledPIDController angleController =
       new ProfiledPIDController(
-          JsonConstants.drivetrainConstants.angleControllerKp,
-          JsonConstants.drivetrainConstants.angleControllerKi,
-          JsonConstants.drivetrainConstants.angleControllerKd,
+          JsonConstants.drivetrainConstants.rotationAlignKp,
+          JsonConstants.drivetrainConstants.rotationAlignKi,
+          JsonConstants.drivetrainConstants.rotationAlignKd,
           new TrapezoidProfile.Constraints(
-              JsonConstants.drivetrainConstants.maxPIDVelocity,
-              JsonConstants.drivetrainConstants.maxPIDAcceleration));
+              JsonConstants.drivetrainConstants.maxRotationAlignVelocity,
+              JsonConstants.drivetrainConstants.maxRotationAlignAcceleration));
 
   public enum DesiredLocation {
     Reef0,

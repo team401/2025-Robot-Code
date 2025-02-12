@@ -24,48 +24,48 @@ public class LineupState implements PeriodicStateInterface {
   private int observationAge;
 
   // along track pid test mode
-  private LoggedTunableNumber alongTrackkP =
+  private LoggedTunableNumber alongTrackKp =
       new LoggedTunableNumber(
-          "DriveLineupGains/AlongTrackkP", JsonConstants.drivetrainConstants.driveAlongTrackkP);
-  private LoggedTunableNumber alongTrackkI =
+          "DriveLineupGains/AlongTrackKp", JsonConstants.drivetrainConstants.driveAlongTrackKp);
+  private LoggedTunableNumber alongTrackKi =
       new LoggedTunableNumber(
-          "DriveLineupGains/AlongTrackkI", JsonConstants.drivetrainConstants.driveAlongTrackkI);
-  private LoggedTunableNumber alongTrackkD =
+          "DriveLineupGains/AlongTrackKi", JsonConstants.drivetrainConstants.driveAlongTrackKi);
+  private LoggedTunableNumber alongTrackKd =
       new LoggedTunableNumber(
-          "DriveLineupGains/AlongTrackkD", JsonConstants.drivetrainConstants.driveAlongTrackkD);
+          "DriveLineupGains/AlongTrackKd", JsonConstants.drivetrainConstants.driveAlongTrackKd);
 
   // cross tack pid test mode
-  private LoggedTunableNumber crossTrackkP =
+  private LoggedTunableNumber crossTrackKp =
       new LoggedTunableNumber(
-          "DriveLineupGains/CrossTrackkP", JsonConstants.drivetrainConstants.driveCrossTrackkP);
-  private LoggedTunableNumber crossTrackkI =
+          "DriveLineupGains/CrossTrackKp", JsonConstants.drivetrainConstants.driveCrossTrackKp);
+  private LoggedTunableNumber crossTrackKi =
       new LoggedTunableNumber(
-          "DriveLineupGains/CrossTrackkI", JsonConstants.drivetrainConstants.driveCrossTrackkI);
-  private LoggedTunableNumber crossTrackkD =
+          "DriveLineupGains/CrossTrackKi", JsonConstants.drivetrainConstants.driveCrossTrackKi);
+  private LoggedTunableNumber crossTrackKd =
       new LoggedTunableNumber(
-          "DriveLineupGains/CrossTrackkD", JsonConstants.drivetrainConstants.driveCrossTrackkD);
+          "DriveLineupGains/CrossTrackKd", JsonConstants.drivetrainConstants.driveCrossTrackKd);
 
   // rotation pid test mode
   private LoggedTunableNumber rotationkP =
       new LoggedTunableNumber(
-          "DriveLineupGains/rotationkP", JsonConstants.drivetrainConstants.driveRotationkP);
+          "DriveLineupGains/rotationkP", JsonConstants.drivetrainConstants.driveRotationKp);
   private LoggedTunableNumber rotationkI =
       new LoggedTunableNumber(
-          "DriveLineupGains/rotationkI", JsonConstants.drivetrainConstants.driveRotationkI);
+          "DriveLineupGains/rotationkI", JsonConstants.drivetrainConstants.driveRotationKi);
   private LoggedTunableNumber rotationkD =
       new LoggedTunableNumber(
-          "DriveLineupGains/rotationkD", JsonConstants.drivetrainConstants.driveRotationkD);
+          "DriveLineupGains/rotationkD", JsonConstants.drivetrainConstants.driveRotationKd);
 
   private PIDController driveAlongTrackLineupController =
       new PIDController(
-          JsonConstants.drivetrainConstants.driveAlongTrackkP,
-          JsonConstants.drivetrainConstants.driveAlongTrackkI,
-          JsonConstants.drivetrainConstants.driveAlongTrackkD);
+          JsonConstants.drivetrainConstants.driveAlongTrackKp,
+          JsonConstants.drivetrainConstants.driveAlongTrackKi,
+          JsonConstants.drivetrainConstants.driveAlongTrackKd);
   private PIDController driveCrossTrackLineupController =
       new PIDController(
-          JsonConstants.drivetrainConstants.driveCrossTrackkP,
-          JsonConstants.drivetrainConstants.driveCrossTrackkI,
-          JsonConstants.drivetrainConstants.driveCrossTrackkD);
+          JsonConstants.drivetrainConstants.driveCrossTrackKp,
+          JsonConstants.drivetrainConstants.driveCrossTrackKi,
+          JsonConstants.drivetrainConstants.driveCrossTrackKd);
 
   private Constraints driveAlongTrackProfileConstraints =
       new Constraints(
@@ -76,9 +76,9 @@ public class LineupState implements PeriodicStateInterface {
 
   private PIDController rotationController =
       new PIDController(
-          JsonConstants.drivetrainConstants.driveRotationkP,
-          JsonConstants.drivetrainConstants.driveRotationkI,
-          JsonConstants.drivetrainConstants.driveRotationkD);
+          JsonConstants.drivetrainConstants.driveRotationKp,
+          JsonConstants.drivetrainConstants.driveRotationKi,
+          JsonConstants.drivetrainConstants.driveRotationKd);
 
   public LineupState(Drive drive) {
     this.drive = drive;
@@ -333,17 +333,17 @@ public class LineupState implements PeriodicStateInterface {
             (pid) -> {
               this.setAlongTrackPID(pid[0], pid[1], pid[2]);
             },
-            alongTrackkP,
-            alongTrackkI,
-            alongTrackkD);
+            alongTrackKp,
+            alongTrackKi,
+            alongTrackKd);
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (pid) -> {
               this.setCrossTrackPID(pid[0], pid[1], pid[2]);
             },
-            crossTrackkP,
-            crossTrackkI,
-            crossTrackkD);
+            crossTrackKp,
+            crossTrackKi,
+            crossTrackKd);
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (pid) -> {
