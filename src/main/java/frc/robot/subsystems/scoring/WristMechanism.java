@@ -171,6 +171,8 @@ public class WristMechanism {
    */
   private void updateClampedGoalAngle() {
     clampedGoalAngle.mut_replace(UnitUtils.clampMeasure(goalAngle, minAngle, maxAngle));
+
+    Logger.recordOutput("wrist/clampedGoalAngle", clampedGoalAngle);
   }
 
   /**
@@ -219,6 +221,8 @@ public class WristMechanism {
             minAngle,
             JsonConstants.wristConstants.wristMinMinAngle,
             JsonConstants.wristConstants.wristMaxMaxAngle));
+
+    Logger.recordOutput("wrist/minAngle", minAngle);
   }
 
   /**
@@ -237,6 +241,8 @@ public class WristMechanism {
             maxAngle,
             JsonConstants.wristConstants.wristMaxMaxAngle,
             JsonConstants.wristConstants.wristMaxMaxAngle));
+
+    Logger.recordOutput("wrist/maxAngle", maxAngle);
   }
 
   /**
