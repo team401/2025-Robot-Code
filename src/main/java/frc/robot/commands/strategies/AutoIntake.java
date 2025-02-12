@@ -35,7 +35,7 @@ public class AutoIntake extends Command {
 
     if (scoringSubsystem != null) {
       scoringSubsystem.setGamePiece(GamePiece.Coral);
-      scoringSubsystem.setTarget(intakeFieldTarget);
+      scoringSubsystem.setTarget(intakeFieldTarget); // TODO: Change this back
       scoringSubsystem.fireTrigger(ScoringTrigger.BeginIntake);
     }
   }

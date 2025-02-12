@@ -359,7 +359,13 @@ public class ScoringSubsystem extends SubsystemBase {
    * @param target The field target that scoring will aim for, e.g. L2
    */
   public void setTarget(FieldTarget target) {
-    currentTarget = target;
+    // TODO: find and eliminate cases where null is passed to this function
+    if (target == null) {
+      System.out.println("WARNING: Null target set in setTarget");
+      new Exception("Null target in setTarget").printStackTrace();
+    } else {
+      currentTarget = target;
+    }
   }
 
   /**
@@ -435,18 +441,17 @@ public class ScoringSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // ===== BEGIN TESTING CODE; THIS SHOULD BE REMOVED IN COMPETITION CODE =====
-    boolean fireStartIntaking = SmartDashboard.getBoolean("scoring/fireStartIntaking", false);
-    if (fireStartIntaking) {
-      setGamePiece(GamePiece.Coral);
-      stateMachine.fire(ScoringTrigger.BeginIntake);
-    }
+    // boolean fireStartIntaking = SmartDashboard.getBoolean("scoring/fireStartIntaking", false);
+    // if (fireStartIntaking) {
+    //   setGamePiece(GamePiece.Coral);
+    //   stateMachine.fire(ScoringTrigger.BeginIntake);
+    // }
 
-    if (clawMechanism.isCoralDetected()) {
-      setGamePiece(GamePiece.Coral);
-      setTarget(FieldTarget.L4);
-      stateMachine.fire(ScoringTrigger.StartWarmup);
-    }
-
+    // if (clawMechanism.isCoralDetected()) {
+    //   setGamePiece(GamePiece.Coral);
+    //   setTarget(FieldTarget.L4);
+    //   stateMachine.fire(ScoringTrigger.StartWarmup);
+    // }
     // ===== END TESTING CODE =====
 
     if (!overrideStateMachine) {

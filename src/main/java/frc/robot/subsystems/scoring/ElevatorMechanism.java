@@ -114,6 +114,7 @@ public class ElevatorMechanism {
   public void testPeriodic() {
     switch (TestModeManager.getTestMode()) {
       case ElevatorTuning:
+        ScoringSubsystem.getInstance().setOverrideStateMachine(true);
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (pid) -> {
