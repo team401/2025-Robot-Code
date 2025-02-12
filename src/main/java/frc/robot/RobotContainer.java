@@ -1,6 +1,7 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 
 import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,6 +23,7 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import java.io.File;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;

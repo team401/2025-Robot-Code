@@ -13,10 +13,9 @@ import frc.robot.commands.drive.DesiredLocationSelector;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.DrivetrainConstants;
-import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
+import frc.robot.subsystems.ramp.RampSubsystem;
 
 public final class InitBindings {
   // Controller
