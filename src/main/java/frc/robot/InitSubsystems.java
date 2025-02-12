@@ -32,13 +32,13 @@ import frc.robot.subsystems.scoring.ElevatorIOSim;
 import frc.robot.subsystems.scoring.ElevatorIOTalonFX;
 import frc.robot.subsystems.scoring.ElevatorMechanism;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.WristIOSim;
+import frc.robot.subsystems.scoring.WristIOTalonFX;
+import frc.robot.subsystems.scoring.WristMechanism;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
-import frc.robot.subsystems.scoring.WristIOSim;
-import frc.robot.subsystems.scoring.WristIOTalonFX;
-import frc.robot.subsystems.scoring.WristMechanism;
 
 public final class InitSubsystems {
   public static ScoringSubsystem initScoringSubsystem() {
