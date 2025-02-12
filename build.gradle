@@ -101,14 +101,14 @@ dependencies {
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
 
-    def coppercoreVersion = "2025.1.4"
+    def coppercoreVersion = "2025.1.8" // mavenLocal version
 
     implementation "io.github.team401.coppercore:controls:$coppercoreVersion"
     implementation "io.github.team401.coppercore:geometry:$coppercoreVersion"
     implementation "io.github.team401.coppercore:math:$coppercoreVersion"
     implementation "io.github.team401.coppercore:monitors:$coppercoreVersion"
     implementation "io.github.team401.coppercore:parameter_tools:$coppercoreVersion"
-    //implementation "io.github.team401.coppercore:vision:$coppercoreVersion"
+    implementation "io.github.team401.coppercore:vision:$coppercoreVersion"
     implementation "io.github.team401.coppercore:wpilib_interface:$coppercoreVersion"
 }
 

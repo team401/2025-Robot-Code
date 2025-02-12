@@ -42,9 +42,9 @@ public class ModuleIOTalonFX implements ModuleIO {
       constants;
 
   // Hardware objects
-  private final TalonFX driveTalon;
-  private final TalonFX turnTalon;
-  private final CANcoder cancoder;
+  final TalonFX driveTalon;
+  final TalonFX turnTalon;
+  final CANcoder cancoder;
 
   // Voltage control requests
   private final VoltageOut voltageRequest = new VoltageOut(0);
