@@ -35,8 +35,6 @@
       "filepath": "hitl",
       "files": [
         "DrivetrainConstants.json",
-        "ElevatorConstants.json",
-        "WristConstants.json",
         "ClawConstants.json",
         "FeatureFlags.json",
         "OperatorConstants.json",
