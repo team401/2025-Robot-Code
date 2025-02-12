@@ -94,7 +94,7 @@ public class RobotContainer {
     if (FeatureFlags.synced.getObject().runScoring) {
       scoringSubsystem = InitSubsystems.initScoringSubsystem();
       if (FeatureFlags.synced.getObject().runDrive) {
-        scoringSubsystem.setIsDriveLinedUpSupplier(() -> drive.isDriveCloseToFinalLineupPose());
+        scoringSubsystem.setIsDriveLinedUpSupplier(() -> drive.isDriveAlignmentFinished());
       } else {
         scoringSubsystem.setIsDriveLinedUpSupplier(() -> true);
       }
