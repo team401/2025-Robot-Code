@@ -17,7 +17,7 @@ public class ScoreState implements PeriodicStateInterface {
   public void periodic() {
     ScoringSetpoint setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getTarget());
 
-    scoringSubsystem.setElevatorGoalHeight(setpoint.elevatorHeight());
+    scoringSubsystem.setGoalSetpoint(setpoint);
 
     switch (scoringSubsystem.getGamePiece()) {
       case Coral:

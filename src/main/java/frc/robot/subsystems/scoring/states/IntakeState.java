@@ -80,7 +80,7 @@ public class IntakeState implements PeriodicStateInterface {
         break;
     }
 
-    scoringSubsystem.setElevatorGoalHeight(setpoint.elevatorHeight());
+    scoringSubsystem.setGoalSetpoint(setpoint);
 
     switch (scoringSubsystem.getGamePiece()) {
       case Coral:

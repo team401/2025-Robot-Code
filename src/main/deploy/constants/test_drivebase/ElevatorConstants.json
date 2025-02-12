@@ -55,5 +55,9 @@
   "minWristDownHeight": {
     "value": 0.2,
     "unit": "Meter"
+  },
+  "elevatorSetpointEpsilon": {
+    "value": 0.05,
+    "unit": "Meter"
   }
 }

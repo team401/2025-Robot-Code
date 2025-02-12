@@ -15,12 +15,13 @@ import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.ExampleElevatorCommand;
 import frc.robot.constants.JsonConstants;
+import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.states.IdleState;
 import frc.robot.subsystems.scoring.states.IntakeState;
 import frc.robot.subsystems.scoring.states.ScoreState;
 import frc.robot.subsystems.scoring.states.WarmupState;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -109,6 +110,8 @@ public class ScoringSubsystem extends SubsystemBase {
    */
   private boolean overrideStateMachine = false;
 
+  private BooleanSupplier isDriveLinedUpSupplier;
+
   public enum FieldTarget {
     L1,
     L2,
@@ -157,6 +160,8 @@ public class ScoringSubsystem extends SubsystemBase {
     DoneIntaking,
     CancelAction,
     ToggleWarmup, // warmup button toggles warmup <-> idle
+    StartWarmup, // drive automatically enters warmup when lineup begins
+    WarmupReady,
     ScoredPiece,
     ReturnToIdle, // Return to idle when a warmup/score state no longer detects a gamepiece
   }
@@ -173,7 +178,7 @@ public class ScoringSubsystem extends SubsystemBase {
     this.wristMechanism = wristMechanism;
     this.clawMechanism = clawMechanism;
 
-    setDefaultCommand(new ExampleElevatorCommand(this));
+    // setDefaultCommand(new ExampleElevatorCommand(this));
 
     instance = this;
 
@@ -185,21 +190,24 @@ public class ScoringSubsystem extends SubsystemBase {
             ScoringTrigger.BeginIntake,
             ScoringState.Intake,
             () -> !(isCoralDetected() || isAlgaeDetected()))
-        .permit(ScoringTrigger.ToggleWarmup, ScoringState.Warmup);
+        .permit(ScoringTrigger.ToggleWarmup, ScoringState.Warmup)
+        .permitIf(ScoringTrigger.StartWarmup, ScoringState.Warmup, () -> autoTransition);
 
     stateMachineConfiguration
         .configure(ScoringState.Intake)
-        // .configureOnEntryAction(ScoringState.Intake.state::onEntry) // Just tried this line too
-        // but it didn't work
         // If autoTransition, go straight to warmup from intake once we're done
         // Otherwise, return to idle
-        .permitIf(ScoringTrigger.DoneIntaking, ScoringState.Warmup, () -> autoTransition)
-        .permitIf(ScoringTrigger.DoneIntaking, ScoringState.Idle, () -> !autoTransition)
+        .permit(ScoringTrigger.DoneIntaking, ScoringState.Idle)
         .permit(ScoringTrigger.CancelAction, ScoringState.Idle);
 
     stateMachineConfiguration
         .configure(ScoringState.Warmup)
         .permit(ScoringTrigger.ToggleWarmup, ScoringState.Idle)
+        // Allow warmup to transition to scoring if autoTransition is enabled and we are lined up
+        .permitIf(
+            ScoringTrigger.WarmupReady,
+            ScoringState.Score,
+            () -> autoTransition && isDriveLinedUpSupplier.getAsBoolean())
         .permit(ScoringTrigger.ReturnToIdle, ScoringState.Idle);
 
     stateMachineConfiguration
@@ -210,6 +218,10 @@ public class ScoringSubsystem extends SubsystemBase {
     stateMachine = new StateMachine<>(stateMachineConfiguration, ScoringState.Idle);
 
     SmartDashboard.putBoolean("scoring/fireStartIntaking", false);
+  }
+
+  public void setIsDriveLinedUpSupplier(BooleanSupplier newSupplier) {
+    isDriveLinedUpSupplier = newSupplier;
   }
 
   /**
@@ -233,6 +245,28 @@ public class ScoringSubsystem extends SubsystemBase {
   }
 
   /**
+   * Send a new goal angle to the wrist mechanism
+   *
+   * @param goalAngle Goal wrist to command wrist mechanism to
+   */
+  public void setWristGoalAngle(Angle goalAngle) {
+    if (JsonConstants.scoringFeatureFlags.runWrist) {
+      wristMechanism.setGoalAngle(goalAngle);
+    }
+  }
+
+  /**
+   * Set the goal positions for elevator and wrist according to a ScoringSetpoint
+   *
+   * @param setpoint The setpoint to control to
+   */
+  public void setGoalSetpoint(ScoringSetpoint setpoint) {
+    setElevatorGoalHeight(setpoint.elevatorHeight());
+    setWristGoalAngle(setpoint.wristAngle());
+    Logger.recordOutput("scoring/setpoint", setpoint.name());
+  }
+
+  /**
    * Get the current height of the elevator.
    *
    * <p>This height is determined by the {@link ElevatorMechanism}.
@@ -244,6 +278,21 @@ public class ScoringSubsystem extends SubsystemBase {
       return elevatorMechanism.getElevatorHeight();
     } else {
       return Meters.zero();
+    }
+  }
+
+  /**
+   * Get the current angle of the wrist
+   *
+   * <p>This height is determined by the {@link WristMechanism}.
+   *
+   * @return
+   */
+  public Angle getWristAngle() {
+    if (JsonConstants.scoringFeatureFlags.runWrist) {
+      return wristMechanism.getWristAngle();
+    } else {
+      return Rotations.zero();
     }
   }
 
@@ -274,7 +323,7 @@ public class ScoringSubsystem extends SubsystemBase {
    */
   public boolean isCoralDetected() {
     if (JsonConstants.scoringFeatureFlags.runClaw) {
-      return clawMechanism.getIO().isCoralDetected();
+      return clawMechanism.isCoralDetected();
     } else {
       return false;
     }
@@ -287,7 +336,7 @@ public class ScoringSubsystem extends SubsystemBase {
    */
   public boolean isAlgaeDetected() {
     if (JsonConstants.scoringFeatureFlags.runClaw) {
-      return clawMechanism.getIO().isAlgaeDetected();
+      return clawMechanism.isAlgaeDetected();
     } else {
       return false;
     }
@@ -361,15 +410,20 @@ public class ScoringSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // ===== BEGIN TESTING CODE; THIS SHOULD BE REMOVED IN COMPETITION CODE =====
     boolean fireStartIntaking = SmartDashboard.getBoolean("scoring/fireStartIntaking", false);
     if (fireStartIntaking) {
-      setGamePiece(GamePiece.Algae);
-      setTarget(FieldTarget.L2);
+      setGamePiece(GamePiece.Coral);
       stateMachine.fire(ScoringTrigger.BeginIntake);
-      if (!stateMachine.getTransitionInfo().wasFail()) {
-        System.out.println(stateMachine.getTransitionInfo().getTransition().isInternal());
-      }
     }
+
+    if (clawMechanism.isCoralDetected()) {
+      setGamePiece(GamePiece.Coral);
+      setTarget(FieldTarget.L4);
+    }
+    ;
+
+    // ===== END TESTING CODE =====
 
     if (!overrideStateMachine) {
       stateMachine.periodic();
@@ -482,5 +536,16 @@ public class ScoringSubsystem extends SubsystemBase {
 
     elevatorMechanism.setAllowedRangeOfMotion(elevatorMinHeight, elevatorMaxHeight);
     wristMechanism.setAllowedRangeOfMotion(wristMinAngle, wristMaxAngle);
+  }
+
+  /**
+   * Get the current instance of the scoring subsystem.
+   *
+   * <p>This should be used for drive to fire the trigger to enter warmup when drive enters lineup
+   *
+   * @return Current instance of the scoring subsystem.
+   */
+  public static ScoringSubsystem getInstance() {
+    return instance;
   }
 }

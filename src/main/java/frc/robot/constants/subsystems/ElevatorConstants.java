@@ -184,6 +184,9 @@ public final class ElevatorConstants {
    */
   public final Distance minWristDownHeight = Meters.of(0.2); // TODO: Real value
 
+  /** When within this distance, the elevator is considered "at its setpoint" */
+  public final Distance elevatorSetpointEpsilon = Meters.of(0.05);
+
   public static final class Sim {
     @JSONExclude
     public static final JSONSync<ElevatorConstants.Sim> synced =

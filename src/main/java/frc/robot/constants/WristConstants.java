@@ -1,6 +1,7 @@
 package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
@@ -92,6 +93,9 @@ public class WristConstants {
    * robot below.
    */
   public final Angle minElevatorDownSafeAngle = Rotations.of(-0.5); // TODO: Actual value
+
+  /** The wrist can be this far away from the goal and considered "at the setpoint" */
+  public final Angle wristSetpointEpsilon = Degrees.of(1.0);
 
   public static final class Sim {
     @JSONExclude
