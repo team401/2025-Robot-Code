@@ -1,6 +1,7 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 
 import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,6 +23,7 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import java.io.File;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -34,6 +36,7 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here
+  private RampSubsystem rampSubsystem;
   private ScoringSubsystem scoringSubsystem = null;
   private Drive drive = null;
   private VisionLocalizer vision = null;
@@ -43,6 +46,8 @@ public class RobotContainer {
   private SendableChooser<AutoStrategy> autoChooser = new SendableChooser<>();
 
   public static SwerveDriveSimulation driveSim = null;
+
+  // Replace with CommandPS4Controller or CommandJoystick if needed
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -93,7 +98,9 @@ public class RobotContainer {
         drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
       }
     }
-
+    if (FeatureFlags.synced.getObject().runRamp) {
+      rampSubsystem = InitSubsystems.initRampSubsystem();
+    }
     strategyManager = new StrategyManager(drive, scoringSubsystem);
   }
 
@@ -107,6 +114,9 @@ public class RobotContainer {
     // initialize helper commands
     if (FeatureFlags.synced.getObject().runDrive) {
       InitBindings.initDriveBindings(drive);
+    }
+    if (FeatureFlags.synced.getObject().runRamp) {
+      InitBindings.initRampBindings(rampSubsystem);
     }
   }
 

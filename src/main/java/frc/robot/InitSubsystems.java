@@ -25,6 +25,10 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMapleSim;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.ramp.RampIOSim;
+import frc.robot.subsystems.ramp.RampIOTalonFX;
+import frc.robot.subsystems.ramp.RampMechanism;
+import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ClawIOSim;
 import frc.robot.subsystems.scoring.ClawIOTalonFX;
 import frc.robot.subsystems.scoring.ClawMechanism;
@@ -118,6 +122,18 @@ public final class InitSubsystems {
             new ModuleIO() {},
             new ModuleIO() {},
             new ModuleIO() {});
+    }
+  }
+
+  public static RampSubsystem initRampSubsystem() {
+    switch (ModeConstants.currentMode) {
+      case REAL:
+        return new RampSubsystem(new RampMechanism(new RampIOTalonFX()));
+      case SIM:
+        return new RampSubsystem(new RampMechanism(new RampIOSim()));
+      default:
+        throw new UnsupportedOperationException(
+            "Non-exhaustive list of mode types supported in InitSubsystems");
     }
   }
 

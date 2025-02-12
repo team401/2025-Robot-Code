@@ -15,6 +15,7 @@ import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
+import frc.robot.subsystems.ramp.RampSubsystem;
 
 public final class InitBindings {
   // Controller
@@ -123,5 +124,22 @@ public final class InitBindings {
                   drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
                 },
                 drive));
+  }
+
+  public static void initRampBindings(RampSubsystem rampSubsystem) {
+    driverController
+        .a()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.prepareForClimb();
+                }));
+    driverController
+        .b()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.prepareForIntake();
+                }));
   }
 }
