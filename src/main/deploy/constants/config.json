@@ -4,19 +4,23 @@
   "environments": [
     {
       "name": "comp",
-      "filepath": "comp"
+      "filepath": "comp",
+      "files": []
     },
     {
       "name": "test_drivebase",
-      "filepath": "test_drivebase"
+      "filepath": "test_drivebase",
+      "files": []
     },
     {
       "name": "hitl",
-      "filepath": "hitl"
+      "filepath": "hitl",
+      "files": []
     },
     {
       "name": "test_ramp",
-      "filepath": "test_ramp"
+      "filepath": "test_ramp",
+      "files": []
     }
   ]
 }
