@@ -3,6 +3,8 @@ package frc.robot;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.constants.ModeConstants;
+import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -40,15 +42,10 @@ public class Robot extends LoggedRobot {
     }
 
     // Set up data receivers & replay source
-    switch (Constants.currentMode) {
+    switch (ModeConstants.currentMode) {
       case REAL:
         // Running on a real robot, log to a USB stick ("/U/logs")
         Logger.addDataReceiver(new WPILOGWriter());
-        Logger.addDataReceiver(new NT4Publisher());
-        break;
-
-      case SIM:
-        // Running a physics simulator, log to NT
         Logger.addDataReceiver(new NT4Publisher());
         break;
 
@@ -58,6 +55,12 @@ public class Robot extends LoggedRobot {
         String logPath = LogFileUtil.findReplayLog();
         Logger.setReplaySource(new WPILOGReader(logPath));
         Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+        break;
+
+      case MAPLESIM:
+      case SIM:
+      default:
+        Logger.addDataReceiver(new NT4Publisher());
         break;
     }
 
@@ -101,17 +104,14 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    autonomousCommand = robotContainer.getAutonomousCommand();
-
-    // schedule the autonomous command (example)
-    if (autonomousCommand != null) {
-      autonomousCommand.schedule();
-    }
+    robotContainer.autonomousInit();
   }
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    robotContainer.periodic();
+  }
 
   /** This function is called once when teleop is enabled. */
   @Override
@@ -123,6 +123,8 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+
+    robotContainer.teleopInit();
   }
 
   /** This function is called once when test mode is enabled. */
@@ -136,7 +138,9 @@ public class Robot extends LoggedRobot {
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    robotContainer.periodic();
+  }
 
   /** This function is called periodically during test mode. */
   @Override
@@ -146,9 +150,23 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+    SimulatedArena.getInstance().resetFieldForAuto();
+    // SimulatedArena.overrideInstance(new Arena2025Reefscape());
+  }
 
   /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+    if (ModeConstants.currentMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
+      SimulatedArena.getInstance().simulationPeriodic();
+      Logger.recordOutput(
+          "FieldSimulation/RobotPosition", RobotContainer.driveSim.getSimulatedDriveTrainPose());
+
+      Logger.recordOutput(
+          "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+      Logger.recordOutput(
+          "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+    }
+  }
 }

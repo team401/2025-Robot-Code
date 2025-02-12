@@ -341,6 +341,24 @@ public class ScoringSubsystem extends SubsystemBase {
     overrideStateMachine = doOverrideStateMachine;
   }
 
+  /**
+   * checks if other subsytems need to wait on intake
+   *
+   * @return true if intake has coral / algae
+   */
+  public boolean shouldWaitOnIntake() {
+    return false;
+  }
+
+  /**
+   * checks if other subsystems need to wait on score
+   *
+   * @return true if scoring subsystem has scored
+   */
+  public boolean shouldWaitOnScore() {
+    return false;
+  }
+
   @Override
   public void periodic() {
     boolean fireStartIntaking = SmartDashboard.getBoolean("scoring/fireStartIntaking", false);

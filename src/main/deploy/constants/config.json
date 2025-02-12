@@ -1,5 +1,5 @@
 {
-  "environment": "comp",
+  "environment": "test_drivebase",
   "defaults": "comp",
   "environments": [
     {
@@ -12,6 +12,7 @@
         "ClawConstants.json",
         "FeatureFlags.json",
         "OperatorConstants.json",
+        "VisionConstants.json",
         "ScoringFeatureFlags.json",
         "ScoringSetpoints.json"
       ]
@@ -26,6 +27,7 @@
         "ClawConstants.json",
         "FeatureFlags.json",
         "OperatorConstants.json",
+        "VisionConstants.json",
         "ScoringFeatureFlags.json",
         "ScoringSetpoints.json"
       ]

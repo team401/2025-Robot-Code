@@ -9,14 +9,19 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import coppercore.controls.state_machine.StateMachine;
+import coppercore.controls.state_machine.StateMachineConfiguration;
+import coppercore.controls.state_machine.state.PeriodicStateInterface;
+import coppercore.controls.state_machine.state.StateContainer;
+import coppercore.vision.VisionLocalizer.DistanceToTag;
 import coppercore.wpilib_interface.DriveTemplate;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,6 +34,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -38,12 +44,16 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants;
-import frc.robot.Constants.Mode;
 import frc.robot.constants.JsonConstants;
+import frc.robot.constants.ModeConstants;
+import frc.robot.subsystems.drive.states.IdleState;
+import frc.robot.subsystems.drive.states.JoystickDrive;
+import frc.robot.subsystems.drive.states.LineupState;
+import frc.robot.subsystems.drive.states.OTFState;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -110,6 +120,15 @@ public class Drive implements DriveTemplate {
 
   private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
 
+  public ProfiledPIDController angleController =
+      new ProfiledPIDController(
+          JsonConstants.drivetrainConstants.angleControllerKp,
+          JsonConstants.drivetrainConstants.angleControllerKi,
+          JsonConstants.drivetrainConstants.angleControllerKd,
+          new TrapezoidProfile.Constraints(
+              JsonConstants.drivetrainConstants.maxPIDVelocity,
+              JsonConstants.drivetrainConstants.maxPIDAcceleration));
+
   public enum DesiredLocation {
     Reef0,
     Reef1,
@@ -147,14 +166,58 @@ public class Drive implements DriveTemplate {
   };
 
   private DesiredLocation desiredLocation = DesiredLocation.Reef0;
-
-  private boolean isOTF = false;
-
-  private Command driveToPose = null;
+  private DesiredLocation intakeLocation = DesiredLocation.CoralStationLeft;
+  private boolean goToIntake = false;
 
   private NetworkTableInstance inst = NetworkTableInstance.getDefault();
   private NetworkTable table = inst.getTable("");
   private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
+
+  @AutoLogOutput(key = "Drive/waitOnScore")
+  private BooleanSupplier waitOnScore = () -> false;
+
+  @AutoLogOutput(key = "Drive/waitOnIntake")
+  private BooleanSupplier waitOnIntake = () -> false;
+
+  private VisionAlignment alignmentSupplier = null;
+
+  private static Drive instance;
+
+  private enum DriveState implements StateContainer {
+    Idle(new IdleState(instance)),
+    OTF(new OTFState(instance)),
+    Lineup(new LineupState(instance)),
+    Joystick(new JoystickDrive(instance));
+    private final PeriodicStateInterface state;
+
+    DriveState(PeriodicStateInterface state) {
+      this.state = state;
+    }
+
+    @Override
+    public PeriodicStateInterface getState() {
+      return state;
+    }
+  }
+
+  public enum DriveTrigger {
+    ManualJoysticks,
+    BeginAutoAlignment,
+    CancelAutoAlignment,
+    FinishOTF,
+    CancelOTF,
+    BeginLineup,
+    CancelLineup,
+    FinishLineup,
+    WaitForScore,
+  }
+
+  private StateMachineConfiguration<DriveState, DriveTrigger> stateMachineConfiguration;
+
+  private StateMachine<DriveState, DriveTrigger> stateMachine;
+
+  private boolean isAligningToFieldElement = false;
+  private Translation2d lockedAlignPosition = new Translation2d();
 
   public Drive(
       GyroIO gyroIO,
@@ -198,7 +261,7 @@ public class Drive implements DriveTemplate {
 
     // warm up java processing for faster pathfind later
     PathfindingCommand.warmupCommand().schedule();
-
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
     // Configure SysId
     sysId =
         new SysIdRoutine(
@@ -209,6 +272,48 @@ public class Drive implements DriveTemplate {
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+
+    configureStates();
+  }
+
+  public void configureStates() {
+    instance = this;
+
+    stateMachineConfiguration = new StateMachineConfiguration<>();
+
+    stateMachineConfiguration
+        .configure(DriveState.Joystick)
+        .permitIf(
+            DriveTrigger.BeginAutoAlignment,
+            DriveState.OTF,
+            () -> !this.isDriveCloseToFinalLineupPose())
+        .permitIf(
+            DriveTrigger.BeginAutoAlignment,
+            DriveState.Lineup,
+            () -> this.isDriveCloseToFinalLineupPose());
+
+    stateMachineConfiguration
+        .configure(DriveState.OTF)
+        .permit(DriveTrigger.CancelOTF, DriveState.Joystick)
+        .permitIf(
+            DriveTrigger.FinishOTF,
+            DriveState.Joystick,
+            () -> this.isDriveCloseToFinalLineupPose() && !this.isDesiredLocationReef())
+        .permitIf(
+            DriveTrigger.FinishOTF,
+            DriveState.Lineup,
+            () -> (this.isDriveCloseToFinalLineupPose() && this.isDesiredLocationReef()))
+        .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick)
+        .permitIf(DriveTrigger.BeginLineup, DriveState.Lineup, () -> this.isDesiredLocationReef());
+
+    stateMachineConfiguration
+        .configure(DriveState.Lineup)
+        .permit(DriveTrigger.CancelLineup, DriveState.Joystick)
+        .permitIf(DriveTrigger.FinishLineup, DriveState.Idle, () -> this.isWaitingOnScore())
+        .permitIf(DriveTrigger.FinishLineup, DriveState.Joystick, () -> !this.isWaitingOnScore())
+        .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick);
+
+    stateMachine = new StateMachine<>(stateMachineConfiguration, DriveState.Joystick);
   }
 
   @Override
@@ -228,21 +333,13 @@ public class Drive implements DriveTemplate {
       }
     }
 
+    stateMachine.periodic();
+    Logger.recordOutput("Drive/State", stateMachine.getCurrentState());
+
     // Log empty setpoint states when disabled
     if (DriverStation.isDisabled()) {
       Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
-    }
-
-    // OTF Command
-    Logger.recordOutput("Drive/OnTheFly", isOTF);
-    if (driveToPose != null) {
-      Logger.recordOutput("Drive/OnTheFlyCommandStatus", this.driveToPose.isScheduled());
-
-      // cancel path following command once OTF cancelled (likely via trigger)
-      if (!isOTF) {
-        driveToPose.cancel();
-      }
     }
 
     // check for update from reef touchscreen
@@ -286,7 +383,8 @@ public class Drive implements DriveTemplate {
     }
 
     // Update gyro alert
-    gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+    gyroDisconnectedAlert.set(
+        !gyroInputs.connected && ModeConstants.currentMode == ModeConstants.Mode.REAL);
   }
 
   /**
@@ -297,7 +395,7 @@ public class Drive implements DriveTemplate {
    *     control), false for auto (robot centric)
    */
   public void setGoalSpeeds(ChassisSpeeds speeds, boolean fieldCentric) {
-    if (fieldCentric) {
+    if (fieldCentric && stateMachine.inState(DriveState.Joystick)) {
       // Adjust for field-centric control
       boolean isFlipped =
           DriverStation.getAlliance().isPresent()
@@ -310,26 +408,69 @@ public class Drive implements DriveTemplate {
 
       this.goalSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, robotRotation);
     } else {
-      Logger.recordOutput("Drive/DesiredOTFSpeeds", speeds);
+      Logger.recordOutput("Drive/DesiredRobotCentricSpeeds", speeds);
       this.goalSpeeds = speeds;
     }
   }
 
-  /**
-   * sets isOTF of robot true will cause robot to create a path from current location to the set
-   * PathLocation
-   *
-   * @param isOTF boolean telling robot if it should create a OTF path
-   */
-  public void setOTF(boolean isOTF) {
-    this.isOTF = isOTF;
-
-    if (isOTF) {
-      this.driveToPose = this.getDriveToPoseCommand();
-      if (this.driveToPose != null) {
-        this.driveToPose.schedule();
-      }
+  public void alignToFieldElement() {
+    if (isDesiredLocationReef()) {
+      lockedAlignPosition =
+          isAllianceRed()
+              ? JsonConstants.redFieldLocations.redReefCenterTranslation
+              : JsonConstants.blueFieldLocations.blueReefCenterTranslation;
+      isAligningToFieldElement = true;
     }
+  }
+
+  public void disableAlign() {
+    isAligningToFieldElement = false;
+  }
+
+  /**
+   * set supplier that interfaces with scoring used to make drive wait until setting next location
+   * in auto
+   *
+   * @param waitOnScore BooleanSupplier to let drive know if scoring is done scoring
+   */
+  public void setWaitOnScoreSupplier(BooleanSupplier waitOnScore) {
+    this.waitOnScore = waitOnScore;
+  }
+
+  /**
+   * set supplier that interfaces with intake to make drive wait until setting next location in auto
+   *
+   * @param waitOnIntake BooleanSupplier to let drive know if intake has a coral for auto
+   */
+  public void setWaitOnIntakeSupplier(BooleanSupplier waitOnIntake) {
+    this.waitOnIntake = waitOnIntake;
+  }
+
+  /**
+   * sets the supplier for landing zone alignment help
+   *
+   * @param alignmentSupplier from vision.getDistanceErrorToTag; helps drive align to reef
+   */
+  public void setAlignmentSupplier(VisionAlignment alignmentSupplier) {
+    this.alignmentSupplier = alignmentSupplier;
+  }
+
+  /**
+   * gets the alignment supplier for use in lineup state
+   *
+   * @return VisionAlignment supplier (possibly null)
+   */
+  public VisionAlignment getVisionAlignment() {
+    return alignmentSupplier;
+  }
+
+  /**
+   * checks if drive needs to wait on scoring subsystem
+   *
+   * @return true if drive is waiting
+   */
+  public boolean isWaitingOnScore() {
+    return waitOnScore.getAsBoolean();
   }
 
   /**
@@ -337,8 +478,57 @@ public class Drive implements DriveTemplate {
    *
    * @return state of OTF following
    */
+  @AutoLogOutput(key = "Drive/OTF/isOTF")
   public boolean isDriveOTF() {
-    return isOTF;
+    return stateMachine.inState(DriveState.OTF);
+  }
+
+  /**
+   * checks if robot pose is sufficiently close to desired pose
+   *
+   * @return true if robot pose is close to desired pose
+   */
+  @AutoLogOutput(key = "Drive/OTF/isDriveCloseToFinalLineupPose")
+  public boolean isDriveCloseToFinalLineupPose() {
+    // relative to transforms first pose into distance from desired pose
+    // then get distance between poses (if less than 0.1 meters we are good)
+    return this.getPose()
+            .relativeTo(OTFState.findOTFPoseFromDesiredLocation(this))
+            .getTranslation()
+            .getNorm()
+        < JsonConstants.drivetrainConstants.otfPoseDistanceLimit;
+  }
+
+  /**
+   * checks if drive is currently lining up to a reef
+   *
+   * @return state of lining up
+   */
+  @AutoLogOutput(key = "Drive/Lineup/isLiningUp")
+  public boolean isDriveLiningUp() {
+    return stateMachine.inState(DriveState.Lineup);
+  }
+
+  /**
+   * checks if desired locaiton is set to a reef location
+   *
+   * @return true if location is reef; false otherwise (processor / coral station)
+   */
+  public boolean isDesiredLocationReef() {
+    return !(desiredLocation == DesiredLocation.CoralStationLeft
+            || desiredLocation == DesiredLocation.CoralStationRight
+            || desiredLocation == DesiredLocation.Processor)
+        && !goToIntake; // only want reef if intake is false
+  }
+
+  /**
+   * checks if location is a scoring location
+   *
+   * @return true if location is scoring (reef / processor)
+   */
+  public boolean isLocationScoring(DesiredLocation location) {
+    return !(location == DesiredLocation.CoralStationLeft
+        || location == DesiredLocation.CoralStationRight);
   }
 
   /**
@@ -348,7 +538,17 @@ public class Drive implements DriveTemplate {
    * @param location desired location for robot to pathfind to
    */
   public void setDesiredLocation(DesiredLocation location) {
-    this.desiredLocation = location;
+    if (isLocationScoring(location)) {
+      this.desiredLocation = location;
+    }
+  }
+
+  /**
+   * @return the desired location for otf and lineup
+   */
+  @AutoLogOutput(key = "Drive//DesiredLocation")
+  public DesiredLocation getDesiredLocation() {
+    return goToIntake ? this.intakeLocation : this.desiredLocation;
   }
 
   /**
@@ -368,7 +568,7 @@ public class Drive implements DriveTemplate {
       return;
     }
     if (locationArray[(int) desiredIndex] != desiredLocation) {
-      if (isOTF) {
+      if (isDriveOTF()) {
         this.updateDesiredLocation((int) desiredIndex);
       } else {
         this.setDesiredLocation((int) desiredIndex);
@@ -396,65 +596,99 @@ public class Drive implements DriveTemplate {
   public void updateDesiredLocation(DesiredLocation location) {
     this.setDesiredLocation(location);
 
-    if (isOTF) {
-      this.driveToPose.cancel();
-      this.driveToPose = this.getDriveToPoseCommand();
-      this.driveToPose.schedule();
+    if (isDriveOTF()) {
+      stateMachine.fire(DriveTrigger.ManualJoysticks);
+      stateMachine.fire(DriveTrigger.BeginAutoAlignment);
     }
   }
 
   /**
-   * finds a pose to pathfind to based on desiredLocation enum
+   * set which intake to go to
    *
-   * @return a pose representing the corresponding scoring location
+   * @param location coral station location (left v right)
    */
-  public Pose2d findOTFPoseFromPathLocation() {
-    switch (this.desiredLocation) {
-        // reef 0 and 1 will have the same path
-        // NOTE: use PathPlannerPath.getStartingHolonomicPose to find pose for reef lineup if wanted
-      case Reef0:
-        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
-            ? JsonConstants.redFieldLocations.reef0
-            : new Pose2d();
-      case Reef1:
-        return new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180)));
-      case CoralStationRight:
-        return new Pose2d(16.0, 6.6, new Rotation2d(0.0));
-        // return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
-      case CoralStationLeft:
-        return new Pose2d(1.2, 7.0, Rotation2d.fromRadians(-1));
-      default:
-        // no location set, so don't allow drive to run OTF
-        this.setOTF(false);
-        return null;
+  public void setDesiredIntakeLocation(DesiredLocation location) {
+    if (!isLocationScoring(location)) {
+      this.intakeLocation = location;
     }
   }
 
   /**
-   * gets the path from current pose to the desired pose found from location
+   * tells drive to otf to intake instead of reef
    *
-   * @return command that drive can schedule to follow the path found
+   * @param goToIntake true if drive should go to coral stations
    */
-  public Command getDriveToPoseCommand() {
-    Pose2d targetPose = findOTFPoseFromPathLocation();
+  public void setGoToIntake(boolean goToIntake) {
+    this.goToIntake = goToIntake;
+  }
 
-    if (targetPose == null) {
-      return null;
-    }
+  /**
+   * checks if drive is in intake mode
+   *
+   * @return true if drive is going to a coral station
+   */
+  @AutoLogOutput(key = "Drive/goToIntake")
+  public boolean isGoingToIntake() {
+    return goToIntake;
+  }
 
-    // Create the constraints to use while pathfinding
-    PathConstraints constraints =
-        new PathConstraints(
-            JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
-            JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
-            JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
-            JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
+  /**
+   * attempts to change state of state machine
+   *
+   * @param trigger trigger to give to state for transition
+   */
+  public void fireTrigger(DriveTrigger trigger) {
+    stateMachine.fire(trigger);
+  }
 
-    return AutoBuilder.pathfindToPose(targetPose, constraints, 0.0);
+  /**
+   * checks if alignment has run
+   *
+   * @return true if we are close to otf for intake OR we have finished lineup for reef
+   */
+  public boolean isDriveAlignmentFinished() {
+    return goToIntake
+        ? this.isDriveCloseToFinalLineupPose()
+        : (this.stateMachine.getCurrentState().equals(DriveState.Joystick)
+            || this.stateMachine.getCurrentState().equals(DriveState.Idle));
+  }
+
+  /**
+   * checks if driver station alliance is red
+   *
+   * @return true if alliance is red
+   */
+  public boolean isAllianceRed() {
+    return DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Red);
+  }
+
+  public void alignToTarget() {
+    double omega = 0.0;
+
+    // Get current position
+    Translation2d currentPosition = getPose().getTranslation();
+
+    // Calculate desired angle to face the target position
+    double targetAngle =
+        Math.atan2(
+            lockedAlignPosition.getY() - currentPosition.getY(),
+            lockedAlignPosition.getX() - currentPosition.getX());
+
+    Logger.recordOutput("Drive/targetAngle", targetAngle);
+
+    // Use PID to rotate toward the target angle
+    omega = angleController.calculate(getRotation().getRadians(), targetAngle);
+    setGoalSpeeds(
+        new ChassisSpeeds(goalSpeeds.vxMetersPerSecond, goalSpeeds.vyMetersPerSecond, omega),
+        false);
   }
 
   /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
   public void runVelocity() {
+    if (isAligningToFieldElement) {
+      alignToTarget();
+    }
+
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(this.goalSpeeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
@@ -621,5 +855,14 @@ public class Drive implements DriveTemplate {
           DriveConfiguration.getInstance().BackRight.LocationX,
           DriveConfiguration.getInstance().BackRight.LocationY)
     };
+  }
+
+  @FunctionalInterface
+  public static interface VisionAlignment {
+    public DistanceToTag get(
+        int tagId,
+        int desiredCameraIndex,
+        double crossTrackOffsetMeters,
+        double alongTrackOffsetMeters);
   }
 }

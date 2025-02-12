@@ -18,8 +18,8 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import frc.robot.constants.ElevatorConstants;
 import frc.robot.constants.SimConstants;
+import frc.robot.constants.subsystems.ElevatorConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorIOSim extends ElevatorIOTalonFX {
