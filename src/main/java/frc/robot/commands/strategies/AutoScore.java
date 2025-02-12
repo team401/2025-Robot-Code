@@ -5,6 +5,8 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
+import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class AutoScore extends Command {
@@ -14,10 +16,15 @@ public class AutoScore extends Command {
   @AutoLogOutput(key = "AutoScore/location")
   private DesiredLocation currentScoringLocation;
 
-  public AutoScore(Drive drive, ScoringSubsystem scoring, DesiredLocation scoringLocation) {
+  @AutoLogOutput(key = "AutoScore/target")
+  private FieldTarget currentFieldTarget;
+
+  public AutoScore(
+      Drive drive, ScoringSubsystem scoring, DesiredLocation scoringLocation, FieldTarget target) {
     this.drive = drive;
     this.scoringSubsystem = scoring;
     this.currentScoringLocation = scoringLocation;
+    this.currentFieldTarget = target;
     // we dont want to require subsystems (it prevents drive otf from running)
   }
 
@@ -26,6 +33,12 @@ public class AutoScore extends Command {
       drive.setGoToIntake(false);
       drive.setDesiredLocation(currentScoringLocation);
       drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+    }
+
+    if (scoringSubsystem != null) {
+      scoringSubsystem.setAutoTransition(true);
+      scoringSubsystem.setGamePiece(GamePiece.Coral);
+      scoringSubsystem.setTarget(currentFieldTarget);
     }
   }
 

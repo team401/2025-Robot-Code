@@ -137,7 +137,8 @@ public class StrategyManager {
         case Teleop:
         case Manual:
         default:
-          return new AutoIntake(drive, scoringSubsysttem, action.location());
+          return new AutoIntake(
+              drive, scoringSubsysttem, action.location(), action.scoringTarget());
       }
     } else if (action.type() == ActionType.Score) {
       switch (this.autonomyMode) {
@@ -145,7 +146,7 @@ public class StrategyManager {
         case Teleop:
         case Manual:
         default:
-          return new AutoScore(drive, scoringSubsysttem, action.location());
+          return new AutoScore(drive, scoringSubsysttem, action.location(), action.scoringTarget());
       }
     } else {
       return null;

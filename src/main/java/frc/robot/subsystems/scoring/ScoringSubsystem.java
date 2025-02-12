@@ -220,6 +220,17 @@ public class ScoringSubsystem extends SubsystemBase {
     SmartDashboard.putBoolean("scoring/fireStartIntaking", false);
   }
 
+  /**
+   * Set whether or not the scoring subsystem should automatically transition through its states
+   * (e.g. automatically enter warmup when drive starts lining up, automatically go to score when
+   * warmup is ready, etc.)
+   *
+   * @param shouldAutoTransition True if auto transition is enabled, false if not
+   */
+  public void setAutoTransition(boolean shouldAutoTransition) {
+    this.autoTransition = shouldAutoTransition;
+  }
+
   public void setIsDriveLinedUpSupplier(BooleanSupplier newSupplier) {
     isDriveLinedUpSupplier = newSupplier;
   }
@@ -391,21 +402,34 @@ public class ScoringSubsystem extends SubsystemBase {
   }
 
   /**
-   * checks if other subsytems need to wait on intake
+   * checks if other subsystems need to wait on intake
    *
-   * @return true if intake has coral / algae
+   * @return false if intake has coral / algae, and true if its still waiting to intake
    */
   public boolean shouldWaitOnIntake() {
-    return false;
+    return !clawMechanism.isCoralDetected() && !clawMechanism.isCoralDetected();
   }
 
   /**
    * checks if other subsystems need to wait on score
    *
-   * @return true if scoring subsystem has scored
+   * @return true if scoring subsystem is scoring, and false if it is done
    */
   public boolean shouldWaitOnScore() {
-    return false;
+    boolean hasGamePiece;
+    switch (currentPiece) {
+      case Coral:
+      default: // Default only exists so that linter doesn't yell at me for possibly uninitialized
+        // hasGamePiece
+        hasGamePiece = clawMechanism.isCoralDetected();
+        break;
+      case Algae:
+        hasGamePiece = clawMechanism.isAlgaeDetected();
+        break;
+    }
+    return ((stateMachine.getCurrentState() == ScoringState.Warmup)
+            || (stateMachine.getCurrentState() == ScoringState.Score))
+        && hasGamePiece;
   }
 
   @Override
