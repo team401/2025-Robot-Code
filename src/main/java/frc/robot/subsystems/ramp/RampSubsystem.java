@@ -28,10 +28,10 @@ public class RampSubsystem extends SubsystemBase {
   }
 
   public boolean isReadyForClimb() {
-    return isReadyForClimb();
+    return mechanism.inPosition();
   }
 
   public boolean isReadyForIntake() {
-    return isReadyForIntake();
+    return mechanism.inPosition();
   }
 }

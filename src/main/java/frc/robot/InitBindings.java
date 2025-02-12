@@ -23,9 +23,6 @@ public final class InitBindings {
   private static final CommandJoystick rightJoystick =
       new CommandJoystick(OperatorConstants.synced.getObject().kRightJoystickPort);
 
-  private static final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.synced.getObject().kDriverControllerPort);
-
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private static final CommandXboxController driverController =
       new CommandXboxController(OperatorConstants.synced.getObject().kDriverControllerPort);
@@ -92,14 +89,14 @@ public final class InitBindings {
   }
 
   public static void initRampBindings(RampSubsystem rampSubsystem) {
-    m_driverController
+    driverController
         .a()
         .onTrue(
             new InstantCommand(
                 () -> {
                   rampSubsystem.prepareForClimb();
                 }));
-    m_driverController
+    driverController
         .b()
         .onTrue(
             new InstantCommand(

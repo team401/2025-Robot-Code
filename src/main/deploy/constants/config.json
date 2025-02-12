@@ -1,5 +1,5 @@
 {
-  "environment": "comp",
+  "environment": "test_ramp",
   "defaults": "comp",
   "environments": [
     {
@@ -30,6 +30,13 @@
         "ElevatorConstants.json",
         "FeatureFlags.json",
         "OperatorConstants.json"
+      ]
+    },
+    {
+      "name": "test_ramp",
+      "filepath": "test_ramp",
+      "files": [
+        "RampConstants.json"
       ]
     }
   ]

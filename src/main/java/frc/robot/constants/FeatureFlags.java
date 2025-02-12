@@ -16,4 +16,5 @@ public final class FeatureFlags {
 
   public Boolean runElevator = false;
   public Boolean runDrive = true;
+  public Boolean runRamp = true;
 }

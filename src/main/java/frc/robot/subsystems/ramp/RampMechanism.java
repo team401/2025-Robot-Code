@@ -1,5 +1,6 @@
 package frc.robot.subsystems.ramp;
 
+import frc.robot.constants.JsonConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class RampMechanism {
@@ -9,21 +10,19 @@ public class RampMechanism {
 
   public double position = 1.0;
   public boolean inPosition = false;
-  public boolean holdDirectionPositive = false;
-  public double positionRange = 0.02;
+  public double positionRange = JsonConstants.rampConstants.positionRange;
 
   public RampMechanism(RampIO io) {
     this.io = io;
   }
 
+  private void updateInPosition() {
+    inPosition = Math.abs(position - inputs.position) <= positionRange;
+  }
+
   public void periodic() {
     io.updateInputs(inputs);
-    if (position - positionRange <= inputs.position
-        && position + positionRange >= inputs.position) {
-      inPosition = true;
-    } else {
-      inPosition = false;
-    }
+    updateInPosition();
     outputs.targetPosition = position;
     inputs.inPosition = inPosition;
     io.updateOutputs(inputs, outputs);
@@ -31,11 +30,9 @@ public class RampMechanism {
     Logger.processInputs("ramp/outputs", outputs);
   }
 
-  public void setHoldDirection(boolean dir) {}
-
   public void setPosition(double position) {
     this.position = position;
-    this.inPosition = false;
+    updateInPosition();
   }
 
   public boolean inPosition() {

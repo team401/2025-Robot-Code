@@ -9,12 +9,12 @@ public class JsonConstants {
     EnvironmentHandler.getEnvironmentHandler(
         Filesystem.getDeployDirectory().toPath().resolve("constants/config.json").toString());
 
+    RampConstants.synced.saveData();
     DrivetrainConstants.synced.loadData();
     ElevatorConstants.synced.loadData();
     ElevatorConstants.Sim.synced.loadData();
     RedFieldLocations.synced.loadData();
     RampConstants.synced.loadData();
-
 
     drivetrainConstants = DrivetrainConstants.synced.getObject();
     elevatorConstants = ElevatorConstants.synced.getObject();
@@ -28,5 +28,4 @@ public class JsonConstants {
   public static ElevatorConstants.Sim elevatorConstantsSim;
   public static RedFieldLocations redFieldLocations;
   public static RampConstants rampConstants;
-
 }

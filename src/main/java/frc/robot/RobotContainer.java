@@ -15,8 +15,6 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
-import frc.robot.subsystems.ramp.RampIOSim;
-import frc.robot.subsystems.ramp.RampMechanism;
 import frc.robot.subsystems.ramp.RampSubsystem;
 
 /**
@@ -28,7 +26,7 @@ import frc.robot.subsystems.ramp.RampSubsystem;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here
   private ElevatorSubsystem elevatorSubsystem;
-  private RampSubsystem rampSubsystem = new RampSubsystem(new RampMechanism(new RampIOSim()));
+  private RampSubsystem rampSubsystem;
   private Drive drive;
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -55,6 +53,9 @@ public class RobotContainer {
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
     }
+    if (FeatureFlags.synced.getObject().runRamp) {
+      rampSubsystem = InitSubsystems.initRampSubsystem();
+    }
   }
 
   /**
@@ -71,7 +72,9 @@ public class RobotContainer {
     if (FeatureFlags.synced.getObject().runDrive) {
       InitBindings.initDriveBindings(drive);
     }
-    InitBindings.initRampBindings(rampSubsystem);
+    if (FeatureFlags.synced.getObject().runRamp) {
+      InitBindings.initRampBindings(rampSubsystem);
+    }
   }
 
   /**

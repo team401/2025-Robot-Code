@@ -3,11 +3,16 @@ package frc.robot.subsystems.ramp;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.constants.JsonConstants;
 
 // TODO make pid constants
 public class RampIOSim implements RampIO {
 
-  private final PIDController controller = new PIDController(7.5, 0.001, 0.0);
+  private final PIDController controller =
+      new PIDController(
+          JsonConstants.rampConstants.PID_SIM_P,
+          JsonConstants.rampConstants.PID_SIM_I,
+          JsonConstants.rampConstants.PID_SIM_D);
 
   private SingleJointedArmSim sim =
       new SingleJointedArmSim(
@@ -23,6 +28,7 @@ public class RampIOSim implements RampIO {
   public void updateOutputs(RampInputs inputs, RampOutputs outputs) {
     controller.setSetpoint(outputs.targetPosition);
     double volts = controller.calculate(inputs.position);
+    volts = Math.min(Math.max(volts, -12.0), 12.0);
     outputs.appliedVolts = volts;
     sim.setInputVoltage(volts);
   }

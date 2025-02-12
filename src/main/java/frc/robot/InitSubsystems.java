@@ -12,6 +12,10 @@ import frc.robot.subsystems.elevator.ElevatorIOSim;
 import frc.robot.subsystems.elevator.ElevatorIOTalonFX;
 import frc.robot.subsystems.elevator.ElevatorMechanism;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.ramp.RampIOSim;
+import frc.robot.subsystems.ramp.RampIOTalonFX;
+import frc.robot.subsystems.ramp.RampMechanism;
+import frc.robot.subsystems.ramp.RampSubsystem;
 
 public final class InitSubsystems {
   public static ElevatorSubsystem initElevatorSubsystem() {
@@ -56,6 +60,18 @@ public final class InitSubsystems {
             new ModuleIO() {},
             new ModuleIO() {},
             new ModuleIO() {});
+    }
+  }
+
+  public static RampSubsystem initRampSubsystem() {
+    switch (ModeConstants.currentMode) {
+      case REAL:
+        return new RampSubsystem(new RampMechanism(new RampIOTalonFX()));
+      case SIM:
+        return new RampSubsystem(new RampMechanism(new RampIOSim()));
+      default:
+        throw new UnsupportedOperationException(
+            "Non-exhaustive list of mode types supported in InitSubsystems");
     }
   }
 }
