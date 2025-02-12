@@ -40,14 +40,6 @@ public class AutoIntake extends Command {
     }
   }
 
-  public void execute() {
-    if (scoringSubsystem != null) {
-      // scoringSubsystem.setGamePiece(GamePiece.Coral);
-      // scoringSubsystem.setTarget(intakeFieldTarget);
-      scoringSubsystem.fireTrigger(ScoringTrigger.BeginIntake);
-    }
-  }
-
   /**
    * determines when everything has finished (scoring / intake and drive at location)
    *

@@ -210,7 +210,11 @@ public class ScoringSubsystem extends SubsystemBase {
     stateMachineConfiguration
         .configure(ScoringState.Score)
         .permit(ScoringTrigger.ScoredPiece, ScoringState.Idle)
-        .permit(ScoringTrigger.ReturnToIdle, ScoringState.Idle);
+        .permit(ScoringTrigger.ReturnToIdle, ScoringState.Idle)
+        .permitIf(
+            ScoringTrigger.BeginIntake,
+            ScoringState.Intake,
+            () -> !(clawMechanism.isCoralDetected() || clawMechanism.isAlgaeDetected()));
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, ScoringState.Idle);
   }
