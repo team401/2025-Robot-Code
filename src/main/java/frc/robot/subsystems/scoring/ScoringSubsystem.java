@@ -7,8 +7,11 @@ import coppercore.controls.state_machine.StateMachine;
 import coppercore.controls.state_machine.StateMachineConfiguration;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.state.StateContainer;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -37,8 +40,12 @@ import org.littletonrobotics.junction.Logger;
  * <ul>
  *   <li>If the elevator is below the crossbar and the wrist is in a position where it would
  *       collide, the elevator is clamped to be below the crossbar.
- *   <li>If the elevator is above the crossbar, the wrist is clamped to be in a position where it
+ *   <li>If the elevator is above the crossbar and the wrist is in a position where it would
+ *       collide, the elevator is clamped to be above the crossbar.
+ *   <li>If the elevator is at the crossbar, the wrist is clamped to be in a position where it
  *       cannot collide.
+ *   <li>If the elevator is below the crossbar and its goal position is above the crossbar (or vice
+ *       versa), the wrist is clamped to be in a position where it cannot collide.
  *   <li>While these rules do next explicitly force the claw to go to a non-colliding position when
  *       elevator is going up, there will be no setpoint above the crossbar where the wrist is in a
  *       colliding position. Therefore, the wrist will always be moving to a non-colliding position
@@ -362,6 +369,11 @@ public class ScoringSubsystem extends SubsystemBase {
       clawMechanism.periodic();
     }
 
+    if (JsonConstants.scoringFeatureFlags.runElevator
+        && JsonConstants.scoringFeatureFlags.runWrist) {
+      determineProtectionClamps();
+    }
+
     Logger.recordOutput("scoring/state", stateMachine.getCurrentState());
   }
 
@@ -378,5 +390,79 @@ public class ScoringSubsystem extends SubsystemBase {
     if (JsonConstants.scoringFeatureFlags.runClaw) {
       clawMechanism.testPeriodic();
     }
+  }
+
+  /**
+   * Based on the state of the wrist and elevator, clamp their positions to avoid collisions
+   *
+   * <p>This method does not verify that the mechanisms exist, so featureflags should be checked
+   * before it is called.
+   */
+  public void determineProtectionClamps() {
+    MutDistance elevatorMinHeight = JsonConstants.elevatorConstants.minElevatorHeight.mutableCopy();
+    MutDistance elevatorMaxHeight = JsonConstants.elevatorConstants.maxElevatorHeight.mutableCopy();
+
+    Distance elevatorHeight = elevatorMechanism.getElevatorHeight();
+    Distance elevatorGoalHeight = elevatorMechanism.getElevatorGoalHeight();
+
+    MutAngle wristMinAngle = JsonConstants.wristConstants.wristMinMinAngle.mutableCopy();
+    MutAngle wristMaxAngle = JsonConstants.wristConstants.wristMaxMaxAngle.mutableCopy();
+
+    Angle wristAngle = wristMechanism.getWristAngle();
+
+    // If the elevator is below the minimum safe height for wrist to be down, clamp wrist above its
+    // collision point
+    if (elevatorHeight.lt(JsonConstants.elevatorConstants.minWristDownHeight)) {
+      wristMinAngle.mut_replace(
+          (Angle)
+              Measure.max(wristMinAngle, JsonConstants.wristConstants.minElevatorDownSafeAngle));
+    }
+
+    // If the wrist is below the minimum safe angle for the elevator to be down, clamp the elevator
+    // above its collision point
+    if (wristAngle.lt(JsonConstants.wristConstants.minElevatorDownSafeAngle)) {
+      elevatorMinHeight.mut_replace(
+          (Distance)
+              Measure.max(elevatorMaxHeight, JsonConstants.elevatorConstants.minWristDownHeight));
+    }
+
+    // If the wrist is in an unsafe position for the elevator to move past the crossbar, clamp the
+    // elevator above/below its collision point
+    if (wristAngle.gt(JsonConstants.wristConstants.maxCrossBarSafeAngle)) {
+      if (elevatorHeight.gt(JsonConstants.elevatorConstants.minWristInAboveCrossBarHeight)) {
+        elevatorMinHeight.mut_replace(
+            (Distance)
+                Measure.max(
+                    elevatorMinHeight,
+                    JsonConstants.elevatorConstants.minWristInAboveCrossBarHeight));
+      } else {
+        elevatorMaxHeight.mut_replace(
+            (Distance)
+                Measure.min(
+                    elevatorMaxHeight,
+                    JsonConstants.elevatorConstants.maxWristInBelowCrossBarHeight));
+      }
+    }
+
+    // If the elevator is at the height of the crossbar, clamp wrist to be outside collision point
+    if (elevatorHeight.gte(JsonConstants.elevatorConstants.maxWristInBelowCrossBarHeight)
+        && elevatorHeight.lte(JsonConstants.elevatorConstants.minWristInAboveCrossBarHeight)) {
+      wristMaxAngle.mut_replace(
+          (Angle) Measure.min(wristMaxAngle, JsonConstants.wristConstants.maxCrossBarSafeAngle));
+    }
+    // If the elevator is below crossbar and trying to go up or above crossbar and trying to go
+    // down, clamp wrist be below its collision point
+    if ((elevatorHeight.lte(JsonConstants.elevatorConstants.minWristInAboveCrossBarHeight)
+            && elevatorGoalHeight.gte(
+                JsonConstants.elevatorConstants.maxWristInBelowCrossBarHeight))
+        || (elevatorHeight.gte(JsonConstants.elevatorConstants.maxWristInBelowCrossBarHeight)
+            && elevatorGoalHeight.lte(
+                JsonConstants.elevatorConstants.maxWristInBelowCrossBarHeight))) {
+      wristMaxAngle.mut_replace(
+          (Angle) Measure.min(wristMaxAngle, JsonConstants.wristConstants.maxCrossBarSafeAngle));
+    }
+
+    elevatorMechanism.setAllowedRangeOfMotion(elevatorMinHeight, elevatorMaxHeight);
+    wristMechanism.setAllowedRangeOfMotion(wristMinAngle, wristMaxAngle);
   }
 }

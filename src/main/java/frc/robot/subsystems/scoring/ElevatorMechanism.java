@@ -312,6 +312,17 @@ public class ElevatorMechanism {
   }
 
   /**
+   * Get the current goal height of the elevator.
+   *
+   * <p>This is the unclamped goal height, and it will not be changed when clamps are updated.
+   *
+   * @return A Distance, the latest goal height set by setGoalHeight
+   */
+  public Distance getElevatorGoalHeight() {
+    return goalHeight;
+  }
+
+  /**
    * Set whether the override voltage should be applied or whether the elevator should control to
    * its position
    */

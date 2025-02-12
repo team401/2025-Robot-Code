@@ -84,6 +84,15 @@ public class WristConstants {
   public final Angle wristMinMinAngle = Rotations.of(-0.75);
   public final Angle wristMaxMaxAngle = Rotations.of(0.25);
 
+  /** The maximum angle the wrist can be at while passing by the crossbar without hitting it. */
+  public final Angle maxCrossBarSafeAngle = Rotations.of(0.0); // TODO: Actual value
+
+  /**
+   * The minimum angle the wrist can be at while the elevator is down and not hit the parts of the
+   * robot below.
+   */
+  public final Angle minElevatorDownSafeAngle = Rotations.of(-0.5); // TODO: Actual value
+
   public static final class Sim {
     @JSONExclude
     public static final JSONSync<WristConstants.Sim> synced =
