@@ -59,6 +59,8 @@ public final class InitSubsystems {
         }
         break;
       case SIM:
+      case MAPLESIM: // TODO: Once ground intake is added, make sure this plays nice with it in
+        // maplesim
         if (JsonConstants.scoringFeatureFlags.runElevator) {
           elevatorMechanism = new ElevatorMechanism(new ElevatorIOSim());
         }
@@ -73,7 +75,9 @@ public final class InitSubsystems {
         throw new UnsupportedOperationException("Scoring replay is not yet implemented.");
       default:
         throw new UnsupportedOperationException(
-            "Non-exhaustive list of mode types supported in InitSubsystems");
+            "Non-exhaustive list of mode types supported in InitSubsystems (got "
+                + ModeConstants.currentMode
+                + ")");
     }
 
     return new ScoringSubsystem(elevatorMechanism, wristMechanism, clawMechanism);

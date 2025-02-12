@@ -17,16 +17,16 @@
     "value": 40.0,
     "unit": "Amp"
   },
-  "wristKG": 0.0,
+  "wristKG": 0.15,
   "wristKS": 0.0,
   "wristKV": 0.0,
   "wristKA": 0.0,
-  "wristKP": 0.0,
-  "wristKI": 0.0,
-  "wristKD": 0.0,
-  "wristMotionMagicCruiseVelocityRotationsPerSecond": 0.1,
-  "wristMotionMagicExpo_kA": 6.0,
-  "wristMotionMagicExpo_kV": 6.0,
+  "wristKP": 15.0,
+  "wristKI": 0.4,
+  "wristKD": 2.0,
+  "wristMotionMagicCruiseVelocityRotationsPerSecond": 0.3,
+  "wristMotionMagicExpo_kA": 7.0,
+  "wristMotionMagicExpo_kV": 2.0,
   "wristCANcoderAbsoluteSensorDiscontinuityPoint": {
     "value": 0.3,
     "unit": "Rotation"
