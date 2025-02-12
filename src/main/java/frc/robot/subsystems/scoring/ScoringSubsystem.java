@@ -13,7 +13,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
@@ -178,8 +177,6 @@ public class ScoringSubsystem extends SubsystemBase {
     this.wristMechanism = wristMechanism;
     this.clawMechanism = clawMechanism;
 
-    // setDefaultCommand(new ExampleElevatorCommand(this));
-
     instance = this;
 
     stateMachineConfiguration = new StateMachineConfiguration<>();
@@ -216,8 +213,6 @@ public class ScoringSubsystem extends SubsystemBase {
         .permit(ScoringTrigger.ReturnToIdle, ScoringState.Idle);
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, ScoringState.Idle);
-
-    SmartDashboard.putBoolean("scoring/fireStartIntaking", false);
   }
 
   /**
@@ -360,11 +355,11 @@ public class ScoringSubsystem extends SubsystemBase {
    */
   public void setTarget(FieldTarget target) {
     // TODO: find and eliminate cases where null is passed to this function
-    if (target == null) {
+    if (target != null) {
+      currentTarget = target;
+    } else {
       System.out.println("WARNING: Null target set in setTarget");
       new Exception("Null target in setTarget").printStackTrace();
-    } else {
-      currentTarget = target;
     }
   }
 
@@ -413,7 +408,7 @@ public class ScoringSubsystem extends SubsystemBase {
    * @return false if intake has coral / algae, and true if its still waiting to intake
    */
   public boolean shouldWaitOnIntake() {
-    return !clawMechanism.isCoralDetected() && !clawMechanism.isCoralDetected();
+    return !clawMechanism.isCoralDetected() && !clawMechanism.isAlgaeDetected();
   }
 
   /**
@@ -440,20 +435,6 @@ public class ScoringSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // ===== BEGIN TESTING CODE; THIS SHOULD BE REMOVED IN COMPETITION CODE =====
-    // boolean fireStartIntaking = SmartDashboard.getBoolean("scoring/fireStartIntaking", false);
-    // if (fireStartIntaking) {
-    //   setGamePiece(GamePiece.Coral);
-    //   stateMachine.fire(ScoringTrigger.BeginIntake);
-    // }
-
-    // if (clawMechanism.isCoralDetected()) {
-    //   setGamePiece(GamePiece.Coral);
-    //   setTarget(FieldTarget.L4);
-    //   stateMachine.fire(ScoringTrigger.StartWarmup);
-    // }
-    // ===== END TESTING CODE =====
-
     if (!overrideStateMachine) {
       stateMachine.periodic();
     }
