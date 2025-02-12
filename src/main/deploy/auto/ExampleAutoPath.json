@@ -3,7 +3,9 @@
     "Reef2",
     "Reef5"
   ],
-  "scoringLevels": [],
-  "fieldTargets": [],
+  "scoringLevels": [
+    "L4",
+    "L4"
+  ],
   "intakeLocation": "CoralStationRight"
 }
