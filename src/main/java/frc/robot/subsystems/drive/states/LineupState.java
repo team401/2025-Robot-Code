@@ -7,7 +7,6 @@ import coppercore.vision.VisionLocalizer.DistanceToTag;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.TestModeManager;
@@ -73,8 +72,6 @@ public class LineupState implements PeriodicStateInterface {
       new Constraints(
           JsonConstants.drivetrainConstants.driveAlongTrackVelocity,
           JsonConstants.drivetrainConstants.driveAlongTrackVelocity);
-  private TrapezoidProfile driveAlongTrackProfile =
-      new TrapezoidProfile(driveAlongTrackProfileConstraints);
 
   private PIDController rotationController =
       new PIDController(
@@ -91,6 +88,11 @@ public class LineupState implements PeriodicStateInterface {
     // cancel rotation lock on center
     drive.disableAlign();
 
+    // dont rely on previous estimates
+    latestObservation = null;
+    observationAge = 0;
+
+    // begin warming up elevator/wrist when lineup starts
     ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
   }
 
@@ -144,7 +146,7 @@ public class LineupState implements PeriodicStateInterface {
   public boolean lineupFinished() {
     return latestObservation != null
         && (latestObservation.alongTrackDistance() < 0.01
-            && latestObservation.crossTrackDistance() < 0.01);
+            && Math.abs(latestObservation.crossTrackDistance()) < 0.01);
   }
 
   public void periodic() {
@@ -231,6 +233,20 @@ public class LineupState implements PeriodicStateInterface {
     }
   }
 
+  public double getAlongTrackVelocity(double alongTrackDistance) {
+    if (alongTrackDistance < 0) {
+      return 0;
+    }
+
+    double rawVelocity =
+        Math.sqrt(2 * JsonConstants.drivetrainConstants.lineupMaxAcceleration * alongTrackDistance);
+    return Math.min(rawVelocity, JsonConstants.drivetrainConstants.lineupMaxVelocity);
+  }
+
+  public double getAlongTrackVelocityReductionFactor(double crossTrackDistance) {
+    return (0.5 - Math.abs(crossTrackDistance));
+  }
+
   /** take over goal speeds to align to reef exactly */
   public void LineupWithReefLocation() {
     int tagId = this.getTagIdForReef();
@@ -259,8 +275,6 @@ public class LineupState implements PeriodicStateInterface {
       if (latestObservation != null && observationAge < 5) {
         observation = latestObservation;
         observationAge++;
-      } else {
-        drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
       }
     } else {
       latestObservation = observation;
@@ -274,19 +288,8 @@ public class LineupState implements PeriodicStateInterface {
     // give to PID Controllers and setGoalSpeeds (robotCentric)
     double vx =
         JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
-            * driveAlongTrackLineupController.calculate(observation.alongTrackDistance());
-    // ChassisSpeeds speeds = getChassisSpeeds();
-    // Pose2d pose = getPose();
-    // double velocityToTarget = (pose.getX() * speeds.vxMetersPerSecond + pose.getY() *
-    // speeds.vyMetersPerSecond) / Math.sqrt(pose.getX() * pose.getX() + pose.getY() * pose.getY());
-    // double velocityToTarget = -getChassisSpeeds().vxMetersPerSecond;
-    // Logger.recordOutput("Drive/Lineup/velocityToTarget", velocityToTarget);
-    // double vx =
-    //     -driveAlongTrackProfile.calculate(
-    //             0.02,
-    //             new State(observation.alongTrackDistance(), velocityToTarget),
-    //             new State(0, 0))
-    //         .velocity;
+            * getAlongTrackVelocityReductionFactor(observation.crossTrackDistance())
+            * getAlongTrackVelocity(observation.alongTrackDistance());
     double vy = driveCrossTrackLineupController.calculate(observation.crossTrackDistance());
     double omega =
         rotationController.calculate(
