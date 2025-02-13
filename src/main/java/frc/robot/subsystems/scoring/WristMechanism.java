@@ -1,9 +1,9 @@
 package frc.robot.subsystems.scoring;
 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
 
@@ -19,7 +19,7 @@ import org.littletonrobotics.junction.Logger;
  * A Mechanism to keep track of the Wrist
  *
  * <ul>
- *   <li>Uses closed-loop control, using torque-current FOC
+ *   <li>Uses closed-loop voltage control
  *   <li>Tracks its own position (0 is when the center of mass is at the same height as the joint,
  *       or 90 degrees up from where the wrist naturally hangs).
  */
@@ -48,7 +48,7 @@ public class WristMechanism {
   LoggedTunableNumber wristExpokA;
 
   LoggedTunableNumber wristTuningSetpointRotations;
-  LoggedTunableNumber wristTuningOverrideAmps;
+  LoggedTunableNumber wristTuningOverrideVolts;
 
   public WristMechanism(WristIO io) {
     wristkP =
@@ -80,7 +80,8 @@ public class WristMechanism {
 
     wristTuningSetpointRotations =
         new LoggedTunableNumber("WristTunables/wristTuningSetpointRotations", 0.0);
-    wristTuningOverrideAmps = new LoggedTunableNumber("WristTunables/wristTuningOverrideAmps", 0.0);
+    wristTuningOverrideVolts =
+        new LoggedTunableNumber("WristTunables/wristTuningOverrideVolts", 0.0);
 
     this.io = io;
   }
@@ -142,13 +143,13 @@ public class WristMechanism {
             },
             wristTuningSetpointRotations);
         break;
-      case WristCurrentTuning:
+      case WristVoltageTuning:
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (setpoint) -> {
-              io.setOverrideCurrent(Amps.of(setpoint[0]));
+              io.setOverrideVoltage(Volts.of(setpoint[0]));
             },
-            wristTuningOverrideAmps);
+            wristTuningOverrideVolts);
         io.setOverrideMode(true);
         break;
       default:
