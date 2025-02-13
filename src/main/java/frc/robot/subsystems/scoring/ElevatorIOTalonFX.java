@@ -84,16 +84,16 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     // Update with large CANcoder direction and apply
     cancoderConfiguration.MagnetSensor.SensorDirection =
         ElevatorConstants.synced.getObject().elevatorLargeCANCoderDirection;
-    // largeCANCoder.getConfigurator().apply(cancoderConfiguration);
+    largeCANCoder.getConfigurator().apply(cancoderConfiguration);
 
     largeCANcoderAbsolutePosition = largeCANCoder.getAbsolutePosition();
 
     BaseStatusSignal.setUpdateFrequencyForAll(50.0, largeCANcoderAbsolutePosition);
 
     // Update with small CANcoder direction and apply
-    // cancoderConfiguration.MagnetSensor.SensorDirection =
-    //     ElevatorConstants.synced.getObject().elevatorSmallCANCoderDirection;
-    // smallCANCoder.getConfigurator().apply(cancoderConfiguration);
+    cancoderConfiguration.MagnetSensor.SensorDirection =
+        ElevatorConstants.synced.getObject().elevatorSmallCANCoderDirection;
+    smallCANCoder.getConfigurator().apply(cancoderConfiguration);
 
     // Initialize talonFXConfigs to use FusedCANCoder and Motion Magic Expo and have correct PID
     // gains and current limits.

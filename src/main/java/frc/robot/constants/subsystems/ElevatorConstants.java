@@ -166,6 +166,8 @@ public final class ElevatorConstants {
    */
   public final Distance elevatorTargetThresholdMeters = Meters.of(0.03);
 
+  public final Integer medianFilterWindowSize = 5;
+
   public static final class Sim {
     @JSONExclude
     public static final JSONSync<ElevatorConstants.Sim> synced =

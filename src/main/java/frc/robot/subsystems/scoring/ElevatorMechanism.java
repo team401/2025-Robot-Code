@@ -12,6 +12,7 @@ import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
 import coppercore.parameter_tools.LoggedTunableNumber;
 import coppercore.wpilib_interface.UnitUtils;
 import coppercore.wpilib_interface.tuning.Tunable;
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.VoltageUnit;
@@ -23,6 +24,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Per;
 import frc.robot.TestModeManager;
+import frc.robot.constants.JsonConstants;
 import frc.robot.constants.subsystems.ElevatorConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -56,6 +58,11 @@ public class ElevatorMechanism implements Tunable {
   // This exists in case we fail to seed with CRT the first try, it will try again each tick until
   // it succeeds.
   private boolean hasBeenSeeded = false;
+
+  MedianFilter largeCANcoderFilter =
+      new MedianFilter(JsonConstants.elevatorConstants.medianFilterWindowSize);
+  MedianFilter smallCANcoderFilter =
+      new MedianFilter(JsonConstants.elevatorConstants.medianFilterWindowSize);
 
   public ElevatorMechanism(ElevatorIO io) {
     elevatorkP =
@@ -177,6 +184,11 @@ public class ElevatorMechanism implements Tunable {
   public void seedWithCRT() {
     Logger.recordOutput("elevator/CRTSolutionSpoolAngle", Rotations.of(-1.0));
 
+    final double filteredLargeEncoderAbsPos =
+        largeCANcoderFilter.calculate(inputs.largeEncoderAbsolutePos.in(Rotations));
+    final double filteredSmallEncoderAbsPos =
+        smallCANcoderFilter.calculate(inputs.smallEncoderAbsolutePos.in(Rotations));
+
     final int ticks = ElevatorConstants.synced.getObject().CRTticksPerRotation;
     final int smallTeeth = ElevatorConstants.synced.getObject().smallCANCoderTeeth;
     final int largeTeeth = ElevatorConstants.synced.getObject().largeCANCoderTeeth;
@@ -194,19 +206,18 @@ public class ElevatorMechanism implements Tunable {
     Logger.recordOutput("elevator/CRT/ticksLarge", ticksLarge);
 
     // long solutionTicks = -1;
-    long solutionTicks = 0;
+    long solutionTicks = -1;
 
     for (int i = 0; i < ticksSmall; i++) {
-      break;
       // // Try the offset of each multiple of 19 * ticks
-      // long potentialPosition = i * largeTeeth * ticks + ticksLarge;
-      // // Check whether that potential position is encoder 17's remainder away from a
-      // // multiple of 17
-      // if ((potentialPosition - ticksSmall) % (smallTeeth * ticks) == 0) {
-      //   // If both conditions are met, we have a solution.
-      //   solutionTicks = potentialPosition;
-      //   break;
-      // }
+      long potentialPosition = i * largeTeeth * ticks + ticksLarge;
+      // Check whether that potential position is encoder 17's remainder away from a
+      // multiple of 17
+      if ((potentialPosition - ticksSmall) % (smallTeeth * ticks) == 0) {
+        // If both conditions are met, we have a solution.
+        solutionTicks = potentialPosition;
+        break;
+      }
     }
 
     if (solutionTicks != -1) {

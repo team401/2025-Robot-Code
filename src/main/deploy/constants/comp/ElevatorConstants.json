@@ -39,7 +39,7 @@
     "value": 80.0,
     "unit": "Amp"
   },
-  "CRTticksPerRotation": 512,
+  "CRTticksPerRotation": 4096,
   "elevatorTargetThresholdMeters": {
     "value": 0.03,
     "unit": "Meter"
