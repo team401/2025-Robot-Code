@@ -13,6 +13,7 @@ import coppercore.parameter_tools.LoggedTunableNumber;
 import coppercore.wpilib_interface.UnitUtils;
 import coppercore.wpilib_interface.tuning.Tunable;
 import edu.wpi.first.math.filter.MedianFilter;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.AngularAccelerationUnit;
 import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.VoltageUnit;
@@ -189,6 +190,10 @@ public class ElevatorMechanism implements Tunable {
     final double filteredSmallEncoderAbsPos =
         smallCANcoderFilter.calculate(inputs.smallEncoderAbsolutePos.in(Rotations));
 
+    Logger.recordOutput(
+        "elevator/CRT/filteredLargeEncoderAbsPos",
+        Units.rotationsToRadians(filteredLargeEncoderAbsPos));
+
     final int ticks = ElevatorConstants.synced.getObject().CRTticksPerRotation;
     final int smallTeeth = ElevatorConstants.synced.getObject().smallCANCoderTeeth;
     final int largeTeeth = ElevatorConstants.synced.getObject().largeCANCoderTeeth;
@@ -199,8 +204,8 @@ public class ElevatorMechanism implements Tunable {
     // aren't divisible by 18, this would result in rounding losing precision.
     // Therefore, we just multiply by 19 or 17 and then divide the final result by
     // 18.
-    long ticksSmall = Math.round(io.getSmallCANCoderAbsPos().in(Rotations) * ticks * smallTeeth);
-    long ticksLarge = Math.round(io.getLargeCANCoderAbsPos().in(Rotations) * ticks * largeTeeth);
+    long ticksSmall = Math.round(filteredSmallEncoderAbsPos * ticks * smallTeeth);
+    long ticksLarge = Math.round(filteredLargeEncoderAbsPos * ticks * largeTeeth);
 
     Logger.recordOutput("elevator/CRT/ticksSmall", ticksSmall);
     Logger.recordOutput("elevator/CRT/ticksLarge", ticksLarge);
