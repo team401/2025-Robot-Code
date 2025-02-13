@@ -26,9 +26,7 @@ public class ClimbSubsystem extends SubsystemBase {
 
   public enum ClimbAction {
     NONE, // do nothing
-    START_CLIMB, // start automated climb sequence
-    SYSTEM_READY,
-    READY_FOR_CLIMB,
+    CLIMB,
     CANCEL,
     OVERRIDE
   }
@@ -65,17 +63,17 @@ public class ClimbSubsystem extends SubsystemBase {
 
     climbMachineConfiguration
         .configure(ClimbState.IDLE)
-        .permit(ClimbAction.START_CLIMB, ClimbState.WAITING)
+        .permit(ClimbAction.CLIMB, ClimbState.WAITING)
         .permit(ClimbAction.OVERRIDE, ClimbState.OVERRIDE);
 
     climbMachineConfiguration
         .configure(ClimbState.WAITING)
-        .permit(ClimbAction.SYSTEM_READY, ClimbState.SEARCHING)
+        .permitIf(ClimbAction.CLIMB, ClimbState.SEARCHING, rampClear)
         .permit(ClimbAction.CANCEL, ClimbState.IDLE);
 
     climbMachineConfiguration
         .configure(ClimbState.SEARCHING)
-        .permit(ClimbAction.READY_FOR_CLIMB, ClimbState.LIFTING)
+        .permitIf(ClimbAction.CLIMB, ClimbState.LIFTING, () -> inputs.lockedToCage)
         .permit(ClimbAction.CANCEL, ClimbState.IDLE);
 
     climbMachineConfiguration
@@ -87,6 +85,7 @@ public class ClimbSubsystem extends SubsystemBase {
   }
 
   public void fireTrigger(ClimbAction action) {
+    currentAction = action;
     climbMachine.fire(action);
   }
 
@@ -112,6 +111,7 @@ public class ClimbSubsystem extends SubsystemBase {
 
     Logger.processInputs("climb/inputs", inputs);
     Logger.processInputs("climb/outputs", outputs);
+    Logger.recordOutput("climb/rampClear", rampClear);
     Logger.recordOutput("climb/State", climbMachine.getCurrentState());
     Logger.recordOutput("climb/Action", currentAction);
   }

@@ -16,7 +16,7 @@ public class WaitingState implements PeriodicStateInterface {
   public void periodic() {
     climbSubsystem.setGoalAngle(ClimbConstants.synced.getObject().restingAngle);
     if (climbSubsystem.getRampClear()) {
-      climbSubsystem.fireTrigger(ClimbAction.SYSTEM_READY);
+      climbSubsystem.fireTrigger(ClimbAction.CLIMB);
     }
   }
 }
