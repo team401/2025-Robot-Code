@@ -29,6 +29,7 @@ public class ClimbSubsystem extends SubsystemBase {
     START_CLIMB, // start automated climb sequence
     SYSTEM_READY,
     READY_FOR_CLIMB,
+    CANCEL,
     OVERRIDE
   }
 
@@ -70,16 +71,16 @@ public class ClimbSubsystem extends SubsystemBase {
     climbMachineConfiguration
         .configure(ClimbState.WAITING)
         .permit(ClimbAction.SYSTEM_READY, ClimbState.SEARCHING)
-        .permit(ClimbAction.NONE, ClimbState.IDLE);
+        .permit(ClimbAction.CANCEL, ClimbState.IDLE);
 
     climbMachineConfiguration
         .configure(ClimbState.SEARCHING)
         .permit(ClimbAction.READY_FOR_CLIMB, ClimbState.LIFTING)
-        .permit(ClimbAction.NONE, ClimbState.IDLE);
+        .permit(ClimbAction.CANCEL, ClimbState.IDLE);
 
     climbMachineConfiguration
         .configure(ClimbState.LIFTING)
-        .permit(ClimbAction.NONE, ClimbState.IDLE);
+        .permit(ClimbAction.CANCEL, ClimbState.IDLE);
 
     climbMachine =
         new StateMachine<ClimbState, ClimbAction>(climbMachineConfiguration, ClimbState.IDLE);

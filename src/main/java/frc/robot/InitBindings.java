@@ -109,6 +109,6 @@ public final class InitBindings {
     driverController
         .a()
         .onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.START_CLIMB)));
-    driverController.b().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.NONE)));
+    driverController.b().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)));
   }
 }

@@ -22,10 +22,10 @@ public class ClimbIOSim extends ClimbIOTalonFX {
               ClimbConstants.Sim.synced.getObject().climbArmLengthMeters,
               ClimbConstants.Sim.synced.getObject().climbArmMassKg),
           ClimbConstants.Sim.synced.getObject().climbArmLengthMeters,
-          0,
-          2 * Math.PI,
-          false,
-          0,
+          ClimbConstants.Sim.synced.getObject().minAngleRads,
+          ClimbConstants.Sim.synced.getObject().maxAngleRads,
+          ClimbConstants.Sim.synced.getObject().simGravity,
+          ClimbConstants.Sim.synced.getObject().startAngleRads,
           ClimbConstants.Sim.synced.getObject().climbStdDevs,
           0);
 
@@ -35,7 +35,10 @@ public class ClimbIOSim extends ClimbIOTalonFX {
 
   @Override
   public void updateInputs(ClimbInputs inputs) {
+    leadMotorSimState.setRawRotorPosition(inputs.goalAngle);
     leadMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
+
+    leadMotorSimState.setRawRotorPosition(inputs.goalAngle);
     followerMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
 
     climb.setInputVoltage(leadMotorSimState.getMotorVoltage());

@@ -1,5 +1,4 @@
 {
-  "runElevator": false,
   "runDrive": false,
   "runVision": false,
   "runScoring": true,
