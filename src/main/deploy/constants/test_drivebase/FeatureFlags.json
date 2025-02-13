@@ -1,10 +1,6 @@
 {
   "runDrive": true,
   "runVision": true,
-<<<<<<< HEAD
   "runScoring": false,
   "runClimb": true
-=======
-  "runScoring": true
->>>>>>> main
 }
