@@ -128,13 +128,7 @@ public final class InitBindings {
   }
 
   public static void initClimbBindings(ClimbSubsystem climb) {
-    driverController
-        .a()
-        .onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)))
-        .onFalse(new InstantCommand(() -> climb.fireTrigger(ClimbAction.NONE)));
-    driverController
-        .b()
-        .onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)))
-        .onFalse(new InstantCommand(() -> climb.fireTrigger(ClimbAction.NONE)));
+    driverController.a().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)));
+    driverController.b().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)));
   }
 }

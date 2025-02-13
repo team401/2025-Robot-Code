@@ -24,10 +24,10 @@ public class ClimbConstants {
   public final Integer leadClimbMotorId = 0;
   public final Integer followerClimbMotorId = 1;
 
-  public final Double climbkS = 160.0;
-  public final Double climbkV = 1.0;
-  public final Double climbkA = 1.0;
-  public final Double climbkG = 1.0;
+  public final Double climbkS = 0.0;
+  public final Double climbkV = 0.0;
+  public final Double climbkA = 0.0;
+  public final Double climbkG = 0.0;
   public final Double climbP = 50.0;
   public final Double climbI = 0.0;
   public final Double climbD = 0.0;
