@@ -133,6 +133,7 @@ public final class InitBindings {
     driverController.a().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)));
     driverController.b().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)));
   }
+
   /**
    * Initialize bindings specifically for Test Mode.
    *
