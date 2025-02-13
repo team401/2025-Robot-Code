@@ -54,7 +54,7 @@ public class RobotContainer {
     configureSubsystems();
     // Configure the trigger bindings
     configureBindings();
-    TestModeManager.testInit();
+    TestModeManager.init();
     configureAutos();
   }
 
@@ -150,6 +150,8 @@ public class RobotContainer {
 
   /** This method must be called from robot, as it isn't called automatically */
   public void testInit() {
+    InitBindings.initTestModeBindings();
+
     switch (TestModeManager.getTestMode()) {
       case DriveFeedForwardCharacterization:
         CommandScheduler.getInstance()
