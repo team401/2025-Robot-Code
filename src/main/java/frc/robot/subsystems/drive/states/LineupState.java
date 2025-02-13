@@ -14,6 +14,8 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.drive.Drive.VisionAlignment;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 import org.littletonrobotics.junction.Logger;
 
 public class LineupState implements PeriodicStateInterface {
@@ -89,6 +91,9 @@ public class LineupState implements PeriodicStateInterface {
     // dont rely on previous estimates
     latestObservation = null;
     observationAge = 0;
+    
+    // begin warming up elevator/wrist when lineup starts
+    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
   }
 
   /**

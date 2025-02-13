@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import frc.robot.constants.JsonConstants;
+import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 
 public class IdleState implements PeriodicStateInterface {
@@ -15,7 +16,16 @@ public class IdleState implements PeriodicStateInterface {
 
   @Override
   public void periodic() {
-    scoringSubsystem.setElevatorGoalHeight(JsonConstants.scoringSetpoints.idle.elevatorHeight());
-    scoringSubsystem.setClawRollerVoltage(Volts.zero());
+    ScoringSetpoint setpoint;
+
+    if (scoringSubsystem.isAlgaeDetected()) {
+      scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeIdleVoltage);
+      setpoint = JsonConstants.scoringSetpoints.idleWithAlgae;
+    } else {
+      scoringSubsystem.setClawRollerVoltage(Volts.zero());
+      setpoint = JsonConstants.scoringSetpoints.idle;
+    }
+
+    scoringSubsystem.setGoalSetpoint(setpoint);
   }
 }
