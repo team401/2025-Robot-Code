@@ -1,6 +1,10 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
+import java.io.File;
+
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.Logger;
 
 import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -8,6 +12,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Timer;
@@ -27,9 +33,6 @@ import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
-import java.io.File;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.littletonrobotics.junction.Logger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -49,9 +52,11 @@ public class RobotContainer {
 
   public static SwerveDriveSimulation driveSim = null;
 
-  public void robotPeriodic() {
-    // double height = 1.05*Math.sin(Timer.getTimestamp()) + 1.05;
-    double height = scoringSubsystem.getElevatorHeight().magnitude();
+  public void updateRobotModel(){
+    double height = 0;
+    if (scoringSubsystem != null){
+      height = scoringSubsystem.getElevatorHeight().magnitude();
+    }
     double stage_one_height = Math.max(height - 0.55, 0.0);
     double stage_two_height = Math.max(stage_one_height - 0.8, 0.0);
     double claw_rotation = 2 * Math.sin(Timer.getTimestamp() * 1.0 / 3.0) + 2.0;
@@ -211,5 +216,17 @@ public class RobotContainer {
 
   public void disabledInit() {
     CommandScheduler.getInstance().cancelAll();
+  }
+
+  public void updateMapleSim() {
+    SimulatedArena.getInstance().simulationPeriodic();
+    if (driveSim != null){
+      Logger.recordOutput(
+        "FieldSimulation/RobotPosition", RobotContainer.driveSim.getSimulatedDriveTrainPose());
+    }
+    Logger.recordOutput(
+        "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+    Logger.recordOutput(
+        "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
   }
 }
