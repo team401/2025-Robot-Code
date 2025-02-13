@@ -6,6 +6,7 @@ public final class ModeConstants {
   public enum Mode {
     REAL,
     SIM,
+    MAPLESIM,
     REPLAY
   }
 

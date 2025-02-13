@@ -1,0 +1,11 @@
+{
+  "scoringLocations": [
+    "Reef2",
+    "Reef5"
+  ],
+  "scoringLevels": [
+    "L2",
+    "L4"
+  ],
+  "intakeLocation": "CoralStationRight"
+}
