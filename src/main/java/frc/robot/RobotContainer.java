@@ -21,6 +21,7 @@ import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import java.io.File;
@@ -36,6 +37,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here
   private ScoringSubsystem scoringSubsystem = null;
   private Drive drive = null;
+  private ClimbSubsystem climbSubsystem = null;
   private VisionLocalizer vision = null;
   private StrategyManager strategyManager = null;
   private AutoStrategyContainer strategyContainer = null;
@@ -43,6 +45,8 @@ public class RobotContainer {
   private SendableChooser<AutoStrategy> autoChooser = new SendableChooser<>();
 
   public static SwerveDriveSimulation driveSim = null;
+
+  // The robot's subsystems and commands are defined here
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -90,6 +94,9 @@ public class RobotContainer {
         drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
       }
     }
+    if (FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem = InitSubsystems.initClimbSubsystem();
+    }
 
     if (FeatureFlags.synced.getObject().runScoring) {
       scoringSubsystem = InitSubsystems.initScoringSubsystem();
@@ -113,6 +120,9 @@ public class RobotContainer {
     // initialize helper commands
     if (FeatureFlags.synced.getObject().runDrive) {
       InitBindings.initDriveBindings(drive);
+    }
+    if (FeatureFlags.synced.getObject().runClimb) {
+      InitBindings.initClimbBindings(climbSubsystem);
     }
   }
 

@@ -1,5 +1,6 @@
 {
   "runDrive": true,
   "runVision": true,
-  "runScoring": true
+  "runScoring": false,
+  "runClimb": true
 }

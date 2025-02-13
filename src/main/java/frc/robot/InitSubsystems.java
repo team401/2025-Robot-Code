@@ -16,6 +16,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
+import frc.robot.subsystems.climb.ClimbIOSim;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConfiguration;
 import frc.robot.subsystems.drive.GyroIO;
@@ -81,6 +83,20 @@ public final class InitSubsystems {
     }
 
     return new ScoringSubsystem(elevatorMechanism, wristMechanism, clawMechanism);
+  }
+
+  public static ClimbSubsystem initClimbSubsystem() {
+    switch (ModeConstants.currentMode) {
+      case REAL:
+        throw new UnsupportedOperationException("Climb real functions are not yet implemented.");
+      case SIM:
+        return new ClimbSubsystem(new ClimbIOSim());
+      case REPLAY:
+        throw new UnsupportedOperationException("Climb replay is not yet implemented.");
+      default:
+        throw new UnsupportedOperationException(
+            "Non-exhaustive list of mode types supported in InitSubsystems");
+    }
   }
 
   public static Drive initDriveSubsystem() {
