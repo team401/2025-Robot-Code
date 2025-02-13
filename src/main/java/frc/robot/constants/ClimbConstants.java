@@ -21,16 +21,20 @@ public class ClimbConstants {
   public final Angle searchingAngle = Degrees.of(60);
   public final Angle finalHangingAngle = Degrees.of(0);
 
-  public final int leadClimbMotorId = 0;
-  public final int followerClimbMotorId = 1;
+  public final Integer leadClimbMotorId = 0;
+  public final Integer followerClimbMotorId = 1;
 
-  public final double climbP = 5;
-  public final double climbI = 0;
-  public final double climbD = 0;
+  public final Double climbkS = 1.0;
+  public final Double climbkV = 1.0;
+  public final Double climbkA = 1.0;
+  public final Double climbkG = 1.0;
+  public final Double climbP = 5.0;
+  public final Double climbI = 0.0;
+  public final Double climbD = 0.0;
 
-  public final double climbCurrentLimit = 60;
+  public final Double climbCurrentLimit = 60.0;
 
-  public final boolean invertFollowerClimbMotor = false;
+  public final Boolean invertFollowerClimbMotor = false;
 
   public static final class Sim {
     public static final JSONSync<ClimbConstants.Sim> synced =

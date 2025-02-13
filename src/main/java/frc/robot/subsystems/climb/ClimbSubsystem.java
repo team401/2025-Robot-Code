@@ -86,7 +86,7 @@ public class ClimbSubsystem extends SubsystemBase {
   }
 
   public void fireTrigger(ClimbAction action) {
-    currentAction = action;
+    climbMachine.fire(action);
   }
 
   public void setGoalAngle(Angle angle) {
@@ -103,8 +103,6 @@ public class ClimbSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-
-    climbMachine.fire(currentAction);
 
     climbMachine.periodic();
 

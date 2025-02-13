@@ -15,6 +15,8 @@ public class SearchingState implements PeriodicStateInterface {
   @Override
   public void periodic() {
     climbSubsystem.setGoalAngle(ClimbConstants.synced.getObject().searchingAngle);
-    if (climbSubsystem.getLockedToCage()) climbSubsystem.fireTrigger(ClimbAction.READY_FOR_CLIMB);
+    if (climbSubsystem.getLockedToCage()) {
+      climbSubsystem.fireTrigger(ClimbAction.READY_FOR_CLIMB);
+    }
   }
 }

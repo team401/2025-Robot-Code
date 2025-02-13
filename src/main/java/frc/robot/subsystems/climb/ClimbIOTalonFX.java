@@ -8,7 +8,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
@@ -33,8 +33,8 @@ public class ClimbIOTalonFX implements ClimbIO {
 
   private boolean override = false;
 
-  private MotionMagicTorqueCurrentFOC calculator =
-      new MotionMagicTorqueCurrentFOC(ClimbConstants.synced.getObject().restingAngle);
+  private MotionMagicVoltage calculator =
+      new MotionMagicVoltage(ClimbConstants.synced.getObject().restingAngle);
 
   public ClimbIOTalonFX() {
     leadMotor = new TalonFX(ClimbConstants.synced.getObject().leadClimbMotorId);
@@ -53,6 +53,10 @@ public class ClimbIOTalonFX implements ClimbIO {
                     .withStatorCurrentLimit(ClimbConstants.synced.getObject().climbCurrentLimit))
             .withSlot0(
                 new Slot0Configs()
+                    .withKS(ClimbConstants.synced.getObject().climbkS)
+                    .withKV(ClimbConstants.synced.getObject().climbkV)
+                    .withKA(ClimbConstants.synced.getObject().climbkA)
+                    .withKG(ClimbConstants.synced.getObject().climbkG)
                     .withKP(ClimbConstants.synced.getObject().climbP)
                     .withKI(ClimbConstants.synced.getObject().climbI)
                     .withKD(ClimbConstants.synced.getObject().climbD))

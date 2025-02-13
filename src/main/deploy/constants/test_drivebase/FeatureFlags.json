@@ -3,5 +3,5 @@
   "runDrive": true,
   "runVision": true,
   "runScoring": false,
-  "runClimb": false
+  "runClimb": true
 }

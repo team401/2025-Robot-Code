@@ -14,7 +14,6 @@ public final class FeatureFlags {
           EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
-  public final Boolean runElevator = false;
   public final Boolean runClimb = true;
   public final Boolean runDrive = true;
   public Boolean runVision = true;

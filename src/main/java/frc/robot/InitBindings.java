@@ -6,7 +6,6 @@ import static edu.wpi.first.units.Units.Meters;
 import coppercore.wpilib_interface.DriveWithJoysticks;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -107,7 +106,9 @@ public final class InitBindings {
   }
 
   public static void initClimbBindings(ClimbSubsystem climb) {
-    leftJoystick.button(10)
-          .onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.START_CLIMB)));
+    driverController
+        .a()
+        .onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.START_CLIMB)));
+    driverController.b().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.NONE)));
   }
 }
