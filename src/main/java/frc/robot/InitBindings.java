@@ -2,6 +2,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.wpilib_interface.DriveWithJoysticks;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,6 +16,7 @@ import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
 
 public final class InitBindings {
   // Controller
@@ -123,5 +125,63 @@ public final class InitBindings {
                   drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
                 },
                 drive));
+  }
+
+  /**
+   * Initialize bindings specifically for Test Mode.
+   *
+   * <p>This function doesn't run automatically, and it should be called in testInit
+   */
+  public static void initTestModeBindings() {
+    switch (TestModeManager.getTestMode()) {
+      case SetpointTuning:
+        // Use B to manually run claw forward
+        driverController
+            .b()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                      ScoringSubsystem.getInstance()
+                          .setClawRollerVoltage(JsonConstants.clawConstants.intakeVoltage);
+                    }))
+            .onFalse(
+                new InstantCommand(
+                    () -> {
+                      ScoringSubsystem.getInstance().setClawRollerVoltage(Volts.zero());
+                    }));
+
+        // Use A to manually run claw backward (good for repositioning coral)
+        driverController
+            .a()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                      ScoringSubsystem.getInstance()
+                          .setClawRollerVoltage(
+                              JsonConstants.clawConstants.intakeVoltage.times(-0.5));
+                    }))
+            .onFalse(
+                new InstantCommand(
+                    () -> {
+                      ScoringSubsystem.getInstance().setClawRollerVoltage(Volts.zero());
+                    }));
+
+        // Use Y to manually score coral
+        driverController
+            .y()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                      ScoringSubsystem.getInstance()
+                          .setClawRollerVoltage(JsonConstants.clawConstants.coralScoreVoltage);
+                    }))
+            .onFalse(
+                new InstantCommand(
+                    () -> {
+                      ScoringSubsystem.getInstance().setClawRollerVoltage(Volts.zero());
+                    }));
+      default:
+        break;
+    }
   }
 }

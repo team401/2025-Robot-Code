@@ -114,7 +114,6 @@ public class ElevatorMechanism {
   public void testPeriodic() {
     switch (TestModeManager.getTestMode()) {
       case ElevatorTuning:
-        ScoringSubsystem.getInstance().setOverrideStateMachine(true);
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (pid) -> {
@@ -148,16 +147,19 @@ public class ElevatorMechanism {
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (setpoint) -> {
+              io.setOverrideVolts(Volts.of(setpoint[0]));
+            },
+            elevatorTuningOverrideVolts);
+
+      case SetpointTuning:
+        // Allow setpointing the elevator in ElevatorTuning and SetpointTuning modes
+        LoggedTunableNumber.ifChanged(
+            hashCode(),
+            (setpoint) -> {
               setGoalHeight(Meters.of(setpoint[0]));
             },
             elevatorTuningSetpointMeters);
 
-        LoggedTunableNumber.ifChanged(
-            hashCode(),
-            (setpoint) -> {
-              io.setOverrideVolts(Volts.of(setpoint[0]));
-            },
-            elevatorTuningOverrideVolts);
         break;
       default:
         break;

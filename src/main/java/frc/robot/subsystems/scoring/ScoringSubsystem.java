@@ -14,6 +14,7 @@ import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.states.IdleState;
@@ -465,6 +466,17 @@ public class ScoringSubsystem extends SubsystemBase {
 
   /** This method must be called by RobotContainer, as it does not run automatically! */
   public void testPeriodic() {
+    switch (TestModeManager.getTestMode()) {
+      case ElevatorTuning:
+      case WristClosedLoopTuning:
+      case WristVoltageTuning:
+      case SetpointTuning:
+        setOverrideStateMachine(true);
+        break;
+      default:
+        break;
+    }
+
     if (JsonConstants.scoringFeatureFlags.runElevator) {
       elevatorMechanism.testPeriodic();
     }
