@@ -78,9 +78,6 @@ public class RobotContainer {
   }
 
   public void configureSubsystems() {
-    if (FeatureFlags.synced.getObject().runScoring) {
-      scoringSubsystem = InitSubsystems.initScoringSubsystem();
-    }
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
       if (ModeConstants.simMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
@@ -91,6 +88,15 @@ public class RobotContainer {
         vision = InitSubsystems.initVisionSubsystem(drive);
 
         drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
+      }
+    }
+
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem = InitSubsystems.initScoringSubsystem();
+      if (FeatureFlags.synced.getObject().runDrive) {
+        scoringSubsystem.setIsDriveLinedUpSupplier(() -> drive.isDriveAlignmentFinished());
+      } else {
+        scoringSubsystem.setIsDriveLinedUpSupplier(() -> true);
       }
     }
 

@@ -12,7 +12,6 @@ import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.constants.JsonConstants;
 import org.littletonrobotics.junction.Logger;
@@ -24,10 +23,10 @@ public class ClawIOSim implements ClawIO {
     ALGAE
   }
 
-  boolean hasCoral = false;
+  boolean hasCoral = true; // Initialize with a coral because of preload
   boolean hasAlgae = false;
 
-  boolean coralSensed = false;
+  boolean coralSensed = true;
   boolean algaeSensed = false;
 
   boolean coralAvailable = false;
@@ -49,13 +48,10 @@ public class ClawIOSim implements ClawIO {
    *   <li>When not holding a gamepiece, this value will be -1.0.
    * </ul>
    */
-  private double piecePos = -1.0;
+  private double piecePos = 0.8; // Init to 0.8 so that coral is detected
 
   // Keep track of what the claw is currently holding
-  private HasState has = HasState.NONE;
-
-  // Keep track of how long we've been intaking/outtaking to simulate moving an object in or out
-  private Timer movementTimer = new Timer();
+  private HasState has = HasState.CORAL;
 
   public ClawIOSim() {
     SmartDashboard.putBoolean("clawSim/coralAvailable", false);
@@ -119,6 +115,8 @@ public class ClawIOSim implements ClawIO {
 
     switch (has) {
       case NONE:
+        coralSensed = false;
+        algaeSensed = false;
         break;
       case CORAL:
         coralSensed = piecePos > JsonConstants.clawConstantsSim.coralDetectionPoint;
@@ -130,6 +128,7 @@ public class ClawIOSim implements ClawIO {
         break;
     }
 
+    Logger.recordOutput("clawSim/has", has);
     Logger.recordOutput("clawSim/hasCoral", hasCoral);
     Logger.recordOutput("clawSim/hasAlgae", hasAlgae);
     Logger.recordOutput("clawSim/piecePos", piecePos);

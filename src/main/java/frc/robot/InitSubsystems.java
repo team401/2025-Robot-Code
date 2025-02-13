@@ -32,6 +32,9 @@ import frc.robot.subsystems.scoring.ElevatorIOSim;
 import frc.robot.subsystems.scoring.ElevatorIOTalonFX;
 import frc.robot.subsystems.scoring.ElevatorMechanism;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.WristIOSim;
+import frc.robot.subsystems.scoring.WristIOTalonFX;
+import frc.robot.subsystems.scoring.WristMechanism;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -40,19 +43,29 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 public final class InitSubsystems {
   public static ScoringSubsystem initScoringSubsystem() {
     ElevatorMechanism elevatorMechanism = null;
+    WristMechanism wristMechanism = null;
     ClawMechanism clawMechanism = null;
+
     switch (ModeConstants.currentMode) {
       case REAL:
         if (JsonConstants.scoringFeatureFlags.runElevator) {
           elevatorMechanism = new ElevatorMechanism(new ElevatorIOTalonFX());
+        }
+        if (JsonConstants.scoringFeatureFlags.runWrist) {
+          wristMechanism = new WristMechanism(new WristIOTalonFX());
         }
         if (JsonConstants.scoringFeatureFlags.runClaw) {
           clawMechanism = new ClawMechanism(new ClawIOTalonFX());
         }
         break;
       case SIM:
+      case MAPLESIM: // TODO: Once ground intake is added, make sure this plays nice with it in
+        // maplesim
         if (JsonConstants.scoringFeatureFlags.runElevator) {
           elevatorMechanism = new ElevatorMechanism(new ElevatorIOSim());
+        }
+        if (JsonConstants.scoringFeatureFlags.runWrist) {
+          wristMechanism = new WristMechanism(new WristIOSim());
         }
         if (JsonConstants.scoringFeatureFlags.runClaw) {
           clawMechanism = new ClawMechanism(new ClawIOSim());
@@ -62,9 +75,12 @@ public final class InitSubsystems {
         throw new UnsupportedOperationException("Scoring replay is not yet implemented.");
       default:
         throw new UnsupportedOperationException(
-            "Non-exhaustive list of mode types supported in InitSubsystems");
+            "Non-exhaustive list of mode types supported in InitSubsystems (got "
+                + ModeConstants.currentMode
+                + ")");
     }
-    return new ScoringSubsystem(elevatorMechanism, clawMechanism);
+
+    return new ScoringSubsystem(elevatorMechanism, wristMechanism, clawMechanism);
   }
 
   public static Drive initDriveSubsystem() {

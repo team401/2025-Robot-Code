@@ -15,6 +15,8 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.drive.Drive.VisionAlignment;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 import org.littletonrobotics.junction.Logger;
 
 public class LineupState implements PeriodicStateInterface {
@@ -88,6 +90,8 @@ public class LineupState implements PeriodicStateInterface {
   public void onEntry(Transition transition) {
     // cancel rotation lock on center
     drive.disableAlign();
+
+    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
   }
 
   /**

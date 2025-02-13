@@ -114,6 +114,7 @@ public class ElevatorMechanism {
   public void testPeriodic() {
     switch (TestModeManager.getTestMode()) {
       case ElevatorTuning:
+        ScoringSubsystem.getInstance().setOverrideStateMachine(true);
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (pid) -> {
@@ -309,6 +310,17 @@ public class ElevatorMechanism {
     return Meters.of(
         spoolAngle.in(Rotations)
             * ElevatorConstants.synced.getObject().elevatorHeightPerSpoolRotation.in(Meters));
+  }
+
+  /**
+   * Get the current goal height of the elevator.
+   *
+   * <p>This is the unclamped goal height, and it will not be changed when clamps are updated.
+   *
+   * @return A Distance, the latest goal height set by setGoalHeight
+   */
+  public Distance getElevatorGoalHeight() {
+    return goalHeight;
   }
 
   /**
