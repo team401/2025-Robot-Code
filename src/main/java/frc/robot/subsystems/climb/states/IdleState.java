@@ -13,6 +13,6 @@ public class IdleState implements PeriodicStateInterface {
 
   @Override
   public void periodic() {
-    climbSubsystem.setGoalAngle(ClimbConstants.restingAngle);
+    climbSubsystem.setGoalAngle(ClimbConstants.synced.getObject().restingAngle);
   }
 }

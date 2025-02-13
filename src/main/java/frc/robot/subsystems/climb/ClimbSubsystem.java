@@ -4,7 +4,6 @@ import coppercore.controls.state_machine.StateMachine;
 import coppercore.controls.state_machine.StateMachineConfiguration;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.state.StateContainer;
-import edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.climb.states.IdleState;
@@ -22,6 +21,7 @@ public class ClimbSubsystem extends SubsystemBase {
   private ClimbInputsAutoLogged inputs = new ClimbInputsAutoLogged();
   private ClimbOutputsAutoLogged outputs = new ClimbOutputsAutoLogged();
 
+  // TODO: replace when ramp becomes a thing
   private BooleanSupplier rampClear = () -> true;
 
   public enum ClimbAction {
@@ -111,9 +111,9 @@ public class ClimbSubsystem extends SubsystemBase {
     io.updateInputs(inputs);
     io.applyOutputs(outputs);
 
-    System.out.println(climbMachine.getCurrentState());
     Logger.processInputs("climb/inputs", inputs);
     Logger.processInputs("climb/outputs", outputs);
+    Logger.recordOutput("climb/State", climbMachine.getCurrentState());
     Logger.recordOutput("climb/Action", currentAction);
   }
 }

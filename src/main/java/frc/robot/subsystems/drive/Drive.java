@@ -20,6 +20,7 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -115,6 +116,15 @@ public class Drive implements DriveTemplate {
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
   private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
+
+  public ProfiledPIDController angleController =
+      new ProfiledPIDController(
+          JsonConstants.drivetrainConstants.angleControllerKp,
+          JsonConstants.drivetrainConstants.angleControllerKi,
+          JsonConstants.drivetrainConstants.angleControllerKd,
+          new TrapezoidProfile.Constraints(
+              JsonConstants.drivetrainConstants.maxPIDVelocity,
+              JsonConstants.drivetrainConstants.maxPIDAcceleration));
 
   public enum DesiredLocation {
     Reef0,
@@ -223,6 +233,9 @@ public class Drive implements DriveTemplate {
   private NetworkTable table = inst.getTable("");
   private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
 
+  private boolean isAligningToFieldElement = false;
+  private Translation2d lockedAlignPosition = new Translation2d();
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -266,7 +279,7 @@ public class Drive implements DriveTemplate {
 
     // warm up java processing for faster pathfind later
     PathfindingCommand.warmupCommand().schedule();
-
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
     // Configure SysId
     sysId =
         new SysIdRoutine(
@@ -425,6 +438,20 @@ public class Drive implements DriveTemplate {
       Logger.recordOutput("Drive/DesiredRobotCentricSpeeds", speeds);
       this.goalSpeeds = speeds;
     }
+  }
+
+  public void alignToFieldElement() {
+    if (isDesiredLocationReef()) {
+      lockedAlignPosition =
+          isAllianceRed()
+              ? JsonConstants.redFieldLocations.redReefCenterTranslation
+              : JsonConstants.blueFieldLocations.blueReefCenterTranslation;
+      isAligningToFieldElement = true;
+    }
+  }
+
+  public void disableAlign() {
+    isAligningToFieldElement = false;
   }
 
   /**
@@ -633,18 +660,76 @@ public class Drive implements DriveTemplate {
         // NOTE: pairs of reef sides (ie 0 and 1) will have the same otf pose (approximately 0.5-1
         // meter away from center of tag)
       case Reef0:
-        return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red
-            ? JsonConstants.redFieldLocations.reef0
-            : new Pose2d();
       case Reef1:
-        return new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180)));
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef01Translation,
+                JsonConstants.redFieldLocations.redReef01Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef01Translation,
+                JsonConstants.blueFieldLocations.blueReef01Rotation);
+      case Reef2:
+      case Reef3:
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef23Translation,
+                JsonConstants.redFieldLocations.redReef23Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef23Translation,
+                JsonConstants.blueFieldLocations.blueReef23Rotation);
+      case Reef4:
+      case Reef5:
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef45Translation,
+                JsonConstants.redFieldLocations.redReef45Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef45Translation,
+                JsonConstants.blueFieldLocations.blueReef45Rotation);
+      case Reef6:
+      case Reef7:
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef67Translation,
+                JsonConstants.redFieldLocations.redReef67Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef67Translation,
+                JsonConstants.blueFieldLocations.blueReef67Rotation);
+      case Reef8:
+      case Reef9:
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef89Translation,
+                JsonConstants.redFieldLocations.redReef89Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef89Translation,
+                JsonConstants.blueFieldLocations.blueReef89Rotation);
+      case Reef10:
+      case Reef11:
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef1011Translation,
+                JsonConstants.redFieldLocations.redReef1011Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef1011Translation,
+                JsonConstants.blueFieldLocations.blueReef1011Rotation);
       case CoralStationRight:
-        return new Pose2d(16.0, 6.6, new Rotation2d(0.0));
-        // return new Pose2d(1.2, 1, Rotation2d.fromRadians(1));
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redCoralStationRightTranslation,
+                JsonConstants.redFieldLocations.redCoralStationRightRotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueCoralStationRightTranslation,
+                JsonConstants.blueFieldLocations.blueCoralStationRightRotation);
       case CoralStationLeft:
-        return new Pose2d(1.2, 7.0, Rotation2d.fromRadians(-1));
+        return isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redCoralStationLeftTranslation,
+                JsonConstants.redFieldLocations.redCoralStationLeftRotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueCoralStationLeftTranslation,
+                JsonConstants.blueFieldLocations.blueCoralStationLeftRotation);
       default:
-        // no location set, so don't allow drive to run OTF
         this.setOTF(false);
         return null;
     }
@@ -691,7 +776,6 @@ public class Drive implements DriveTemplate {
     boolean allianceRed = this.isAllianceRed();
     switch (desiredLocation) {
       case Reef0:
-        return 7;
       case Reef1:
         return allianceRed ? 10 : 21;
       case Reef2:
@@ -763,29 +847,35 @@ public class Drive implements DriveTemplate {
   public Rotation2d getRotationForReefSide() {
     switch (desiredLocation) {
       case Reef0:
-        return new Rotation2d();
       case Reef1:
-        return new Rotation2d();
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef01Rotation
+            : JsonConstants.blueFieldLocations.blueReef01Rotation;
       case Reef2:
-        return new Rotation2d();
       case Reef3:
-        return new Rotation2d();
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef23Rotation
+            : JsonConstants.blueFieldLocations.blueReef23Rotation;
       case Reef4:
-        return new Rotation2d();
       case Reef5:
-        return new Rotation2d();
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef45Rotation
+            : JsonConstants.blueFieldLocations.blueReef45Rotation;
       case Reef6:
-        return new Rotation2d();
       case Reef7:
-        return new Rotation2d();
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef67Rotation
+            : JsonConstants.blueFieldLocations.blueReef67Rotation;
       case Reef8:
-        return new Rotation2d();
       case Reef9:
-        return new Rotation2d();
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef89Rotation
+            : JsonConstants.blueFieldLocations.blueReef89Rotation;
       case Reef10:
-        return new Rotation2d();
       case Reef11:
-        return new Rotation2d();
+        return isAllianceRed()
+            ? JsonConstants.redFieldLocations.redReef1011Rotation
+            : JsonConstants.blueFieldLocations.blueReef1011Rotation;
       default:
         return new Rotation2d();
     }
@@ -854,8 +944,31 @@ public class Drive implements DriveTemplate {
     this.setGoalSpeeds(new ChassisSpeeds(vx, vy, omega), false);
   }
 
+  public void alignToTarget() {
+    double omega = 0.0;
+
+    // Get current position
+    Translation2d currentPosition = getPose().getTranslation();
+
+    // Calculate desired angle to face the target position
+    double targetAngle =
+        Math.atan2(
+            lockedAlignPosition.getY() - currentPosition.getY(),
+            lockedAlignPosition.getX() - currentPosition.getX());
+
+    // Use PID to rotate toward the target angle
+    omega = angleController.calculate(getRotation().getRadians(), targetAngle);
+    setGoalSpeeds(
+        new ChassisSpeeds(goalSpeeds.vxMetersPerSecond, goalSpeeds.vyMetersPerSecond, omega),
+        false);
+  }
+
   /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
   public void runVelocity() {
+    if (isAligningToFieldElement) {
+      alignToTarget();
+    }
+
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(this.goalSpeeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);

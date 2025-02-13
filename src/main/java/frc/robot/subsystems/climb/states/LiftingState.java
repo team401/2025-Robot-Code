@@ -14,6 +14,6 @@ public class LiftingState implements PeriodicStateInterface {
 
   @Override
   public void periodic() {
-    climbSubsystem.setGoalAngle(ClimbConstants.finalHangingAngle);
+    climbSubsystem.setGoalAngle(ClimbConstants.synced.getObject().finalHangingAngle);
   }
 }
