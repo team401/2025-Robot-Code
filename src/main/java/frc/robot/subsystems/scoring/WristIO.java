@@ -10,11 +10,11 @@ import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.Per;
+import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface WristIO {
@@ -110,12 +110,13 @@ public interface WristIO {
   public default void setOverrideMode(boolean override) {}
 
   /**
-   * Set the current to apply in override mode.
+   * Set the voltage to apply in override mode.
    *
-   * <p>This is a current because the wrist uses TorqueCurrentFOC for control instead of voltage.
+   * <p>This is a voltage because the wrist uses MotionMagicExpoVoltage for control instead of
+   * torque-current FOC
    *
-   * @param current The current to apply. This will only be applied after setOverrideMode(true) is
+   * @param voltage The voltage to apply. This will only be applied after setOverrideMode(true) is
    *     called.
    */
-  public default void setOverrideCurrent(Current current) {}
+  public default void setOverrideVoltage(Voltage voltage) {}
 }

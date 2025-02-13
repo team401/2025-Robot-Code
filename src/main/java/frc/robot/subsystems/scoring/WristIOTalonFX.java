@@ -1,7 +1,7 @@
 package frc.robot.subsystems.scoring;
 
-import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -13,7 +13,6 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
-import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -25,10 +24,10 @@ import edu.wpi.first.units.AngularVelocityUnit;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.MutAngle;
-import edu.wpi.first.units.measure.MutCurrent;
+import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Per;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.JsonConstants;
 
 public class WristIOTalonFX implements WristIO {
@@ -41,12 +40,14 @@ public class WristIOTalonFX implements WristIO {
 
   private MutAngle wristGoalPosition = Rotations.mutable(0.2);
 
-  private MotionMagicExpoVoltage request = new MotionMagicExpoVoltage(wristGoalPosition);
+  private MotionMagicExpoVoltage request =
+      new MotionMagicExpoVoltage(wristGoalPosition).withEnableFOC(true);
+  private VoltageOut overrideRequest = new VoltageOut(0.0);
 
   private boolean motorsDisabled = false;
 
   private boolean isOverriding = false;
-  private MutCurrent overrideCurrent = Amps.mutable(0.0);
+  private MutVoltage overrideVoltage = Volts.mutable(0.0);
 
   public WristIOTalonFX() {
     talonFXConfigs =
@@ -124,8 +125,8 @@ public class WristIOTalonFX implements WristIO {
 
       return;
     } else if (isOverriding) {
-      wristMotor.setControl(new TorqueCurrentFOC(overrideCurrent));
-      outputs.wristOutput = overrideCurrent.in(Amps);
+      wristMotor.setControl(overrideRequest.withOutput(overrideVoltage));
+      outputs.wristOutput = overrideVoltage.in(Volts);
 
       return;
     }
@@ -192,7 +193,7 @@ public class WristIOTalonFX implements WristIO {
     isOverriding = override;
   }
 
-  public void setOverrideCurrent(Current current) {
-    overrideCurrent.mut_replace(current);
+  public void setOverrideVoltage(Voltage volts) {
+    overrideVoltage.mut_replace(volts);
   }
 }
