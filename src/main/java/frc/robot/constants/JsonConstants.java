@@ -8,7 +8,6 @@ import frc.robot.constants.subsystems.DrivetrainConstants;
 import frc.robot.constants.subsystems.ElevatorConstants;
 
 public class JsonConstants {
-
   public static void loadConstants() {
     EnvironmentHandler.getEnvironmentHandler(
         Filesystem.getDeployDirectory().toPath().resolve("constants/config.json").toString());
@@ -18,15 +17,18 @@ public class JsonConstants {
     ElevatorConstants.Sim.synced.loadData();
     ClawConstants.synced.loadData();
     ClawConstants.Sim.synced.loadData();
+    WristConstants.synced.loadData();
+    WristConstants.Sim.synced.loadData();
     ScoringFeatureFlags.synced.loadData();
     ScoringSetpoints.synced.loadData();
     RedFieldLocations.synced.loadData();
     BlueFieldLocations.synced.loadData();
-    DrivetrainConstants.synced.loadData();
     VisionConstants.synced.loadData();
 
     elevatorConstants = ElevatorConstants.synced.getObject();
     elevatorConstantsSim = ElevatorConstants.Sim.synced.getObject();
+    wristConstants = WristConstants.synced.getObject();
+    wristConstantsSim = WristConstants.Sim.synced.getObject();
     clawConstants = ClawConstants.synced.getObject();
     clawConstantsSim = ClawConstants.Sim.synced.getObject();
     scoringFeatureFlags = ScoringFeatureFlags.synced.getObject();
@@ -39,6 +41,8 @@ public class JsonConstants {
 
   public static ElevatorConstants elevatorConstants;
   public static ElevatorConstants.Sim elevatorConstantsSim;
+  public static WristConstants wristConstants;
+  public static WristConstants.Sim wristConstantsSim;
   public static ClawConstants clawConstants;
   public static ClawConstants.Sim clawConstantsSim;
   public static ScoringFeatureFlags scoringFeatureFlags;

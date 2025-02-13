@@ -15,6 +15,8 @@ import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem.ClimbAction;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DesiredLocation;
+import frc.robot.subsystems.drive.Drive.DriveTrigger;
 
 public final class InitBindings {
   // Controller
@@ -46,7 +48,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  drive.setAutoAlignment(true);
+                  drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
                 },
                 drive));
     rightJoystick
@@ -54,7 +56,7 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  drive.setAutoAlignment(false);
+                  drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
                 },
                 drive));
 
@@ -103,6 +105,26 @@ public final class InitBindings {
                       new Pose2d(
                           Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
                 }));
+    rightJoystick
+        .top()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  drive.setDesiredIntakeLocation(DesiredLocation.CoralStationRight);
+                  drive.setGoToIntake(true);
+                  drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                },
+                drive));
+
+    rightJoystick
+        .top()
+        .onFalse(
+            new InstantCommand(
+                () -> {
+                  drive.setGoToIntake(false);
+                  drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+                },
+                drive));
   }
 
   public static void initClimbBindings(ClimbSubsystem climb) {
