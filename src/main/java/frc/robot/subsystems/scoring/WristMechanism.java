@@ -136,6 +136,8 @@ public class WristMechanism {
             wristExpokA,
             wristExpokV);
 
+      case SetpointTuning:
+        // Allow setpointing in WristClosedLoopTuning and SetpointTuning
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (setpoint) -> {
