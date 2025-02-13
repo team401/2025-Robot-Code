@@ -6,11 +6,14 @@ import static edu.wpi.first.units.Units.Meters;
 import coppercore.wpilib_interface.DriveWithJoysticks;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.drive.DesiredLocationSelector;
 import frc.robot.constants.OperatorConstants;
+import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem.ClimbAction;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DrivetrainConstants;
 
@@ -85,5 +88,10 @@ public final class InitBindings {
                       new Pose2d(
                           Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
                 }));
+  }
+
+  public static void initClimbBindings(ClimbSubsystem climb) {
+    leftJoystick.button(10)
+          .onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.START_CLIMB)));
   }
 }

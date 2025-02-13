@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.drive.AkitDriveCommands;
 import frc.robot.constants.FeatureFlags;
@@ -70,19 +71,32 @@ public class RobotContainer {
     }
   }
 
+    /**
+   * Use this method to define your trigger->command mappings. Triggers can be created via the
+   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
+   * predicate, or via the named factories in {@link
+   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
+   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
+   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+   * joysticks}.
+   */
+
   private void configureBindings() {
     // initialize helper commands
     if (FeatureFlags.synced.getObject().runDrive) {
       InitBindings.initDriveBindings(drive);
     }
-
     if (FeatureFlags.synced.getObject().runClimb) {
-      m_buttonMasher
-          .a()
-          .onTrue(Commands.runOnce(() -> climbSubsystem.fireTrigger(ClimbAction.START_CLIMB)))
-          .onFalse(Commands.runOnce(() -> climbSubsystem.fireTrigger(ClimbAction.NONE)));
+      InitBindings.initClimbBindings(climbSubsystem);
     }
   }
+
+
+    /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
 
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous

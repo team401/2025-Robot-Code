@@ -2,5 +2,6 @@
   "runElevator": false,
   "runDrive": true,
   "runVision": true,
-  "runScoring": false
+  "runScoring": false,
+  "runClimb": false
 }
