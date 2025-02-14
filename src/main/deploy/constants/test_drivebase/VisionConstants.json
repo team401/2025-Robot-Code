@@ -1,11 +1,11 @@
 {
-  "FrontLeftCameraIndex": 0,
+  "FrontLeftCameraIndex": 1,
   "FrontRightCameraIndex": 0,
   "FrontLeftTransform": {
     "m_translation": {
-      "m_x": 0.0,
-      "m_y": 0.0,
-      "m_z": 0.0
+      "m_x": 0.17779999999999999,
+      "m_y": 0.1397,
+      "m_z": 0.30479999999999996
     },
     "m_rotation": {
       "m_q": {

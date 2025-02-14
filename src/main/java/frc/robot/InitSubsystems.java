@@ -159,7 +159,8 @@ public final class InitSubsystems {
             tagLayout,
             new double[0],
             new VisionIOPhotonReal(
-                "Front-Right", JsonConstants.visionConstants.FrontRightTransform));
+                "Front-Right", JsonConstants.visionConstants.FrontRightTransform),
+            new VisionIOPhotonReal("Front-Left", JsonConstants.visionConstants.FrontLeftTransform));
       case SIM:
         return new VisionLocalizer(
             drive::addVisionMeasurement,

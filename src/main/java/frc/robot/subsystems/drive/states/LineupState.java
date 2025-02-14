@@ -93,7 +93,9 @@ public class LineupState implements PeriodicStateInterface {
     observationAge = 0;
 
     // begin warming up elevator/wrist when lineup starts
-    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+    if (ScoringSubsystem.getInstance() != null) {
+      ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+    }
   }
 
   /**
