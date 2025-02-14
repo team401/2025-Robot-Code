@@ -11,9 +11,6 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.util.Units;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.subsystems.climb.ClimbIOSim;
@@ -162,12 +159,7 @@ public final class InitSubsystems {
             tagLayout,
             new double[0],
             new VisionIOPhotonReal(
-                "Front-Right",
-                new Transform3d(
-                    Units.inchesToMeters(7.0),
-                    Units.inchesToMeters(-5.5),
-                    Units.inchesToMeters(12.0),
-                    new Rotation3d(0, 0, 0))));
+                "Front-Right", JsonConstants.visionConstants.FrontRightTransform));
       case SIM:
         return new VisionLocalizer(
             drive::addVisionMeasurement,
