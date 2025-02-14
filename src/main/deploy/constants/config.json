@@ -1,0 +1,51 @@
+{
+  "environment": "test_drivebase",
+  "defaults": "comp",
+  "environments": [
+    {
+      "name": "comp",
+      "filepath": "comp",
+      "files": [
+        "DrivetrainConstants.json",
+        "ElevatorConstants.json",
+        "WristConstants.json",
+        "ClawConstants.json",
+        "FeatureFlags.json",
+        "OperatorConstants.json",
+        "VisionConstants.json",
+        "ScoringFeatureFlags.json",
+        "ScoringSetpoints.json",
+        "ClimbConstants.json"
+      ]
+    },
+    {
+      "name": "test_drivebase",
+      "filepath": "test_drivebase",
+      "files": [
+        "DrivetrainConstants.json",
+        "ElevatorConstants.json",
+        "WristConstants.json",
+        "ClawConstants.json",
+        "FeatureFlags.json",
+        "OperatorConstants.json",
+        "VisionConstants.json",
+        "ScoringFeatureFlags.json",
+        "ScoringSetpoints.json",
+        "ClimbConstants.json"
+      ]
+    },
+    {
+      "name": "hitl",
+      "filepath": "hitl",
+      "files": [
+        "DrivetrainConstants.json",
+        "ClawConstants.json",
+        "FeatureFlags.json",
+        "OperatorConstants.json",
+        "ScoringFeatureFlags.json",
+        "ScoringSetpoints.json",
+        "ClimbConstants.json"
+      ]
+    }
+  ]
+}
