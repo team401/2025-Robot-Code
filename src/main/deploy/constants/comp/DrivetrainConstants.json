@@ -1,0 +1,352 @@
+{
+  "maxLinearSpeed": 6.0,
+  "maxAngularSpeed": 6.283185307179586,
+  "joystickDeadband": 0.1,
+  "maxPIDVelocity": 6.283185307179586,
+  "maxPIDAcceleration": 3.141592653589793,
+  "steerKp": 40.0,
+  "steerKi": 0.0,
+  "steerKd": 0.0,
+  "steerKs": 0.18753,
+  "steerKv": 2.49773,
+  "steerKa": 0.0,
+  "steerKg": 0.0,
+  "driveKp": 30.0,
+  "driveKi": 0.0,
+  "driveKd": 0.0,
+  "driveKs": 0.1915,
+  "driveKv": 0.83161,
+  "driveKa": 0.0,
+  "driveKg": 0.0,
+  "kSteerClosedLoopOutput": "Voltage",
+  "kDriveClosedLoopOutput": "TorqueCurrentFOC",
+  "kDriveMotorType": "TalonFX_Integrated",
+  "kSteerMotorType": "TalonFX_Integrated",
+  "kSteerFeedbackType": "FusedCANcoder",
+  "driveInitialConfigs": {
+    "FutureProofConfigs": true,
+    "MotorOutput": {
+      "Inverted": "CounterClockwise_Positive",
+      "NeutralMode": "Coast",
+      "DutyCycleNeutralDeadband": 0.0,
+      "PeakForwardDutyCycle": 1.0,
+      "PeakReverseDutyCycle": -1.0,
+      "ControlTimesyncFreqHz": 0.0
+    },
+    "CurrentLimits": {
+      "StatorCurrentLimit": 120.0,
+      "StatorCurrentLimitEnable": true,
+      "SupplyCurrentLimit": 70.0,
+      "SupplyCurrentLimitEnable": true,
+      "SupplyCurrentLowerLimit": 40.0,
+      "SupplyCurrentLowerTime": 1.0
+    },
+    "Voltage": {
+      "SupplyVoltageTimeConstant": 0.0,
+      "PeakForwardVoltage": 16.0,
+      "PeakReverseVoltage": -16.0
+    },
+    "TorqueCurrent": {
+      "PeakForwardTorqueCurrent": 800.0,
+      "PeakReverseTorqueCurrent": -800.0,
+      "TorqueNeutralDeadband": 0.0
+    },
+    "Feedback": {
+      "FeedbackRotorOffset": 0.0,
+      "SensorToMechanismRatio": 1.0,
+      "RotorToSensorRatio": 1.0,
+      "FeedbackSensorSource": "RotorSensor",
+      "FeedbackRemoteSensorID": 0,
+      "VelocityFilterTimeConstant": 0.0
+    },
+    "DifferentialSensors": {
+      "DifferentialSensorSource": "Disabled",
+      "DifferentialTalonFXSensorID": 0,
+      "DifferentialRemoteSensorID": 0
+    },
+    "DifferentialConstants": {
+      "PeakDifferentialDutyCycle": 2.0,
+      "PeakDifferentialVoltage": 32.0,
+      "PeakDifferentialTorqueCurrent": 1600.0
+    },
+    "OpenLoopRamps": {
+      "DutyCycleOpenLoopRampPeriod": 0.0,
+      "VoltageOpenLoopRampPeriod": 0.0,
+      "TorqueOpenLoopRampPeriod": 0.0
+    },
+    "ClosedLoopRamps": {
+      "DutyCycleClosedLoopRampPeriod": 0.0,
+      "VoltageClosedLoopRampPeriod": 0.0,
+      "TorqueClosedLoopRampPeriod": 0.0
+    },
+    "HardwareLimitSwitch": {
+      "ForwardLimitType": "NormallyOpen",
+      "ForwardLimitAutosetPositionEnable": false,
+      "ForwardLimitAutosetPositionValue": 0.0,
+      "ForwardLimitEnable": true,
+      "ForwardLimitSource": "LimitSwitchPin",
+      "ForwardLimitRemoteSensorID": 0,
+      "ReverseLimitType": "NormallyOpen",
+      "ReverseLimitAutosetPositionEnable": false,
+      "ReverseLimitAutosetPositionValue": 0.0,
+      "ReverseLimitEnable": true,
+      "ReverseLimitSource": "LimitSwitchPin",
+      "ReverseLimitRemoteSensorID": 0
+    },
+    "Audio": {
+      "BeepOnBoot": true,
+      "BeepOnConfig": true,
+      "AllowMusicDurDisable": false
+    },
+    "SoftwareLimitSwitch": {
+      "ForwardSoftLimitEnable": false,
+      "ReverseSoftLimitEnable": false,
+      "ForwardSoftLimitThreshold": 0.0,
+      "ReverseSoftLimitThreshold": 0.0
+    },
+    "MotionMagic": {
+      "MotionMagicCruiseVelocity": 0.0,
+      "MotionMagicAcceleration": 0.0,
+      "MotionMagicJerk": 0.0,
+      "MotionMagicExpo_kV": 0.12,
+      "MotionMagicExpo_kA": 0.1
+    },
+    "CustomParams": {
+      "CustomParam0": 0,
+      "CustomParam1": 0
+    },
+    "ClosedLoopGeneral": {
+      "ContinuousWrap": false
+    },
+    "Slot0": {
+      "kP": 0.0,
+      "kI": 0.0,
+      "kD": 0.0,
+      "kS": 0.0,
+      "kV": 0.0,
+      "kA": 0.0,
+      "kG": 0.0,
+      "GravityType": "Elevator_Static",
+      "StaticFeedforwardSign": "UseVelocitySign"
+    },
+    "Slot1": {
+      "kP": 0.0,
+      "kI": 0.0,
+      "kD": 0.0,
+      "kS": 0.0,
+      "kV": 0.0,
+      "kA": 0.0,
+      "kG": 0.0,
+      "GravityType": "Elevator_Static",
+      "StaticFeedforwardSign": "UseVelocitySign"
+    },
+    "Slot2": {
+      "kP": 0.0,
+      "kI": 0.0,
+      "kD": 0.0,
+      "kS": 0.0,
+      "kV": 0.0,
+      "kA": 0.0,
+      "kG": 0.0,
+      "GravityType": "Elevator_Static",
+      "StaticFeedforwardSign": "UseVelocitySign"
+    }
+  },
+  "steerInitialConfigs": {
+    "FutureProofConfigs": true,
+    "MotorOutput": {
+      "Inverted": "CounterClockwise_Positive",
+      "NeutralMode": "Coast",
+      "DutyCycleNeutralDeadband": 0.0,
+      "PeakForwardDutyCycle": 1.0,
+      "PeakReverseDutyCycle": -1.0,
+      "ControlTimesyncFreqHz": 0.0
+    },
+    "CurrentLimits": {
+      "StatorCurrentLimit": 60.0,
+      "StatorCurrentLimitEnable": true,
+      "SupplyCurrentLimit": 70.0,
+      "SupplyCurrentLimitEnable": true,
+      "SupplyCurrentLowerLimit": 40.0,
+      "SupplyCurrentLowerTime": 1.0
+    },
+    "Voltage": {
+      "SupplyVoltageTimeConstant": 0.0,
+      "PeakForwardVoltage": 16.0,
+      "PeakReverseVoltage": -16.0
+    },
+    "TorqueCurrent": {
+      "PeakForwardTorqueCurrent": 800.0,
+      "PeakReverseTorqueCurrent": -800.0,
+      "TorqueNeutralDeadband": 0.0
+    },
+    "Feedback": {
+      "FeedbackRotorOffset": 0.0,
+      "SensorToMechanismRatio": 1.0,
+      "RotorToSensorRatio": 1.0,
+      "FeedbackSensorSource": "RotorSensor",
+      "FeedbackRemoteSensorID": 0,
+      "VelocityFilterTimeConstant": 0.0
+    },
+    "DifferentialSensors": {
+      "DifferentialSensorSource": "Disabled",
+      "DifferentialTalonFXSensorID": 0,
+      "DifferentialRemoteSensorID": 0
+    },
+    "DifferentialConstants": {
+      "PeakDifferentialDutyCycle": 2.0,
+      "PeakDifferentialVoltage": 32.0,
+      "PeakDifferentialTorqueCurrent": 1600.0
+    },
+    "OpenLoopRamps": {
+      "DutyCycleOpenLoopRampPeriod": 0.0,
+      "VoltageOpenLoopRampPeriod": 0.0,
+      "TorqueOpenLoopRampPeriod": 0.0
+    },
+    "ClosedLoopRamps": {
+      "DutyCycleClosedLoopRampPeriod": 0.0,
+      "VoltageClosedLoopRampPeriod": 0.0,
+      "TorqueClosedLoopRampPeriod": 0.0
+    },
+    "HardwareLimitSwitch": {
+      "ForwardLimitType": "NormallyOpen",
+      "ForwardLimitAutosetPositionEnable": false,
+      "ForwardLimitAutosetPositionValue": 0.0,
+      "ForwardLimitEnable": true,
+      "ForwardLimitSource": "LimitSwitchPin",
+      "ForwardLimitRemoteSensorID": 0,
+      "ReverseLimitType": "NormallyOpen",
+      "ReverseLimitAutosetPositionEnable": false,
+      "ReverseLimitAutosetPositionValue": 0.0,
+      "ReverseLimitEnable": true,
+      "ReverseLimitSource": "LimitSwitchPin",
+      "ReverseLimitRemoteSensorID": 0
+    },
+    "Audio": {
+      "BeepOnBoot": true,
+      "BeepOnConfig": true,
+      "AllowMusicDurDisable": false
+    },
+    "SoftwareLimitSwitch": {
+      "ForwardSoftLimitEnable": false,
+      "ReverseSoftLimitEnable": false,
+      "ForwardSoftLimitThreshold": 0.0,
+      "ReverseSoftLimitThreshold": 0.0
+    },
+    "MotionMagic": {
+      "MotionMagicCruiseVelocity": 0.0,
+      "MotionMagicAcceleration": 0.0,
+      "MotionMagicJerk": 0.0,
+      "MotionMagicExpo_kV": 0.12,
+      "MotionMagicExpo_kA": 0.1
+    },
+    "CustomParams": {
+      "CustomParam0": 0,
+      "CustomParam1": 0
+    },
+    "ClosedLoopGeneral": {
+      "ContinuousWrap": false
+    },
+    "Slot0": {
+      "kP": 0.0,
+      "kI": 0.0,
+      "kD": 0.0,
+      "kS": 0.0,
+      "kV": 0.0,
+      "kA": 0.0,
+      "kG": 0.0,
+      "GravityType": "Elevator_Static",
+      "StaticFeedforwardSign": "UseVelocitySign"
+    },
+    "Slot1": {
+      "kP": 0.0,
+      "kI": 0.0,
+      "kD": 0.0,
+      "kS": 0.0,
+      "kV": 0.0,
+      "kA": 0.0,
+      "kG": 0.0,
+      "GravityType": "Elevator_Static",
+      "StaticFeedforwardSign": "UseVelocitySign"
+    },
+    "Slot2": {
+      "kP": 0.0,
+      "kI": 0.0,
+      "kD": 0.0,
+      "kS": 0.0,
+      "kV": 0.0,
+      "kA": 0.0,
+      "kG": 0.0,
+      "GravityType": "Elevator_Static",
+      "StaticFeedforwardSign": "UseVelocitySign"
+    }
+  },
+  "encoderInitialConfigs": {
+    "FutureProofConfigs": true,
+    "MagnetSensor": {
+      "SensorDirection": "CounterClockwise_Positive",
+      "MagnetOffset": 0.0,
+      "AbsoluteSensorDiscontinuityPoint": 0.5
+    },
+    "CustomParams": {
+      "CustomParam0": 0,
+      "CustomParam1": 0
+    }
+  },
+  "kCANBus": {
+    "_name": "canivore",
+    "_status": {
+      "BusUtilization": 0.0,
+      "BusOffCount": 0,
+      "TxFullCount": 0,
+      "REC": 0,
+      "TEC": 0
+    },
+    "_jni": {
+      "busUtilization": 0.0,
+      "busOffCount": 0,
+      "txFullCount": 0,
+      "rec": 0,
+      "tec": 0
+    }
+  },
+  "kCoupleRatio": 0.0,
+  "kDriveGearRatio": 6.75,
+  "kSteerGearRatio": 25.0,
+  "kInvertLeftSide": false,
+  "kInvertRightSide": true,
+  "kPigeonId": 13,
+  "OTFMaxLinearVelocity": 3.5,
+  "OTFMaxLinearAccel": 0.5,
+  "OTFMaxAngularVelocity": 3.141592653589793,
+  "OTFMaxAngularAccel": 1.5707963267948966,
+  "driveAlongTrackMultiplier": -1,
+  "driveAlongTrackOffset": 0.25,
+  "driveCrossTrackFrontRightOffset": 0.0,
+  "otfPoseDistanceLimit": 0.1,
+  "otfPoseEndingVelocity": 0.5,
+  "DrivetrainConstants": {
+    "CANBusName": "canivore",
+    "Pigeon2Id": 13
+  },
+  "kFrontLeftDriveMotorId": 7,
+  "kFrontLeftSteerMotorId": 8,
+  "kFrontLeftEncoderId": 9,
+  "kFrontLeftSteerMotorInverted": false,
+  "kFrontLeftEncoderInverted": false,
+  "kFrontRightDriveMotorId": 1,
+  "kFrontRightSteerMotorId": 2,
+  "kFrontRightEncoderId": 12,
+  "kFrontRightSteerMotorInverted": false,
+  "kFrontRightEncoderInverted": false,
+  "kBackLeftDriveMotorId": 5,
+  "kBackLeftSteerMotorId": 6,
+  "kBackLeftEncoderId": 10,
+  "kBackLeftSteerMotorInverted": false,
+  "kBackLeftEncoderInverted": false,
+  "kBackRightDriveMotorId": 3,
+  "kBackRightSteerMotorId": 4,
+  "kBackRightEncoderId": 11,
+  "kBackRightSteerMotorInverted": false,
+  "kBackRightEncoderInverted": false
+}

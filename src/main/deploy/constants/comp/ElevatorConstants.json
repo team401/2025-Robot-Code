@@ -1,0 +1,59 @@
+{
+  "leadElevatorMotorId": 9,
+  "followerElevatorMotorId": 10,
+  "invertFollowerElevatorMotor": false,
+  "smallCANCoderTeeth": 17,
+  "largeCANCoderTeeth": 19,
+  "spoolTeeth": 18,
+  "elevatorReduction": 5.0,
+  "carriageMass": {
+    "value": 20.0,
+    "unit": "Pound"
+  },
+  "drumRadius": {
+    "value": 0.7515,
+    "unit": "Inch"
+  },
+  "elevatorHeightPerSpoolRotation": {
+    "value": 4.724,
+    "unit": "Inch"
+  },
+  "elevatorCANCoderDiscontinuityPoint": 1.0,
+  "elevatorLargeCANCoderID": 11,
+  "isLargeCANcoderClockwisePositive": true,
+  "elevatorSmallCANCoderID": 12,
+  "isSmallCANcoderClockwisePositive": true,
+  "elevatorkP": 20.0,
+  "elevatorkI": 1.0,
+  "elevatorkD": 0.0,
+  "elevatorkS": 0.0,
+  "elevatorkV": 0.0,
+  "elevatorkA": 0.0,
+  "elevatorkG": 8.7,
+  "elevatorCruiseVelocityMetersPerSecond": 3.0,
+  "elevatorExpo_kV_raw": 0.0,
+  "elevatorExpo_kA_raw": 0.1,
+  "minElevatorHeightMeters": 0.0,
+  "maxElevatorHeightMeters": 3.0,
+  "elevatorStatorCurrentLimit": {
+    "value": 80.0,
+    "unit": "Amp"
+  },
+  "CRTticksPerRotation": 4096,
+  "elevatorTargetThresholdMeters": {
+    "value": 0.03,
+    "unit": "Meter"
+  },
+  "maxWristInBelowCrossBarHeight": {
+    "value": 1.0,
+    "unit": "Meter"
+  },
+  "minWristInAboveCrossBarHeight": {
+    "value": 1.1,
+    "unit": "Meter"
+  },
+  "minWristDownHeight": {
+    "value": 0.2,
+    "unit": "Meter"
+  }
+}
