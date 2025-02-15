@@ -48,6 +48,9 @@ public class ClawConstants {
   public final Voltage coralScoreVoltage = Volts.of(3.0);
   public final Voltage algaeScoreVoltage = Volts.of(-3.0);
 
+  /** Voltage the claw should use to hold the algae in place while idling */
+  public final Voltage algaeIdleVoltage = Volts.of(1.0);
+
   /** How far should the motor rotate after the sensor detects a coral to intake? */
   public final Angle intakeAnglePastCoralrange = Rotations.of(3.375); // 2.275 on 3 volts
 

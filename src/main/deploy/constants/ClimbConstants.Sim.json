@@ -1,0 +1,6 @@
+{
+  "climbArmLengthMeters": 0.5,
+  "climbArmMassKg": 0.5,
+  "climbGearing": 75,
+  "climbStdDevs": 0.005
+}

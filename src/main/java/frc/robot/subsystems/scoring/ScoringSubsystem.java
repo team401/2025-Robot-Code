@@ -7,20 +7,90 @@ import coppercore.controls.state_machine.StateMachine;
 import coppercore.controls.state_machine.StateMachineConfiguration;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.state.StateContainer;
+import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
+import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.states.IdleState;
 import frc.robot.subsystems.scoring.states.IntakeState;
 import frc.robot.subsystems.scoring.states.ScoreState;
 import frc.robot.subsystems.scoring.states.WarmupState;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
+/**
+ * The scoring subsystem contains the elevator and the wrist, which need to be able to avoid each
+ * other and the ground intake.
+ *
+ * <p>This subsystem functions with a state machine, which uses a series of setpoints defined by
+ * ScoringSetpoints.java to configure itself physically for each task required. It uses closed-loop
+ * control for the wrist and the elevator, and both the wrist and the elevator implement a system of
+ * 'moving clamps' where their position can be 'clamped' regardless of their goal position to ensure
+ * that they are out of the way and avoiding collisions when necessary.
+ *
+ * <p>The general strategy for collision avoidance is as follows:
+ *
+ * <p>Avoiding collisions with the crossbar:
+ *
+ * <ul>
+ *   <li>If the elevator is below the crossbar and the wrist is in a position where it would
+ *       collide, the elevator is clamped to be below the crossbar.
+ *   <li>If the elevator is above the crossbar and the wrist is in a position where it would
+ *       collide, the elevator is clamped to be above the crossbar.
+ *   <li>If the elevator is at the crossbar, the wrist is clamped to be in a position where it
+ *       cannot collide.
+ *   <li>If the elevator is below the crossbar and its goal position is above the crossbar (or vice
+ *       versa), the wrist is clamped to be in a position where it cannot collide.
+ *   <li>While these rules do next explicitly force the claw to go to a non-colliding position when
+ *       elevator is going up, there will be no setpoint above the crossbar where the wrist is in a
+ *       colliding position. Therefore, the wrist will always be moving to a non-colliding position
+ *       while the elevator is going up, and the elevator will wait for it to be safe before going
+ *       up.
+ * </ul>
+ *
+ * <p>Avoiding collisions with the ground: (this part may or may not be necessary, depending on
+ * configuration)
+ *
+ * <ul>
+ *   <li>If the elevator is below a certain height, clamp the wrist angle to be above a certain
+ *       value (could be calculated with sin(wristAngle))
+ *   <li>If the wrist is below a certain angle, clamp the elevator to be above a certain height to
+ *       avoid pushing wrist into ground (could be calculated with sin(wristAngle))
+ * </ul>
+ *
+ * <p>Avoiding collisions with the ground intake:
+ *
+ * <p>For context, the ground intake should be safely tucked against the elevator except when: 1)
+ * elevator is moving past, 2) it is ground intaking
+ *
+ * <ul>
+ *   <li>If the elevator is below the collision point and its goal is to be above the collision
+ *       point, clamp the ground intake to be swung out in a non-colliding location
+ *   <li>If the elevator is above the collision point and its goal is to be below the collision
+ *       point, do the same
+ *   <li>When the ground intake is in and the elevator is up, clamp the elevator above it.
+ *   <li>When the ground intake is in and the elevator is down, clamp the elevator below it.
+ *   <li>These clamps will be automatically reverted as soon as the elevator is past, resulting in,
+ *       1) elevator moves as close as it can to the intake 2) intake swings out of the way 3)
+ *       elevator moves past 4) intake swings back into place
+ * </ul>
+ *
+ * <p>This multi-clamp system can pose an interesting challenge: how do we choose which clamp to
+ * apply? The correct way to solve this is to structure the if-statements in a way that the most
+ * restrictive clamps are checked first, so that when those clamps aren't set, the less restrictive
+ * clamps are checked. After all of the clamp conditions are checked, we can finally put a call to
+ * reset the clamps in an 'else,' allowing a full range of motion when no protection conditions are
+ * met.
+ */
 public class ScoringSubsystem extends SubsystemBase {
   private ElevatorMechanism elevatorMechanism;
+  private WristMechanism wristMechanism;
   private ClawMechanism clawMechanism;
 
   // Keep track of an instance to pass to state machine
@@ -39,6 +109,8 @@ public class ScoringSubsystem extends SubsystemBase {
    * manually eject an object without forcing the state machine to agree.
    */
   private boolean overrideStateMachine = false;
+
+  private BooleanSupplier isDriveLinedUpSupplier;
 
   public enum FieldTarget {
     L1,
@@ -88,6 +160,8 @@ public class ScoringSubsystem extends SubsystemBase {
     DoneIntaking,
     CancelAction,
     ToggleWarmup, // warmup button toggles warmup <-> idle
+    StartWarmup, // drive automatically enters warmup when lineup begins
+    WarmupReady,
     ScoredPiece,
     ReturnToIdle, // Return to idle when a warmup/score state no longer detects a gamepiece
   }
@@ -96,11 +170,13 @@ public class ScoringSubsystem extends SubsystemBase {
 
   private StateMachine<ScoringState, ScoringTrigger> stateMachine;
 
-  public ScoringSubsystem(ElevatorMechanism elevatorMechanism, ClawMechanism clawMechanism) {
+  public ScoringSubsystem(
+      ElevatorMechanism elevatorMechanism,
+      WristMechanism wristMechanism,
+      ClawMechanism clawMechanism) {
     this.elevatorMechanism = elevatorMechanism;
+    this.wristMechanism = wristMechanism;
     this.clawMechanism = clawMechanism;
-
-    // setDefaultCommand(new ExampleElevatorCommand(this));
 
     instance = this;
 
@@ -112,31 +188,51 @@ public class ScoringSubsystem extends SubsystemBase {
             ScoringTrigger.BeginIntake,
             ScoringState.Intake,
             () -> !(isCoralDetected() || isAlgaeDetected()))
-        .permit(ScoringTrigger.ToggleWarmup, ScoringState.Warmup);
+        .permit(ScoringTrigger.ToggleWarmup, ScoringState.Warmup)
+        .permitIf(ScoringTrigger.StartWarmup, ScoringState.Warmup, () -> autoTransition);
 
     stateMachineConfiguration
         .configure(ScoringState.Intake)
-        // .configureOnEntryAction(ScoringState.Intake.state::onEntry) // Just tried this line too
-        // but it didn't work
         // If autoTransition, go straight to warmup from intake once we're done
         // Otherwise, return to idle
-        .permitIf(ScoringTrigger.DoneIntaking, ScoringState.Warmup, () -> autoTransition)
-        .permitIf(ScoringTrigger.DoneIntaking, ScoringState.Idle, () -> !autoTransition)
+        .permit(ScoringTrigger.DoneIntaking, ScoringState.Idle)
         .permit(ScoringTrigger.CancelAction, ScoringState.Idle);
 
     stateMachineConfiguration
         .configure(ScoringState.Warmup)
         .permit(ScoringTrigger.ToggleWarmup, ScoringState.Idle)
+        // Allow warmup to transition to scoring if autoTransition is enabled and we are lined up
+        .permitIf(
+            ScoringTrigger.WarmupReady,
+            ScoringState.Score,
+            () -> autoTransition && isDriveLinedUpSupplier.getAsBoolean())
         .permit(ScoringTrigger.ReturnToIdle, ScoringState.Idle);
 
     stateMachineConfiguration
         .configure(ScoringState.Score)
         .permit(ScoringTrigger.ScoredPiece, ScoringState.Idle)
-        .permit(ScoringTrigger.ReturnToIdle, ScoringState.Idle);
+        .permit(ScoringTrigger.ReturnToIdle, ScoringState.Idle)
+        .permitIf(
+            ScoringTrigger.BeginIntake,
+            ScoringState.Intake,
+            () -> !(clawMechanism.isCoralDetected() || clawMechanism.isAlgaeDetected()));
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, ScoringState.Idle);
+  }
 
-    SmartDashboard.putBoolean("scoring/fireStartIntaking", false);
+  /**
+   * Set whether or not the scoring subsystem should automatically transition through its states
+   * (e.g. automatically enter warmup when drive starts lining up, automatically go to score when
+   * warmup is ready, etc.)
+   *
+   * @param shouldAutoTransition True if auto transition is enabled, false if not
+   */
+  public void setAutoTransition(boolean shouldAutoTransition) {
+    this.autoTransition = shouldAutoTransition;
+  }
+
+  public void setIsDriveLinedUpSupplier(BooleanSupplier newSupplier) {
+    isDriveLinedUpSupplier = newSupplier;
   }
 
   /**
@@ -160,6 +256,28 @@ public class ScoringSubsystem extends SubsystemBase {
   }
 
   /**
+   * Send a new goal angle to the wrist mechanism
+   *
+   * @param goalAngle Goal wrist to command wrist mechanism to
+   */
+  public void setWristGoalAngle(Angle goalAngle) {
+    if (JsonConstants.scoringFeatureFlags.runWrist) {
+      wristMechanism.setGoalAngle(goalAngle);
+    }
+  }
+
+  /**
+   * Set the goal positions for elevator and wrist according to a ScoringSetpoint
+   *
+   * @param setpoint The setpoint to control to
+   */
+  public void setGoalSetpoint(ScoringSetpoint setpoint) {
+    setElevatorGoalHeight(setpoint.elevatorHeight());
+    setWristGoalAngle(setpoint.wristAngle());
+    Logger.recordOutput("scoring/setpoint", setpoint.name());
+  }
+
+  /**
    * Get the current height of the elevator.
    *
    * <p>This height is determined by the {@link ElevatorMechanism}.
@@ -171,6 +289,21 @@ public class ScoringSubsystem extends SubsystemBase {
       return elevatorMechanism.getElevatorHeight();
     } else {
       return Meters.zero();
+    }
+  }
+
+  /**
+   * Get the current angle of the wrist
+   *
+   * <p>This height is determined by the {@link WristMechanism}.
+   *
+   * @return
+   */
+  public Angle getWristAngle() {
+    if (JsonConstants.scoringFeatureFlags.runWrist) {
+      return wristMechanism.getWristAngle();
+    } else {
+      return Rotations.zero();
     }
   }
 
@@ -201,7 +334,7 @@ public class ScoringSubsystem extends SubsystemBase {
    */
   public boolean isCoralDetected() {
     if (JsonConstants.scoringFeatureFlags.runClaw) {
-      return clawMechanism.getIO().isCoralDetected();
+      return clawMechanism.isCoralDetected();
     } else {
       return false;
     }
@@ -214,7 +347,7 @@ public class ScoringSubsystem extends SubsystemBase {
    */
   public boolean isAlgaeDetected() {
     if (JsonConstants.scoringFeatureFlags.runClaw) {
-      return clawMechanism.getIO().isAlgaeDetected();
+      return clawMechanism.isAlgaeDetected();
     } else {
       return false;
     }
@@ -226,7 +359,13 @@ public class ScoringSubsystem extends SubsystemBase {
    * @param target The field target that scoring will aim for, e.g. L2
    */
   public void setTarget(FieldTarget target) {
-    currentTarget = target;
+    // TODO: find and eliminate cases where null is passed to this function
+    if (target != null) {
+      currentTarget = target;
+    } else {
+      System.out.println("WARNING: Null target set in setTarget");
+      new Exception("Null target in setTarget").printStackTrace();
+    }
   }
 
   /**
@@ -269,35 +408,38 @@ public class ScoringSubsystem extends SubsystemBase {
   }
 
   /**
-   * checks if other subsytems need to wait on intake
+   * checks if other subsystems need to wait on intake
    *
-   * @return true if intake has coral / algae
+   * @return false if intake has coral / algae, and true if its still waiting to intake
    */
   public boolean shouldWaitOnIntake() {
-    return false;
+    return !clawMechanism.isCoralDetected() && !clawMechanism.isAlgaeDetected();
   }
 
   /**
    * checks if other subsystems need to wait on score
    *
-   * @return true if scoring subsystem has scored
+   * @return true if scoring subsystem is scoring, and false if it is done
    */
   public boolean shouldWaitOnScore() {
-    return false;
+    boolean hasGamePiece;
+    switch (currentPiece) {
+      case Coral:
+      default: // Default only exists so that linter doesn't yell at me for possibly uninitialized
+        // hasGamePiece
+        hasGamePiece = clawMechanism.isCoralDetected();
+        break;
+      case Algae:
+        hasGamePiece = clawMechanism.isAlgaeDetected();
+        break;
+    }
+    return ((stateMachine.getCurrentState() == ScoringState.Warmup)
+            || (stateMachine.getCurrentState() == ScoringState.Score))
+        && hasGamePiece;
   }
 
   @Override
   public void periodic() {
-    boolean fireStartIntaking = SmartDashboard.getBoolean("scoring/fireStartIntaking", false);
-    if (fireStartIntaking) {
-      setGamePiece(GamePiece.Algae);
-      setTarget(FieldTarget.L2);
-      stateMachine.fire(ScoringTrigger.BeginIntake);
-      if (!stateMachine.getTransitionInfo().wasFail()) {
-        System.out.println(stateMachine.getTransitionInfo().getTransition().isInternal());
-      }
-    }
-
     if (!overrideStateMachine) {
       stateMachine.periodic();
     }
@@ -306,8 +448,17 @@ public class ScoringSubsystem extends SubsystemBase {
       elevatorMechanism.periodic();
     }
 
+    if (JsonConstants.scoringFeatureFlags.runWrist) {
+      wristMechanism.periodic();
+    }
+
     if (JsonConstants.scoringFeatureFlags.runClaw) {
       clawMechanism.periodic();
+    }
+
+    if (JsonConstants.scoringFeatureFlags.runElevator
+        && JsonConstants.scoringFeatureFlags.runWrist) {
+      determineProtectionClamps();
     }
 
     Logger.recordOutput("scoring/state", stateMachine.getCurrentState());
@@ -315,12 +466,112 @@ public class ScoringSubsystem extends SubsystemBase {
 
   /** This method must be called by RobotContainer, as it does not run automatically! */
   public void testPeriodic() {
+    switch (TestModeManager.getTestMode()) {
+      case ElevatorTuning:
+      case WristClosedLoopTuning:
+      case WristVoltageTuning:
+      case SetpointTuning:
+        setOverrideStateMachine(true);
+        break;
+      default:
+        break;
+    }
+
     if (JsonConstants.scoringFeatureFlags.runElevator) {
       elevatorMechanism.testPeriodic();
+    }
+
+    if (JsonConstants.scoringFeatureFlags.runWrist) {
+      wristMechanism.testPeriodic();
     }
 
     if (JsonConstants.scoringFeatureFlags.runClaw) {
       clawMechanism.testPeriodic();
     }
+  }
+
+  /**
+   * Based on the state of the wrist and elevator, clamp their positions to avoid collisions
+   *
+   * <p>This method does not verify that the mechanisms exist, so featureflags should be checked
+   * before it is called.
+   */
+  public void determineProtectionClamps() {
+    MutDistance elevatorMinHeight = JsonConstants.elevatorConstants.minElevatorHeight.mutableCopy();
+    MutDistance elevatorMaxHeight = JsonConstants.elevatorConstants.maxElevatorHeight.mutableCopy();
+
+    Distance elevatorHeight = elevatorMechanism.getElevatorHeight();
+    Distance elevatorGoalHeight = elevatorMechanism.getElevatorGoalHeight();
+
+    MutAngle wristMinAngle = JsonConstants.wristConstants.wristMinMinAngle.mutableCopy();
+    MutAngle wristMaxAngle = JsonConstants.wristConstants.wristMaxMaxAngle.mutableCopy();
+
+    Angle wristAngle = wristMechanism.getWristAngle();
+
+    // If the elevator is below the minimum safe height for wrist to be down, clamp wrist above its
+    // collision point
+    if (elevatorHeight.lt(JsonConstants.elevatorConstants.minWristDownHeight)) {
+      wristMinAngle.mut_replace(
+          (Angle)
+              Measure.max(wristMinAngle, JsonConstants.wristConstants.minElevatorDownSafeAngle));
+    }
+
+    // If the wrist is below the minimum safe angle for the elevator to be down, clamp the elevator
+    // above its collision point
+    if (wristAngle.lt(JsonConstants.wristConstants.minElevatorDownSafeAngle)) {
+      elevatorMinHeight.mut_replace(
+          (Distance)
+              Measure.max(elevatorMaxHeight, JsonConstants.elevatorConstants.minWristDownHeight));
+    }
+
+    // If the wrist is in an unsafe position for the elevator to move past the crossbar, clamp the
+    // elevator above/below its collision point
+    if (wristAngle.gt(JsonConstants.wristConstants.maxCrossBarSafeAngle)) {
+      if (elevatorHeight.gt(JsonConstants.elevatorConstants.minWristInAboveCrossBarHeight)) {
+        elevatorMinHeight.mut_replace(
+            (Distance)
+                Measure.max(
+                    elevatorMinHeight,
+                    JsonConstants.elevatorConstants.minWristInAboveCrossBarHeight));
+      } else {
+        elevatorMaxHeight.mut_replace(
+            (Distance)
+                Measure.min(
+                    elevatorMaxHeight,
+                    JsonConstants.elevatorConstants.maxWristInBelowCrossBarHeight));
+      }
+    }
+
+    // If the elevator is at the height of the crossbar, clamp wrist to be outside collision point
+    if (elevatorHeight.gte(JsonConstants.elevatorConstants.maxWristInBelowCrossBarHeight)
+        && elevatorHeight.lte(JsonConstants.elevatorConstants.minWristInAboveCrossBarHeight)) {
+      wristMaxAngle.mut_replace(
+          (Angle) Measure.min(wristMaxAngle, JsonConstants.wristConstants.maxCrossBarSafeAngle));
+    }
+    // If the elevator is below crossbar and trying to go up or above crossbar and trying to go
+    // down, clamp wrist be below its collision point
+    if ((elevatorHeight.lte(JsonConstants.elevatorConstants.minWristInAboveCrossBarHeight)
+            && elevatorGoalHeight.gte(
+                JsonConstants.elevatorConstants.maxWristInBelowCrossBarHeight))
+        || (elevatorHeight.gte(JsonConstants.elevatorConstants.maxWristInBelowCrossBarHeight)
+            && elevatorGoalHeight.lte(
+                JsonConstants.elevatorConstants.maxWristInBelowCrossBarHeight))) {
+      wristMaxAngle.mut_replace(
+          (Angle) Measure.min(wristMaxAngle, JsonConstants.wristConstants.maxCrossBarSafeAngle));
+    }
+
+    elevatorMechanism.setAllowedRangeOfMotion(elevatorMinHeight, elevatorMaxHeight);
+    wristMechanism.setAllowedRangeOfMotion(wristMinAngle, wristMaxAngle);
+  }
+
+  /**
+   * Get the current instance of the scoring subsystem.
+   *
+   * <p>This should be used for drive to fire the trigger to enter warmup when drive enters lineup
+   *
+   * @return Current instance of the scoring subsystem.
+   */
+  public static ScoringSubsystem getInstance() {
+    return instance;
   }
 }
