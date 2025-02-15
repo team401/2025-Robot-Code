@@ -1,5 +1,9 @@
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Threads;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.constants.ModeConstants;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -7,12 +11,6 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.Threads;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.constants.ModeConstants;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -86,6 +84,7 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
+    robotContainer.updateRobotModel();
 
     // Return to normal thread priority
     Threads.setCurrentThreadPriority(false, 10);
@@ -160,8 +159,6 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {
-    Logger.recordOutput("testingPose", new Pose2d());
-    robotContainer.updateRobotModel();
     if (ModeConstants.currentMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
       robotContainer.updateMapleSim();
     }

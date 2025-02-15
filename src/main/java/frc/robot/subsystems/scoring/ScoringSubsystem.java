@@ -1,13 +1,12 @@
 package frc.robot.subsystems.scoring;
 
-import org.littletonrobotics.junction.Logger;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Rotations;
 
 import coppercore.controls.state_machine.StateMachine;
 import coppercore.controls.state_machine.StateMachineConfiguration;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.state.StateContainer;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Rotations;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
@@ -18,6 +17,7 @@ import frc.robot.subsystems.scoring.states.IdleState;
 import frc.robot.subsystems.scoring.states.IntakeState;
 import frc.robot.subsystems.scoring.states.ScoreState;
 import frc.robot.subsystems.scoring.states.WarmupState;
+import org.littletonrobotics.junction.Logger;
 
 public class ScoringSubsystem extends SubsystemBase {
   private ElevatorMechanism elevatorMechanism;
