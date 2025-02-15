@@ -146,6 +146,7 @@ public final class InitBindings {
                   rampSubsystem.prepareForIntake();
                 }));
   }
+
   public static void initClimbBindings(ClimbSubsystem climb) {
     driverController.a().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)));
     driverController.b().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)));
