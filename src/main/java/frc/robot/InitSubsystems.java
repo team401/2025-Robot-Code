@@ -1,7 +1,9 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
+import org.ironmaple.simulation.SimulatedArena;
+import org.ironmaple.simulation.drivesims.COTS;
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
 import coppercore.vision.VisionIO;
 import coppercore.vision.VisionIOPhotonReal;
@@ -14,6 +16,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -36,10 +40,6 @@ import frc.robot.subsystems.scoring.ElevatorIOSim;
 import frc.robot.subsystems.scoring.ElevatorIOTalonFX;
 import frc.robot.subsystems.scoring.ElevatorMechanism;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.drivesims.COTS;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
 public final class InitSubsystems {
   public static ScoringSubsystem initScoringSubsystem() {
@@ -55,6 +55,7 @@ public final class InitSubsystems {
         }
         break;
       case SIM:
+      case MAPLESIM:
         if (JsonConstants.scoringFeatureFlags.runElevator) {
           elevatorMechanism = new ElevatorMechanism(new ElevatorIOSim());
         }
@@ -130,6 +131,7 @@ public final class InitSubsystems {
       case REAL:
         return new RampSubsystem(new RampMechanism(new RampIOTalonFX()));
       case SIM:
+      case MAPLESIM:
         return new RampSubsystem(new RampMechanism(new RampIOSim()));
       default:
         throw new UnsupportedOperationException(

@@ -27,11 +27,7 @@ public class RampSubsystem extends SubsystemBase {
     mechanism.setPosition(JsonConstants.rampConstants.intakePosition);
   }
 
-  public boolean isReadyForClimb() {
-    return mechanism.inPosition();
-  }
-
-  public boolean isReadyForIntake() {
+  public boolean isInPosition() {
     return mechanism.inPosition();
   }
 }

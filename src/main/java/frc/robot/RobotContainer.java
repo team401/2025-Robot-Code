@@ -1,11 +1,14 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
+import java.io.File;
+
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 
 import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -25,8 +28,6 @@ import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
-import java.io.File;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -36,7 +37,7 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here
-  private RampSubsystem rampSubsystem;
+  private RampSubsystem rampSubsystem = null;
   private ScoringSubsystem scoringSubsystem = null;
   private Drive drive = null;
   private VisionLocalizer vision = null;
@@ -46,8 +47,6 @@ public class RobotContainer {
   private SendableChooser<AutoStrategy> autoChooser = new SendableChooser<>();
 
   public static SwerveDriveSimulation driveSim = null;
-
-  // Replace with CommandPS4Controller or CommandJoystick if needed
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

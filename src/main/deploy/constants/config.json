@@ -4,19 +4,51 @@
   "environments": [
     {
       "name": "comp",
-      "filepath": "comp"
+      "filepath": "comp",
+      "files": [
+        "DrivetrainConstants.json",
+        "ElevatorConstants.json",
+        "ClawConstants.json",
+        "FeatureFlags.json",
+        "OperatorConstants.json",
+        "VisionConstants.json",
+        "ScoringFeatureFlags.json",
+        "ScoringSetpoints.json"
+      ]
     },
     {
       "name": "test_drivebase",
-      "filepath": "test_drivebase"
+      "filepath": "test_drivebase",
+      "files": [
+        "DrivetrainConstants.json",
+        "ElevatorConstants.json",
+        "ClawConstants.json",
+        "FeatureFlags.json",
+        "OperatorConstants.json",
+        "VisionConstants.json",
+        "ScoringFeatureFlags.json",
+        "ScoringSetpoints.json"
+      ]
     },
     {
       "name": "hitl",
-      "filepath": "hitl"
+      "filepath": "hitl",
+      "files": [
+        "DrivetrainConstants.json",
+        "ElevatorConstants.json",
+        "ClawConstants.json",
+        "FeatureFlags.json",
+        "OperatorConstants.json",
+        "ScoringFeatureFlags.json",
+        "ScoringSetpoints.json"
+      ]
     },
     {
       "name": "test_ramp",
-      "filepath": "test_ramp"
+      "filepath": "test_ramp",
+      "files": [
+        "RampConstants.json"
+      ]
     }
   ]
 }
