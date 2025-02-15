@@ -28,6 +28,7 @@ import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import java.io.File;
 import org.ironmaple.simulation.SimulatedArena;
@@ -42,6 +43,7 @@ import org.littletonrobotics.junction.Logger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here
+  private RampSubsystem rampSubsystem = null;
   private ScoringSubsystem scoringSubsystem = null;
   private Drive drive = null;
   private ClimbSubsystem climbSubsystem = null;
@@ -136,6 +138,9 @@ public class RobotContainer {
         drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
       }
     }
+    if (FeatureFlags.synced.getObject().runRamp) {
+      rampSubsystem = InitSubsystems.initRampSubsystem();
+    }
     if (FeatureFlags.synced.getObject().runClimb) {
       climbSubsystem = InitSubsystems.initClimbSubsystem();
     }
@@ -148,7 +153,6 @@ public class RobotContainer {
         scoringSubsystem.setIsDriveLinedUpSupplier(() -> true);
       }
     }
-
     strategyManager = new StrategyManager(drive, scoringSubsystem);
   }
 
@@ -162,6 +166,9 @@ public class RobotContainer {
     // initialize helper commands
     if (FeatureFlags.synced.getObject().runDrive) {
       InitBindings.initDriveBindings(drive);
+    }
+    if (FeatureFlags.synced.getObject().runRamp) {
+      InitBindings.initRampBindings(rampSubsystem);
     }
     if (FeatureFlags.synced.getObject().runClimb) {
       InitBindings.initClimbBindings(climbSubsystem);

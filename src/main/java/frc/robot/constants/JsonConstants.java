@@ -11,7 +11,7 @@ public class JsonConstants {
   public static void loadConstants() {
     EnvironmentHandler.getEnvironmentHandler(
         Filesystem.getDeployDirectory().toPath().resolve("constants/config.json").toString());
-
+    // Don't save DrivetrainConstants.java, change the json's manually
     DrivetrainConstants.synced.loadData();
     ElevatorConstants.synced.loadData();
     ElevatorConstants.Sim.synced.loadData();
@@ -22,6 +22,7 @@ public class JsonConstants {
     ScoringFeatureFlags.synced.loadData();
     ScoringSetpoints.synced.loadData();
     RedFieldLocations.synced.loadData();
+    RampConstants.synced.loadData();
     BlueFieldLocations.synced.loadData();
     VisionConstants.synced.loadData();
 
@@ -34,6 +35,7 @@ public class JsonConstants {
     scoringFeatureFlags = ScoringFeatureFlags.synced.getObject();
     scoringSetpoints = ScoringSetpoints.synced.getObject();
     redFieldLocations = RedFieldLocations.synced.getObject();
+    rampConstants = RampConstants.synced.getObject();
     blueFieldLocations = BlueFieldLocations.synced.getObject();
     drivetrainConstants = DrivetrainConstants.synced.getObject();
     visionConstants = VisionConstants.synced.getObject();
@@ -48,6 +50,7 @@ public class JsonConstants {
   public static ScoringFeatureFlags scoringFeatureFlags;
   public static ScoringSetpoints scoringSetpoints;
   public static RedFieldLocations redFieldLocations;
+  public static RampConstants rampConstants;
   public static BlueFieldLocations blueFieldLocations;
   public static DrivetrainConstants drivetrainConstants;
   public static VisionConstants visionConstants;

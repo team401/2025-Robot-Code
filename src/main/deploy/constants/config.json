@@ -1,5 +1,5 @@
 {
-  "environment": "test_drivebase",
+  "environment": "comp",
   "defaults": "comp",
   "environments": [
     {
@@ -45,6 +45,13 @@
         "ScoringFeatureFlags.json",
         "ScoringSetpoints.json",
         "ClimbConstants.json"
+      ]
+    },
+    {
+      "name": "test_ramp",
+      "filepath": "test_ramp",
+      "files": [
+        "RampConstants.json"
       ]
     }
   ]
