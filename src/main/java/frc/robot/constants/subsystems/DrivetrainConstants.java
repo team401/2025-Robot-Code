@@ -21,7 +21,6 @@ import edu.wpi.first.units.measure.*;
 
 public class DrivetrainConstants {
 
-
   public static final JSONSync<DrivetrainConstants> synced =
       new JSONSync<DrivetrainConstants>(
           new DrivetrainConstants(),
@@ -35,12 +34,12 @@ public class DrivetrainConstants {
   public final Double maxAngularSpeed = Math.PI * 2;
   public final Double joystickDeadband = 0.17;
 
-  //AlignToTarget Constants
+  // AlignToTarget Constants
 
-  public final Double maxRotationAlignVelocity = Math.PI * 2;
-  public final Double maxRotationAlignAcceleration = Math.PI;
+  public final Double maxRotationAlignVelocity = 3.5;
+  public final Double maxRotationAlignAcceleration = 3.5;
   public final Double rotationAlignKp = 10.0;
-  public final Double rotationAlignKi = 1.0;
+  public final Double rotationAlignKi = 0.5;
   public final Double rotationAlignKd = 0.0;
 
   // The steer motor uses any SwerveModule.SteerRequestType control request with the

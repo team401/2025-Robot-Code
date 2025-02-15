@@ -1,9 +1,12 @@
 {
   "maxLinearSpeed": 6.0,
   "maxAngularSpeed": 6.283185307179586,
-  "joystickDeadband": 0.1,
-  "maxPIDVelocity": 6.283185307179586,
-  "maxPIDAcceleration": 3.141592653589793,
+  "joystickDeadband": 0.17,
+  "maxRotationAlignVelocity": 3.5,
+  "maxRotationAlignAcceleration": 3.5,
+  "rotationAlignKp": 10.0,
+  "rotationAlignKi": 0.5,
+  "rotationAlignKd": 0.0,
   "steerKp": 40.0,
   "steerKi": 0.0,
   "steerKd": 0.0,
@@ -24,13 +27,13 @@
   "driveCrossTrackKp": 0.5,
   "driveCrossTrackKi": 0.0,
   "driveCrossTrackKd": 0.0,
-  "driveRotationkP": 0.5,
-  "driveRotationkI": 0.0,
-  "driveRotationkD": 0.0,
-  "driveAlongTrackMultiplier": -1,
+  "driveRotationKp": 0.5,
+  "driveRotationKi": 0.0,
+  "driveRotationKd": 0.0,
+  "driveAlongTrackMultiplier": -1.0,
   "driveAlongTrackOffset": 0.25,
-  "driveCrossTrackFrontRightOffset": 0.0,
-  "otfPoseDistanceLimit": 0.2,
+  "driveCrossTrackFrontRightOffset": 0.25,
+  "otfPoseDistanceLimit": 0.1,
   "kSteerClosedLoopOutput": "Voltage",
   "kDriveClosedLoopOutput": "TorqueCurrentFOC",
   "kDriveMotorType": "TalonFX_Integrated",
@@ -323,86 +326,86 @@
       "tec": 0
     }
   },
-  "kCoupleRatio": 3.5714285714285716,
-  "kDriveGearRatio": 6.746031746031747,
-  "kSteerGearRatio": 21.428571428571427,
+  "kCoupleRatio": 0.0,
+  "kDriveGearRatio": 6.75,
+  "kSteerGearRatio": 25.0,
   "kInvertLeftSide": false,
   "kInvertRightSide": true,
-  "kPigeonId": 20,
+  "kPigeonId": 13,
   "OTFMaxLinearVelocity": 3.5,
   "OTFMaxLinearAccel": 2.0,
   "OTFMaxAngularVelocity": 3.141592653589793,
   "OTFMaxAngularAccel": 1.5707963267948966,
   "DrivetrainConstants": {
     "CANBusName": "canivore",
-    "Pigeon2Id": 20
+    "Pigeon2Id": 13
   },
   "kFrontLeftDriveMotorId": 7,
   "kFrontLeftSteerMotorId": 8,
   "kFrontLeftEncoderId": 9,
   "kFrontLeftEncoderOffset": {
-    "unit": "Rotation",
-    "value": 0.044677734375
+    "value": -0.153076171875,
+    "unit": "Rotation"
   },
+  "kFrontLeftSteerMotorInverted": false,
+  "kFrontLeftEncoderInverted": false,
   "kFrontLeftXPos": {
-    "unit": "Inch",
-    "value": 13.125
+    "value": 13.0,
+    "unit": "Inch"
   },
   "kFrontLeftYPos": {
-    "unit": "Inch",
-    "value": 11.625
+    "value": 11.5,
+    "unit": "Inch"
   },
-  "kFrontLeftSteerMotorInverted": true,
-  "kFrontLeftEncoderInverted": false,
   "kFrontRightDriveMotorId": 1,
   "kFrontRightSteerMotorId": 2,
   "kFrontRightEncoderId": 12,
   "kFrontRightEncoderOffset": {
-    "unit": "Rotation",
-    "value": -0.397216796875
+    "value": -0.23583984375,
+    "unit": "Rotation"
   },
+  "kFrontRightSteerMotorInverted": false,
+  "kFrontRightEncoderInverted": false,
   "kFrontRightXPos": {
-    "unit": "Inch",
-    "value": 13.125
+    "value": 13.0,
+    "unit": "Inch"
   },
   "kFrontRightYPos": {
-    "unit": "Inch",
-    "value": -11.625
+    "value": -11.5,
+    "unit": "Inch"
   },
-  "kFrontRightSteerMotorInverted": true,
-  "kFrontRightEncoderInverted": false,
   "kBackLeftDriveMotorId": 5,
   "kBackLeftSteerMotorId": 6,
   "kBackLeftEncoderId": 10,
   "kBackLeftEncoderOffset": {
-    "unit": "Rotation",
-    "value": -0.404296875
+    "value": -0.448486328125,
+    "unit": "Rotation"
   },
+  "kBackLeftSteerMotorInverted": false,
+  "kBackLeftEncoderInverted": false,
   "kBackLeftXPos": {
-    "unit": "Inch",
-    "value": -13.125
+    "value": -13.0,
+    "unit": "Inch"
   },
   "kBackLeftYPos": {
-    "unit": "Inch",
-    "value": 11.625
+    "value": 11.5,
+    "unit": "Inch"
   },
-  "kBackLeftSteerMotorInverted": true,
-  "kBackLeftEncoderInverted": false,
   "kBackRightDriveMotorId": 3,
   "kBackRightSteerMotorId": 4,
   "kBackRightEncoderId": 11,
   "kBackRightEncoderOffset": {
-    "unit": "Rotation",
-    "value": 0.4794921875
+    "value": -0.282958984375,
+    "unit": "Rotation"
   },
+  "kBackRightSteerMotorInverted": false,
+  "kBackRightEncoderInverted": false,
   "kBackRightXPos": {
-    "unit": "Inch",
-    "value": -13.125
+    "value": -13.0,
+    "unit": "Inch"
   },
   "kBackRightYPos": {
-    "unit": "Inch",
-    "value": -11.625
-  },
-  "kBackRightSteerMotorInverted": true,
-  "kBackRightEncoderInverted": false
+    "value": -11.5,
+    "unit": "Inch"
+  }
 }
