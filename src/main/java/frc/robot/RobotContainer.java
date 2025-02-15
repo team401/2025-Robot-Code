@@ -182,7 +182,6 @@ public class RobotContainer {
 
   public void periodic() {
     strategyManager.periodic();
-    scoringSubsystem.setOverrideStateMachine(true);
   }
 
   public void autonomousInit() {

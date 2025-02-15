@@ -179,7 +179,7 @@ public class ScoringSubsystem extends SubsystemBase {
     this.clawMechanism = clawMechanism;
 
     instance = this;
-    
+
     stateMachineConfiguration = new StateMachineConfiguration<>();
 
     stateMachineConfiguration

@@ -84,7 +84,6 @@ public class Robot extends LoggedRobot {
     // This must be called from the robot's periodic block in order for anything in
     // the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    robotContainer.updateRobotModel();
 
     // Return to normal thread priority
     Threads.setCurrentThreadPriority(false, 10);
@@ -159,6 +158,8 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {
+    robotContainer.updateRobotModel();
+
     if (ModeConstants.currentMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
       robotContainer.updateMapleSim();
     }
