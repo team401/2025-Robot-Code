@@ -43,5 +43,17 @@
   "elevatorTargetThresholdMeters": {
     "value": 0.03,
     "unit": "Meter"
+  },
+  "maxWristInBelowCrossBarHeight": {
+    "value": 1.0,
+    "unit": "Meter"
+  },
+  "minWristInAboveCrossBarHeight": {
+    "value": 1.1,
+    "unit": "Meter"
+  },
+  "minWristDownHeight": {
+    "value": 0.2,
+    "unit": "Meter"
   }
 }
