@@ -5,6 +5,9 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
+import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
+import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 
 public class AutoIntake extends Command {
   private Drive drive;
@@ -12,10 +15,14 @@ public class AutoIntake extends Command {
 
   private DesiredLocation intakeLocation;
 
-  public AutoIntake(Drive drive, ScoringSubsystem scoring, DesiredLocation intakeLocation) {
+  private FieldTarget intakeFieldTarget;
+
+  public AutoIntake(
+      Drive drive, ScoringSubsystem scoring, DesiredLocation intakeLocation, FieldTarget target) {
     this.drive = drive;
     this.scoringSubsystem = scoring;
     this.intakeLocation = intakeLocation;
+    this.intakeFieldTarget = target;
     // we dont want to require subsystems (it prevents drive otf from running)
   }
 
@@ -24,6 +31,12 @@ public class AutoIntake extends Command {
       drive.setDesiredIntakeLocation(intakeLocation);
       drive.setGoToIntake(true);
       drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+    }
+
+    if (scoringSubsystem != null) {
+      scoringSubsystem.setGamePiece(GamePiece.Coral);
+      scoringSubsystem.setTarget(intakeFieldTarget);
+      scoringSubsystem.fireTrigger(ScoringTrigger.BeginIntake);
     }
   }
 

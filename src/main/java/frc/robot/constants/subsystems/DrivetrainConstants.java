@@ -83,7 +83,11 @@ public class DrivetrainConstants {
   public final Double driveAlongTrackOffset = 0.25;
   public final Double driveCrossTrackFrontRightOffset = 0.25;
 
+  public final Double lineupMaxVelocity = 3.0;
+  public final Double lineupMaxAcceleration = 1.5;
+
   public final Double otfPoseDistanceLimit = 0.1;
+  public final Double otfPoseEndingVelocity = 0.5;
 
   // The closed-loop output type to use for the steer motors;
   // This affects the PID/FF gains for the steer motors

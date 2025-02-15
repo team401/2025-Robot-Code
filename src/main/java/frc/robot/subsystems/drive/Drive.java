@@ -290,7 +290,7 @@ public class Drive implements DriveTemplate {
         .permitIf(
             DriveTrigger.BeginAutoAlignment,
             DriveState.Lineup,
-            () -> this.isDriveCloseToFinalLineupPose());
+            () -> this.isDriveCloseToFinalLineupPose() && !this.isGoingToIntake());
 
     stateMachineConfiguration
         .configure(DriveState.OTF)
@@ -492,10 +492,14 @@ public class Drive implements DriveTemplate {
   public boolean isDriveCloseToFinalLineupPose() {
     // relative to transforms first pose into distance from desired pose
     // then get distance between poses (if less than 0.1 meters we are good)
-    return this.getPose()
-            .relativeTo(OTFState.findOTFPoseFromDesiredLocation(this))
+    Logger.recordOutput(
+        "Drive/distanceToLineupNewMethod",
+        this.getPose()
             .getTranslation()
-            .getNorm()
+            .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation()));
+    return this.getPose()
+            .getTranslation()
+            .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation())
         < JsonConstants.drivetrainConstants.otfPoseDistanceLimit;
   }
 

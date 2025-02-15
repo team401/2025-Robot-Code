@@ -21,6 +21,7 @@ import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import java.io.File;
@@ -36,6 +37,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here
   private ScoringSubsystem scoringSubsystem = null;
   private Drive drive = null;
+  private ClimbSubsystem climbSubsystem = null;
   private VisionLocalizer vision = null;
   private StrategyManager strategyManager = null;
   private AutoStrategyContainer strategyContainer = null;
@@ -44,13 +46,15 @@ public class RobotContainer {
 
   public static SwerveDriveSimulation driveSim = null;
 
+  // The robot's subsystems and commands are defined here
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     loadConstants();
     configureSubsystems();
     // Configure the trigger bindings
     configureBindings();
-    TestModeManager.testInit();
+    TestModeManager.init();
     configureAutos();
   }
 
@@ -78,9 +82,6 @@ public class RobotContainer {
   }
 
   public void configureSubsystems() {
-    if (FeatureFlags.synced.getObject().runScoring) {
-      scoringSubsystem = InitSubsystems.initScoringSubsystem();
-    }
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
       if (ModeConstants.simMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
@@ -91,6 +92,18 @@ public class RobotContainer {
         vision = InitSubsystems.initVisionSubsystem(drive);
 
         drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
+      }
+    }
+    if (FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem = InitSubsystems.initClimbSubsystem();
+    }
+
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem = InitSubsystems.initScoringSubsystem();
+      if (FeatureFlags.synced.getObject().runDrive) {
+        scoringSubsystem.setIsDriveLinedUpSupplier(() -> drive.isDriveAlignmentFinished());
+      } else {
+        scoringSubsystem.setIsDriveLinedUpSupplier(() -> true);
       }
     }
 
@@ -107,6 +120,9 @@ public class RobotContainer {
     // initialize helper commands
     if (FeatureFlags.synced.getObject().runDrive) {
       InitBindings.initDriveBindings(drive);
+    }
+    if (FeatureFlags.synced.getObject().runClimb) {
+      InitBindings.initClimbBindings(climbSubsystem);
     }
   }
 
@@ -134,6 +150,8 @@ public class RobotContainer {
 
   /** This method must be called from robot, as it isn't called automatically */
   public void testInit() {
+    InitBindings.initTestModeBindings();
+
     switch (TestModeManager.getTestMode()) {
       case DriveFeedForwardCharacterization:
         CommandScheduler.getInstance()
@@ -181,6 +199,7 @@ public class RobotContainer {
 
   public void disabledPeriodic() {
     // Logger.recordOutput("feature_flags/drive", FeatureFlags.synced.getObject().runDrive);
+    strategyManager.logActions();
   }
 
   public void disabledInit() {
