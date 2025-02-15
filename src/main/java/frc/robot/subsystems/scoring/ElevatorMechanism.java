@@ -3,8 +3,10 @@ package frc.robot.subsystems.scoring;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
@@ -22,11 +24,16 @@ import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Per;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.subsystems.ElevatorConstants;
+import frc.robot.subsystems.scoring.ElevatorIO.ElevatorOutputMode;
+
+import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorMechanism implements Tunable {
@@ -111,9 +118,21 @@ public class ElevatorMechanism implements Tunable {
     seedWithCRT();
   }
 
+  /**
+   * Has the elevator position been seeded yet?
+   * 
+   * @return True if it has been seeded, false if it hasn't been seeded.
+   */
+  public boolean hasBeenSeeded() {
+    return hasBeenSeeded;
+  }
+
   public void periodic() {
-    if (!hasBeenSeeded) {
-      seedWithCRT();
+    Logger.recordOutput("elevator/hasBeenSeeded", hasBeenSeeded);
+    if (inputs.largeEncoderConnected && inputs.smallEncoderConnected && !hasBeenSeeded) {
+      if (!JsonConstants.elevatorConstants.ignoreCRT) {
+        seedWithCRT();
+      }
     }
 
     sendGoalHeightToIO();
@@ -183,8 +202,6 @@ public class ElevatorMechanism implements Tunable {
   }
 
   public void seedWithCRT() {
-    Logger.recordOutput("elevator/CRTSolutionSpoolAngle", Rotations.of(-1.0));
-
     final double filteredLargeEncoderAbsPos =
         largeCANcoderFilter.calculate(inputs.largeEncoderAbsolutePos.in(Rotations));
     final double filteredSmallEncoderAbsPos =
@@ -204,16 +221,15 @@ public class ElevatorMechanism implements Tunable {
     // aren't divisible by 18, this would result in rounding losing precision.
     // Therefore, we just multiply by 19 or 17 and then divide the final result by
     // 18.
-    long ticksSmall = Math.round(filteredSmallEncoderAbsPos * ticks * smallTeeth);
-    long ticksLarge = Math.round(filteredLargeEncoderAbsPos * ticks * largeTeeth);
+    long ticksSmall = (long) Math.floor(filteredSmallEncoderAbsPos * ticks * smallTeeth);
+    long ticksLarge = (long) Math.floor(filteredLargeEncoderAbsPos * ticks * largeTeeth);
 
     Logger.recordOutput("elevator/CRT/ticksSmall", ticksSmall);
     Logger.recordOutput("elevator/CRT/ticksLarge", ticksLarge);
 
-    // long solutionTicks = -1;
     long solutionTicks = -1;
 
-    for (int i = 0; i < ticksSmall; i++) {
+    for (int i = 0; i < largeTeeth; i++) {
       // // Try the offset of each multiple of 19 * ticks
       long potentialPosition = i * largeTeeth * ticks + ticksLarge;
       // Check whether that potential position is encoder 17's remainder away from a
@@ -225,9 +241,12 @@ public class ElevatorMechanism implements Tunable {
       }
     }
 
+    Logger.recordOutput("elevator/CRT/solutionTicks", solutionTicks);
+
     if (solutionTicks != -1) {
       // Factor out the 18 from earlier.
-      Angle solutionSpoolAngle = Rotations.of((double) solutionTicks / (double) ticks / spoolTeeth);
+      Angle solutionSpoolAngle =
+          Rotations.of((double) solutionTicks / (double) ticks / (double) spoolTeeth);
       // The 19 tooth encoder will have turned 18/19 of a rotation for each rotation
       // of the spool
       Angle solutionLargeEncAngle =
@@ -247,7 +266,13 @@ public class ElevatorMechanism implements Tunable {
       Logger.recordOutput(
           "elevator/CRTSolutionHeight",
           Inches.of(solutionSpoolAngle.in(Rotations) * 4.724).in(Meters));
+      System.out.println("BAZINGA");
+      System.out.println(Inches.of(solutionSpoolAngle.in(Rotations) * 4.724).in(Meters));
+      System.out.println(solutionSpoolAngle);
     } else {
+      Logger.recordOutput("elevator/CRTSolutionSpoolAngle", Rotations.of(-1.0));
+      Logger.recordOutput("elevator/CRTSolutionHeight", Meters.of(-1.0));
+
       System.out.println("ERROR: Couldn't find solution to seed elevator with CRT");
     }
   }
@@ -343,16 +368,35 @@ public class ElevatorMechanism implements Tunable {
             * ElevatorConstants.synced.getObject().elevatorHeightPerSpoolRotation.in(Meters));
   }
 
+  public LinearVelocity getElevatorVelocity() {
+    AngularVelocity spoolVelocity
+      = inputs.largeEncoderVel.times(
+        (double) JsonConstants.elevatorConstants.largeCANCoderTeeth
+          / (double) JsonConstants.elevatorConstants.spoolTeeth);
+
+    return MetersPerSecond.of(
+      spoolVelocity.in(RotationsPerSecond)
+        * JsonConstants.elevatorConstants.elevatorHeightPerSpoolRotation.in(Meters));
+  }
+
   /**
-   * Set whether the override voltage should be applied or whether the elevator should control to
-   * its position
+   * Set whether the elevator should use closed-loop control, apply its override voltage, or apply its override current.
    */
-  public void setOverrideMode(boolean override) {
-    io.setOverrideMode(override);
+  public void setOutputMode(ElevatorOutputMode outputMode) {
+    io.setOutputMode(outputMode);
+  }
+
+  /**
+   * Set the voltage the elevator will apply when in Voltage override output mode
+   * 
+   * @param volts The voltage to apply
+   */
+  public void setOverrideVoltage(Voltage volts) {
+    io.setOverrideVoltage(volts);
   }
 
   /** Set the static current that will be applied when the elevator is in override mode. */
-  public void setOverrideVolts(Current current) {
+  public void setOverrideCurrent(Current current) {
     io.setOverrideCurrent(current);
   }
 
@@ -384,7 +428,7 @@ public class ElevatorMechanism implements Tunable {
   }
 
   public void setOutput(double output) {
-    io.setOverrideMode(true);
+    io.setOutputMode(ElevatorOutputMode.Current);
     io.setOverrideCurrent(Amps.of(output));
   }
 

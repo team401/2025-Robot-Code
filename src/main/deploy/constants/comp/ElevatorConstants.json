@@ -20,9 +20,7 @@
   },
   "elevatorCANCoderDiscontinuityPoint": 1.0,
   "elevatorLargeCANCoderID": 14,
-  "isLargeCANcoderClockwisePositive": true,
   "elevatorSmallCANCoderID": 15,
-  "isSmallCANcoderClockwisePositive": false,
   "elevatorkP": 60.0,
   "elevatorkI": 0.0,
   "elevatorkD": 0.0,
@@ -43,5 +41,6 @@
   "elevatorTargetThresholdMeters": {
     "value": 0.03,
     "unit": "Meter"
-  }
+  },
+  "medianFilterWindowSize": 10
 }

@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
 
@@ -28,6 +29,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Per;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Filesystem;
 
 public final class ElevatorConstants {
@@ -74,20 +76,14 @@ public final class ElevatorConstants {
   public final Integer elevatorLargeCANCoderID = 11;
   public final Boolean isLargeCANcoderClockwisePositive = true;
 
-  @JSONExclude
   public final SensorDirectionValue elevatorLargeCANCoderDirection =
-      isLargeCANcoderClockwisePositive
-          ? SensorDirectionValue.CounterClockwise_Positive
-          : SensorDirectionValue.Clockwise_Positive;
+      SensorDirectionValue.Clockwise_Positive; // CounterClockwise_Positive;
 
   public final Integer elevatorSmallCANCoderID = 12;
   public final Boolean isSmallCANcoderClockwisePositive = false;
 
-  @JSONExclude
   public final SensorDirectionValue elevatorSmallCANCoderDirection =
-      isSmallCANcoderClockwisePositive
-          ? SensorDirectionValue.CounterClockwise_Positive
-          : SensorDirectionValue.Clockwise_Positive;
+      SensorDirectionValue.CounterClockwise_Positive;
 
   /*
    * The large CANCoder is represented as the mechanism in our Phoenix configs.
@@ -167,6 +163,12 @@ public final class ElevatorConstants {
   public final Distance elevatorTargetThresholdMeters = Meters.of(0.03);
 
   public final Integer medianFilterWindowSize = 5;
+
+  public final Boolean ignoreCRT = false;
+
+  public final Voltage homingVoltage = Volts.of(-3);
+
+  public final LinearVelocity homingVelocityThreshold = MetersPerSecond.of(0.001);
 
   public static final class Sim {
     @JSONExclude

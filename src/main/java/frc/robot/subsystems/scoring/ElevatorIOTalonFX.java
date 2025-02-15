@@ -30,6 +30,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.Per;
+import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.subsystems.ElevatorConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -39,7 +40,9 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   MutAngle spoolGoalAngle = Rotations.mutable(0.0);
 
   Current overrideCurrent;
-  boolean isOverriding;
+  Voltage overrideVoltage;
+
+  ElevatorOutputMode outputMode = ElevatorOutputMode.ClosedLoop;
 
   /* TODO: name this left/right or front/back
   I'm unsure of the physical configuration of these motors
@@ -84,6 +87,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     // Update with large CANcoder direction and apply
     cancoderConfiguration.MagnetSensor.SensorDirection =
         ElevatorConstants.synced.getObject().elevatorLargeCANCoderDirection;
+    cancoderConfiguration.MagnetSensor.MagnetOffset = -0.0302734375;
     largeCANCoder.getConfigurator().apply(cancoderConfiguration);
 
     largeCANcoderAbsolutePosition = largeCANCoder.getAbsolutePosition();
@@ -93,6 +97,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     // Update with small CANcoder direction and apply
     cancoderConfiguration.MagnetSensor.SensorDirection =
         ElevatorConstants.synced.getObject().elevatorSmallCANCoderDirection;
+    cancoderConfiguration.MagnetSensor.MagnetOffset = -0.440185546875;
     smallCANCoder.getConfigurator().apply(cancoderConfiguration);
 
     // Initialize talonFXConfigs to use FusedCANCoder and Motion Magic Expo and have correct PID
@@ -146,12 +151,18 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     inputs.largeEncoderPos.mut_replace(largeCANCoder.getPosition().getValue());
     inputs.smallEncoderPos.mut_replace(smallCANCoder.getPosition().getValue());
 
+    inputs.largeEncoderVel.mut_replace(largeCANCoder.getVelocity().getValue());
+
     StatusCode refreshStatus = BaseStatusSignal.refreshAll(largeCANcoderAbsolutePosition);
 
     inputs.largeEncoderConnected = refreshStatus.isOK();
     inputs.largeEncoderAbsolutePos.mut_replace(largeCANcoderAbsolutePosition.getValue());
 
     inputs.largeAbsPosRot = largeCANCoder.getAbsolutePosition().getValueAsDouble();
+
+    refreshStatus = BaseStatusSignal.refreshAll(smallCANCoder.getAbsolutePosition());
+
+    inputs.smallEncoderConnected = refreshStatus.isOK();
     inputs.smallEncoderAbsolutePos.mut_replace(
         smallCANCoder.getAbsolutePosition().refresh().getValue());
 
@@ -173,15 +184,17 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   @Override
   public void applyOutputs(ElevatorOutputs outputs) {
+    outputs.motorsDisabled = motorDisabled;
+    outputs.outputMode = outputMode;
+
     motionMagicExpoTorqueCurrentFOC.withPosition(largeEncoderGoalAngle);
 
     if (motorDisabled) {
       leadMotor.setControl(voltageOut.withOutput(0.0));
       outputs.elevatorAppliedVolts.mut_replace(Volts.of(0.0));
-    } else if (isOverriding) {
-      leadMotor.setControl(currentOut.withOutput(overrideCurrent));
-      outputs.elevatorAppliedVolts.mut_replace(leadMotor.getMotorVoltage().getValue());
     } else {
+      switch (outputMode) {
+        case ClosedLoop:
       leadMotor.setControl(motionMagicExpoTorqueCurrentFOC);
 
       largeEncoderSetpointPosition.mut_setMagnitude(
@@ -197,6 +210,14 @@ public class ElevatorIOTalonFX implements ElevatorIO {
           Volts.of(leadMotor.getClosedLoopIntegratedOutput().getValueAsDouble()));
       outputs.dContrib.mut_replace(
           Volts.of(leadMotor.getClosedLoopDerivativeOutput().getValueAsDouble()));
+          break;
+        case Voltage:
+          break;
+        case Current:
+          leadMotor.setControl(currentOut.withOutput(overrideCurrent));
+          outputs.elevatorAppliedVolts.mut_replace(leadMotor.getMotorVoltage().getValue());
+          break;
+      }
     }
   }
 
@@ -223,18 +244,23 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   }
 
   @Override
+  public void setOutputMode(ElevatorOutputMode outputMode) {
+    this.outputMode = outputMode;
+  }
+
+  @Override
   public void setSmallCANCoderPosition(Angle newAngle) {
     smallCANCoder.setPosition(newAngle);
   }
 
   @Override
-  public void setOverrideCurrent(Current current) {
-    overrideCurrent = current;
+  public void setOverrideVoltage(Voltage volts) {
+    overrideVoltage = volts;
   }
 
   @Override
-  public void setOverrideMode(boolean override) {
-    isOverriding = override;
+  public void setOverrideCurrent(Current current) {
+    overrideCurrent = current;
   }
 
   @Override
