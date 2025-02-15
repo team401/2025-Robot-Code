@@ -1,5 +1,8 @@
 package frc.robot.subsystems.ramp;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -14,9 +17,24 @@ public class RampIOSim implements RampIO {
           JsonConstants.rampConstants.PID_SIM_I,
           JsonConstants.rampConstants.PID_SIM_D);
 
-  private SingleJointedArmSim sim =
+  private final double gearing = 25;
+  private final double jKgMetersSquared = 0.01906254;
+  private final double armLengthMeters = Inches.of(24.938).in(Meters);
+  private final double minAngleRads = 0;
+  private final double maxAngleRads = Math.PI;
+  private final double startingRads = 0.5 * Math.PI;
+  private final boolean simulateGravity = true;
+
+  private final SingleJointedArmSim sim =
       new SingleJointedArmSim(
-          DCMotor.getKrakenX60(1), 25, 10, 24.938, 0, 2 * Math.PI, true, Math.PI);
+          DCMotor.getKrakenX60(1),
+          gearing,
+          jKgMetersSquared,
+          armLengthMeters,
+          minAngleRads,
+          maxAngleRads,
+          simulateGravity,
+          startingRads);
 
   @Override
   public void updateInputs(RampInputs inputs) {
