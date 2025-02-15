@@ -57,7 +57,6 @@ public final class InitSubsystems {
           clawMechanism = new ClawMechanism(new ClawIOTalonFX());
         }
         break;
-      case MAPLESIM:
       case SIM:
       case MAPLESIM: // TODO: Once ground intake is added, make sure this plays nice with it in
         // maplesim
