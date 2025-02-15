@@ -1,12 +1,11 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Volts;
-
 import coppercore.wpilib_interface.DriveWithJoysticks;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -132,7 +131,7 @@ public final class InitBindings {
 
   public static void initRampBindings(RampSubsystem rampSubsystem) {
     driverController
-        .x()
+        .a()
         .onTrue(
             new InstantCommand(
                 () -> {
