@@ -46,6 +46,13 @@
         "ScoringSetpoints.json",
         "ClimbConstants.json"
       ]
+    },
+    {
+      "name": "test_ramp",
+      "filepath": "test_ramp",
+      "files": [
+        "RampConstants.json"
+      ]
     }
   ]
 }
