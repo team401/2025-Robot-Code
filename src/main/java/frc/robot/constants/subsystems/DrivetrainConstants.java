@@ -20,7 +20,6 @@ import edu.wpi.first.units.measure.*;
 // https://v6.docs.ctr-electronics.com/en/stable/docs/tuner/tuner-swerve/index.html
 
 public class DrivetrainConstants {
-  // Both sets of gains need to be tuned to your individual robot.
 
   public static final JSONSync<DrivetrainConstants> synced =
       new JSONSync<DrivetrainConstants>(
@@ -28,16 +27,20 @@ public class DrivetrainConstants {
           "DrivetrainConstants.json",
           EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
-  // Both sets of gains need to be tuned to your individual robot.
+
+  // SetGoalSpeed Constants
 
   public final Double maxLinearSpeed = 6.0;
   public final Double maxAngularSpeed = Math.PI * 2;
-  public final Double joystickDeadband = 0.1;
-  public final Double maxPIDVelocity = Math.PI * 2;
-  public final Double maxPIDAcceleration = Math.PI;
-  public final Double angleControllerKp = 10.0;
-  public final Double angleControllerKi = 1.0;
-  public final Double angleControllerKd = 0.0;
+  public final Double joystickDeadband = 0.17;
+
+  // AlignToTarget Constants
+
+  public final Double maxRotationAlignVelocity = 3.5;
+  public final Double maxRotationAlignAcceleration = 3.5;
+  public final Double rotationAlignKp = 10.0;
+  public final Double rotationAlignKi = 0.5;
+  public final Double rotationAlignKd = 0.0;
 
   // The steer motor uses any SwerveModule.SteerRequestType control request with the
   // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
@@ -62,21 +65,20 @@ public class DrivetrainConstants {
   public final Double driveKg = 0.0;
 
   // lineup PID gains
-  public final Double driveAlongTrackkP = 0.5;
-  public final Double driveAlongTrackkI = 0.0;
-  public final Double driveAlongTrackkD = 0.0;
+  public final Double driveAlongTrackKp = 0.5;
+  public final Double driveAlongTrackKi = 0.0;
+  public final Double driveAlongTrackKd = 0.0;
 
   @JSONExclude public final Double driveAlongTrackAcceleration = 5.0;
   @JSONExclude public final Double driveAlongTrackVelocity = 2.0;
 
-  public final Double driveCrossTrackkP = 0.5;
-  public final Double driveCrossTrackkI = 0.0;
-  public final Double driveCrossTrackkD = 0.0;
+  public final Double driveCrossTrackKp = 0.5;
+  public final Double driveCrossTrackKi = 0.0;
+  public final Double driveCrossTrackKd = 0.0;
 
-  public final Double driveRotationkP = 0.5;
-  public final Double driveRotationkI = 0.0;
-  public final Double driveRotationkD = 0.0;
-
+  public final Double driveRotationKp = 0.5;
+  public final Double driveRotationKi = 0.0;
+  public final Double driveRotationKd = 0.0;
   public final Double driveAlongTrackMultiplier = -1.0;
   public final Double driveAlongTrackOffset = 0.25;
   public final Double driveCrossTrackFrontRightOffset = 0.25;
