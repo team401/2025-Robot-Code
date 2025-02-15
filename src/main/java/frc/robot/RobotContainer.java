@@ -30,10 +30,14 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+
 import java.io.File;
+
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
+
+import static edu.wpi.first.units.Units.Radians;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -58,14 +62,17 @@ public class RobotContainer {
   public void updateRobotModel() {
     double height = 0.0;
     double claw_rotation = 0.0;
-    double ramp_rotation = Math.sin(Timer.getTimestamp() * 1.5) + 1.0;
+    double ramp_rotation = 0.0;
     double climb_rotation = 0.0;
     if (scoringSubsystem != null) {
       height = scoringSubsystem.getElevatorHeight().magnitude();
-      claw_rotation = scoringSubsystem.getWristAngle().magnitude();
+      claw_rotation = scoringSubsystem.getWristAngle().in(Radians);
     }
     if (climbSubsystem != null) {
       climb_rotation = climbSubsystem.getRotation().magnitude();
+    }
+    if (rampSubsystem != null){
+      ramp_rotation = rampSubsystem.getPosition();
     }
     height = Math.min(height, 1.87);
     double stage_one_height = Math.max(height - 0.55, 0.0);
@@ -80,7 +87,7 @@ public class RobotContainer {
               new Translation3d(-0.16, 0.31, 0.115), new Rotation3d(climb_rotation, 0.0, 0.0)),
           new Pose3d(
               new Translation3d(0.34, 0.12, height + 0.35),
-              new Rotation3d(0.0, claw_rotation, 0.0)),
+              new Rotation3d(0.0, -claw_rotation, 0.0)),
           new Pose3d(new Translation3d(0.0, 0.0, height), new Rotation3d(0.0, 0.0, 0.0)),
           new Pose3d(new Translation3d(0.0, 0.0, stage_two_height), new Rotation3d(0.0, 0.0, 0.0)),
           new Pose3d(new Translation3d(0.0, 0.0, stage_one_height), new Rotation3d(0.0, 0.0, 0.0))
@@ -123,9 +130,6 @@ public class RobotContainer {
   }
 
   public void configureSubsystems() {
-    if (FeatureFlags.synced.getObject().runScoring) {
-      scoringSubsystem = InitSubsystems.initScoringSubsystem();
-    }
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
       if (ModeConstants.simMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {

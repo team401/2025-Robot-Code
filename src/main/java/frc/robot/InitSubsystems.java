@@ -91,6 +91,7 @@ public final class InitSubsystems {
       case REAL:
         throw new UnsupportedOperationException("Climb real functions are not yet implemented.");
       case SIM:
+      case MAPLESIM:
         return new ClimbSubsystem(new ClimbIOSim());
       case REPLAY:
         throw new UnsupportedOperationException("Climb replay is not yet implemented.");
