@@ -11,9 +11,6 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.util.Units;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.subsystems.climb.ClimbIOSim;
@@ -27,6 +24,10 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMapleSim;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.ramp.RampIOSim;
+import frc.robot.subsystems.ramp.RampIOTalonFX;
+import frc.robot.subsystems.ramp.RampMechanism;
+import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ClawIOSim;
 import frc.robot.subsystems.scoring.ClawIOTalonFX;
 import frc.robot.subsystems.scoring.ClawMechanism;
@@ -153,6 +154,19 @@ public final class InitSubsystems {
     }
   }
 
+  public static RampSubsystem initRampSubsystem() {
+    switch (ModeConstants.currentMode) {
+      case REAL:
+        return new RampSubsystem(new RampMechanism(new RampIOTalonFX()));
+      case SIM:
+      case MAPLESIM:
+        return new RampSubsystem(new RampMechanism(new RampIOSim()));
+      default:
+        throw new UnsupportedOperationException(
+            "Non-exhaustive list of mode types supported in InitSubsystems");
+    }
+  }
+
   public static VisionLocalizer initVisionSubsystem(Drive drive) {
     AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
     switch (ModeConstants.currentMode) {
@@ -162,12 +176,7 @@ public final class InitSubsystems {
             tagLayout,
             new double[0],
             new VisionIOPhotonReal(
-                "Front-Right",
-                new Transform3d(
-                    Units.inchesToMeters(7.0),
-                    Units.inchesToMeters(-5.5),
-                    Units.inchesToMeters(12.0),
-                    new Rotation3d(0, 0, 0))));
+                "Front-Right", JsonConstants.visionConstants.FrontRightTransform));
       case SIM:
         return new VisionLocalizer(
             drive::addVisionMeasurement,
