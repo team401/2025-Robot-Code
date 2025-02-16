@@ -1,7 +1,6 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.*;
 
 import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -22,6 +21,7 @@ import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
+import frc.robot.subsystems.LED;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.ramp.RampSubsystem;
@@ -44,6 +44,7 @@ public class RobotContainer {
   private VisionLocalizer vision = null;
   private StrategyManager strategyManager = null;
   private AutoStrategyContainer strategyContainer = null;
+  private LED led = null;
 
   private SendableChooser<AutoStrategy> autoChooser = new SendableChooser<>();
 
@@ -85,6 +86,7 @@ public class RobotContainer {
   }
 
   public void configureSubsystems() {
+    led = InitSubsystems.initLed();
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
       if (ModeConstants.simMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
