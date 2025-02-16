@@ -13,7 +13,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
-import frc.robot.subsystems.LED;
 import frc.robot.subsystems.climb.ClimbIOSim;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
@@ -41,27 +40,6 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
 public final class InitSubsystems {
-
-  public static LED initLed() {
-    LED leds = null;
-
-    switch (ModeConstants.currentMode) {
-      case REAL:
-        leds = new LED();
-        leds.run(LED.rainbow);
-      case SIM:
-        return null;
-      case MAPLESIM:
-        return null;
-      case REPLAY:
-        return null;
-      default:
-        throw new UnsupportedOperationException(
-            "Non-exhaustive list of mode types supported in InitSubsystems (got "
-                + ModeConstants.currentMode
-                + ")");
-    }
-  }
 
   public static ScoringSubsystem initScoringSubsystem() {
     ElevatorMechanism elevatorMechanism = null;
