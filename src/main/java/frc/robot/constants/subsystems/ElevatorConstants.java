@@ -43,11 +43,9 @@ public final class ElevatorConstants {
           EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
-  // TODO: Rename these
-  // see ElevatorIOTalonFX
-  public final Integer leadElevatorMotorId = 9; // TODO: Actual CAN IDs
-  public final Integer followerElevatorMotorId = 10;
-  public final Boolean invertFollowerElevatorMotor = false;
+  public final Integer leadElevatorMotorId = 12;
+  public final Integer followerElevatorMotorId = 11;
+  public final Boolean invertFollowerElevatorMotor = true;
 
   public final Integer smallCANCoderTeeth = 17;
   public final Integer largeCANCoderTeeth = 19;
@@ -75,14 +73,12 @@ public final class ElevatorConstants {
   public final Double elevatorCANCoderDiscontinuityPoint = 1.0;
 
   // TODO: Tune encoder directions!
-  public final Integer elevatorLargeCANCoderID = 11;
-  public final Boolean isLargeCANcoderClockwisePositive = true;
+  public final Integer elevatorLargeCANCoderID = 14;
 
   public final SensorDirectionValue elevatorLargeCANCoderDirection =
-      SensorDirectionValue.Clockwise_Positive; // CounterClockwise_Positive;
+      SensorDirectionValue.Clockwise_Positive;
 
-  public final Integer elevatorSmallCANCoderID = 12;
-  public final Boolean isSmallCANcoderClockwisePositive = false;
+  public final Integer elevatorSmallCANCoderID = 15;
 
   public final SensorDirectionValue elevatorSmallCANCoderDirection =
       SensorDirectionValue.CounterClockwise_Positive;
@@ -144,13 +140,8 @@ public final class ElevatorConstants {
   public final Per<VoltageUnit, AngularAccelerationUnit> elevatorExpo_kA =
       VoltsPerRadianPerSecondSquared.ofNative(elevatorExpo_kA_raw);
 
-  // TODO: Find actual values for these!
-  /* Minimum elevator height in meters, stored as a double so it can be synced by JSONSync */
-  public final Double minElevatorHeightMeters = 0.0;
-  @JSONExclude public final Distance minElevatorHeight = Meters.of(minElevatorHeightMeters);
-  /* Maximum elevator height in meters, stored as a double so it can be synced by JSONSync */
-  public final Double maxElevatorHeightMeters = 1.9;
-  @JSONExclude public final Distance maxElevatorHeight = Meters.of(maxElevatorHeightMeters);
+  public final Distance minElevatorHeight = Meters.of(0.0);
+  public final Distance maxElevatorHeight = Meters.of(1.9);
 
   // TODO: Tune this value
   public final Current elevatorStatorCurrentLimit = Amps.of(80.0);
@@ -164,13 +155,17 @@ public final class ElevatorConstants {
    */
   public final Distance elevatorTargetThresholdMeters = Meters.of(0.03);
 
-  public final Integer medianFilterWindowSize = 5;
+  public final Integer medianFilterWindowSize = 10; // We might want to go smaller with this value
 
-  public final Boolean ignoreCRT = true;
+  public final Boolean ignoreCRT = false;
 
   public final Voltage homingVoltage = Volts.of(-3);
 
-  public final LinearVelocity homingVelocityThreshold = MetersPerSecond.of(0.001);
+  /**
+   * What reported velocity should be considered "moving" while homing, stored as a Double because
+   * we can't serialize a MetersPerSecond
+   */
+  public final Double homingVelocityThresholdMetersPerSecond = 0.001;
 
   /** The maximum amount of time the elevator can home for before saying it's at 0 and giving up */
   public final Time homingMaxTime = Seconds.of(3.0);

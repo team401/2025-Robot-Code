@@ -20,7 +20,9 @@
   },
   "elevatorCANCoderDiscontinuityPoint": 1.0,
   "elevatorLargeCANCoderID": 14,
+  "elevatorLargeCANCoderDirection": "Clockwise_Positive",
   "elevatorSmallCANCoderID": 15,
+  "elevatorSmallCANCoderDirection": "CounterClockwise_Positive",
   "elevatorkP": 60.0,
   "elevatorkI": 0.0,
   "elevatorkD": 0.0,
@@ -31,8 +33,14 @@
   "elevatorCruiseVelocityMetersPerSecond": 3.0,
   "elevatorExpo_kV_raw": 0.0,
   "elevatorExpo_kA_raw": 0.1,
-  "minElevatorHeightMeters": 0.0,
-  "maxElevatorHeightMeters": 1.9,
+  "minElevatorHeight": {
+    "value": 0.0,
+    "unit": "Meter"
+  },
+  "maxElevatorHeight": {
+    "value": 1.9,
+    "unit": "Meter"
+  },
   "elevatorStatorCurrentLimit": {
     "value": 80.0,
     "unit": "Amp"
@@ -42,5 +50,20 @@
     "value": 0.03,
     "unit": "Meter"
   },
-  "medianFilterWindowSize": 10
+  "medianFilterWindowSize": 10,
+  "ignoreCRT": false,
+  "homingVoltage": {
+    "value": -3.0,
+    "unit": "Volt"
+  },
+  "homingVelocityThresholdMetersPerSecond": 0.001,
+  "homingMaxTime": {
+    "value": 3.0,
+    "unit": "Second"
+  },
+  "homingMaxUnmovingTime": {
+    "value": 1.0,
+    "unit": "Second"
+  },
+  "homingVelocityFilterWindowSize": 5
 }

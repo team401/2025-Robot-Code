@@ -48,7 +48,7 @@ public class InitState implements PeriodicStateInterface {
         velocityFilter.calculate(scoringSubsystem.getElevatorVelocity().abs(MetersPerSecond));
 
     if (filteredAbsVelocity
-        < JsonConstants.elevatorConstants.homingVelocityThreshold.abs(MetersPerSecond)) {
+        < JsonConstants.elevatorConstants.homingVelocityThresholdMetersPerSecond) {
       // If the elevator is NOT moving:
       if (hasMovedYet) {
         // If it HAS moved yet, that means it's moved and then come to rest, therefore we are at
