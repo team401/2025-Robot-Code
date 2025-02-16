@@ -32,8 +32,6 @@ import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.subsystems.ElevatorConstants;
 import frc.robot.subsystems.scoring.ElevatorIO.ElevatorOutputMode;
-
-import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorMechanism implements Tunable {
@@ -114,13 +112,19 @@ public class ElevatorMechanism implements Tunable {
 
     periodic();
 
+    // Initialize CRT logging fields with sentinel values so we can see them in AdvantageScope
+    // before CRT is finished
+    Logger.recordOutput("elevator/CRTSolutionSpoolAngle", Rotations.of(-1.0));
+    Logger.recordOutput("elevator/CRTSolutionHeight", Meters.of(-1.0));
+    Logger.recordOutput("elevator/seededWithCRT", false);
+
     // Seed elevator height using CRT on initialize
     seedWithCRT();
   }
 
   /**
    * Has the elevator position been seeded yet?
-   * 
+   *
    * @return True if it has been seeded, false if it hasn't been seeded.
    */
   public boolean hasBeenSeeded() {
@@ -266,15 +270,26 @@ public class ElevatorMechanism implements Tunable {
       Logger.recordOutput(
           "elevator/CRTSolutionHeight",
           Inches.of(solutionSpoolAngle.in(Rotations) * 4.724).in(Meters));
-      System.out.println("BAZINGA");
-      System.out.println(Inches.of(solutionSpoolAngle.in(Rotations) * 4.724).in(Meters));
-      System.out.println(solutionSpoolAngle);
+      Logger.recordOutput("elevator/seededWithCRT", true);
     } else {
-      Logger.recordOutput("elevator/CRTSolutionSpoolAngle", Rotations.of(-1.0));
-      Logger.recordOutput("elevator/CRTSolutionHeight", Meters.of(-1.0));
-
       System.out.println("ERROR: Couldn't find solution to seed elevator with CRT");
     }
+  }
+
+  /**
+   * Seed the elevator to zero height
+   *
+   * <p>This should be called after a homing routine determines the elevator is at zero
+   */
+  public void seedToZero() {
+    io.setLargeCANCoderPosition(Rotations.zero());
+    io.setSmallCANCoderPosition(Rotations.zero());
+
+    Logger.recordOutput("elevator/CRTSolutionSpoolAngle", Rotations.of(0.0));
+    Logger.recordOutput("elevator/CRTSolutionHeight", Meters.of(0.0));
+    Logger.recordOutput("elevator/seededWithCRT", false);
+
+    hasBeenSeeded = true;
   }
 
   /**
@@ -369,18 +384,19 @@ public class ElevatorMechanism implements Tunable {
   }
 
   public LinearVelocity getElevatorVelocity() {
-    AngularVelocity spoolVelocity
-      = inputs.largeEncoderVel.times(
-        (double) JsonConstants.elevatorConstants.largeCANCoderTeeth
-          / (double) JsonConstants.elevatorConstants.spoolTeeth);
+    AngularVelocity spoolVelocity =
+        inputs.largeEncoderVel.times(
+            (double) JsonConstants.elevatorConstants.largeCANCoderTeeth
+                / (double) JsonConstants.elevatorConstants.spoolTeeth);
 
     return MetersPerSecond.of(
-      spoolVelocity.in(RotationsPerSecond)
-        * JsonConstants.elevatorConstants.elevatorHeightPerSpoolRotation.in(Meters));
+        spoolVelocity.in(RotationsPerSecond)
+            * JsonConstants.elevatorConstants.elevatorHeightPerSpoolRotation.in(Meters));
   }
 
   /**
-   * Set whether the elevator should use closed-loop control, apply its override voltage, or apply its override current.
+   * Set whether the elevator should use closed-loop control, apply its override voltage, or apply
+   * its override current.
    */
   public void setOutputMode(ElevatorOutputMode outputMode) {
     io.setOutputMode(outputMode);
@@ -388,7 +404,7 @@ public class ElevatorMechanism implements Tunable {
 
   /**
    * Set the voltage the elevator will apply when in Voltage override output mode
-   * 
+   *
    * @param volts The voltage to apply
    */
   public void setOverrideVoltage(Voltage volts) {

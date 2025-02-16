@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
@@ -29,6 +30,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Per;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Filesystem;
 
@@ -164,11 +166,21 @@ public final class ElevatorConstants {
 
   public final Integer medianFilterWindowSize = 5;
 
-  public final Boolean ignoreCRT = false;
+  public final Boolean ignoreCRT = true;
 
   public final Voltage homingVoltage = Volts.of(-3);
 
   public final LinearVelocity homingVelocityThreshold = MetersPerSecond.of(0.001);
+
+  /** The maximum amount of time the elevator can home for before saying it's at 0 and giving up */
+  public final Time homingMaxTime = Seconds.of(3.0);
+
+  /**
+   * The maximum amount of time the elevator can home without ever moving before it knows its at 0
+   */
+  public final Time homingMaxUnmovingTime = Seconds.of(1.0);
+
+  public final Integer homingVelocityFilterWindowSize = 5;
 
   public static final class Sim {
     @JSONExclude

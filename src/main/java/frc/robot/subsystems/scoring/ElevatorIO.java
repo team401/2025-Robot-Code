@@ -17,13 +17,10 @@ import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Voltage;
-
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
-  /**
-   * What override mode the elevator is currently in
-   */
+  /** What override mode the elevator is currently in */
   enum ElevatorOutputMode {
     ClosedLoop, // Not overriding, it should be closed loop
     Current, // Overriding, manually applying a current
@@ -146,19 +143,20 @@ public interface ElevatorIO {
 
   /**
    * Set the override voltage for the elevator when in Voltage output mode
-   * 
+   *
    * @param volts The voltage to apply
    */
   public void setOverrideVoltage(Voltage volts);
 
   /**
-   * Set the static current (because of FOC) that will be applied when the elevator is in Current output
-   * mode.
+   * Set the static current (because of FOC) that will be applied when the elevator is in Current
+   * output mode.
    */
   public void setOverrideCurrent(Current current);
 
   /**
-   * Set whether the elevator should use ClosedLoop control (default), voltage override, or current override
+   * Set whether the elevator should use ClosedLoop control (default), voltage override, or current
+   * override
    */
   public void setOutputMode(ElevatorOutputMode mode);
 

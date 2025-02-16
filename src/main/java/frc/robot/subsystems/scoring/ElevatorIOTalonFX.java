@@ -195,21 +195,22 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     } else {
       switch (outputMode) {
         case ClosedLoop:
-      leadMotor.setControl(motionMagicExpoTorqueCurrentFOC);
+          leadMotor.setControl(motionMagicExpoTorqueCurrentFOC);
 
-      largeEncoderSetpointPosition.mut_setMagnitude(
-          (leadMotor.getClosedLoopReference().getValue()));
+          largeEncoderSetpointPosition.mut_setMagnitude(
+              (leadMotor.getClosedLoopReference().getValue()));
 
-      Logger.recordOutput(
-          "elevator/referenceSlope", leadMotor.getClosedLoopReferenceSlope().getValueAsDouble());
-      outputs.elevatorAppliedVolts.mut_replace(
-          Volts.of(leadMotor.getClosedLoopOutput().getValueAsDouble()));
-      outputs.pContrib.mut_replace(
-          Volts.of(leadMotor.getClosedLoopProportionalOutput().getValueAsDouble()));
-      outputs.iContrib.mut_replace(
-          Volts.of(leadMotor.getClosedLoopIntegratedOutput().getValueAsDouble()));
-      outputs.dContrib.mut_replace(
-          Volts.of(leadMotor.getClosedLoopDerivativeOutput().getValueAsDouble()));
+          Logger.recordOutput(
+              "elevator/referenceSlope",
+              leadMotor.getClosedLoopReferenceSlope().getValueAsDouble());
+          outputs.elevatorAppliedVolts.mut_replace(
+              Volts.of(leadMotor.getClosedLoopOutput().getValueAsDouble()));
+          outputs.pContrib.mut_replace(
+              Volts.of(leadMotor.getClosedLoopProportionalOutput().getValueAsDouble()));
+          outputs.iContrib.mut_replace(
+              Volts.of(leadMotor.getClosedLoopIntegratedOutput().getValueAsDouble()));
+          outputs.dContrib.mut_replace(
+              Volts.of(leadMotor.getClosedLoopDerivativeOutput().getValueAsDouble()));
           break;
         case Voltage:
           break;

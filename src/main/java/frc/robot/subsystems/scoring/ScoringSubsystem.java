@@ -114,8 +114,8 @@ public class ScoringSubsystem extends SubsystemBase {
     stateMachineConfiguration = new StateMachineConfiguration<>();
 
     stateMachineConfiguration
-      .configure(ScoringState.Init)
-      .permit(ScoringTrigger.Seeded, ScoringState.Idle);
+        .configure(ScoringState.Init)
+        .permit(ScoringTrigger.Seeded, ScoringState.Idle);
 
     stateMachineConfiguration
         .configure(ScoringState.Idle)
@@ -160,8 +160,9 @@ public class ScoringSubsystem extends SubsystemBase {
   }
 
   /**
-   * Set whether or not the elevator should override and manually apply a voltage/current, or if it should used closed-loop
-   * 
+   * Set whether or not the elevator should override and manually apply a voltage/current, or if it
+   * should used closed-loop
+   *
    * @param outputMode ClosedLoop, Voltage, or Current
    */
   public void setElevatorOverrideMode(ElevatorOutputMode outputMode) {
@@ -362,10 +363,16 @@ public class ScoringSubsystem extends SubsystemBase {
 
   /**
    * Has the elevator position been seeded yet?
-   * 
+   *
    * @return True if it has been seeded, false if it hasn't been seeded.
    */
   public boolean hasBeenSeeded() {
     return elevatorMechanism.hasBeenSeeded();
+  }
+
+  public void seedElevatorToZero() {
+    if (elevatorMechanism != null) {
+      elevatorMechanism.seedToZero();
+    }
   }
 }
