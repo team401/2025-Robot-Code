@@ -7,7 +7,6 @@ import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
-import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
@@ -21,8 +20,8 @@ import org.littletonrobotics.junction.Logger;
 
 public class GroundIntakeIOSim extends GroundIntakeIOTalonFX {
 
-  //CANcoderSimState shoulderCANcoderSimState = shoulderMotor.getSimState();
-  //CANcoderSimState rollerCANcoderSimState = rollerMotor.getSimState();
+  // CANcoderSimState shoulderCANcoderSimState = shoulderMotor.getSimState();
+  // CANcoderSimState rollerCANcoderSimState = rollerMotor.getSimState();
 
   TalonFXSimState wristMotorSimState = shoulderMotor.getSimState();
   TalonFXSimState rollerCancoderSimState = rollerMotor.getSimState();
@@ -55,8 +54,8 @@ public class GroundIntakeIOSim extends GroundIntakeIOTalonFX {
     lastWristAngle.mut_replace(wristAngle);
 
     // 1:1 ratio of wrist to CANcoder makes this math very easy
-    //wristMotorSimState.setRawRotorPosition(diffAngle);
-    //wristMotorSimState.setRotorVelocity(wristVelocity);
+    // wristMotorSimState.setRawRotorPosition(diffAngle);
+    // wristMotorSimState.setRotorVelocity(wristVelocity);
 
     // TODO Check if above was true meaning?
     // wristCANcoderSimState.addPosition(diffAngle);
@@ -85,5 +84,4 @@ public class GroundIntakeIOSim extends GroundIntakeIOTalonFX {
 
     super.updateWristInputs(inputs);
   }
-
 }

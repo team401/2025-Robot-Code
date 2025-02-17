@@ -3,10 +3,13 @@ package frc.robot.subsystems.ground;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.state.StateContainer;
 import frc.robot.subsystems.ground.states.IdleState;
+import frc.robot.subsystems.ground.states.IntakeState;
+import frc.robot.subsystems.ground.states.ReverseState;
+import frc.robot.subsystems.ground.states.WarmupState;
 
-public class GroundSubsystem {
+public class GroundIntakeSubsystem {
 
-  private GroundSubsystem instance = this;
+  private static GroundIntakeSubsystem instance;
 
   GroundIntakeIO io;
   GroundIntakeInputsAutoLogged inputs = new GroundIntakeInputsAutoLogged();
@@ -20,16 +23,16 @@ public class GroundSubsystem {
     OVERRIDE
   }
 
-   private enum GroundIntakeState implements StateContainer {
+  private enum GroundIntakeState implements StateContainer {
     IDLE(new IdleState(instance)), // do nothing
-    WAITING(new WaitingState(instance)), // waiting for system to be ready for climb
-    SEARCHING(new SearchingState(instance)), // searching for target
-    LIFTING(new LiftingState(instance)), // moving arm to hang
+    WARMUP(new WarmupState(instance)), // waiting for system to be ready for climb
+    INTAKE(new IntakeState(instance)), // searching for target
+    REVERSE(new ReverseState(instance)), // moving arm to hang
     OVERRIDE(new PeriodicStateInterface() {});
 
     private final PeriodicStateInterface state;
 
-    ClimbState(PeriodicStateInterface state) {
+    GroundIntakeState(PeriodicStateInterface state) {
       this.state = state;
     }
 
@@ -38,5 +41,4 @@ public class GroundSubsystem {
       return state;
     }
   }
-
 }
