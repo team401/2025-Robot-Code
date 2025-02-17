@@ -102,7 +102,7 @@ dependencies {
     annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
 
     def coppercoreVersion = "2025.1.10"
-    
+
     implementation "io.github.team401.coppercore:controls:$coppercoreVersion"
     implementation "io.github.team401.coppercore:geometry:$coppercoreVersion"
     implementation "io.github.team401.coppercore:math:$coppercoreVersion"

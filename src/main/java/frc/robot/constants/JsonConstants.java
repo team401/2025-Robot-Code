@@ -13,7 +13,6 @@ public class JsonConstants {
         Filesystem.getDeployDirectory().toPath().resolve("constants/config.json").toString());
     // Don't save DrivetrainConstants.java, change the json's manually
     DrivetrainConstants.synced.loadData();
-    ElevatorConstants.synced.saveData();
     ElevatorConstants.synced.loadData();
     ElevatorConstants.Sim.synced.loadData();
     ClawConstants.synced.loadData();

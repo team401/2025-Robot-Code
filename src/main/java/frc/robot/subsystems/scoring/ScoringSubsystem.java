@@ -17,11 +17,10 @@ import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.JsonConstants;
-import frc.robot.subsystems.scoring.ElevatorIO.ElevatorOutputMode;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
+import frc.robot.subsystems.scoring.ElevatorIO.ElevatorOutputMode;
 import frc.robot.subsystems.scoring.states.IdleState;
 import frc.robot.subsystems.scoring.states.InitState;
 import frc.robot.subsystems.scoring.states.IntakeState;
@@ -230,6 +229,7 @@ public class ScoringSubsystem extends SubsystemBase {
             () -> !(clawMechanism.isCoralDetected() || clawMechanism.isAlgaeDetected()));
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, ScoringState.Init);
+  }
 
   /**
    * Set whether or not the scoring subsystem should automatically transition through its states

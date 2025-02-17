@@ -58,7 +58,7 @@ public class ElevatorMechanism implements Tunable {
   LoggedTunableNumber elevatorExpokA;
 
   LoggedTunableNumber elevatorTuningSetpointMeters;
-  LoggedTunableNumber elevatorTuningOverrideVolts;
+  LoggedTunableNumber elevatorTuningOverrideAmps;
 
   // Has the elevator been seeded with CRT yet?
   // This exists in case we fail to seed with CRT the first try, it will try again each tick until
@@ -105,8 +105,8 @@ public class ElevatorMechanism implements Tunable {
 
     elevatorTuningSetpointMeters =
         new LoggedTunableNumber("ElevatorTunables/elevatorTuningSetpointMeters", 0.0);
-    elevatorTuningOverrideVolts =
-        new LoggedTunableNumber("ElevatorTunables/elevatorTuningOverrideVolts", 0.0);
+    elevatorTuningOverrideAmps =
+        new LoggedTunableNumber("ElevatorTunables/elevatorTuningOverrideAmps", 0.0);
 
     this.io = io;
 
@@ -188,10 +188,11 @@ public class ElevatorMechanism implements Tunable {
 
         LoggedTunableNumber.ifChanged(
             hashCode(),
-            (setpoint) -> {
-              io.setOverrideVolts(Volts.of(setpoint[0]));
+            (current) -> {
+              io.setOverrideCurrent(Amps.of(current[0]));
+              io.setOutputMode(ElevatorOutputMode.Current);
             },
-            elevatorTuningOverrideVolts);
+            elevatorTuningOverrideAmps);
 
       case SetpointTuning:
         // Allow setpointing the elevator in ElevatorTuning and SetpointTuning modes
@@ -199,9 +200,9 @@ public class ElevatorMechanism implements Tunable {
             hashCode(),
             (setpoint) -> {
               setGoalHeight(Meters.of(setpoint[0]));
+              io.setOutputMode(ElevatorOutputMode.ClosedLoop);
             },
             elevatorTuningSetpointMeters);
-
         break;
       default:
         break;
