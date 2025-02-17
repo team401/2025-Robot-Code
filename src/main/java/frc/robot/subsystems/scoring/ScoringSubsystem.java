@@ -594,7 +594,7 @@ public class ScoringSubsystem extends SubsystemBase {
     if (wristAngle.lt(JsonConstants.wristConstants.minElevatorDownSafeAngle)) {
       elevatorMinHeight.mut_replace(
           (Distance)
-              Measure.max(elevatorMaxHeight, JsonConstants.elevatorConstants.minWristDownHeight));
+              Measure.max(elevatorMinHeight, JsonConstants.elevatorConstants.minWristDownHeight));
     }
 
     // If the wrist is in an unsafe position for the elevator to move past the crossbar, clamp the

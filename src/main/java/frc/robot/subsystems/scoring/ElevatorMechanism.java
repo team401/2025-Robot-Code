@@ -204,6 +204,11 @@ public class ElevatorMechanism implements Tunable {
             },
             elevatorTuningSetpointMeters);
         break;
+      case WristClosedLoopTuning:
+      case WristVoltageTuning:
+        // When tuning the wrist, go to half a meter to avoid destroying outselves
+        setGoalHeight(Meters.of(0.5));
+        setOutputMode(ElevatorOutputMode.ClosedLoop);
       default:
         break;
     }
@@ -335,6 +340,8 @@ public class ElevatorMechanism implements Tunable {
    * current bounds.
    */
   private void updateClampedGoalHeight() {
+    Logger.recordOutput("elevator/minHeight", minHeight);
+    Logger.recordOutput("elevator/maxHeight", maxHeight);
     clampedGoalHeight.mut_replace(UnitUtils.clampMeasure(goalHeight, minHeight, maxHeight));
   }
 
@@ -358,6 +365,7 @@ public class ElevatorMechanism implements Tunable {
             (double) ElevatorConstants.synced.getObject().spoolTeeth
                 / (double) ElevatorConstants.synced.getObject().largeCANCoderTeeth);
 
+    Logger.recordOutput("elevator/sentGoalRotations", largeEncoderRotations);
     io.setLargeCANCoderGoalPos(largeEncoderRotations);
   }
 

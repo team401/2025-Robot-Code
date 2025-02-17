@@ -31,8 +31,8 @@ import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.JsonConstants;
 
 public class WristIOTalonFX implements WristIO {
-  TalonFX wristMotor = new TalonFX(JsonConstants.wristConstants.wristMotorId);
-  CANcoder wristCANcoder = new CANcoder(JsonConstants.wristConstants.wristCANcoderId);
+  TalonFX wristMotor = new TalonFX(JsonConstants.wristConstants.wristMotorId, "canivore");
+  CANcoder wristCANcoder = new CANcoder(JsonConstants.wristConstants.wristCANcoderId, "canivore");
 
   // Keep track of talonFX configs and only update FF/PID when necessary to avoid unnecessary object
   // creation
