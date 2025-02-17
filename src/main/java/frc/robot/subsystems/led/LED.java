@@ -7,9 +7,12 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.AddressableLEDBufferView;
 import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.LEDConstants;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class LED extends SubsystemBase {
@@ -37,7 +40,7 @@ public class LED extends SubsystemBase {
   // Create views for two sections of the LED strip.
   private final AddressableLEDBufferView bottomData = ledStrip.createView(0, 252);
   // Create the top view starting at LED 253; then reverse the view if needed.
-  private final AddressableLEDBufferView topData = ledStrip.createView(253, 506).reversed();
+  private final AddressableLEDBufferView topData = ledStrip.createView(253, 503).reversed();
 
   // Define patterns for different effects.
   public LEDPattern rainbow =
@@ -184,5 +187,59 @@ public class LED extends SubsystemBase {
           downPattern.applyTo(bottomData);
           upPattern.applyTo(topData);
         });
+  }
+
+  public Command runCycle() {
+    return new Command() {
+      private double lastTime;
+      private int currentIndex = 0;
+
+      // Create a list of solid LEDPatterns using your LEDConstants.
+      // Add or remove colors as desired.
+      private final List<LEDPattern> patterns =
+          Arrays.asList(
+              LEDPattern.solid(LEDConstants.lockedOnHang),
+              LEDPattern.solid(LEDConstants.holdingAlgae),
+              LEDPattern.solid(LEDConstants.holdingCoral),
+              LEDPattern.solid(LEDConstants.targetOnReefL1),
+              LEDPattern.solid(LEDConstants.targetOnReefL2),
+              LEDPattern.solid(LEDConstants.targetOnReefL3),
+              LEDPattern.solid(LEDConstants.targetOnReefL4),
+              LEDPattern.solid(LEDConstants.targetOnReef),
+              LEDPattern.solid(LEDConstants.targetOnNet));
+
+      @Override
+      public void initialize() {
+        currentIndex = 0;
+        lastTime = Timer.getFPGATimestamp();
+        // Apply the first color pattern on both sides.
+        runCustomSplitPattern(patterns.get(currentIndex), patterns.get(currentIndex)).schedule();
+      }
+
+      @Override
+      public void execute() {
+        double now = Timer.getFPGATimestamp();
+        if (now - lastTime >= 1.0) { // One second elapsed
+          currentIndex++;
+          if (currentIndex < patterns.size()) {
+            // Schedule the next color.
+            runCustomSplitPattern(patterns.get(currentIndex), patterns.get(currentIndex))
+                .schedule();
+            lastTime = now;
+          }
+        }
+      }
+
+      @Override
+      public boolean isFinished() {
+        // Finish once we've cycled through all the patterns.
+        return currentIndex >= patterns.size();
+      }
+
+      @Override
+      public void end(boolean interrupted) {
+        // Optionally, cancel any running LED command if needed.
+      }
+    };
   }
 }

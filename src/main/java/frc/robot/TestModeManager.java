@@ -21,6 +21,7 @@ public class TestModeManager {
     DriveSysIdDynamicForward,
     DriveSysIdDynamicBackward,
     DriveLineupTuning,
+    LEDTest,
     None, // Default test mode that does nothing until a new one is selected.
   }
 
@@ -55,6 +56,9 @@ public class TestModeManager {
     testModeChooser.addOption("Drive SysId (Dynamic Forward)", TestMode.DriveSysIdDynamicForward);
     testModeChooser.addOption("Drive SysId (Dynamic Reverse)", TestMode.DriveSysIdDynamicBackward);
     testModeChooser.addOption("Drive Lineup Tuning", TestMode.DriveLineupTuning);
+
+    // LED
+    testModeChooser.addOption("LED Cycle Test", TestMode.LEDTest);
 
     SmartDashboard.putData("Test Mode Selector", testModeChooser);
   }

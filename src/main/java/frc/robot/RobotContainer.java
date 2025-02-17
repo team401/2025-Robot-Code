@@ -23,6 +23,7 @@ import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.led.LED;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import java.io.File;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -39,6 +40,7 @@ public class RobotContainer {
   private Drive drive = null;
   private ClimbSubsystem climbSubsystem = null;
   private VisionLocalizer vision = null;
+  private LED led = null;
   private StrategyManager strategyManager = null;
   private AutoStrategyContainer strategyContainer = null;
 
@@ -82,7 +84,7 @@ public class RobotContainer {
   }
 
   public void configureSubsystems() {
-
+    led = new LED();
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
       if (ModeConstants.simMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
@@ -186,6 +188,8 @@ public class RobotContainer {
       case DriveSysIdDynamicBackward:
         CommandScheduler.getInstance()
             .schedule(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+      case LEDTest:
+        CommandScheduler.getInstance().schedule(led.runCycle());
         break;
       default:
         break;
