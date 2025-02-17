@@ -6,19 +6,15 @@ import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.VoltageConfigs;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.MutVoltage; 
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.JsonConstants;
-import frc.robot.subsystems.ground.GroundIntakeIO.GroundIntakeInputs;
-import frc.robot.subsystems.ground.GroundIntakeIO.GroundIntakeOutputs;
-import frc.robot.subsystems.scoring.ClawIO.ClawInputs;
-import frc.robot.subsystems.scoring.ClawIO.ClawOutputs;
 
 public class GroundIntakeIOTalonFX implements GroundIntakeIO{
     TalonFX rollerMotor = new TalonFX(JsonConstants.groundIntakeConstants.rollerMotorID);
@@ -28,6 +24,7 @@ public class GroundIntakeIOTalonFX implements GroundIntakeIO{
     private MutCurrent outputCurrent = Amps.mutable(0.0);
     private VoltageOut voltageRequest = new VoltageOut(outputVoltage);
     
+    private MutAngle goalAngle = Angle.mutable(0.0);
 
     public GroundIntakeIOTalonFX() {
         TalonFXConfiguration shoulderTalonFXConfigs =
@@ -76,4 +73,10 @@ public class GroundIntakeIOTalonFX implements GroundIntakeIO{
   public void setVoltage(Voltage volts) {
     outputVoltage.mut_replace(volts);
   }
+
+  @Override
+  public void setShoulderGoalPosition(Angle goalAngle){
+    this.goalAngle.mut_replace(goalAngle);
+  }
+
 }
