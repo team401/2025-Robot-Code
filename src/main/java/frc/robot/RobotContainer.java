@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -19,6 +20,7 @@ import frc.robot.constants.AutoStrategy;
 import frc.robot.constants.AutoStrategyContainer;
 import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
+import frc.robot.constants.LEDConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.LED;
@@ -47,6 +49,8 @@ public class RobotContainer {
   private SendableChooser<AutoStrategy> autoChooser = new SendableChooser<>();
 
   public static SwerveDriveSimulation driveSim = null;
+
+  DigitalInput ledSwitch = new DigitalInput(LEDConstants.ledSwitch);
 
   // The robot's subsystems and commands are defined here
 
@@ -143,12 +147,17 @@ public class RobotContainer {
 
     // load chosen strategy
     strategyManager.addActionsFromAutoStrategy(autoChooser.getSelected());
+
+    led.enabled(FeatureFlags.synced.getObject().runLEDs);
+  
   }
 
   public void teleopInit() {
     strategyManager.setAutonomyMode(AutonomyMode.Teleop);
     // clear leftover actions from auto
     strategyManager.clearActions();
+
+    led.enabled(FeatureFlags.synced.getObject().runLEDs);
   }
 
   /** This method must be called from robot, as it isn't called automatically */
@@ -191,6 +200,8 @@ public class RobotContainer {
       default:
         break;
     }
+
+    led.enabled(FeatureFlags.synced.getObject().runLEDs);
   }
 
   /** This method must be called from the robot, as it isn't called automatically. */
@@ -203,6 +214,10 @@ public class RobotContainer {
   public void disabledPeriodic() {
     // Logger.recordOutput("feature_flags/drive", FeatureFlags.synced.getObject().runDrive);
     strategyManager.logActions();
+
+    if (ledSwitch != null && led != null) {
+      led.enabled(!ledSwitch.get());
+    }
   }
 
   public void disabledInit() {

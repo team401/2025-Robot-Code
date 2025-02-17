@@ -34,6 +34,14 @@ public class LED extends SubsystemBase {
     led.setData(ledData);
   }
 
+  public void enabled(boolean enabled) {
+    if (enabled) {
+      led.start();
+    } else {
+      led.stop();
+    }
+  }
+
   public Command run(LEDPattern pattern) {
     return runSplitPatterns(pattern, pattern);
   }
