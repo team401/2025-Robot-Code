@@ -157,7 +157,7 @@ public final class ElevatorConstants {
 
   public final Integer medianFilterWindowSize = 10; // We might want to go smaller with this value
 
-  public final Boolean ignoreCRT = false;
+  public final Boolean ignoreCRT = true;
 
   public final Voltage homingVoltage = Volts.of(-3);
 

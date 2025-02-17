@@ -2,9 +2,11 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import coppercore.vision.VisionLocalizer;
 import coppercore.wpilib_interface.tuning.TuneG;
+import coppercore.wpilib_interface.tuning.TuneS;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -170,15 +172,10 @@ public class RobotContainer {
             .schedule(
                 new SequentialCommandGroup(
                     new WaitCommand(2.0),
-                    new TuneG(scoringSubsystem.getElevatorMechanismForTuning(), 0.01, 3, 0.01)));
-        // new TuneS(
-        //     scoringSubsystem.getElevatorMechanismForTuning(),
-        //     RotationsPerSecond.of(0.001),
-        //     0.1)));
-        // Can't put a TuneV in a sequential group for some reason :(
-        // new WaitCommand(3.0),
-        // new TuneV(
-        //     scoringSubsystem.getElevatorMechanismForTuning(), 0.0, Rotations.of(3.0))));
+                    new TuneS(
+                        scoringSubsystem.getElevatorMechanismForTuning(),
+                        RotationsPerSecond.of(0.001),
+                        0.1)));
         break;
       case DriveFeedForwardCharacterization:
         CommandScheduler.getInstance()
