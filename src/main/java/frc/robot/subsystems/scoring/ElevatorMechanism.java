@@ -189,16 +189,19 @@ public class ElevatorMechanism implements Tunable {
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (setpoint) -> {
+              io.setOverrideVolts(Volts.of(setpoint[0]));
+            },
+            elevatorTuningOverrideVolts);
+
+      case SetpointTuning:
+        // Allow setpointing the elevator in ElevatorTuning and SetpointTuning modes
+        LoggedTunableNumber.ifChanged(
+            hashCode(),
+            (setpoint) -> {
               setGoalHeight(Meters.of(setpoint[0]));
             },
             elevatorTuningSetpointMeters);
 
-        LoggedTunableNumber.ifChanged(
-            hashCode(),
-            (setpoint) -> {
-              io.setOverrideCurrent(Amps.of(setpoint[0]));
-            },
-            elevatorTuningOverrideVolts);
         break;
       default:
         break;
@@ -392,6 +395,17 @@ public class ElevatorMechanism implements Tunable {
     return MetersPerSecond.of(
         spoolVelocity.in(RotationsPerSecond)
             * JsonConstants.elevatorConstants.elevatorHeightPerSpoolRotation.in(Meters));
+  }
+
+  /**
+   * Get the current goal height of the elevator.
+   *
+   * <p>This is the unclamped goal height, and it will not be changed when clamps are updated.
+   *
+   * @return A Distance, the latest goal height set by setGoalHeight
+   */
+  public Distance getElevatorGoalHeight() {
+    return goalHeight;
   }
 
   /**

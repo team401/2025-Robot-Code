@@ -9,8 +9,11 @@ public class TestModeManager {
   public enum TestMode {
     ElevatorTuning,
     ElevatorCharacterization,
+    WristVoltageTuning,
+    WristClosedLoopTuning,
     ClawTuning,
     ClawOvershootTuning,
+    SetpointTuning,
     DriveFeedForwardCharacterization,
     DriveWheelRadiusCharacterization,
     DriveSysIdQuasistaticForward,
@@ -28,14 +31,18 @@ public class TestModeManager {
    * Initialize test modes by publishing the test mode chooser. This method should be called by the
    * Robot, as it doesn't run automatically
    */
-  public static void testInit() {
+  public static void init() {
     testModeChooser = new SendableChooser<TestMode>();
 
     testModeChooser.setDefaultOption("None", TestMode.None);
-    // Elevator Test Modes
+    // Scoring Test Modes
     testModeChooser.addOption("Elevator Tuning", TestMode.ElevatorTuning);
     testModeChooser.addOption("Elevator Characterization", TestMode.ElevatorCharacterization);
+    testModeChooser.addOption("Wrist Voltage Tuning", TestMode.WristVoltageTuning);
+    testModeChooser.addOption("Wrist Closed-Loop Tuning", TestMode.WristClosedLoopTuning);
     testModeChooser.addOption("Claw Tuning", TestMode.ClawTuning);
+    testModeChooser.addOption("Claw Overshoot Tuning", TestMode.ClawOvershootTuning);
+    testModeChooser.addOption("Scoring Setpoint Tuning", TestMode.SetpointTuning);
     // Drive Test Modes
     testModeChooser.addOption(
         "Drive FeedForward Characterization", TestMode.DriveFeedForwardCharacterization);

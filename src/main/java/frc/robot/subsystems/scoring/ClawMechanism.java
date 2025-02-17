@@ -84,4 +84,22 @@ public class ClawMechanism {
         break;
     }
   }
+
+  /**
+   * Check whether the claw currently detects a coral
+   *
+   * @return True if detected, false if not
+   */
+  public boolean isCoralDetected() {
+    return inputs.coralDetected;
+  }
+
+  /**
+   * Check whether the claw currently detects an algae
+   *
+   * @return True if detected, false if not
+   */
+  public boolean isAlgaeDetected() {
+    return inputs.algaeDetected;
+  }
 }

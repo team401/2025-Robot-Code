@@ -65,5 +65,17 @@
     "value": 1.0,
     "unit": "Second"
   },
-  "homingVelocityFilterWindowSize": 5
+  "homingVelocityFilterWindowSize": 5,
+  "maxWristInBelowCrossBarHeight": {
+    "value": 1.0,
+    "unit": "Meter"
+  },
+  "minWristInAboveCrossBarHeight": {
+    "value": 1.1,
+    "unit": "Meter"
+  },
+  "minWristDownHeight": {
+    "value": 0.2,
+    "unit": "Meter"
+  }
 }

@@ -177,6 +177,27 @@ public final class ElevatorConstants {
 
   public final Integer homingVelocityFilterWindowSize = 5;
 
+  /**
+   * This is the maximum height the elevator can reach while the wrist is "in" without smashing it
+   * into the crossbar.
+   */
+  public final Distance maxWristInBelowCrossBarHeight = Meters.of(1.0); // TODO: Real value
+
+  /**
+   * This is the minimum height the elevator can go down to if the wrist is "in" while above the
+   * crossbar.
+   */
+  public final Distance minWristInAboveCrossBarHeight = Meters.of(1.1); // TODO: Real value
+
+  /**
+   * This is the minimum height the elevator can reach while the wrist is down without hitting it on
+   * the chassis below
+   */
+  public final Distance minWristDownHeight = Meters.of(0.2); // TODO: Real value
+
+  /** When within this distance, the elevator is considered "at its setpoint" */
+  public final Distance elevatorSetpointEpsilon = Meters.of(0.05);
+
   public static final class Sim {
     @JSONExclude
     public static final JSONSync<ElevatorConstants.Sim> synced =

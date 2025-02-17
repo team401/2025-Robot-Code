@@ -7,13 +7,15 @@ import coppercore.vision.VisionLocalizer.DistanceToTag;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.drive.Drive.VisionAlignment;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 import org.littletonrobotics.junction.Logger;
 
 public class LineupState implements PeriodicStateInterface {
@@ -23,61 +25,59 @@ public class LineupState implements PeriodicStateInterface {
   private int observationAge;
 
   // along track pid test mode
-  private LoggedTunableNumber alongTrackkP =
+  private LoggedTunableNumber alongTrackKp =
       new LoggedTunableNumber(
-          "DriveLineupGains/AlongTrackkP", JsonConstants.drivetrainConstants.driveAlongTrackkP);
-  private LoggedTunableNumber alongTrackkI =
+          "DriveLineupGains/AlongTrackKp", JsonConstants.drivetrainConstants.driveAlongTrackKp);
+  private LoggedTunableNumber alongTrackKi =
       new LoggedTunableNumber(
-          "DriveLineupGains/AlongTrackkI", JsonConstants.drivetrainConstants.driveAlongTrackkI);
-  private LoggedTunableNumber alongTrackkD =
+          "DriveLineupGains/AlongTrackKi", JsonConstants.drivetrainConstants.driveAlongTrackKi);
+  private LoggedTunableNumber alongTrackKd =
       new LoggedTunableNumber(
-          "DriveLineupGains/AlongTrackkD", JsonConstants.drivetrainConstants.driveAlongTrackkD);
+          "DriveLineupGains/AlongTrackKd", JsonConstants.drivetrainConstants.driveAlongTrackKd);
 
   // cross tack pid test mode
-  private LoggedTunableNumber crossTrackkP =
+  private LoggedTunableNumber crossTrackKp =
       new LoggedTunableNumber(
-          "DriveLineupGains/CrossTrackkP", JsonConstants.drivetrainConstants.driveCrossTrackkP);
-  private LoggedTunableNumber crossTrackkI =
+          "DriveLineupGains/CrossTrackKp", JsonConstants.drivetrainConstants.driveCrossTrackKp);
+  private LoggedTunableNumber crossTrackKi =
       new LoggedTunableNumber(
-          "DriveLineupGains/CrossTrackkI", JsonConstants.drivetrainConstants.driveCrossTrackkI);
-  private LoggedTunableNumber crossTrackkD =
+          "DriveLineupGains/CrossTrackKi", JsonConstants.drivetrainConstants.driveCrossTrackKi);
+  private LoggedTunableNumber crossTrackKd =
       new LoggedTunableNumber(
-          "DriveLineupGains/CrossTrackkD", JsonConstants.drivetrainConstants.driveCrossTrackkD);
+          "DriveLineupGains/CrossTrackKd", JsonConstants.drivetrainConstants.driveCrossTrackKd);
 
   // rotation pid test mode
   private LoggedTunableNumber rotationkP =
       new LoggedTunableNumber(
-          "DriveLineupGains/rotationkP", JsonConstants.drivetrainConstants.driveRotationkP);
+          "DriveLineupGains/rotationkP", JsonConstants.drivetrainConstants.driveRotationKp);
   private LoggedTunableNumber rotationkI =
       new LoggedTunableNumber(
-          "DriveLineupGains/rotationkI", JsonConstants.drivetrainConstants.driveRotationkI);
+          "DriveLineupGains/rotationkI", JsonConstants.drivetrainConstants.driveRotationKi);
   private LoggedTunableNumber rotationkD =
       new LoggedTunableNumber(
-          "DriveLineupGains/rotationkD", JsonConstants.drivetrainConstants.driveRotationkD);
+          "DriveLineupGains/rotationkD", JsonConstants.drivetrainConstants.driveRotationKd);
 
   private PIDController driveAlongTrackLineupController =
       new PIDController(
-          JsonConstants.drivetrainConstants.driveAlongTrackkP,
-          JsonConstants.drivetrainConstants.driveAlongTrackkI,
-          JsonConstants.drivetrainConstants.driveAlongTrackkD);
+          JsonConstants.drivetrainConstants.driveAlongTrackKp,
+          JsonConstants.drivetrainConstants.driveAlongTrackKi,
+          JsonConstants.drivetrainConstants.driveAlongTrackKd);
   private PIDController driveCrossTrackLineupController =
       new PIDController(
-          JsonConstants.drivetrainConstants.driveCrossTrackkP,
-          JsonConstants.drivetrainConstants.driveCrossTrackkI,
-          JsonConstants.drivetrainConstants.driveCrossTrackkD);
+          JsonConstants.drivetrainConstants.driveCrossTrackKp,
+          JsonConstants.drivetrainConstants.driveCrossTrackKi,
+          JsonConstants.drivetrainConstants.driveCrossTrackKd);
 
   private Constraints driveAlongTrackProfileConstraints =
       new Constraints(
           JsonConstants.drivetrainConstants.driveAlongTrackVelocity,
           JsonConstants.drivetrainConstants.driveAlongTrackVelocity);
-  private TrapezoidProfile driveAlongTrackProfile =
-      new TrapezoidProfile(driveAlongTrackProfileConstraints);
 
   private PIDController rotationController =
       new PIDController(
-          JsonConstants.drivetrainConstants.driveRotationkP,
-          JsonConstants.drivetrainConstants.driveRotationkI,
-          JsonConstants.drivetrainConstants.driveRotationkD);
+          JsonConstants.drivetrainConstants.driveRotationKp,
+          JsonConstants.drivetrainConstants.driveRotationKi,
+          JsonConstants.drivetrainConstants.driveRotationKd);
 
   public LineupState(Drive drive) {
     this.drive = drive;
@@ -87,6 +87,13 @@ public class LineupState implements PeriodicStateInterface {
   public void onEntry(Transition transition) {
     // cancel rotation lock on center
     drive.disableAlign();
+
+    // dont rely on previous estimates
+    latestObservation = null;
+    observationAge = 0;
+
+    // begin warming up elevator/wrist when lineup starts
+    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
   }
 
   /**
@@ -139,7 +146,7 @@ public class LineupState implements PeriodicStateInterface {
   public boolean lineupFinished() {
     return latestObservation != null
         && (latestObservation.alongTrackDistance() < 0.01
-            && latestObservation.crossTrackDistance() < 0.01);
+            && Math.abs(latestObservation.crossTrackDistance()) < 0.01);
   }
 
   public void periodic() {
@@ -149,9 +156,9 @@ public class LineupState implements PeriodicStateInterface {
     }
     this.LineupWithReefLocation();
 
-    // if (lineupFinished()) {
-    //   drive.fireTrigger(DriveTrigger.FinishLineup);
-    // }
+    if (lineupFinished()) {
+      drive.fireTrigger(DriveTrigger.FinishLineup);
+    }
   }
 
   /**
@@ -226,6 +233,20 @@ public class LineupState implements PeriodicStateInterface {
     }
   }
 
+  public double getAlongTrackVelocity(double alongTrackDistance) {
+    if (alongTrackDistance < 0) {
+      return 0;
+    }
+
+    double rawVelocity =
+        Math.sqrt(2 * JsonConstants.drivetrainConstants.lineupMaxAcceleration * alongTrackDistance);
+    return Math.min(rawVelocity, JsonConstants.drivetrainConstants.lineupMaxVelocity);
+  }
+
+  public double getAlongTrackVelocityReductionFactor(double crossTrackDistance) {
+    return (0.5 - Math.abs(crossTrackDistance));
+  }
+
   /** take over goal speeds to align to reef exactly */
   public void LineupWithReefLocation() {
     int tagId = this.getTagIdForReef();
@@ -254,8 +275,6 @@ public class LineupState implements PeriodicStateInterface {
       if (latestObservation != null && observationAge < 5) {
         observation = latestObservation;
         observationAge++;
-      } else {
-        return;
       }
     } else {
       latestObservation = observation;
@@ -269,19 +288,8 @@ public class LineupState implements PeriodicStateInterface {
     // give to PID Controllers and setGoalSpeeds (robotCentric)
     double vx =
         JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
-            * driveAlongTrackLineupController.calculate(observation.alongTrackDistance());
-    // ChassisSpeeds speeds = getChassisSpeeds();
-    // Pose2d pose = getPose();
-    // double velocityToTarget = (pose.getX() * speeds.vxMetersPerSecond + pose.getY() *
-    // speeds.vyMetersPerSecond) / Math.sqrt(pose.getX() * pose.getX() + pose.getY() * pose.getY());
-    // double velocityToTarget = -getChassisSpeeds().vxMetersPerSecond;
-    // Logger.recordOutput("Drive/Lineup/velocityToTarget", velocityToTarget);
-    // double vx =
-    //     -driveAlongTrackProfile.calculate(
-    //             0.02,
-    //             new State(observation.alongTrackDistance(), velocityToTarget),
-    //             new State(0, 0))
-    //         .velocity;
+            * getAlongTrackVelocityReductionFactor(observation.crossTrackDistance())
+            * getAlongTrackVelocity(observation.alongTrackDistance());
     double vy = driveCrossTrackLineupController.calculate(observation.crossTrackDistance());
     double omega =
         rotationController.calculate(
@@ -332,17 +340,17 @@ public class LineupState implements PeriodicStateInterface {
             (pid) -> {
               this.setAlongTrackPID(pid[0], pid[1], pid[2]);
             },
-            alongTrackkP,
-            alongTrackkI,
-            alongTrackkD);
+            alongTrackKp,
+            alongTrackKi,
+            alongTrackKd);
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (pid) -> {
               this.setCrossTrackPID(pid[0], pid[1], pid[2]);
             },
-            crossTrackkP,
-            crossTrackkI,
-            crossTrackkD);
+            crossTrackKp,
+            crossTrackKi,
+            crossTrackKd);
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (pid) -> {

@@ -146,7 +146,8 @@ public class OTFState implements PeriodicStateInterface {
             JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
             JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
 
-    return AutoBuilder.pathfindToPose(otfPose, constraints, 0.0);
+    return AutoBuilder.pathfindToPose(
+        otfPose, constraints, JsonConstants.drivetrainConstants.otfPoseEndingVelocity);
   }
 
   public void periodic() {
@@ -164,8 +165,10 @@ public class OTFState implements PeriodicStateInterface {
       Logger.recordOutput("Drive/OTF/commandScheduled", driveToPose.isScheduled());
 
       // this runs when we accidentally go into otf (too close to reef for final pose to be true)
-      if (driveToPose.isFinished()) {
+      if (driveToPose.isFinished() && drive.isDesiredLocationReef()) {
         drive.fireTrigger(DriveTrigger.BeginLineup);
+      } else if (driveToPose.isFinished()) {
+        drive.fireTrigger(DriveTrigger.CancelOTF);
       }
     }
   }

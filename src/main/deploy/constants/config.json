@@ -8,12 +8,14 @@
       "files": [
         "DrivetrainConstants.json",
         "ElevatorConstants.json",
+        "WristConstants.json",
         "ClawConstants.json",
         "FeatureFlags.json",
         "OperatorConstants.json",
         "VisionConstants.json",
         "ScoringFeatureFlags.json",
-        "ScoringSetpoints.json"
+        "ScoringSetpoints.json",
+        "ClimbConstants.json"
       ]
     },
     {
@@ -22,12 +24,14 @@
       "files": [
         "DrivetrainConstants.json",
         "ElevatorConstants.json",
+        "WristConstants.json",
         "ClawConstants.json",
         "FeatureFlags.json",
         "OperatorConstants.json",
         "VisionConstants.json",
         "ScoringFeatureFlags.json",
-        "ScoringSetpoints.json"
+        "ScoringSetpoints.json",
+        "ClimbConstants.json"
       ]
     },
     {
@@ -35,12 +39,19 @@
       "filepath": "hitl",
       "files": [
         "DrivetrainConstants.json",
-        "ElevatorConstants.json",
         "ClawConstants.json",
         "FeatureFlags.json",
         "OperatorConstants.json",
         "ScoringFeatureFlags.json",
-        "ScoringSetpoints.json"
+        "ScoringSetpoints.json",
+        "ClimbConstants.json"
+      ]
+    },
+    {
+      "name": "test_ramp",
+      "filepath": "test_ramp",
+      "files": [
+        "RampConstants.json"
       ]
     }
   ]
