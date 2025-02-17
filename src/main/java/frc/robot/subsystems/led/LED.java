@@ -38,9 +38,9 @@ public class LED extends SubsystemBase {
   private final AddressableLEDBuffer ledStrip = new AddressableLEDBuffer(LEDConstants.totalLength);
 
   // Create views for two sections of the LED strip.
-  private final AddressableLEDBufferView bottomData = ledStrip.createView(0, 252);
+  private final AddressableLEDBufferView bottomData = ledStrip.createView(0, 29);
   // Create the top view starting at LED 253; then reverse the view if needed.
-  private final AddressableLEDBufferView topData = ledStrip.createView(253, 503).reversed();
+  private final AddressableLEDBufferView topData = ledStrip.createView(30, 60).reversed();
 
   // Define patterns for different effects.
   public LEDPattern rainbow =
@@ -51,7 +51,7 @@ public class LED extends SubsystemBase {
   public LEDPattern holdingAlgae =
       LEDPattern.steps(
           Map.of(
-              0, LEDConstants.holdingAlgae, 1 / 3.0, LEDConstants.off, 2 / 3.0, LEDConstants.off));
+              0, LEDConstants.holdingAlgae, 1 / 3.0, LEDConstants.off));
 
   public LEDPattern holdingCoral =
       LEDPattern.steps(
@@ -219,11 +219,12 @@ public class LED extends SubsystemBase {
       @Override
       public void execute() {
         double now = Timer.getFPGATimestamp();
-        if (now - lastTime >= 1.0) { // One second elapsed
-          currentIndex++;
+        if (now - lastTime >= 5.5) { // One second elapsed
+          currentIndex = (currentIndex + 1) % patterns.size();
           if (currentIndex < patterns.size()) {
             // Schedule the next color.
-            runCustomSplitPattern(patterns.get(currentIndex), patterns.get(currentIndex))
+            runCustomSplitPattern(
+                    patterns.get(currentIndex), patterns.get((currentIndex + 1) % patterns.size()))
                 .schedule();
             lastTime = now;
           }
@@ -232,8 +233,7 @@ public class LED extends SubsystemBase {
 
       @Override
       public boolean isFinished() {
-        // Finish once we've cycled through all the patterns.
-        return currentIndex >= patterns.size();
+        return false;
       }
 
       @Override
