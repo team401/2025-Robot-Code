@@ -1,6 +1,7 @@
 package frc.robot.subsystems.ground;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -11,6 +12,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.MutVoltage; 
 import edu.wpi.first.units.measure.Voltage;
@@ -24,7 +26,7 @@ public class GroundIntakeIOTalonFX implements GroundIntakeIO{
     private MutCurrent outputCurrent = Amps.mutable(0.0);
     private VoltageOut voltageRequest = new VoltageOut(outputVoltage);
     
-    private MutAngle goalAngle = Angle.mutable(0.0);
+    private MutAngle goalAngle = Radians.mutable(0.0);
 
     public GroundIntakeIOTalonFX() {
         TalonFXConfiguration shoulderTalonFXConfigs =
