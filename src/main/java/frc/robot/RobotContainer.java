@@ -7,11 +7,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -23,7 +21,6 @@ import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
-import frc.robot.subsystems.LED;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
@@ -44,7 +41,6 @@ public class RobotContainer {
   private VisionLocalizer vision = null;
   private StrategyManager strategyManager = null;
   private AutoStrategyContainer strategyContainer = null;
-  private final LED led = new LED();
 
   private SendableChooser<AutoStrategy> autoChooser = new SendableChooser<>();
 
@@ -148,13 +144,6 @@ public class RobotContainer {
   }
 
   public void teleopInit() {
-    LEDPattern leftPattern = LEDPattern.solid(Color.kBlueViolet);
-    LEDPattern middlePattern = LEDPattern.solid(Color.kDarkBlue);
-    LEDPattern rightPattern = LEDPattern.solid(Color.kCyan);
-
-    // Schedule the command to display the "message" on the three sections.
-    CommandScheduler.getInstance()
-        .schedule(led.getMessageCommand(leftPattern, middlePattern, rightPattern));
 
     strategyManager.setAutonomyMode(AutonomyMode.Teleop);
     // clear leftover actions from auto
