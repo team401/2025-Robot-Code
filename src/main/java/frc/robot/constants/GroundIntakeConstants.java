@@ -1,8 +1,6 @@
 package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Centimeters;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -10,7 +8,6 @@ import coppercore.parameter_tools.json.JSONExclude;
 import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
 import coppercore.parameter_tools.path_provider.EnvironmentHandler;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -26,9 +23,9 @@ public class GroundIntakeConstants {
 
   public final Integer shoulderMotorID = 14; // TODO: Finalize CAN id
   public final Integer rollerMotorID = 15; // TODO: Finalize CAN id
-  
+
   public final InvertedValue kRollerMotorInverted =
-  InvertedValue.Clockwise_Positive; // TODO: Tune this value
+      InvertedValue.Clockwise_Positive; // TODO: Tune this value
 
   public final InvertedValue kShoulderMotorInverted =
       InvertedValue.Clockwise_Positive; // TODO: Tune this value
@@ -41,8 +38,6 @@ public class GroundIntakeConstants {
 
   public final Voltage rollerCollectVoltage = Volts.of(3.0);
   public final Voltage rollerSpitVoltage = Volts.of(-3.0);
-
-  
 
   public static final class Sim {
     @JSONExclude

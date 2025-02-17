@@ -17,16 +17,15 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.SimConstants;
-import frc.robot.subsystems.ground.GroundIntakeIO.GroundIntakeInputs;
-
 import org.littletonrobotics.junction.Logger;
 
 public class GroundIntakeIOSim extends GroundIntakeIOTalonFX {
 
-  CANcoderSimState shoulderCANcoderSimState = shoulderMotor.getSimState();
-  CANcoderSimState rollerCANcoderSimState = rollerMotor.getSimState();
+  //CANcoderSimState shoulderCANcoderSimState = shoulderMotor.getSimState();
+  //CANcoderSimState rollerCANcoderSimState = rollerMotor.getSimState();
 
   TalonFXSimState wristMotorSimState = shoulderMotor.getSimState();
+  TalonFXSimState rollerCancoderSimState = rollerMotor.getSimState();
 
   private final SingleJointedArmSim wristSim =
       new SingleJointedArmSim(
@@ -43,12 +42,12 @@ public class GroundIntakeIOSim extends GroundIntakeIOTalonFX {
     super();
 
     // Initialize sim state so that the first periodic runs with accurate data
-    updateSimState();
+    updateSimStateWrist();
   }
 
   MutAngle lastWristAngle = Radians.mutable(0.0);
 
-  private void updateSimState() {
+  private void updateSimStateWrist() {
     Angle wristAngle = Radians.of(wristSim.getAngleRads());
     AngularVelocity wristVelocity = RadiansPerSecond.of(wristSim.getVelocityRadPerSec());
 
@@ -56,8 +55,12 @@ public class GroundIntakeIOSim extends GroundIntakeIOTalonFX {
     lastWristAngle.mut_replace(wristAngle);
 
     // 1:1 ratio of wrist to CANcoder makes this math very easy
-    wristCANcoderSimState.addPosition(diffAngle);
-    wristCANcoderSimState.setVelocity(wristVelocity);
+    //wristMotorSimState.setRawRotorPosition(diffAngle);
+    //wristMotorSimState.setRotorVelocity(wristVelocity);
+
+    // TODO Check if above was true meaning?
+    // wristCANcoderSimState.addPosition(diffAngle);
+    // wristCANcoderSimState.setVelocity(wristVelocity);
 
     Angle rotorDiffAngle = diffAngle.times(JsonConstants.wristConstants.wristReduction);
     AngularVelocity rotorVelocity =
@@ -72,12 +75,15 @@ public class GroundIntakeIOSim extends GroundIntakeIOTalonFX {
     Logger.recordOutput("wristSim/position", wristAngle.in(Rotations));
   }
 
+  private void updateSimStateRoller() {}
+
   @Override
-  public void updateInputs(GroundIntakeInputs inputs) {
-    updateSimState();
+  public void updateWristInputs(GroundIntakeInputs inputs) {
+    updateSimStateWrist();
 
     wristSim.update(SimConstants.simDeltaTime.in(Seconds));
 
-    super.updateInputs(inputs);
+    super.updateWristInputs(inputs);
   }
+
 }
