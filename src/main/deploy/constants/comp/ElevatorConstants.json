@@ -51,18 +51,18 @@
     "unit": "Meter"
   },
   "medianFilterWindowSize": 10,
-  "ignoreCRT": false,
+  "ignoreCRT": true,
   "homingVoltage": {
     "value": -3.0,
     "unit": "Volt"
   },
-  "homingVelocityThresholdMetersPerSecond": 0.001,
+  "homingVelocityThresholdMetersPerSecond": 0.1,
   "homingMaxTime": {
     "value": 3.0,
     "unit": "Second"
   },
   "homingMaxUnmovingTime": {
-    "value": 1.0,
+    "value": 0.25,
     "unit": "Second"
   },
   "homingVelocityFilterWindowSize": 5,

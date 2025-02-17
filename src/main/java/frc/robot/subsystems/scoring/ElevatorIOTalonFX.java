@@ -87,7 +87,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     // Update with large CANcoder direction and apply
     cancoderConfiguration.MagnetSensor.SensorDirection =
         ElevatorConstants.synced.getObject().elevatorLargeCANCoderDirection;
-    cancoderConfiguration.MagnetSensor.MagnetOffset = -0.0302734375;
+    cancoderConfiguration.MagnetSensor.MagnetOffset = -0.026123046875;
     largeCANCoder.getConfigurator().apply(cancoderConfiguration);
 
     largeCANcoderAbsolutePosition = largeCANCoder.getAbsolutePosition();
@@ -97,7 +97,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     // Update with small CANcoder direction and apply
     cancoderConfiguration.MagnetSensor.SensorDirection =
         ElevatorConstants.synced.getObject().elevatorSmallCANCoderDirection;
-    cancoderConfiguration.MagnetSensor.MagnetOffset = -0.440185546875;
+    cancoderConfiguration.MagnetSensor.MagnetOffset = 0.000244;
     smallCANCoder.getConfigurator().apply(cancoderConfiguration);
 
     // Initialize talonFXConfigs to use FusedCANCoder and Motion Magic Expo and have correct PID
@@ -213,6 +213,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
               Volts.of(leadMotor.getClosedLoopDerivativeOutput().getValueAsDouble()));
           break;
         case Voltage:
+          leadMotor.setControl(new VoltageOut(overrideVoltage));
+          outputs.elevatorAppliedVolts.mut_replace(overrideVoltage);
           break;
         case Current:
           leadMotor.setControl(currentOut.withOutput(overrideCurrent));

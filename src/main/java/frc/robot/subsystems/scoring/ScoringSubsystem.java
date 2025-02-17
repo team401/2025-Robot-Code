@@ -229,6 +229,9 @@ public class ScoringSubsystem extends SubsystemBase {
             () -> !(clawMechanism.isCoralDetected() || clawMechanism.isAlgaeDetected()));
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, ScoringState.Init);
+
+    // Manually call the onEntry for init, since we didn't transition into it
+    stateMachine.getCurrentState().state.onEntry(null);
   }
 
   /**
