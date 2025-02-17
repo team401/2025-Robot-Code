@@ -48,72 +48,26 @@ public class LED extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Continuously update the LED strip with the current buffer data.
-    led.setData(ledBuffer);
+    led.setData(ledData);
   }
 
-  /** Returns a command that continuously applies the rainbow pattern to the entire LED strip. */
-  public Command getRainbowCommand() {
-    return new Command() {
-      {
-        addRequirements(LED.this);
-      }
-
-      @Override
-      public void execute() {
-        // Apply the rainbow pattern across the entire strip.
-        rainbow.applyTo(ledBuffer);
-      }
-
-      @Override
-      public boolean isFinished() {
-        return false;
-      }
-    };
+  public void enabled(boolean enabled) {
+    if (enabled) {
+      led.start();
+    } else {
+      led.stop();
+    }
   }
 
-  /**
-   * Returns a command that continuously applies distinct patterns to each third of the LED strip.
-   * Use this to "send messages" by displaying different effects on the left, middle, and right
-   * sections.
-   *
-   * @param leftPattern The pattern for the left third.
-   * @param middlePattern The pattern for the middle third.
-   * @param rightPattern The pattern for the right third.
-   * @return a command that applies these patterns continuously.
-   */
-  public Command getMessageCommand(
-      LEDPattern leftPattern, LEDPattern middlePattern, LEDPattern rightPattern) {
-    return new Command() {
-      {
-        addRequirements(LED.this);
-      }
-
-      @Override
-      public void execute() {
-        leftPattern.applyTo(leftData);
-        middlePattern.applyTo(middleData);
-        rightPattern.applyTo(rightData);
-      }
-
-      @Override
-      public boolean isFinished() {
-        return false;
-      }
-    };
+  public Command run(LEDPattern pattern) {
+    return runSplitPatterns(pattern, pattern);
   }
 
-  // Optionally, helper methods to apply patterns to individual sections:
-
-  public void runPatternOnLeft(LEDPattern pattern) {
-    pattern.applyTo(leftData);
-  }
-
-  public void runPatternOnMiddle(LEDPattern pattern) {
-    pattern.applyTo(middleData);
-  }
-
-  public void runPatternOnRight(LEDPattern pattern) {
-    pattern.applyTo(rightData);
+  public Command runSplitPatterns(LEDPattern left, LEDPattern right) {
+    return run(
+        () -> {
+          left.applyTo(leftData);
+          right.applyTo(rightData);
+        });
   }
 }
