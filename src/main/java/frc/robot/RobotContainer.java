@@ -1,17 +1,13 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
 
 import coppercore.vision.VisionLocalizer;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -24,20 +20,15 @@ import frc.robot.constants.AutoStrategy;
 import frc.robot.constants.AutoStrategyContainer;
 import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
-import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
-
 import java.io.File;
-
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
-
-import static edu.wpi.first.units.Units.Radians;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -71,7 +62,7 @@ public class RobotContainer {
     if (climbSubsystem != null) {
       climb_rotation = climbSubsystem.getRotation().magnitude();
     }
-    if (rampSubsystem != null){
+    if (rampSubsystem != null) {
       ramp_rotation = rampSubsystem.getPosition();
     }
     height = Math.min(height, 1.87);
@@ -132,10 +123,10 @@ public class RobotContainer {
   public void configureSubsystems() {
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
-      if (ModeConstants.simMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
-        drive.setPose(
-            new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
-      }
+      // if (ModeConstants.simMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
+      //   drive.setPose(
+      //       new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
+      // }
       if (FeatureFlags.synced.getObject().runVision) {
         vision = InitSubsystems.initVisionSubsystem(drive);
 
