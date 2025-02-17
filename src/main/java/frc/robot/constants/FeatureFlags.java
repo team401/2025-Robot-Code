@@ -15,7 +15,8 @@ public final class FeatureFlags {
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
   public Boolean runDrive = true;
-  public final Boolean runScoring = true;
+  public Boolean runVision = true;
+  public final Boolean runScoring = false;
   // public final Boolean runElevator = true; // TODO: Figure out if we need Mechanism-level feature
   // flags
   // public final Boolean runClaw = true;

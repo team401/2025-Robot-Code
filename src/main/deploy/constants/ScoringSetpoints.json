@@ -1,68 +1,134 @@
 {
   "idle": {
+    "name": "Idle",
     "elevatorHeight": {
       "value": 1.5,
       "unit": "Inch"
+    },
+    "wristAngle": {
+      "value": 0.0,
+      "unit": "Rotation"
     }
   },
-  "L1": {
-    "elevatorHeight": {
-      "value": 0.05,
-      "unit": "Meter"
-    }
-  },
-  "L2": {
-    "elevatorHeight": {
-      "value": 0.25,
-      "unit": "Meter"
-    }
-  },
-  "L3": {
-    "elevatorHeight": {
-      "value": 0.5,
-      "unit": "Meter"
-    }
-  },
-  "L4": {
-    "elevatorHeight": {
-      "value": 0.75,
-      "unit": "Meter"
-    }
-  },
-  "L2algae": {
+  "idleWithAlgae": {
+    "name": "IdleWithAlgae",
     "elevatorHeight": {
       "value": 0.2,
       "unit": "Meter"
+    },
+    "wristAngle": {
+      "value": -0.75,
+      "unit": "Rotation"
     }
   },
-  "L3algae": {
-    "elevatorHeight": {
-      "value": 0.4,
-      "unit": "Meter"
-    }
-  },
-  "coralStation": {
+  "L1": {
+    "name": "L1",
     "elevatorHeight": {
       "value": 1.0,
       "unit": "Meter"
+    },
+    "wristAngle": {
+      "value": 0.0,
+      "unit": "Rotation"
     }
   },
-  "processor": {
+  "L2": {
+    "name": "L2",
+    "elevatorHeight": {
+      "value": 1.5,
+      "unit": "Meter"
+    },
+    "wristAngle": {
+      "value": -0.15,
+      "unit": "Rotation"
+    }
+  },
+  "L3": {
+    "name": "L3",
+    "elevatorHeight": {
+      "value": 2.0,
+      "unit": "Meter"
+    },
+    "wristAngle": {
+      "value": -0.15,
+      "unit": "Rotation"
+    }
+  },
+  "L4": {
+    "name": "L4",
+    "elevatorHeight": {
+      "value": 2.5,
+      "unit": "Meter"
+    },
+    "wristAngle": {
+      "value": -0.25,
+      "unit": "Rotation"
+    }
+  },
+  "L2algae": {
+    "name": "L2algae",
+    "elevatorHeight": {
+      "value": 1.8,
+      "unit": "Meter"
+    },
+    "wristAngle": {
+      "value": -0.75,
+      "unit": "Rotation"
+    }
+  },
+  "L3algae": {
+    "name": "L3algae",
+    "elevatorHeight": {
+      "value": 2.3,
+      "unit": "Meter"
+    },
+    "wristAngle": {
+      "value": -0.75,
+      "unit": "Rotation"
+    }
+  },
+  "coralStation": {
+    "name": "coralStation",
     "elevatorHeight": {
       "value": 0.1,
       "unit": "Meter"
+    },
+    "wristAngle": {
+      "value": 0.1,
+      "unit": "Rotation"
+    }
+  },
+  "processor": {
+    "name": "processor",
+    "elevatorHeight": {
+      "value": 0.1,
+      "unit": "Meter"
+    },
+    "wristAngle": {
+      "value": -0.75,
+      "unit": "Rotation"
     }
   },
   "net": {
+    "name": "net",
     "elevatorHeight": {
       "value": 1.25,
       "unit": "Meter"
+    },
+    "wristAngle": {
+      "value": -0.75,
+      "unit": "Rotation"
     }
   },
   "ground": {
+    "name": "ground",
     "elevatorHeight": {
-      "value": 0.0,
+      "value": 0.2,
       "unit": "Meter"
+    },
+    "wristAngle": {
+      "value": -0.75,
+      "unit": "Rotation"
     }
   }
 }
