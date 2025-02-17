@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import coppercore.vision.VisionLocalizer;
-import coppercore.wpilib_interface.tuning.TuneG;
 import coppercore.wpilib_interface.tuning.TuneS;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
