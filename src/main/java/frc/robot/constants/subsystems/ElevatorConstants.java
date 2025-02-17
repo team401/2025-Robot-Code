@@ -71,7 +71,7 @@ public final class ElevatorConstants {
   public final Double elevatorCANCoderDiscontinuityPoint = 1.0;
 
   // TODO: Tune encoder directions!
-  public final int elevatorLargeCANCoderID = 11;
+  public final Integer elevatorLargeCANCoderID = 11;
   public final Boolean isLargeCANcoderClockwisePositive = true;
 
   @JSONExclude
@@ -80,7 +80,7 @@ public final class ElevatorConstants {
           ? SensorDirectionValue.CounterClockwise_Positive
           : SensorDirectionValue.Clockwise_Positive;
 
-  public final int elevatorSmallCANCoderID = 12;
+  public final Integer elevatorSmallCANCoderID = 12;
   public final Boolean isSmallCANcoderClockwisePositive = true;
 
   @JSONExclude

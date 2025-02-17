@@ -18,6 +18,7 @@ import frc.robot.StrategyManager.AutonomyMode;
 import frc.robot.commands.drive.AkitDriveCommands;
 import frc.robot.constants.AutoStrategy;
 import frc.robot.constants.AutoStrategyContainer;
+import frc.robot.constants.ClimbConstants;
 import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
@@ -101,6 +102,7 @@ public class RobotContainer {
     JsonConstants.loadConstants();
     FeatureFlags.synced.loadData();
     OperatorConstants.synced.loadData();
+    ClimbConstants.synced.loadData();
   }
 
   public void configureAutos() {

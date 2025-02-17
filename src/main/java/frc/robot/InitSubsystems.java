@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.subsystems.climb.ClimbIOSim;
+import frc.robot.subsystems.climb.ClimbIOTalonFX;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConfiguration;
@@ -89,7 +90,7 @@ public final class InitSubsystems {
   public static ClimbSubsystem initClimbSubsystem() {
     switch (ModeConstants.currentMode) {
       case REAL:
-        throw new UnsupportedOperationException("Climb real functions are not yet implemented.");
+        return new ClimbSubsystem(new ClimbIOTalonFX());
       case SIM:
       case MAPLESIM:
         return new ClimbSubsystem(new ClimbIOSim());
