@@ -149,7 +149,6 @@ public class RobotContainer {
     strategyManager.addActionsFromAutoStrategy(autoChooser.getSelected());
 
     led.enabled(FeatureFlags.synced.getObject().runLEDs);
-  
   }
 
   public void teleopInit() {
