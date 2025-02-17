@@ -11,6 +11,7 @@ public final class BuildConstants {
   public static final String GIT_BRANCH = "camera-updates";
   public static final String BUILD_DATE = "2025-02-17 13:56:50 EST";
   public static final long BUILD_UNIX_TIME = 1739818610497L;
+
   public static final int DIRTY = 0;
 
   private BuildConstants() {}

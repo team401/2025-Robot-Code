@@ -1,6 +1,7 @@
 package frc.robot.subsystems.scoring;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 
 import coppercore.controls.state_machine.StateMachine;
@@ -9,7 +10,9 @@ import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.state.StateContainer;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Voltage;
@@ -17,7 +20,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
+import frc.robot.subsystems.scoring.ElevatorIO.ElevatorOutputMode;
 import frc.robot.subsystems.scoring.states.IdleState;
+import frc.robot.subsystems.scoring.states.InitState;
 import frc.robot.subsystems.scoring.states.IntakeState;
 import frc.robot.subsystems.scoring.states.ScoreState;
 import frc.robot.subsystems.scoring.states.WarmupState;
@@ -138,6 +143,7 @@ public class ScoringSubsystem extends SubsystemBase {
   private GamePiece currentPiece = GamePiece.Coral;
 
   private enum ScoringState implements StateContainer {
+    Init(new InitState(instance)),
     Idle(new IdleState(instance)),
     Intake(new IntakeState(instance)),
     Warmup(new WarmupState(instance)),
@@ -156,6 +162,7 @@ public class ScoringSubsystem extends SubsystemBase {
   }
 
   public enum ScoringTrigger {
+    Seeded,
     BeginIntake,
     DoneIntaking,
     CancelAction,
@@ -181,6 +188,10 @@ public class ScoringSubsystem extends SubsystemBase {
     instance = this;
 
     stateMachineConfiguration = new StateMachineConfiguration<>();
+
+    stateMachineConfiguration
+        .configure(ScoringState.Init)
+        .permit(ScoringTrigger.Seeded, ScoringState.Idle);
 
     stateMachineConfiguration
         .configure(ScoringState.Idle)
@@ -217,7 +228,10 @@ public class ScoringSubsystem extends SubsystemBase {
             ScoringState.Intake,
             () -> !(clawMechanism.isCoralDetected() || clawMechanism.isAlgaeDetected()));
 
-    stateMachine = new StateMachine<>(stateMachineConfiguration, ScoringState.Idle);
+    stateMachine = new StateMachine<>(stateMachineConfiguration, ScoringState.Init);
+
+    // Manually call the onEntry for init, since we didn't transition into it
+    stateMachine.getCurrentState().state.onEntry(null);
   }
 
   /**
@@ -242,6 +256,24 @@ public class ScoringSubsystem extends SubsystemBase {
    */
   public void fireTrigger(ScoringTrigger trigger) {
     stateMachine.fire(trigger);
+  }
+
+  /**
+   * Set whether or not the elevator should override and manually apply a voltage/current, or if it
+   * should used closed-loop
+   *
+   * @param outputMode ClosedLoop, Voltage, or Current
+   */
+  public void setElevatorOverrideMode(ElevatorOutputMode outputMode) {
+    elevatorMechanism.setOutputMode(outputMode);
+  }
+
+  public void setElevatorOverrideCurrent(Current current) {
+    elevatorMechanism.setOverrideCurrent(current);
+  }
+
+  public void setElevatorOverrideVoltage(Voltage volts) {
+    elevatorMechanism.setOverrideVoltage(volts);
   }
 
   /**
@@ -282,13 +314,28 @@ public class ScoringSubsystem extends SubsystemBase {
    *
    * <p>This height is determined by the {@link ElevatorMechanism}.
    *
-   * @return
+   * @return Current elevator height
    */
   public Distance getElevatorHeight() {
     if (JsonConstants.scoringFeatureFlags.runElevator) {
       return elevatorMechanism.getElevatorHeight();
     } else {
       return Meters.zero();
+    }
+  }
+
+  /**
+   * Get the current velocity of the elevator.
+   *
+   * <p>This velocity is determined by the {@link ElevatorMechanism}.
+   *
+   * @return Current elevator velocity
+   */
+  public LinearVelocity getElevatorVelocity() {
+    if (JsonConstants.scoringFeatureFlags.runElevator) {
+      return elevatorMechanism.getElevatorVelocity();
+    } else {
+      return MetersPerSecond.of(0.0);
     }
   }
 
@@ -487,6 +534,32 @@ public class ScoringSubsystem extends SubsystemBase {
 
     if (JsonConstants.scoringFeatureFlags.runClaw) {
       clawMechanism.testPeriodic();
+    }
+  }
+
+  /**
+   * Get the Scoring subsystem's ElevatorMechanism instance.
+   *
+   * <p>This should ONLY be used to create Tunable commands from the elevator.
+   *
+   * @return the ElevatorMechanism that scoring uses
+   */
+  public ElevatorMechanism getElevatorMechanismForTuning() {
+    return elevatorMechanism;
+  }
+
+  /**
+   * Has the elevator position been seeded yet?
+   *
+   * @return True if it has been seeded, false if it hasn't been seeded.
+   */
+  public boolean hasBeenSeeded() {
+    return elevatorMechanism.hasBeenSeeded();
+  }
+
+  public void seedElevatorToZero() {
+    if (elevatorMechanism != null) {
+      elevatorMechanism.seedToZero();
     }
   }
 
