@@ -66,9 +66,11 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
             (double) ElevatorConstants.synced.getObject().spoolTeeth
                 / (double) ElevatorConstants.synced.getObject().largeCANCoderTeeth);
     Angle smallEncoderRotations =
-        spoolRotations.times(
-            (double) ElevatorConstants.synced.getObject().spoolTeeth
-                / (double) ElevatorConstants.synced.getObject().smallCANCoderTeeth);
+        spoolRotations
+            .times(
+                (double) ElevatorConstants.synced.getObject().spoolTeeth
+                    / (double) ElevatorConstants.synced.getObject().smallCANCoderTeeth)
+            .times(-1);
 
     Angle motorRotations =
         spoolRotations.times(ElevatorConstants.synced.getObject().elevatorReduction);
@@ -98,9 +100,11 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
             (double) ElevatorConstants.synced.getObject().spoolTeeth
                 / (double) ElevatorConstants.synced.getObject().largeCANCoderTeeth);
     AngularVelocity smallEncoderVelocity =
-        spoolVelocity.times(
-            (double) ElevatorConstants.synced.getObject().spoolTeeth
-                / (double) ElevatorConstants.synced.getObject().smallCANCoderTeeth);
+        spoolVelocity
+            .times(
+                (double) ElevatorConstants.synced.getObject().spoolTeeth
+                    / (double) ElevatorConstants.synced.getObject().smallCANCoderTeeth)
+            .times(-1);
 
     largeCANcoderSimState.setRawPosition(largeEncoderRotations);
     largeCANcoderSimState.setVelocity(largeEncoderVelocity);
