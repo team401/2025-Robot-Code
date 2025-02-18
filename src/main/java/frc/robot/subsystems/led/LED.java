@@ -49,9 +49,7 @@ public class LED extends SubsystemBase {
   public LEDPattern lockedOnHang = LEDPattern.solid(LEDConstants.lockedOnHang);
 
   public LEDPattern holdingAlgae =
-      LEDPattern.steps(
-          Map.of(
-              0, LEDConstants.holdingAlgae, 1 / 3.0, LEDConstants.off));
+      LEDPattern.steps(Map.of(0, LEDConstants.holdingAlgae, 1 / 3.0, LEDConstants.off));
 
   public LEDPattern holdingCoral =
       LEDPattern.steps(
