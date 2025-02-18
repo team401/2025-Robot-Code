@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
 
+import coppercore.math.Deadband;
 import coppercore.parameter_tools.LoggedTunableNumber;
 import coppercore.wpilib_interface.UnitUtils;
 import coppercore.wpilib_interface.tuning.Tunable;
@@ -32,6 +33,7 @@ import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.subsystems.ElevatorConstants;
 import frc.robot.subsystems.scoring.ElevatorIO.ElevatorOutputMode;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorMechanism implements Tunable {
@@ -69,6 +71,8 @@ public class ElevatorMechanism implements Tunable {
       new MedianFilter(JsonConstants.elevatorConstants.medianFilterWindowSize);
   MedianFilter smallCANcoderFilter =
       new MedianFilter(JsonConstants.elevatorConstants.medianFilterWindowSize);
+
+  DoubleSupplier tuningHeightSetpointAdjustmentSupplier = () -> 0.0;
 
   public ElevatorMechanism(ElevatorIO io) {
     elevatorkP =
@@ -196,6 +200,19 @@ public class ElevatorMechanism implements Tunable {
 
       case SetpointTuning:
         // Allow setpointing the elevator in ElevatorTuning and SetpointTuning modes
+        final double deadband = 0.17;
+
+        double deadbandedJoystick =
+            Deadband.oneAxisDeadband(
+                tuningHeightSetpointAdjustmentSupplier.getAsDouble(), deadband);
+
+        if (Math.abs(deadbandedJoystick) > deadband) {
+          elevatorTuningSetpointMeters =
+              new LoggedTunableNumber(
+                  "ElevatorTunables/elevatorTuningSetpointMeters",
+                  goalHeight.in(Meters) + deadbandedJoystick * 0.02);
+        }
+
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (setpoint) -> {
@@ -453,6 +470,14 @@ public class ElevatorMechanism implements Tunable {
   /** Set whether or not the motors on the elevator should be disabled. */
   public void setMotorsDisabled(boolean disabled) {
     io.setMotorsDisabled(disabled);
+  }
+
+  /**
+   * Set the supplier used to get the value of the joystick used to move the elevator setpoint in
+   * setpoint tuning mode
+   */
+  public void setTuningHeightSetpointAdjustmentSupplier(DoubleSupplier newSupplier) {
+    this.tuningHeightSetpointAdjustmentSupplier = newSupplier;
   }
 
   // ===== Tunable definitions: =====

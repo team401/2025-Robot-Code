@@ -27,6 +27,7 @@ import frc.robot.subsystems.scoring.states.IntakeState;
 import frc.robot.subsystems.scoring.states.ScoreState;
 import frc.robot.subsystems.scoring.states.WarmupState;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -514,10 +515,10 @@ public class ScoringSubsystem extends SubsystemBase {
   /** This method must be called by RobotContainer, as it does not run automatically! */
   public void testPeriodic() {
     switch (TestModeManager.getTestMode()) {
+      case SetpointTuning:
       case ElevatorTuning:
       case WristClosedLoopTuning:
       case WristVoltageTuning:
-      case SetpointTuning:
         setOverrideStateMachine(true);
         break;
       default:
@@ -635,6 +636,16 @@ public class ScoringSubsystem extends SubsystemBase {
 
     elevatorMechanism.setAllowedRangeOfMotion(elevatorMinHeight, elevatorMaxHeight);
     wristMechanism.setAllowedRangeOfMotion(wristMinAngle, wristMaxAngle);
+  }
+
+  /**
+   * Set the supplier used to get the value of the joystick used to move the elevator setpoint in
+   * setpoint tuning mode
+   */
+  public void setTuningHeightSetpointAdjustmentSupplier(DoubleSupplier newSupplier) {
+    if (elevatorMechanism != null) {
+      elevatorMechanism.setTuningHeightSetpointAdjustmentSupplier(newSupplier);
+    }
   }
 
   /**

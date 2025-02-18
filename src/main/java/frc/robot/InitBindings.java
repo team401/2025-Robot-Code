@@ -205,6 +205,9 @@ public final class InitBindings {
                     () -> {
                       ScoringSubsystem.getInstance().setClawRollerVoltage(Volts.zero());
                     }));
+
+        ScoringSubsystem.getInstance()
+            .setTuningHeightSetpointAdjustmentSupplier(() -> driverController.getLeftY());
       default:
         break;
     }
