@@ -4,7 +4,7 @@
   "sensorToMechanismRatio": 1.0,
   "wristReduction": 20.0,
   "wristMotorInvertedValue": "Clockwise_Positive",
-  "wristNeutralModeValue": "Coast",
+  "wristNeutralModeValue": "Brake",
   "wristSupplyCurrentLimit": {
     "value": 40.0,
     "unit": "Amp"
@@ -21,7 +21,7 @@
   "wristKS": 0.2,
   "wristKV": 0.0,
   "wristKA": 0.0,
-  "wristKP": 0.15,
+  "wristKP": 15,
   "wristKI": 0.0,
   "wristKD": 0.5,
   "wristMotionMagicCruiseVelocityRotationsPerSecond": 0.1,
