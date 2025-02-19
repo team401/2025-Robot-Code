@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /** Object to handle switching between test modes. */
 public class TestModeManager {
   public enum TestMode {
+    RampTuning,
     ElevatorTuning,
     ElevatorCharacterization,
     WristVoltageTuning,
@@ -35,6 +36,8 @@ public class TestModeManager {
     testModeChooser = new SendableChooser<TestMode>();
 
     testModeChooser.setDefaultOption("None", TestMode.None);
+    // Ramp Test Mode
+    testModeChooser.addOption("Ramp Tuning", TestMode.RampTuning);
     // Scoring Test Modes
     testModeChooser.addOption("Elevator Tuning", TestMode.ElevatorTuning);
     testModeChooser.addOption("Elevator Characterization", TestMode.ElevatorCharacterization);

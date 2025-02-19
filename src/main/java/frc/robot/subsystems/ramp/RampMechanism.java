@@ -1,12 +1,33 @@
 package frc.robot.subsystems.ramp;
 
-import frc.robot.constants.JsonConstants;
 import org.littletonrobotics.junction.Logger;
+
+import coppercore.parameter_tools.LoggedTunableNumber;
+import frc.robot.TestModeManager;
+import frc.robot.constants.JsonConstants;
 
 public class RampMechanism {
   RampIO io;
   RampInputsAutoLogged inputs = new RampInputsAutoLogged();
   RampOutputsAutoLogged outputs = new RampOutputsAutoLogged();
+
+  LoggedTunableNumber tunablePosition;
+
+  public void testPeriodic(){
+    switch (TestModeManager.getTestMode()) {
+      case RampTuning:
+        LoggedTunableNumber.ifChanged(
+                hashCode(),
+                (pos) -> {
+                  position = pos[0];
+                  outputs.targetPosition = position;
+                },
+                tunablePosition);
+        break;
+      default:
+      break;
+    }
+  }
 
   public double position = 1.0;
   public boolean inPosition = false;
