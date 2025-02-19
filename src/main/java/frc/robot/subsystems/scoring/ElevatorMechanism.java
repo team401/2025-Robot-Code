@@ -29,7 +29,6 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Per;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.subsystems.ElevatorConstants;
@@ -208,10 +207,9 @@ public class ElevatorMechanism implements Tunable {
                 tuningHeightSetpointAdjustmentSupplier.getAsDouble(), deadband);
 
         if (Math.abs(deadbandedJoystick) > deadband) {
-          double newGoalHeightMeters = goalHeight.in(Meters) + deadbandedJoystick * 0.02;
-          SmartDashboard.putNumber(
-              "TunableNumbers/ElevatorTunables/elevatorTuningSetpointMeters", newGoalHeightMeters);
-          setGoalHeight(Meters.of(newGoalHeightMeters));
+          double newGoalHeightMeters =
+              elevatorTuningSetpointMeters.getAsDouble() + deadbandedJoystick * 0.02;
+          elevatorTuningSetpointMeters.setValue(newGoalHeightMeters);
         }
 
         LoggedTunableNumber.ifChanged(
