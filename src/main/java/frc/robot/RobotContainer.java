@@ -1,8 +1,11 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import coppercore.vision.VisionLocalizer;
+import coppercore.wpilib_interface.tuning.TuneS;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -12,6 +15,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.StrategyManager.AutonomyMode;
 import frc.robot.commands.drive.AkitDriveCommands;
@@ -23,6 +28,7 @@ import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.led.LED;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import java.io.File;
@@ -36,6 +42,7 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here
+  private RampSubsystem rampSubsystem = null;
   private ScoringSubsystem scoringSubsystem = null;
   private Drive drive = null;
   private ClimbSubsystem climbSubsystem = null;
@@ -97,6 +104,9 @@ public class RobotContainer {
         drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
       }
     }
+    if (FeatureFlags.synced.getObject().runRamp) {
+      rampSubsystem = InitSubsystems.initRampSubsystem();
+    }
     if (FeatureFlags.synced.getObject().runClimb) {
       climbSubsystem = InitSubsystems.initClimbSubsystem();
     }
@@ -109,7 +119,6 @@ public class RobotContainer {
         scoringSubsystem.setIsDriveLinedUpSupplier(() -> true);
       }
     }
-
     strategyManager = new StrategyManager(drive, scoringSubsystem);
   }
 
@@ -123,6 +132,9 @@ public class RobotContainer {
     // initialize helper commands
     if (FeatureFlags.synced.getObject().runDrive) {
       InitBindings.initDriveBindings(drive);
+    }
+    if (FeatureFlags.synced.getObject().runRamp) {
+      InitBindings.initRampBindings(rampSubsystem);
     }
     if (FeatureFlags.synced.getObject().runClimb) {
       InitBindings.initClimbBindings(climbSubsystem);
@@ -157,6 +169,17 @@ public class RobotContainer {
     InitBindings.initTestModeBindings();
 
     switch (TestModeManager.getTestMode()) {
+      case ElevatorCharacterization:
+        scoringSubsystem.setOverrideStateMachine(true);
+        CommandScheduler.getInstance()
+            .schedule(
+                new SequentialCommandGroup(
+                    new WaitCommand(2.0),
+                    new TuneS(
+                        scoringSubsystem.getElevatorMechanismForTuning(),
+                        RotationsPerSecond.of(0.001),
+                        0.1)));
+        break;
       case DriveFeedForwardCharacterization:
         CommandScheduler.getInstance()
             .schedule(AkitDriveCommands.feedforwardCharacterization(drive));

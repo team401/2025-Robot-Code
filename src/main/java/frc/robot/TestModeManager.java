@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class TestModeManager {
   public enum TestMode {
     ElevatorTuning,
+    ElevatorCharacterization,
     WristVoltageTuning,
     WristClosedLoopTuning,
     ClawTuning,
@@ -37,6 +38,7 @@ public class TestModeManager {
     testModeChooser.setDefaultOption("None", TestMode.None);
     // Scoring Test Modes
     testModeChooser.addOption("Elevator Tuning", TestMode.ElevatorTuning);
+    testModeChooser.addOption("Elevator Characterization", TestMode.ElevatorCharacterization);
     testModeChooser.addOption("Wrist Voltage Tuning", TestMode.WristVoltageTuning);
     testModeChooser.addOption("Wrist Closed-Loop Tuning", TestMode.WristClosedLoopTuning);
     testModeChooser.addOption("Claw Tuning", TestMode.ClawTuning);
