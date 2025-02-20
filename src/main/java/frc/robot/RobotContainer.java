@@ -83,7 +83,7 @@ public class RobotContainer {
               new Translation3d(-0.16, 0.31, 0.115), new Rotation3d(climb_rotation, 0.0, 0.0)),
           new Pose3d(
               new Translation3d(0.34, 0.12, height + 0.35),
-              new Rotation3d(0.0, -claw_rotation + 0.465719787, 0.0)),
+              new Rotation3d(0.0, claw_rotation + 0.465719787 * 180.0, 0.0)),
           new Pose3d(new Translation3d(0.0, 0.0, height), new Rotation3d(0.0, 0.0, 0.0)),
           new Pose3d(new Translation3d(0.0, 0.0, stage_two_height), new Rotation3d(0.0, 0.0, 0.0)),
           new Pose3d(new Translation3d(0.0, 0.0, stage_one_height), new Rotation3d(0.0, 0.0, 0.0))
