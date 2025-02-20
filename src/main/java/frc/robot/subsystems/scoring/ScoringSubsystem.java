@@ -16,8 +16,10 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.TestModeManager;
+import frc.robot.TestModeManager.TestMode;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.ElevatorIO.ElevatorOutputMode;
@@ -25,6 +27,7 @@ import frc.robot.subsystems.scoring.states.IdleState;
 import frc.robot.subsystems.scoring.states.InitState;
 import frc.robot.subsystems.scoring.states.IntakeState;
 import frc.robot.subsystems.scoring.states.ScoreState;
+import frc.robot.subsystems.scoring.states.TuningState;
 import frc.robot.subsystems.scoring.states.WarmupState;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -149,7 +152,8 @@ public class ScoringSubsystem extends SubsystemBase {
     Idle(new IdleState(instance)),
     Intake(new IntakeState(instance)),
     Warmup(new WarmupState(instance)),
-    Score(new ScoreState(instance));
+    Score(new ScoreState(instance)),
+    Tuning(new TuningState(instance));
 
     private final PeriodicStateInterface state;
 
@@ -173,11 +177,22 @@ public class ScoringSubsystem extends SubsystemBase {
     WarmupReady,
     ScoredPiece,
     ReturnToIdle, // Return to idle when a warmup/score state no longer detects a gamepiece
+    EnterTestMode,
+    LeaveTestMode,
   }
 
   private StateMachineConfiguration<ScoringState, ScoringTrigger> stateMachineConfiguration;
 
   private StateMachine<ScoringState, ScoringTrigger> stateMachine;
+
+  private final BooleanSupplier isScoringTuningSupplier =
+      () ->
+          DriverStation.isTest()
+              && (TestModeManager.getTestMode() == TestMode.ElevatorTuning
+                  || TestModeManager.getTestMode() == TestMode.ElevatorCharacterization
+                  || TestModeManager.getTestMode() == TestMode.WristClosedLoopTuning
+                  || TestModeManager.getTestMode() == TestMode.WristVoltageTuning
+                  || TestModeManager.getTestMode() == TestMode.SetpointTuning);
 
   public ScoringSubsystem(
       ElevatorMechanism elevatorMechanism,
@@ -193,8 +208,15 @@ public class ScoringSubsystem extends SubsystemBase {
 
     stateMachineConfiguration
         .configure(ScoringState.Init)
-        .permitIf(ScoringTrigger.Seeded, ScoringState.Warmup, () -> shouldWarmupAfterInit)
-        .permitIf(ScoringTrigger.Seeded, ScoringState.Idle, () -> !shouldWarmupAfterInit);
+        .permitIf(ScoringTrigger.Seeded, ScoringState.Tuning, isScoringTuningSupplier)
+        .permitIf(
+            ScoringTrigger.Seeded,
+            ScoringState.Warmup,
+            () -> !isScoringTuningSupplier.getAsBoolean() && shouldWarmupAfterInit)
+        .permitIf(
+            ScoringTrigger.Seeded,
+            ScoringState.Idle,
+            () -> !isScoringTuningSupplier.getAsBoolean() && !shouldWarmupAfterInit);
 
     stateMachineConfiguration
         .configure(ScoringState.Idle)
@@ -203,7 +225,11 @@ public class ScoringSubsystem extends SubsystemBase {
             ScoringState.Intake,
             () -> !(isCoralDetected() || isAlgaeDetected()))
         .permit(ScoringTrigger.ToggleWarmup, ScoringState.Warmup)
-        .permitIf(ScoringTrigger.StartWarmup, ScoringState.Warmup, () -> autoTransition);
+        .permitIf(ScoringTrigger.EnterTestMode, ScoringState.Tuning, isScoringTuningSupplier);
+
+    stateMachineConfiguration
+        .configure(ScoringState.Tuning)
+        .permit(ScoringTrigger.LeaveTestMode, ScoringState.Idle);
 
     stateMachineConfiguration
         .configure(ScoringState.Intake)
@@ -451,18 +477,6 @@ public class ScoringSubsystem extends SubsystemBase {
   }
 
   /**
-   * Set whether or not to temporarily override/disable the state machine. This should only be used
-   * by test modes!
-   *
-   * @param doOverrideStateMachine True if the state machine is disabled, and false if the state
-   *     machine should run. This value is false on initialization and will only change when this
-   *     method is called.
-   */
-  public void setOverrideStateMachine(boolean doOverrideStateMachine) {
-    overrideStateMachine = doOverrideStateMachine;
-  }
-
-  /**
    * checks if other subsystems need to wait on intake
    *
    * @return false if intake has coral / algae, and true if its still waiting to intake
@@ -496,6 +510,10 @@ public class ScoringSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     if (!overrideStateMachine) {
+      if (stateMachine.getCurrentState() == ScoringState.Tuning
+          && !isScoringTuningSupplier.getAsBoolean()) {
+        fireTrigger(ScoringTrigger.LeaveTestMode);
+      }
       stateMachine.periodic();
     }
 
@@ -526,7 +544,9 @@ public class ScoringSubsystem extends SubsystemBase {
       case WristClosedLoopTuning:
       case WristVoltageTuning:
       case SetpointTuning:
-        setOverrideStateMachine(true);
+        if (stateMachine.getCurrentState() != ScoringState.Tuning) {
+          fireTrigger(ScoringTrigger.EnterTestMode);
+        }
         break;
       default:
         break;
