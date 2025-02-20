@@ -110,14 +110,6 @@ public class ScoringSubsystem extends SubsystemBase {
    */
   private boolean autoTransition = true;
 
-  /**
-   * This boolean exists to temporarily stop the state machine from running
-   *
-   * <p>It is intended to be used for test modes, e.g. ClawOvershootTuning needs to be able to
-   * manually eject an object without forcing the state machine to agree.
-   */
-  private boolean overrideStateMachine = false;
-
   private boolean shouldWarmupAfterInit = false;
 
   private BooleanSupplier isDriveLinedUpSupplier;
@@ -509,13 +501,11 @@ public class ScoringSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (!overrideStateMachine) {
-      if (stateMachine.getCurrentState() == ScoringState.Tuning
-          && !isScoringTuningSupplier.getAsBoolean()) {
-        fireTrigger(ScoringTrigger.LeaveTestMode);
-      }
-      stateMachine.periodic();
+    if (stateMachine.getCurrentState() == ScoringState.Tuning
+        && !isScoringTuningSupplier.getAsBoolean()) {
+      fireTrigger(ScoringTrigger.LeaveTestMode);
     }
+    stateMachine.periodic();
 
     if (JsonConstants.scoringFeatureFlags.runElevator) {
       elevatorMechanism.periodic();
