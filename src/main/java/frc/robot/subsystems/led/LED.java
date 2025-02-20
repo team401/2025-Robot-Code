@@ -13,8 +13,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.LEDConstants;
-import frc.robot.constants.ModeConstants;
-import frc.robot.constants.ModeConstants.Mode;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;
@@ -36,8 +34,8 @@ public class LED extends SubsystemBase {
   private final AddressableLED led = new AddressableLED(LEDConstants.ledPort);
   private final AddressableLEDBuffer ledStrip = new AddressableLEDBuffer(LEDConstants.totalLength);
 
-  private final AddressableLEDBufferView leftData = ledStrip.createView(0, 30);
-  private final AddressableLEDBufferView rightData = ledStrip.createView(30, 60).reversed();
+  private final AddressableLEDBufferView leftData = ledStrip.createView(0, 29);
+  private final AddressableLEDBufferView rightData = ledStrip.createView(30, 59).reversed();
 
   private List<LEDPattern> leftPatterns = new ArrayList<>();
   private List<LEDPattern> rightPatterns = new ArrayList<>();
@@ -58,92 +56,31 @@ public class LED extends SubsystemBase {
   public LEDPattern holdingCoral =
       LEDPattern.steps(Map.of(0, LEDConstants.holdingCoral, 1 / 3.0, LEDConstants.off));
 
-  public LEDPattern targetOnReef =
-      LEDPattern.steps(
-          Map.of(
-              0,
-              LEDConstants.off,
-              1 / 3.0,
-              LEDConstants.targetOnReef,
-              2 / 3.0,
-              LEDConstants.targetOnReef));
+  public LEDPattern targetOnReef = LEDPattern.steps(Map.of(1 / 3.0, LEDConstants.targetOnReef));
 
-  public LEDPattern targetOnReefL1 =
-      LEDPattern.steps(
-          Map.of(
-              0,
-              LEDConstants.off,
-              1 / 3.0,
-              LEDConstants.targetOnReefL1,
-              2 / 3.0,
-              LEDConstants.targetOnReefL1));
+  public LEDPattern targetOnReefL1 = LEDPattern.steps(Map.of(1 / 3.0, LEDConstants.targetOnReefL1));
 
-  public LEDPattern targetOnReefL2 =
-      LEDPattern.steps(
-          Map.of(
-              0,
-              LEDConstants.off,
-              1 / 3.0,
-              LEDConstants.targetOnReefL2,
-              2 / 3.0,
-              LEDConstants.targetOnReefL2));
+  public LEDPattern targetOnReefL2 = LEDPattern.steps(Map.of(1 / 3.0, LEDConstants.targetOnReefL2));
 
-  public LEDPattern targetOnReefL3 =
-      LEDPattern.steps(
-          Map.of(
-              0,
-              LEDConstants.off,
-              1 / 3.0,
-              LEDConstants.targetOnReefL3,
-              2 / 3.0,
-              LEDConstants.targetOnReefL3));
+  public LEDPattern targetOnReefL3 = LEDPattern.steps(Map.of(1 / 3.0, LEDConstants.targetOnReefL3));
 
-  public LEDPattern targetOnReefL4 =
-      LEDPattern.steps(
-          Map.of(
-              0,
-              LEDConstants.off,
-              1 / 3.0,
-              LEDConstants.targetOnReefL4,
-              2 / 3.0,
-              LEDConstants.targetOnReefL4));
+  public LEDPattern targetOnReefL4 = LEDPattern.steps(Map.of(1 / 3.0, LEDConstants.targetOnReefL4));
 
   public LEDPattern targetOnProcessor =
-      LEDPattern.steps(
-          Map.of(
-              0,
-              LEDConstants.off,
-              1 / 3.0,
-              LEDConstants.targetOnProcessor,
-              2 / 3.0,
-              LEDConstants.targetOnProcessor));
+      LEDPattern.steps(Map.of(1 / 3.0, LEDConstants.targetOnProcessor));
 
-  public LEDPattern targetOnNet =
-      LEDPattern.steps(
-          Map.of(
-              0,
-              LEDConstants.off,
-              1 / 3.0,
-              LEDConstants.targetOnNet,
-              2 / 3.0,
-              LEDConstants.targetOnNet));
+  public LEDPattern targetOnNet = LEDPattern.steps(Map.of(1 / 3.0, LEDConstants.targetOnNet));
 
   public LEDPattern targetOnCoralStation =
-      LEDPattern.steps(
-          Map.of(
-              0,
-              LEDConstants.off,
-              1 / 3.0,
-              LEDConstants.targetOnCoral,
-              2 / 3.0,
-              LEDConstants.targetOnCoral));
+      LEDPattern.steps(Map.of(1 / 3.0, LEDConstants.targetOnCoral));
   public LEDPattern endGame = LEDPattern.solid(Color.kRed);
 
   public LEDPattern lockedOnHang = LEDPattern.solid(LEDConstants.lockedOnHang);
 
-  public LED(ScoringSubsystem scoringSubsystem, ClimbSubsystem climbSubsystem) {
+  public LED(ScoringSubsystem scoringSubsystem, ClimbSubsystem climbSubsystem, Drive drive) {
     this.scoringSubsystem = scoringSubsystem;
     this.climbSubsystem = climbSubsystem;
+    this.driveSubsystem = drive;
     led.setLength(LEDConstants.totalLength);
     led.start();
   }
@@ -155,60 +92,56 @@ public class LED extends SubsystemBase {
     if (!enabled) {
       // if not enabled LEDs are left cleared
     } else if (DriverStation.isDisabled()) {
-      if (ModeConstants.currentMode == Mode.REAL) {
-        rainbow();
-      }
+      rainbow();
     } else {
       // endgame
       if (DriverStation.getMatchTime() < 20 && DriverStation.getMatchTime() > 17) {
         addPattern(endGame);
       }
       // algae
-      if ((scoringSubsystem.getGamePiece() == GamePiece.Algae)) {
+      if (scoringSubsystem != null && (scoringSubsystem.getGamePiece() == GamePiece.Algae)) {
         addSplitPattern(holdingAlgae, clear);
       }
       // coral
-      if ((scoringSubsystem.getGamePiece() == GamePiece.Coral)) {
+      if (scoringSubsystem != null && (scoringSubsystem.getGamePiece() == GamePiece.Coral)) {
         addSplitPattern(clear, holdingCoral);
       }
       // height target
-      if ((scoringSubsystem.getTarget() == FieldTarget.L1)) {
+      if (scoringSubsystem != null && (scoringSubsystem.getTarget() == FieldTarget.L1)) {
         addSplitPattern(targetOnReefL1, clear);
       }
-      if ((scoringSubsystem.getTarget() == FieldTarget.L2)) {
+      if (scoringSubsystem != null && (scoringSubsystem.getTarget() == FieldTarget.L2)) {
         addSplitPattern(targetOnReefL2, clear);
       }
-      if ((scoringSubsystem.getTarget() == FieldTarget.L3)) {
+      if (scoringSubsystem != null && (scoringSubsystem.getTarget() == FieldTarget.L3)) {
         addSplitPattern(targetOnReefL3, clear);
       }
-      if ((scoringSubsystem.getTarget() == FieldTarget.L4)) {
+      if (scoringSubsystem != null && (scoringSubsystem.getTarget() == FieldTarget.L4)) {
         addSplitPattern(targetOnReefL4, clear);
       }
-      if ((scoringSubsystem.getTarget() == FieldTarget.L4)) {
+      if (scoringSubsystem != null && (scoringSubsystem.getTarget() == FieldTarget.L4)) {
         addSplitPattern(targetOnReefL4, clear);
       }
-      if ((climbSubsystem.getLockedToCage()) == true) {
+      if (climbSubsystem != null && (climbSubsystem.getLockedToCage()) == true) {
         addPattern(lockedOnHang);
       }
-      if ((driveSubsystem.getDesiredLocation()) == DesiredLocation.Processor) {
+      if (driveSubsystem != null
+          && (driveSubsystem.getDesiredLocation()) == DesiredLocation.Processor) {
         addSplitPattern(clear, targetOnProcessor);
       }
-      if ((driveSubsystem.getDesiredLocation()) == (DesiredLocation.CoralStationLeft)) {
+      if (driveSubsystem != null
+          && (driveSubsystem.getDesiredLocation()) == (DesiredLocation.CoralStationLeft)) {
         addSplitPattern(targetOnCoralStation, clear);
       }
-      if ((driveSubsystem.getDesiredLocation()) == (DesiredLocation.CoralStationRight)) {
+      if (driveSubsystem != null
+          && (driveSubsystem.getDesiredLocation()) == (DesiredLocation.CoralStationRight)) {
         addSplitPattern(clear, targetOnCoralStation);
       }
       applyPatterns();
 
-      if (ModeConstants.currentMode == Mode.REAL) {
-        led.setData(ledStrip);
-      }
-    }
-
-    if (ModeConstants.currentMode == Mode.REAL) {
       led.setData(ledStrip);
     }
+    led.setData(ledStrip);
   }
 
   public void addSplitPattern(LEDPattern left, LEDPattern right) {
@@ -228,6 +161,8 @@ public class LED extends SubsystemBase {
     for (int i = 0; i < rightData.getLength(); i++) {
       rightData.setRGB(i, 0, 0, 0);
     }
+    leftPatterns.clear();
+    rightPatterns.clear();
   }
 
   public void rainbow() {
@@ -271,11 +206,10 @@ public class LED extends SubsystemBase {
 
   private void mergeBuffers() {
     int halfLength = leftData.getLength();
-
     for (int i = 0; i < halfLength; i++) {
       ledStrip.setRGB(i, leftData.getRed(i), leftData.getGreen(i), leftData.getBlue(i));
       ledStrip.setRGB(
-          i + halfLength, rightData.getRed(i), rightData.getGreen(i), rightData.getBlue(i));
+          2 * halfLength - i - 1, rightData.getRed(i), rightData.getGreen(i), rightData.getBlue(i));
     }
   }
 

@@ -91,7 +91,6 @@ public class RobotContainer {
   }
 
   public void configureSubsystems() {
-    led = new LED(scoringSubsystem, climbSubsystem);
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
       if (ModeConstants.simMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
@@ -120,6 +119,7 @@ public class RobotContainer {
       }
     }
     strategyManager = new StrategyManager(drive, scoringSubsystem);
+    led = new LED(scoringSubsystem, climbSubsystem, drive);
   }
 
   /**
