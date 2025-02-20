@@ -16,7 +16,10 @@ import frc.robot.constants.LEDConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.constants.ModeConstants.Mode;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.ramp.RampMechanism;
+import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +28,7 @@ import java.util.Map;
 
 public class LED extends SubsystemBase {
 
-  private boolean enabled = true;
+  private boolean enabled = true; //TODO: Add LED Switch on branch "switch-led-brake"
   private ScoringSubsystem scoringSubsystem;
   private ClimbSubsystem climbSubsystem;
 
@@ -42,7 +45,13 @@ public class LED extends SubsystemBase {
       LEDPattern.rainbow(255, 255)
           .scrollAtRelativeSpeed(Percent.per(Second).of(LEDConstants.rainbowSpeed));
   public LEDPattern clear = LEDPattern.solid(Color.kBlack);
-
+  /*
+   * How LED's work:
+   * 1. Add a list of colors in LEDConstants.java
+   * 2. Add a list of LEDPatterns that use those colors
+   * 3. LEDPatterns are where the magic happens, make your specific colors/animations/etc there
+   * 4. Call them in periodic();
+   */
   public LEDPattern holdingAlgae =
       LEDPattern.steps(Map.of(0, LEDConstants.holdingAlgae, 1 / 3.0, LEDConstants.off));
   public LEDPattern holdingCoral =
@@ -127,6 +136,11 @@ public class LED extends SubsystemBase {
               LEDConstants.targetOnCoral,
               2 / 3.0,
               LEDConstants.targetOnCoral));
+  public LEDPattern endGame =
+      LEDPattern.solid(Color.kRed);
+
+  public LEDPattern lockedOnHang =
+      LEDPattern.solid(LEDConstants.lockedOnHang);
 
   public LED(ScoringSubsystem scoringSubsystem, ClimbSubsystem climbSubsystem) {
     this.scoringSubsystem = scoringSubsystem;
@@ -146,9 +160,43 @@ public class LED extends SubsystemBase {
         rainbow();
       }
     } else {
-      if ((scoringSubsystem != null && scoringSubsystem.getGamePiece() == GamePiece.Algae)) {
-        runSplitPattern(holdingAlgae, clear);
+        //endgame 
+      if (DriverStation.getMatchTime() < 20 && DriverStation.getMatchTime() > 17) {
+       addPattern(endGame);
+    }
+        //algae
+      if ((scoringSubsystem.getGamePiece() == GamePiece.Algae)) {
+        addSplitPattern(holdingAlgae, clear);
       }
+        //coral
+      if ((scoringSubsystem.getGamePiece() == GamePiece.Coral)) {
+        addSplitPattern(clear, holdingCoral);
+      }
+      //height target
+      if ((scoringSubsystem.getTarget() == FieldTarget.L1)) {
+        addSplitPattern(targetOnReefL1, clear);
+      }
+      if ((scoringSubsystem.getTarget() == FieldTarget.L2)) {
+        addSplitPattern(targetOnReefL2, clear);
+      }
+      if ((scoringSubsystem.getTarget() == FieldTarget.L3)) {
+        addSplitPattern(targetOnReefL3, clear);
+      }
+      if ((scoringSubsystem.getTarget() == FieldTarget.L4)) {
+        addSplitPattern(targetOnReefL4, clear);
+      }
+      if ((scoringSubsystem.getTarget() == FieldTarget.L4)) {
+        addSplitPattern(targetOnReefL4, clear);
+      }
+      if ((climbSubsystem.getLockedToCage()) == true) {
+        addPattern(lockedOnHang);
+      }
+
+
+      if (ModeConstants.currentMode == Mode.REAL) {
+        led.setData(ledStrip);
+    }
+
     }
     
     if (ModeConstants.currentMode == Mode.REAL) {
@@ -156,9 +204,14 @@ public class LED extends SubsystemBase {
     }
   }
 
-  public void addPattern(LEDPattern left, LEDPattern right) {
+  public void addSplitPattern(LEDPattern left, LEDPattern right) {
     leftPatterns.add(left);
     rightPatterns.add(right);
+  }
+
+  public void addPattern(LEDPattern pattern) {
+    leftPatterns.add(pattern);
+    rightPatterns.add(pattern);
   }
 
   public void clear() {
