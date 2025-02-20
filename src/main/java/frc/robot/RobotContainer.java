@@ -1,11 +1,21 @@
 package frc.robot;
 
+
 import static edu.wpi.first.units.Units.Radians;
 
 import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
+import coppercore.vision.VisionLocalizer;
+import coppercore.wpilib_interface.tuning.TuneS;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -13,6 +23,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.StrategyManager.AutonomyMode;
 import frc.robot.commands.drive.AkitDriveCommands;
@@ -199,6 +211,17 @@ public class RobotContainer {
     InitBindings.initTestModeBindings();
 
     switch (TestModeManager.getTestMode()) {
+      case ElevatorCharacterization:
+        scoringSubsystem.setOverrideStateMachine(true);
+        CommandScheduler.getInstance()
+            .schedule(
+                new SequentialCommandGroup(
+                    new WaitCommand(2.0),
+                    new TuneS(
+                        scoringSubsystem.getElevatorMechanismForTuning(),
+                        RotationsPerSecond.of(0.001),
+                        0.1)));
+        break;
       case DriveFeedForwardCharacterization:
         CommandScheduler.getInstance()
             .schedule(AkitDriveCommands.feedforwardCharacterization(drive));

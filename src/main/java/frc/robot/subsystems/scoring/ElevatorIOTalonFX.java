@@ -3,6 +3,9 @@ package frc.robot.subsystems.scoring;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusCode;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -12,6 +15,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -35,8 +39,10 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   MutAngle largeEncoderSetpointPosition = Rotations.mutable(0.0);
   MutAngle spoolGoalAngle = Rotations.mutable(0.0);
 
-  Voltage overrideVolts;
-  boolean isOverriding;
+  Current overrideCurrent;
+  Voltage overrideVoltage;
+
+  ElevatorOutputMode outputMode = ElevatorOutputMode.ClosedLoop;
 
   /* TODO: name this left/right or front/back
   I'm unsure of the physical configuration of these motors
@@ -53,18 +59,24 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   boolean motorDisabled = false;
 
+  StatusSignal<Angle> largeCANcoderAbsolutePosition;
+
   // Reuse the same motion magic request to avoid garbage collector having to clean them up.
   MotionMagicExpoTorqueCurrentFOC motionMagicExpoTorqueCurrentFOC =
       new MotionMagicExpoTorqueCurrentFOC(0.0);
   VoltageOut voltageOut = new VoltageOut(0.0);
+  TorqueCurrentFOC currentOut = new TorqueCurrentFOC(0.0);
 
   public ElevatorIOTalonFX() {
     // Initialize TalonFXs  and CANcoders with their correct IDs
-    leadMotor = new TalonFX(ElevatorConstants.synced.getObject().leadElevatorMotorId);
-    followerMotor = new TalonFX(ElevatorConstants.synced.getObject().followerElevatorMotorId);
+    leadMotor = new TalonFX(ElevatorConstants.synced.getObject().leadElevatorMotorId, "canivore");
+    followerMotor =
+        new TalonFX(ElevatorConstants.synced.getObject().followerElevatorMotorId, "canivore");
 
-    largeCANCoder = new CANcoder(ElevatorConstants.synced.getObject().elevatorLargeCANCoderID);
-    smallCANCoder = new CANcoder(ElevatorConstants.synced.getObject().elevatorSmallCANCoderID);
+    largeCANCoder =
+        new CANcoder(ElevatorConstants.synced.getObject().elevatorLargeCANCoderID, "canivore");
+    smallCANCoder =
+        new CANcoder(ElevatorConstants.synced.getObject().elevatorSmallCANCoderID, "canivore");
 
     // Create one CANcoder configuration that will be modified slightly and applied to both
     // CANcoders
@@ -75,11 +87,17 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     // Update with large CANcoder direction and apply
     cancoderConfiguration.MagnetSensor.SensorDirection =
         ElevatorConstants.synced.getObject().elevatorLargeCANCoderDirection;
+    cancoderConfiguration.MagnetSensor.MagnetOffset = -0.026123046875;
     largeCANCoder.getConfigurator().apply(cancoderConfiguration);
+
+    largeCANcoderAbsolutePosition = largeCANCoder.getAbsolutePosition();
+
+    BaseStatusSignal.setUpdateFrequencyForAll(50.0, largeCANcoderAbsolutePosition);
 
     // Update with small CANcoder direction and apply
     cancoderConfiguration.MagnetSensor.SensorDirection =
         ElevatorConstants.synced.getObject().elevatorSmallCANCoderDirection;
+    cancoderConfiguration.MagnetSensor.MagnetOffset = 0.000244;
     smallCANCoder.getConfigurator().apply(cancoderConfiguration);
 
     // Initialize talonFXConfigs to use FusedCANCoder and Motion Magic Expo and have correct PID
@@ -94,7 +112,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                         ElevatorConstants.synced.getObject().largeCANCoderToMechanismRatio)
                     .withRotorToSensorRatio(
                         ElevatorConstants.synced.getObject().rotorToLargeCANCoderRatio))
-            .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
+            .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
@@ -133,8 +151,20 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     inputs.largeEncoderPos.mut_replace(largeCANCoder.getPosition().getValue());
     inputs.smallEncoderPos.mut_replace(smallCANCoder.getPosition().getValue());
 
-    inputs.largeEncoderAbsolutePos.mut_replace(largeCANCoder.getAbsolutePosition().getValue());
-    inputs.smallEncoderAbsolutePos.mut_replace(smallCANCoder.getAbsolutePosition().getValue());
+    inputs.largeEncoderVel.mut_replace(largeCANCoder.getVelocity().getValue());
+
+    StatusCode refreshStatus = BaseStatusSignal.refreshAll(largeCANcoderAbsolutePosition);
+
+    inputs.largeEncoderConnected = refreshStatus.isOK();
+    inputs.largeEncoderAbsolutePos.mut_replace(largeCANcoderAbsolutePosition.getValue());
+
+    inputs.largeAbsPosRot = largeCANCoder.getAbsolutePosition().getValueAsDouble();
+
+    refreshStatus = BaseStatusSignal.refreshAll(smallCANCoder.getAbsolutePosition());
+
+    inputs.smallEncoderConnected = refreshStatus.isOK();
+    inputs.smallEncoderAbsolutePos.mut_replace(
+        smallCANCoder.getAbsolutePosition().refresh().getValue());
 
     inputs.largeEncoderGoalPos.mut_replace(largeEncoderGoalAngle);
     inputs.largeEncoderSetpointPos.mut_replace(largeEncoderSetpointPosition);
@@ -154,30 +184,43 @@ public class ElevatorIOTalonFX implements ElevatorIO {
 
   @Override
   public void applyOutputs(ElevatorOutputs outputs) {
+    outputs.motorsDisabled = motorDisabled;
+    outputs.outputMode = outputMode;
+
     motionMagicExpoTorqueCurrentFOC.withPosition(largeEncoderGoalAngle);
 
     if (motorDisabled) {
       leadMotor.setControl(voltageOut.withOutput(0.0));
       outputs.elevatorAppliedVolts.mut_replace(Volts.of(0.0));
-    } else if (isOverriding) {
-      leadMotor.setControl(voltageOut.withOutput(overrideVolts));
-      outputs.elevatorAppliedVolts.mut_replace(overrideVolts);
     } else {
-      leadMotor.setControl(motionMagicExpoTorqueCurrentFOC);
+      switch (outputMode) {
+        case ClosedLoop:
+          leadMotor.setControl(motionMagicExpoTorqueCurrentFOC);
 
-      largeEncoderSetpointPosition.mut_setMagnitude(
-          (leadMotor.getClosedLoopReference().getValue()));
+          largeEncoderSetpointPosition.mut_setMagnitude(
+              (leadMotor.getClosedLoopReference().getValue()));
 
-      Logger.recordOutput(
-          "elevator/referenceSlope", leadMotor.getClosedLoopReferenceSlope().getValueAsDouble());
-      outputs.elevatorAppliedVolts.mut_replace(
-          Volts.of(leadMotor.getClosedLoopOutput().getValueAsDouble()));
-      outputs.pContrib.mut_replace(
-          Volts.of(leadMotor.getClosedLoopProportionalOutput().getValueAsDouble()));
-      outputs.iContrib.mut_replace(
-          Volts.of(leadMotor.getClosedLoopIntegratedOutput().getValueAsDouble()));
-      outputs.dContrib.mut_replace(
-          Volts.of(leadMotor.getClosedLoopDerivativeOutput().getValueAsDouble()));
+          Logger.recordOutput(
+              "elevator/referenceSlope",
+              leadMotor.getClosedLoopReferenceSlope().getValueAsDouble());
+          outputs.elevatorAppliedVolts.mut_replace(
+              Volts.of(leadMotor.getClosedLoopOutput().getValueAsDouble()));
+          outputs.pContrib.mut_replace(
+              Volts.of(leadMotor.getClosedLoopProportionalOutput().getValueAsDouble()));
+          outputs.iContrib.mut_replace(
+              Volts.of(leadMotor.getClosedLoopIntegratedOutput().getValueAsDouble()));
+          outputs.dContrib.mut_replace(
+              Volts.of(leadMotor.getClosedLoopDerivativeOutput().getValueAsDouble()));
+          break;
+        case Voltage:
+          leadMotor.setControl(new VoltageOut(overrideVoltage));
+          outputs.elevatorAppliedVolts.mut_replace(overrideVoltage);
+          break;
+        case Current:
+          leadMotor.setControl(currentOut.withOutput(overrideCurrent));
+          outputs.elevatorAppliedVolts.mut_replace(leadMotor.getMotorVoltage().getValue());
+          break;
+      }
     }
   }
 
@@ -204,18 +247,23 @@ public class ElevatorIOTalonFX implements ElevatorIO {
   }
 
   @Override
+  public void setOutputMode(ElevatorOutputMode outputMode) {
+    this.outputMode = outputMode;
+  }
+
+  @Override
   public void setSmallCANCoderPosition(Angle newAngle) {
     smallCANCoder.setPosition(newAngle);
   }
 
   @Override
-  public void setOverrideVolts(Voltage volts) {
-    overrideVolts = volts;
+  public void setOverrideVoltage(Voltage volts) {
+    overrideVoltage = volts;
   }
 
   @Override
-  public void setOverrideMode(boolean override) {
-    isOverriding = override;
+  public void setOverrideCurrent(Current current) {
+    overrideCurrent = current;
   }
 
   @Override
