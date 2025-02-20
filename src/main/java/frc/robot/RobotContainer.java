@@ -61,7 +61,7 @@ public class RobotContainer {
     double ramp_rotation = 0.0;
     double climb_rotation = 0.0;
     if (scoringSubsystem != null) {
-      height = -scoringSubsystem.getElevatorHeight().magnitude();
+      height = scoringSubsystem.getElevatorHeight().magnitude();
       claw_rotation = scoringSubsystem.getWristAngle().in(Radians);
     }
     if (climbSubsystem != null) {
