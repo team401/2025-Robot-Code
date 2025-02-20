@@ -61,7 +61,7 @@ public class RobotContainer {
     double ramp_rotation = 0.0;
     double climb_rotation = 0.0;
     if (scoringSubsystem != null) {
-      height = scoringSubsystem.getElevatorHeight().magnitude();
+      height = -scoringSubsystem.getElevatorHeight().magnitude();
       claw_rotation = scoringSubsystem.getWristAngle().in(Radians);
     }
     if (climbSubsystem != null) {
@@ -73,17 +73,17 @@ public class RobotContainer {
     height = Math.min(height, 1.87);
     double stage_one_height = Math.max(height - 0.55, 0.0);
     double stage_two_height = Math.max(stage_one_height - 0.66, 0.0);
+    // Logger.recordOutput(
+    // "testingPose", new Pose3d(new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0.0, 0.0, 0.0)));
     Logger.recordOutput(
-        "testingPose", new Pose3d(new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0.0, 0.0, 0.0)));
-    Logger.recordOutput(
-        "componetPositions",
+        "componentPositions",
         new Pose3d[] {
           new Pose3d(new Translation3d(0.05, 0.01, 0.9), new Rotation3d(0.0, ramp_rotation, 0.0)),
           new Pose3d(
               new Translation3d(-0.16, 0.31, 0.115), new Rotation3d(climb_rotation, 0.0, 0.0)),
           new Pose3d(
               new Translation3d(0.34, 0.12, height + 0.35),
-              new Rotation3d(0.0, -claw_rotation, 0.0)),
+              new Rotation3d(0.0, -claw_rotation + 0.465719787, 0.0)),
           new Pose3d(new Translation3d(0.0, 0.0, height), new Rotation3d(0.0, 0.0, 0.0)),
           new Pose3d(new Translation3d(0.0, 0.0, stage_two_height), new Rotation3d(0.0, 0.0, 0.0)),
           new Pose3d(new Translation3d(0.0, 0.0, stage_one_height), new Rotation3d(0.0, 0.0, 0.0))
@@ -129,10 +129,6 @@ public class RobotContainer {
   public void configureSubsystems() {
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
-      // if (ModeConstants.simMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
-      //   drive.setPose(
-      //       new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
-      // }
       if (FeatureFlags.synced.getObject().runVision) {
         vision = InitSubsystems.initVisionSubsystem(drive);
 
