@@ -84,7 +84,7 @@ public class RobotContainer {
   }
 
   public void configureSubsystems() {
-    led = new LED();
+
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
       if (ModeConstants.simMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {

@@ -21,4 +21,5 @@ public final class LEDConstants {
   public static final Color targetOnNet = Color.kWhite;
   public static final Color targetOnCoral = Color.kLime;
   public static final Color off = Color.kBlack;
+  public static final double rainbowSpeed = 50;
 }
