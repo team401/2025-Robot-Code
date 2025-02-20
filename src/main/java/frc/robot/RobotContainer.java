@@ -28,8 +28,8 @@ import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.led.LED;
+import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import java.io.File;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -91,7 +91,7 @@ public class RobotContainer {
   }
 
   public void configureSubsystems() {
-
+    led = new LED(scoringSubsystem, climbSubsystem);
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
       if (ModeConstants.simMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
