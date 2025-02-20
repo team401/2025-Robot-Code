@@ -6,7 +6,7 @@
       "unit": "Inch"
     },
     "wristAngle": {
-      "value": 0.0,
+      "value": 0.3214,
       "unit": "Rotation"
     }
   },
@@ -28,7 +28,7 @@
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": 0.0,
+      "value": 0.3214,
       "unit": "Rotation"
     }
   },
@@ -39,7 +39,7 @@
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": -0.15,
+      "value": 0.3214,
       "unit": "Rotation"
     }
   },
@@ -50,7 +50,7 @@
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": -0.15,
+      "value": 0.3214,
       "unit": "Rotation"
     }
   },
@@ -61,7 +61,7 @@
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": -0.25,
+      "value": 0.3214,
       "unit": "Rotation"
     }
   },

@@ -32,7 +32,7 @@ public class ScoringSetpoints {
       new ScoringSetpoint(
           "Idle",
           Inches.of(1.5),
-          Rotations.of(0.0)); // Idle at 1.5 inches to avoid obstructing cameras
+          Rotations.of(0.3214)); // Idle at 1.5 inches to avoid obstructing cameras
 
   public final ScoringSetpoint idleWithAlgae =
       new ScoringSetpoint(
@@ -41,10 +41,10 @@ public class ScoringSetpoints {
           Rotations.of(-0.75)); // Hold algae with the wrist out and the arm up
 
   // TODO: Get actual values for all values from here down
-  public final ScoringSetpoint L1 = new ScoringSetpoint("L1", Meters.of(1.0), Rotations.of(0.0));
-  public final ScoringSetpoint L2 = new ScoringSetpoint("L2", Meters.of(1.5), Rotations.of(-0.15));
-  public final ScoringSetpoint L3 = new ScoringSetpoint("L3", Meters.of(2.0), Rotations.of(-0.15));
-  public final ScoringSetpoint L4 = new ScoringSetpoint("L4", Meters.of(2.5), Rotations.of(-0.25));
+  public final ScoringSetpoint L1 = new ScoringSetpoint("L1", Meters.of(1.0), Rotations.of(0.3214));
+  public final ScoringSetpoint L2 = new ScoringSetpoint("L2", Meters.of(1.5), Rotations.of(0.3214));
+  public final ScoringSetpoint L3 = new ScoringSetpoint("L3", Meters.of(2.0), Rotations.of(0.3214));
+  public final ScoringSetpoint L4 = new ScoringSetpoint("L4", Meters.of(2.5), Rotations.of(0.3214));
 
   public final ScoringSetpoint L2algae =
       new ScoringSetpoint("L2algae", Meters.of(1.8), Rotations.of(-0.75));

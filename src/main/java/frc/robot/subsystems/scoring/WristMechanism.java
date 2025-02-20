@@ -258,6 +258,18 @@ public class WristMechanism {
   }
 
   /**
+   * Check whether or not the wrist encoder is currently connected.
+   *
+   * <p>"Connected" means that last time the position status signal was refreshed, the status code
+   * was OK
+   *
+   * @return True if connected, false if disconnected
+   */
+  public boolean isWristEncoderConnected() {
+    return inputs.isWristEncoderConnected;
+  }
+
+  /**
    * Get a reference to the wrist's IO. This should be used to update PID, motion profile, and feed
    * forward gains, and to set brake mode/disable motors. This method exists to avoid the need to
    * duplicate all of these functions between the mechanism and the IO.
