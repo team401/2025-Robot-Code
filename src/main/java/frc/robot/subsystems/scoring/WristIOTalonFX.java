@@ -3,6 +3,7 @@ package frc.robot.subsystems.scoring;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -108,7 +109,10 @@ public class WristIOTalonFX implements WristIO {
     inputs.wristSetpointPosition.mut_replace(
         Rotations.of(wristMotor.getClosedLoopReference().getValue()));
 
-    inputs.wristPosition.mut_replace(wristCANcoder.getPosition().getValue());
+    StatusSignal<Angle> positionSignal = wristCANcoder.getPosition();
+    inputs.isWristEncoderConnected = positionSignal.getStatus().isOK();
+
+    inputs.wristPosition.mut_replace(positionSignal.getValue());
     inputs.wristVelocity.mut_replace(wristCANcoder.getVelocity().getValue());
 
     inputs.wristTargetVelocity.mut_setMagnitude(

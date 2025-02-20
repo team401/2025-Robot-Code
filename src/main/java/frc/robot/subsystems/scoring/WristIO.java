@@ -20,6 +20,14 @@ import org.littletonrobotics.junction.AutoLog;
 public interface WristIO {
   @AutoLog
   public static class WristInputs {
+    /**
+     * Whether or not the wrist CANcoder is connected
+     *
+     * <p>This value is determined by whether or not refreshing the Position status signal returns
+     * an OK signal
+     */
+    public boolean isWristEncoderConnected = false;
+
     /** Current wrist position as reported by the CANcoder */
     public MutAngle wristPosition = Rotations.mutable(0.0);
 
