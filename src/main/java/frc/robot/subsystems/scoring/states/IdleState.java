@@ -16,6 +16,8 @@ public class IdleState implements PeriodicStateInterface {
 
   @Override
   public void periodic() {
+    scoringSubsystem.setClawRollerVoltage(Volts.zero());
+
     ScoringSetpoint setpoint;
 
     if (scoringSubsystem.isAlgaeDetected()) {
