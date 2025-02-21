@@ -218,6 +218,10 @@ public class RobotContainer {
     if (FeatureFlags.synced.getObject().runScoring) {
       scoringSubsystem.testPeriodic();
     }
+
+    if (FeatureFlags.synced.getObject().runRamp) {
+      rampSubsystem.testPeriodic();
+    }
   }
 
   public void disabledPeriodic() {
