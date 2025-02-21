@@ -19,6 +19,10 @@ public class RampSubsystem extends SubsystemBase {
     mechanism.periodic();
   }
 
+  public void testPeriodic() {
+    mechanism.testPeriodic();
+  }
+
   public void prepareForClimb() {
     mechanism.setPosition(JsonConstants.rampConstants.climbPosition);
   }

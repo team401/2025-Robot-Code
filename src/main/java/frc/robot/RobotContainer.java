@@ -1,13 +1,16 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
+import java.io.File;
+
+import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 
 import coppercore.vision.VisionLocalizer;
 import coppercore.wpilib_interface.tuning.TuneS;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -30,8 +33,6 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
-import java.io.File;
-import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -217,6 +218,9 @@ public class RobotContainer {
   public void testPeriodic() {
     if (FeatureFlags.synced.getObject().runScoring) {
       scoringSubsystem.testPeriodic();
+    }
+    if (FeatureFlags.synced.getObject().runRamp) {
+      rampSubsystem.testPeriodic();
     }
   }
 
