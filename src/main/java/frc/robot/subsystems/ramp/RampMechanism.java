@@ -10,6 +10,7 @@ public class RampMechanism {
 
   public double position = 1.0;
   public boolean inPosition = false;
+  public boolean positionControl = true;
   public double positionRange = JsonConstants.rampConstants.positionRange;
 
   public RampMechanism(RampIO io) {
@@ -32,6 +33,7 @@ public class RampMechanism {
 
   public void setPosition(double position) {
     this.position = position;
+    positionControl = true;
     updateInPosition();
   }
 
