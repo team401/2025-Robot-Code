@@ -24,83 +24,74 @@ import frc.robot.subsystems.ramp.states.ClimbState;
 public class RampSubsystem extends SubsystemBase {
 
   private RampMechanism mechanism;
-  private StateMachine stateMachine;
+  private StateMachine<RampStates, RampTriggers> stateMachine;
 
   public enum RampStates implements StateContainer {
-   IDLE(new IdleState()),
-   CLIMB(new ClimbState()),
-   INTAKE(new RampIntakeState()),
-   INTAKE_HOLD(new IntakeHoldState());
+    IDLE(new IdleState()),
+    CLIMB(new ClimbState()),
+    INTAKE(new RampIntakeState()),
+    INTAKE_HOLD(new IntakeHoldState());
 
-   private RampState state;
+    private RampState state;
 
-   @Override
-   public StateInterface getState(){
-      return state;
-   }
+    @Override
+    public StateInterface getState(){
+        return state;
+    }
 
-   public RampState getRampState(){
-      return state;
-   }
+    public RampState getRampState(){
+        return state;
+    }
 
-   RampStates(RampState state){
-      this.state = state;
-   }
-}
+    RampStates(RampState state){
+        this.state = state;
+    }
+  }
 
   public RampSubsystem(RampMechanism rampMechanism) {
     mechanism = rampMechanism;
-    stateMachine = setupStateMachine(mechanism);
+    setupStateMachine(mechanism);
   }
 
   @Override
   public void periodic() {
-    mechanism.periodic();
     stateMachine.periodic();
+    mechanism.periodic();
   }
 
-  private StateMachine setupStateMachine(RampMechanism mechanism){
-    StateMachineConfiguration<RampStates, RampTriggers> config = new StateMachineConfiguration();
- 
+  private void setupStateMachine(RampMechanism mechanism){
+    StateMachineConfiguration<RampStates, RampTriggers> config = new StateMachineConfiguration<>();
+
     config
-       .configure(RampStates.IDLE)
-       .permit(RampTriggers.START_INTAKE, RampStates.INTAKE)
-       .permit(RampTriggers.START_CLIMB, RampStates.CLIMB);
- 
+      .configure(RampStates.IDLE)
+      .permit(RampTriggers.START_INTAKE, RampStates.INTAKE)
+      .permit(RampTriggers.START_CLIMB, RampStates.CLIMB);
+
     config
-       .configure(RampStates.INTAKE)
-       .permit(RampTriggers.GOTO_IDLE, RampStates.IDLE)
-       .permit(RampTriggers.START_CLIMB, RampStates.CLIMB)
-       .permit(RampTriggers.HOLD_INTAKE, RampStates.INTAKE_HOLD);
- 
+      .configure(RampStates.INTAKE)
+      .permit(RampTriggers.GOTO_IDLE, RampStates.IDLE)
+      .permit(RampTriggers.START_CLIMB, RampStates.CLIMB)
+      .permit(RampTriggers.HOLD_INTAKE, RampStates.INTAKE_HOLD);
+
     config
-       .configure(RampStates.INTAKE_HOLD)
-       .permit(RampTriggers.GOTO_IDLE, RampStates.IDLE)
-       .permit(RampTriggers.START_CLIMB, RampStates.CLIMB);
- 
+      .configure(RampStates.INTAKE_HOLD)
+      .permit(RampTriggers.GOTO_IDLE, RampStates.IDLE)
+      .permit(RampTriggers.START_CLIMB, RampStates.CLIMB);
+
     config
-       .configure(RampStates.CLIMB)
-       .permit(RampTriggers.GOTO_IDLE, RampStates.IDLE)
-       .permit(RampTriggers.START_INTAKE, RampStates.INTAKE);
- 
-    StateMachine stateMachine = new StateMachine(config, RampStates.IDLE);
- 
+      .configure(RampStates.CLIMB)
+      .permit(RampTriggers.GOTO_IDLE, RampStates.IDLE)
+      .permit(RampTriggers.START_INTAKE, RampStates.INTAKE);
+
+    stateMachine = new StateMachine<>(config, RampStates.IDLE);
+
     RampState.setMechanism(mechanism);
     RampState.setFireTrigger(stateMachine::fire);
     
-    return stateMachine;
- }
+  }
 
   public void fireTrigger(RampTriggers trigger){
     stateMachine.fire(trigger);
- }
-
-  public void prepareForClimb() {
-    mechanism.setPosition(JsonConstants.rampConstants.climbPosition);
-  }
-
-  public void prepareForIntake() {
-    mechanism.setPosition(JsonConstants.rampConstants.intakePosition);
   }
 
   public boolean isInPosition() {

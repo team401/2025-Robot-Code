@@ -8,7 +8,7 @@ public class RampMechanism {
   public RampInputsAutoLogged inputs = new RampInputsAutoLogged();
   RampOutputsAutoLogged outputs = new RampOutputsAutoLogged();
 
-  public double position = 1.0;
+  public double controlValue = 1.0;
   public boolean inPosition = false;
   public boolean positionControl = true;
   public double positionRange = JsonConstants.rampConstants.positionRange;
@@ -17,13 +17,8 @@ public class RampMechanism {
     this.io = io;
   }
 
-  private void updateInPosition() {
-    inPosition = Math.abs(position - inputs.position) <= positionRange;
-  }
-
   public void periodic() {
     io.updateInputs(inputs);
-    updateInPosition();
     outputs.targetPosition = position;
     inputs.inPosition = inPosition;
     io.updateOutputs(inputs, outputs);
@@ -32,9 +27,13 @@ public class RampMechanism {
   }
 
   public void setPosition(double position) {
-    this.position = position;
+    controlValue = position;
     positionControl = true;
-    updateInPosition();
+  }
+
+  public void setVoltage(double voltage) {
+    controlValue = voltage;
+    positionControl = false;
   }
 
   public boolean inPosition() {
@@ -43,10 +42,5 @@ public class RampMechanism {
 
   public boolean inTransition() {
     return !inPosition;
-  }
-
-  public void setVoltage(double voltage) {
-    this.voltage = voltage;
-    positionControl = false;
   }
 }
