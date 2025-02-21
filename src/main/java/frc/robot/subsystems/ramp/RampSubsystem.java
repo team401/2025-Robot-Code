@@ -30,4 +30,9 @@ public class RampSubsystem extends SubsystemBase {
   public boolean isInPosition() {
     return mechanism.inPosition();
   }
+
+  public boolean isInClimbPosition() {
+    return mechanism.position == JsonConstants.rampConstants.climbPosition
+        && mechanism.inPosition();
+  }
 }

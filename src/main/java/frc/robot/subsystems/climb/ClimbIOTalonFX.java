@@ -57,9 +57,9 @@ public class ClimbIOTalonFX implements ClimbIO {
                     .withKV(ClimbConstants.synced.getObject().climbkV)
                     .withKA(ClimbConstants.synced.getObject().climbkA)
                     .withKG(ClimbConstants.synced.getObject().climbkG)
-                    .withKP(ClimbConstants.synced.getObject().climbP)
-                    .withKI(ClimbConstants.synced.getObject().climbI)
-                    .withKD(ClimbConstants.synced.getObject().climbD))
+                    .withKP(ClimbConstants.synced.getObject().climbkP)
+                    .withKI(ClimbConstants.synced.getObject().climbkI)
+                    .withKD(ClimbConstants.synced.getObject().climbkD))
             .withMotionMagic(
                 new MotionMagicConfigs()
                     .withMotionMagicAcceleration(5)
@@ -106,12 +106,44 @@ public class ClimbIOTalonFX implements ClimbIO {
   }
 
   @Override
+  public void setBrakeMode(boolean brake) {
+    if (brake) {
+      leadMotor
+          .getConfigurator()
+          .apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
+      followerMotor
+          .getConfigurator()
+          .apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
+    } else {
+      leadMotor
+          .getConfigurator()
+          .apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
+      followerMotor
+          .getConfigurator()
+          .apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
+    }
+  }
+
+  @Override
   public void setPID(double p, double i, double d) {
     Slot0Configs configs = talonFXConfigs.Slot0;
 
     configs.kP = p;
     configs.kI = i;
     configs.kD = d;
+
+    leadMotor.getConfigurator().apply(configs);
+    followerMotor.getConfigurator().apply(configs);
+  }
+
+  @Override
+  public void setFF(double kS, double kV, double kA, double kG) {
+    Slot0Configs configs = talonFXConfigs.Slot0;
+
+    configs.kS = kS;
+    configs.kV = kV;
+    configs.kA = kA;
+    configs.kG = kG;
 
     leadMotor.getConfigurator().apply(configs);
     followerMotor.getConfigurator().apply(configs);

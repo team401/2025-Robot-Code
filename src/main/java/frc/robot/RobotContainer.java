@@ -102,6 +102,9 @@ public class RobotContainer {
     }
     if (FeatureFlags.synced.getObject().runClimb) {
       climbSubsystem = InitSubsystems.initClimbSubsystem();
+      if (FeatureFlags.synced.getObject().runRamp) {
+        climbSubsystem.setRampSubsystem(rampSubsystem);
+      }
     }
 
     if (FeatureFlags.synced.getObject().runScoring) {
