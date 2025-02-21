@@ -17,9 +17,6 @@ import frc.robot.subsystems.ramp.states.RampIntakeState;
 import frc.robot.subsystems.ramp.states.ClimbState;
 
 
-
-// TODO make use PID
-// TODO make positions constants
 // TODO apply current to hold in position
 public class RampSubsystem extends SubsystemBase {
 
@@ -103,7 +100,7 @@ public class RampSubsystem extends SubsystemBase {
   }
 
   public boolean isInPosition() {
-    return mechanism.inPosition();
+    return stateMachine.getCurrentState().getRampState().inPosition();
   }
 
   public double getPosition() {
