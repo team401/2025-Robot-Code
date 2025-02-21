@@ -5,9 +5,13 @@ import frc.robot.Robot;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import java.util.function.BooleanSupplier;
 
 import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.units.measure.AngularVelocity;
 
 
 public class RampMechanism {
@@ -105,5 +109,9 @@ public class RampMechanism {
 
   public void setHome(){
     io.addOffset(-inputs.position);
+  }
+
+  public AngularVelocity getVelocity() {
+    return RadiansPerSecond.of(outputs.velocity);
   }
 }

@@ -26,6 +26,7 @@ public class RampIOSim implements RampIO {
   private final boolean simulateGravity = true;
 
   public double angle_offset = 0.0;
+  public Double lastPosition;
 
   private final SingleJointedArmSim sim =
       new SingleJointedArmSim(
@@ -58,6 +59,10 @@ public class RampIOSim implements RampIO {
 
   @Override
   public void updateOutputs(RampInputs inputs, RampOutputs outputs) {
+    if (lastPosition == null){
+      lastPosition = inputs.position;
+    }
+    outputs.velocity = inputs.position - lastPosition;
     double volts = inputs.controlValue;
     if (inputs.positionControl){
       controller.setSetpoint(inputs.controlValue);

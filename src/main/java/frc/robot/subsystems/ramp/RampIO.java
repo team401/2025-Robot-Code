@@ -1,7 +1,7 @@
 package frc.robot.subsystems.ramp;
 
 import org.littletonrobotics.junction.AutoLog;
-
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 public interface RampIO {
 
   @AutoLog
@@ -14,6 +14,7 @@ public interface RampIO {
   @AutoLog
   public static class RampOutputs {
      public double appliedVolts;
+     public double velocity;
   }
 
   /**
