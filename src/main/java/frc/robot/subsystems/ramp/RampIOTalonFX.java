@@ -23,6 +23,13 @@ public class RampIOTalonFX implements RampIO {
   }
 
   @Override
+  public void setPID(double kP, double kI, double kD) {
+    controller.setP(kP);
+    controller.setI(kI);
+    controller.setD(kD);
+  }
+
+  @Override
   public void updateInputs(RampInputs inputs) {
     inputs.position = Rotations.of(talon.getPosition().getValueAsDouble()).in(Radians);
   }
