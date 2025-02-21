@@ -28,7 +28,6 @@ public class ClimbSubsystem extends SubsystemBase {
   private ClimbInputsAutoLogged inputs = new ClimbInputsAutoLogged();
   private ClimbOutputsAutoLogged outputs = new ClimbOutputsAutoLogged();
 
-  private RampSubsystem rampSubsystem;
   private BooleanSupplier rampClear = () -> true;
 
   public enum ClimbAction {
@@ -137,8 +136,8 @@ public class ClimbSubsystem extends SubsystemBase {
     return rampClear.getAsBoolean();
   }
 
-  public void setRampSubsystem(RampSubsystem rampSubsystem) {
-    this.rampSubsystem = rampSubsystem;
+  public void setRampClear(BooleanSupplier rClear) {
+    rampClear = rClear;
   }
 
   public boolean getLockedToCage() {
