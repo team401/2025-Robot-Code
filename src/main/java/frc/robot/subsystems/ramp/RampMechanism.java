@@ -12,7 +12,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class RampMechanism {
   RampIO io;
-  RampInputsAutoLogged inputs = new RampInputsAutoLogged();
+  public RampInputsAutoLogged inputs = new RampInputsAutoLogged();
   RampOutputsAutoLogged outputs = new RampOutputsAutoLogged();
 
   private boolean positionControl = false;

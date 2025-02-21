@@ -52,10 +52,6 @@ public abstract class RampState implements PeriodicStateInterface {
    public void periodic(){
       updateMechanism();
    }
-   
-   public void onEntry(Transition transition){
-      updateSetPoint();
-   }
 
    public boolean inPosition() {
       if (positionControl){
