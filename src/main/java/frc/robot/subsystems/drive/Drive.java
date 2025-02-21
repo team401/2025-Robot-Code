@@ -21,6 +21,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -51,6 +52,8 @@ import frc.robot.subsystems.drive.states.JoystickDrive;
 import frc.robot.subsystems.drive.states.LineupState;
 import frc.robot.subsystems.drive.states.OTFState;
 import frc.robot.util.LocalADStarAK;
+
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BooleanSupplier;
@@ -219,6 +222,8 @@ public class Drive implements DriveTemplate {
   private boolean isAligningToFieldElement = false;
   private Translation2d lockedAlignPosition = new Translation2d();
 
+  private LocalADStarAK localADStar = new LocalADStarAK();
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -248,7 +253,7 @@ public class Drive implements DriveTemplate {
         PP_CONFIG,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);
-    Pathfinding.setPathfinder(new LocalADStarAK());
+    Pathfinding.setPathfinder(localADStar);
     PathPlannerLogging.setLogActivePathCallback(
         (activePath) -> {
           Logger.recordOutput(
@@ -314,6 +319,20 @@ public class Drive implements DriveTemplate {
         .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick);
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, DriveState.Joystick);
+  }
+
+  /**
+   * add algae coral stack obstacles for on the fly
+   */
+  public void autonomousInit() {
+    localADStar.setDynamicObstacles(List.of(new Pair<Translation2d, Translation2d>(null, null)), getPose().getTranslation());
+  }
+
+   /**
+   * remove algae coral stack obstacles for on the fly
+   */
+  public void teleopInit() {
+    localADStar.setDynamicObstacles(List.of(new Pair<Translation2d, Translation2d>(null, null)), getPose().getTranslation());
   }
 
   @Override

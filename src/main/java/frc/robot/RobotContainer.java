@@ -182,6 +182,8 @@ public class RobotContainer {
   }
 
   public void autonomousInit() {
+    drive.autonomousInit();
+
     strategyManager.setAutonomyMode(AutonomyMode.Full);
 
     // load chosen strategy
@@ -189,6 +191,8 @@ public class RobotContainer {
   }
 
   public void teleopInit() {
+    drive.teleopInit();
+    
     strategyManager.setAutonomyMode(AutonomyMode.Teleop);
     // clear leftover actions from auto
     strategyManager.clearActions();
