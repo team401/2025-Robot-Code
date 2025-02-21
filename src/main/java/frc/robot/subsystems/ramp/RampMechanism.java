@@ -5,7 +5,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class RampMechanism {
   RampIO io;
-  RampInputsAutoLogged inputs = new RampInputsAutoLogged();
+  public RampInputsAutoLogged inputs = new RampInputsAutoLogged();
   RampOutputsAutoLogged outputs = new RampOutputsAutoLogged();
 
   public double position = 1.0;
@@ -41,5 +41,10 @@ public class RampMechanism {
 
   public boolean inTransition() {
     return !inPosition;
+  }
+
+  public void setVoltage(double voltage) {
+    this.voltage = voltage;
+    positionControl = false;
   }
 }
