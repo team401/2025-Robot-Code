@@ -35,4 +35,8 @@ public class RampSubsystem extends SubsystemBase {
   public boolean isInPosition() {
     return mechanism.inPosition();
   }
+
+  public double getPosition() {
+    return mechanism.inputs.position;
+  }
 }
