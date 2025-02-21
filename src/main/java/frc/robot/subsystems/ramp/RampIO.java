@@ -27,6 +27,8 @@ public interface RampIO {
    */
   public void setPID(double kP, double kI, double kD);
 
+  public void addOffset(double offset);
+  
   public void updateInputs(RampInputs inputs);
 
   public void updateOutputs(RampInputs inputs, RampOutputs outputs);

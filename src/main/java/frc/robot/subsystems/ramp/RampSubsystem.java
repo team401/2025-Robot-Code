@@ -8,13 +8,15 @@ import coppercore.controls.state_machine.state.StateContainer;
 import coppercore.controls.state_machine.state.StateInterface;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.JsonConstants;
+import frc.robot.subsystems.ramp.RampSubsystem.RampStates;
 import frc.robot.subsystems.ramp.states.RampState;
 import frc.robot.subsystems.ramp.states.RampState.RampTriggers;
 import frc.robot.subsystems.ramp.states.IdleState;
 import frc.robot.subsystems.ramp.states.IntakeHoldState;
-import frc.robot.subsystems.scoring.states.IntakeState;
-import frc.robot.subsystems.ramp.states.RampIntakeState;
+import frc.robot.subsystems.ramp.states.IntakeState;
 import frc.robot.subsystems.ramp.states.ClimbState;
+import frc.robot.subsystems.ramp.states.HomingState;
+import frc.robot.subsystems.ramp.states.RampState.RampTriggers;
 
 
 // TODO apply current to hold in position
@@ -26,8 +28,9 @@ public class RampSubsystem extends SubsystemBase {
   public enum RampStates implements StateContainer {
     IDLE(new IdleState()),
     CLIMB(new ClimbState()),
-    INTAKE(new RampIntakeState()),
-    INTAKE_HOLD(new IntakeHoldState());
+    INTAKE(new IntakeState()),
+    INTAKE_HOLD(new IntakeHoldState()),
+    HOMING(new HomingState());
 
     private RampState state;
 
@@ -62,7 +65,8 @@ public class RampSubsystem extends SubsystemBase {
     config
       .configure(RampStates.IDLE)
       .permit(RampTriggers.START_INTAKE, RampStates.INTAKE)
-      .permit(RampTriggers.START_CLIMB, RampStates.CLIMB);
+      .permit(RampTriggers.START_CLIMB, RampStates.CLIMB)
+      .permit(RampTriggers.START_HOMING, RampStates.HOMING);
 
     config
       .configure(RampStates.INTAKE)
@@ -79,6 +83,10 @@ public class RampSubsystem extends SubsystemBase {
       .configure(RampStates.CLIMB)
       .permit(RampTriggers.GOTO_IDLE, RampStates.IDLE)
       .permit(RampTriggers.START_INTAKE, RampStates.INTAKE);
+
+    config
+      .configure(RampStates.HOMING)
+      .permit(RampTriggers.HOMED, RampStates.IDLE);
 
     stateMachine = new StateMachine<>(config, RampStates.IDLE);
 

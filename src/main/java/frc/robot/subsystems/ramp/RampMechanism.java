@@ -103,4 +103,7 @@ public class RampMechanism {
     }
   }
 
+  public void setHome(){
+    io.addOffset(-inputs.position);
+  }
 }

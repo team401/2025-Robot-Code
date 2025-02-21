@@ -17,6 +17,7 @@ public class RampIOTalonFX implements RampIO {
           JsonConstants.rampConstants.PID_TalonFX_D);
 
   private TalonFX talon;
+  public double angle_offset = 0.0;
 
   public RampIOTalonFX() {
     talon = new TalonFX(JsonConstants.rampConstants.motorId);
@@ -29,9 +30,16 @@ public class RampIOTalonFX implements RampIO {
     controller.setD(kD);
   }
 
+
+
+  @Override
+  public void addOffset(double offset){
+    angle_offset += offset;
+  }
+
   @Override
   public void updateInputs(RampInputs inputs) {
-    inputs.position = Rotations.of(talon.getPosition().getValueAsDouble()).in(Radians);
+    inputs.position = Rotations.of(talon.getPosition().getValueAsDouble()).in(Radians) + angle_offset;
   }
 
   @Override

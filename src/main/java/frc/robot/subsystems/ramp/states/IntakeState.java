@@ -2,7 +2,7 @@ package frc.robot.subsystems.ramp.states;
 
 import frc.robot.constants.JsonConstants;
 
-public class RampIntakeState extends RampState {
+public class IntakeState extends RampState {
 
     @Override
     public void periodic(){
