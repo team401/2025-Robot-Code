@@ -119,6 +119,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   private boolean overrideStateMachine = false;
 
+  private boolean shouldWarmupAfterInit = false;
+
   private BooleanSupplier isDriveLinedUpSupplier;
 
   public enum FieldTarget {
@@ -195,7 +197,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
 
     stateMachineConfiguration
         .configure(ScoringState.Init)
-        .permit(ScoringTrigger.Seeded, ScoringState.Idle);
+        .permitIf(ScoringTrigger.Seeded, ScoringState.Warmup, () -> shouldWarmupAfterInit)
+        .permitIf(ScoringTrigger.Seeded, ScoringState.Idle, () -> !shouldWarmupAfterInit);
 
     stateMachineConfiguration
         .configure(ScoringState.Idle)
@@ -294,6 +297,11 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   public void fireTrigger(ScoringTrigger trigger) {
     stateMachine.fire(trigger);
+
+    if (trigger == ScoringTrigger.StartWarmup
+        && stateMachine.getCurrentState() == ScoringState.Init) {
+      shouldWarmupAfterInit = true;
+    }
   }
 
   /**
