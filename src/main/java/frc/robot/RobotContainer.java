@@ -200,7 +200,6 @@ public class RobotContainer {
 
     switch (TestModeManager.getTestMode()) {
       case ElevatorCharacterization:
-        scoringSubsystem.setOverrideStateMachine(true);
         CommandScheduler.getInstance()
             .schedule(
                 new SequentialCommandGroup(
