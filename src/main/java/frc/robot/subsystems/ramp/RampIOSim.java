@@ -51,8 +51,11 @@ public class RampIOSim implements RampIO {
 
   @Override
   public void updateOutputs(RampInputs inputs, RampOutputs outputs) {
-    controller.setSetpoint(outputs.targetPosition);
-    double volts = controller.calculate(inputs.position);
+    double volts = inputs.controlValue;
+    if (inputs.positionControl){
+      controller.setSetpoint(inputs.controlValue);
+      volts = controller.calculate(inputs.position);
+    }
     volts = Math.min(Math.max(volts, -12.0), 12.0);
     outputs.appliedVolts = volts;
     sim.setInputVoltage(volts);
