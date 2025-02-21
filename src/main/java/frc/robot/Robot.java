@@ -158,15 +158,10 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {
-    if (ModeConstants.currentMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
-      SimulatedArena.getInstance().simulationPeriodic();
-      Logger.recordOutput(
-          "FieldSimulation/RobotPosition", RobotContainer.driveSim.getSimulatedDriveTrainPose());
+    robotContainer.updateRobotModel();
 
-      Logger.recordOutput(
-          "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
-      Logger.recordOutput(
-          "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
+    if (ModeConstants.currentMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
+      robotContainer.updateMapleSim();
     }
   }
 }

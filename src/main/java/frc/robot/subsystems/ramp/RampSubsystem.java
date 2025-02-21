@@ -19,6 +19,11 @@ public class RampSubsystem extends SubsystemBase {
     mechanism.periodic();
   }
 
+  /** Must be called manually, does NOT run automatically */
+  public void testPeriodic() {
+    mechanism.testPeriodic();
+  }
+
   public void prepareForClimb() {
     mechanism.setPosition(JsonConstants.rampConstants.climbPosition);
   }
@@ -29,5 +34,9 @@ public class RampSubsystem extends SubsystemBase {
 
   public boolean isInPosition() {
     return mechanism.inPosition();
+  }
+
+  public double getPosition() {
+    return mechanism.inputs.position;
   }
 }
