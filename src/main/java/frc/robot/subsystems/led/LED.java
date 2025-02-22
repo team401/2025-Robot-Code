@@ -8,9 +8,7 @@ import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.AddressableLEDBufferView;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.LEDConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -20,37 +18,28 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class LED extends SubsystemBase {
 
-  private boolean enabled = true; // TODO: Add LED Switch on branch "switch-led-brake"
-  private ScoringSubsystem scoringSubsystem;
-  private ClimbSubsystem climbSubsystem;
-  private Drive driveSubsystem;
-
-  private final AddressableLED led = new AddressableLED(LEDConstants.ledPort);
-  private final AddressableLEDBuffer ledStrip = new AddressableLEDBuffer(LEDConstants.totalLength);
-
-  private final AddressableLEDBufferView leftData = ledStrip.createView(0, 29);
-  private final AddressableLEDBufferView rightData = ledStrip.createView(30, 59).reversed();
-
   private List<LEDPattern> leftPatterns = new ArrayList<>();
   private List<LEDPattern> rightPatterns = new ArrayList<>();
+
+  private final AddressableLED led = new AddressableLED(LEDConstants.ledPort);
+  public final AddressableLEDBuffer ledStrip = new AddressableLEDBuffer(LEDConstants.totalLength);
+
+  public final AddressableLEDBufferView leftData =
+      ledStrip.createView(0, LEDConstants.leftLength - 1);
+  private final AddressableLEDBufferView rightData =
+      ledStrip.createView(LEDConstants.leftLength, LEDConstants.totalLength - 1).reversed();
 
   public LEDPattern rainbow =
       LEDPattern.rainbow(255, 255)
           .scrollAtRelativeSpeed(Percent.per(Second).of(LEDConstants.rainbowSpeed));
-  public LEDPattern clear = LEDPattern.solid(Color.kBlack);
-  /*
-   * How LED's work:
-   * 1. Add a list of colors in LEDConstants.java
-   * 2. Add a list of LEDPatterns that use those colors
-   * 3. LEDPatterns are where the magic happens, make your specific colors/animations/etc there
-   * 4. Call them in periodic();
-   */
+  public LEDPattern rainbow1 =
+      LEDPattern.rainbow(255, 255)
+          .scrollAtRelativeSpeed(Percent.per(Second).of(LEDConstants.rainbowSpeed));
   public LEDPattern holdingAlgae =
       LEDPattern.steps(Map.of(0, LEDConstants.holdingAlgae, 1 / 3.0, LEDConstants.off));
   public LEDPattern holdingCoral =
@@ -77,28 +66,37 @@ public class LED extends SubsystemBase {
 
   public LEDPattern lockedOnHang = LEDPattern.solid(LEDConstants.lockedOnHang);
 
+  public LEDPattern clear = LEDPattern.solid(Color.kBlack);
+  private ScoringSubsystem scoringSubsystem;
+  private ClimbSubsystem climbSubsystem;
+  private Drive driveSubsystem;
+
+  /*
+   * How LED's work:
+   * 1. Add a list of colors in LEDConstants.java
+   * 2. Add a list of LEDPatterns that use those colors
+   * 3. LEDPatterns are where the magic happens, make your specific colors/animations/etc there
+   * 4. Call them in periodic();
+   */
+
   public LED(ScoringSubsystem scoringSubsystem, ClimbSubsystem climbSubsystem, Drive drive) {
     this.scoringSubsystem = scoringSubsystem;
     this.climbSubsystem = climbSubsystem;
     this.driveSubsystem = drive;
     led.setLength(LEDConstants.totalLength);
+
     led.start();
   }
 
   @Override
   public void periodic() {
-    clear();
+    bufferification();
+    led.setData(ledStrip);
+  }
 
-    if (!enabled) {
-      // if not enabled LEDs are left cleared
-    } else if (DriverStation.isDisabled()) {
-      rainbow();
-    } else {
-      // endgame
-      if (DriverStation.getMatchTime() < 20 && DriverStation.getMatchTime() > 17) {
-        addPattern(endGame);
-      }
-      // algae
+  public void bufferification() { // TODO: make this a real method name
+    if (!DriverStation.isDisabled()) {
+      scoringSubsystem.setGamePiece(GamePiece.Coral);
       if (scoringSubsystem != null && (scoringSubsystem.getGamePiece() == GamePiece.Algae)) {
         addSplitPattern(holdingAlgae, clear);
       }
@@ -125,9 +123,8 @@ public class LED extends SubsystemBase {
       if (climbSubsystem != null && (climbSubsystem.getLockedToCage()) == true) {
         addPattern(lockedOnHang);
       }
-      if (driveSubsystem != null
-          && (driveSubsystem.getDesiredLocation()) == DesiredLocation.Processor) {
-        addSplitPattern(clear, targetOnProcessor);
+      if (driveSubsystem != null && (driveSubsystem.isDesiredLocationReef())) {
+        addSplitPattern(clear, targetOnReef);
       }
       if (driveSubsystem != null
           && (driveSubsystem.getDesiredLocation()) == (DesiredLocation.CoralStationLeft)) {
@@ -137,11 +134,20 @@ public class LED extends SubsystemBase {
           && (driveSubsystem.getDesiredLocation()) == (DesiredLocation.CoralStationRight)) {
         addSplitPattern(clear, targetOnCoralStation);
       }
-      applyPatterns();
 
-      led.setData(ledStrip);
+      applyPatterns();
+    } else {
+      runPattern(rainbow);
     }
-    led.setData(ledStrip);
+  }
+
+  public void runSplitPattern(LEDPattern up, LEDPattern down) {
+    down.applyTo(leftData);
+    up.applyTo(rightData);
+  }
+
+  public void runPattern(LEDPattern pattern) {
+    runSplitPattern(pattern, pattern);
   }
 
   public void addSplitPattern(LEDPattern left, LEDPattern right) {
@@ -152,35 +158,6 @@ public class LED extends SubsystemBase {
   public void addPattern(LEDPattern pattern) {
     leftPatterns.add(pattern);
     rightPatterns.add(pattern);
-  }
-
-  public void clear() {
-    for (int i = 0; i < leftData.getLength(); i++) {
-      leftData.setRGB(i, 0, 0, 0);
-    }
-    for (int i = 0; i < rightData.getLength(); i++) {
-      rightData.setRGB(i, 0, 0, 0);
-    }
-    leftPatterns.clear();
-    rightPatterns.clear();
-  }
-
-  public void rainbow() {
-    runPattern(rainbow);
-  }
-
-  public Command runPattern(LEDPattern pattern) {
-    return runSplitPattern(pattern, pattern);
-  }
-
-  /** Runs separate patterns on the top and bottom LED sections. */
-  public Command runSplitPattern(LEDPattern up, LEDPattern down) {
-    return run(
-        () -> {
-          down.applyTo(leftData);
-          up.applyTo(rightData);
-          mergeBuffers(); // Ensure buffer updates properly
-        });
   }
 
   public void applyPatterns() {
@@ -199,70 +176,61 @@ public class LED extends SubsystemBase {
     // Apply patterns to the left and right views
     leftFinal.applyTo(leftData);
     rightFinal.applyTo(rightData);
-
-    // Merge views into the full buffer
-    mergeBuffers();
   }
 
-  private void mergeBuffers() {
-    int halfLength = leftData.getLength();
-    for (int i = 0; i < halfLength; i++) {
-      ledStrip.setRGB(i, leftData.getRed(i), leftData.getGreen(i), leftData.getBlue(i));
-      ledStrip.setRGB(
-          2 * halfLength - i - 1, rightData.getRed(i), rightData.getGreen(i), rightData.getBlue(i));
-    }
-  }
+  /** Runs separate patterns on the top and bottom LED sections. */
 
-  public Command runCycle() {
-    // Just makes sure LEDs aren't destroying themselves or something
-    return new Command() {
-      private double lastTime;
-      private int currentIndex = 0;
+  // public Command runCycle() {
+  //   // Just makes sure LEDs aren't destroying themselves or something
+  //   return new Command() {
+  //     private double lastTime;
+  //     private int currentIndex = 0;
 
-      private final List<LEDPattern> patterns =
-          Arrays.asList(
-              LEDPattern.solid(LEDConstants.lockedOnHang),
-              LEDPattern.solid(LEDConstants.holdingAlgae),
-              LEDPattern.solid(LEDConstants.holdingCoral),
-              LEDPattern.solid(LEDConstants.targetOnReefL1),
-              LEDPattern.solid(LEDConstants.targetOnReefL2),
-              LEDPattern.solid(LEDConstants.targetOnReefL3),
-              LEDPattern.solid(LEDConstants.targetOnReefL4),
-              LEDPattern.solid(LEDConstants.targetOnReef),
-              LEDPattern.solid(LEDConstants.targetOnNet));
+  //     private final List<LEDPattern> patterns =
+  //         Arrays.asList(
+  //             LEDPattern.solid(LEDConstants.lockedOnHang),
+  //             LEDPattern.solid(LEDConstants.holdingAlgae),
+  //             LEDPattern.solid(LEDConstants.holdingCoral),
+  //             LEDPattern.solid(LEDConstants.targetOnReefL1),
+  //             LEDPattern.solid(LEDConstants.targetOnReefL2),
+  //             LEDPattern.solid(LEDConstants.targetOnReefL3),
+  //             LEDPattern.solid(LEDConstants.targetOnReefL4),
+  //             LEDPattern.solid(LEDConstants.targetOnReef),
+  //             LEDPattern.solid(LEDConstants.targetOnNet));
 
-      @Override
-      public void initialize() {
-        currentIndex = 0;
-        lastTime = Timer.getFPGATimestamp();
-        // Apply the first color pattern on both sides.
-        runSplitPattern(patterns.get(currentIndex), patterns.get(currentIndex)).schedule();
-      }
+  //     @Override
+  //     public void initialize() {
+  //       currentIndex = 0;
+  //       lastTime = Timer.getFPGATimestamp();
+  //       // Apply the first color pattern on both sides.
+  //       runSplitPattern(patterns.get(currentIndex), patterns.get(currentIndex)).schedule();
+  //     }
 
-      @Override
-      public void execute() {
-        double now = Timer.getFPGATimestamp();
-        if (now - lastTime >= 5.5) { // One second elapsed
-          currentIndex = (currentIndex + 1) % patterns.size();
-          if (currentIndex < patterns.size()) {
-            // Schedule the next color.
-            runSplitPattern(
-                    patterns.get(currentIndex), patterns.get((currentIndex + 1) % patterns.size()))
-                .schedule();
-            lastTime = now;
-          }
-        }
-      }
+  //     @Override
+  //     public void execute() {
+  //       double now = Timer.getFPGATimestamp();
+  //       if (now - lastTime >= 5.5) { // One second elapsed
+  //         currentIndex = (currentIndex + 1) % patterns.size();
+  //         if (currentIndex < patterns.size()) {
+  //           // Schedule the next color.
+  //           runSplitPattern(
+  //                   patterns.get(currentIndex), patterns.get((currentIndex + 1) %
+  // patterns.size()))
+  //               .schedule();
+  //           lastTime = now;
+  //         }
+  //       }
+  //     }
 
-      @Override
-      public boolean isFinished() {
-        return false;
-      }
+  //     @Override
+  //     public boolean isFinished() {
+  //       return false;
+  //     }
 
-      @Override
-      public void end(boolean interrupted) {
-        // Optionally, cancel any running LED command if needed.
-      }
-    };
-  }
+  //     @Override
+  //     public void end(boolean interrupted) {
+  //       // Optionally, cancel any running LED command if needed.
+  //     }
+  //   };
+  // }
 }

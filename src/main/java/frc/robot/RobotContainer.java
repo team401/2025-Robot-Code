@@ -147,6 +147,7 @@ public class RobotContainer {
   }
 
   public void periodic() {
+
     strategyManager.periodic();
   }
 
@@ -212,7 +213,7 @@ public class RobotContainer {
         CommandScheduler.getInstance()
             .schedule(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
       case LEDTest:
-        CommandScheduler.getInstance().schedule(led.runCycle());
+        // CommandScheduler.getInstance().schedule(led.runCycle());
         break;
       default:
         break;
@@ -227,6 +228,7 @@ public class RobotContainer {
   }
 
   public void disabledPeriodic() {
+    led.periodic();
     // Logger.recordOutput("feature_flags/drive", FeatureFlags.synced.getObject().runDrive);
     strategyManager.logActions();
   }
