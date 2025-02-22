@@ -76,12 +76,12 @@ public final class ElevatorConstants {
   public final Integer elevatorLargeCANCoderID = 14;
 
   public final SensorDirectionValue elevatorLargeCANCoderDirection =
-      SensorDirectionValue.CounterClockwise_Positive;
+      SensorDirectionValue.Clockwise_Positive;
 
   public final Integer elevatorSmallCANCoderID = 15;
 
   public final SensorDirectionValue elevatorSmallCANCoderDirection =
-      SensorDirectionValue.Clockwise_Positive;
+      SensorDirectionValue.CounterClockwise_Positive;
 
   /*
    * The large CANCoder is represented as the mechanism in our Phoenix configs.

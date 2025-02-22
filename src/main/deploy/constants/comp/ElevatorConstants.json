@@ -56,30 +56,50 @@
     "value": -3.0,
     "unit": "Volt"
   },
-  "homingVelocityThresholdMetersPerSecond": 0.1,
+  "homingVelocityThresholdMetersPerSecond": 0.001,
   "homingMaxTime": {
     "value": 3.0,
     "unit": "Second"
   },
   "homingMaxUnmovingTime": {
-    "value": 0.25,
+    "value": 1.0,
     "unit": "Second"
   },
   "homingVelocityFilterWindowSize": 5,
-  "maxWristInBelowCrossBarHeight": {
-    "value": 1.0,
-    "unit": "Meter"
-  },
-  "minWristInAboveCrossBarHeight": {
-    "value": 1.1,
-    "unit": "Meter"
-  },
   "minWristDownHeight": {
     "value": 0.2,
     "unit": "Meter"
   },
+  "minReefSafeHeight": {
+    "value": 0.2,
+    "unit": "Meter"
+  },
+  "L2MinHeightAbove": {
+    "value": 0.32,
+    "unit": "Meter"
+  },
+  "L3MinHeightAbove": {
+    "value": 0.65,
+    "unit": "Meter"
+  },
+  "L4MinHeightAbove": {
+    "value": 1.44,
+    "unit": "Meter"
+  },
+  "L2MaxHeightBelow": {
+    "value": 0.16,
+    "unit": "Meter"
+  },
+  "L3MaxHeightBelow": {
+    "value": 0.35,
+    "unit": "Meter"
+  },
+  "L4MaxHeightBelow": {
+    "value": 0.7,
+    "unit": "Meter"
+  },
   "elevatorSetpointEpsilon": {
-    "value": 0.01,
+    "value": 0.05,
     "unit": "Meter"
   }
 }
