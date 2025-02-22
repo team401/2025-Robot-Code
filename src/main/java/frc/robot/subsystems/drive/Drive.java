@@ -44,6 +44,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.subsystems.drive.states.IdleState;
@@ -165,7 +166,7 @@ public class Drive implements DriveTemplate {
     DesiredLocation.CoralStationRight
   };
 
-  private DesiredLocation desiredLocation = DesiredLocation.Reef0;
+  private DesiredLocation desiredLocation = DesiredLocation.Reef9;
   private DesiredLocation intakeLocation = DesiredLocation.CoralStationLeft;
   private boolean goToIntake = false;
 
@@ -244,7 +245,7 @@ public class Drive implements DriveTemplate {
         this::getChassisSpeeds,
         (ChassisSpeeds speeds) -> this.setGoalSpeeds(speeds, false),
         new PPHolonomicDriveController(
-            new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
+            new PIDConstants(1.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
         PP_CONFIG,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);
@@ -342,8 +343,18 @@ public class Drive implements DriveTemplate {
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
 
+    // allow controlling drive unless we are characterizing
+    if (DriverStation.isTestEnabled()) {
+      switch (TestModeManager.getTestMode()) {
+        case DriveFeedForwardCharacterization:
+        case DriveSteerMotorCharacterization:
+          break;
+        default:
+          this.runVelocity();
+      }
+    }
     // run velocity if not disabled
-    if (!DriverStation.isTest() && !DriverStation.isDisabled()) {
+    else if (!DriverStation.isDisabled()) {
       this.runVelocity();
     }
 
