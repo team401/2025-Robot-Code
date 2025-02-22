@@ -165,7 +165,7 @@ public class Drive implements DriveTemplate {
     DesiredLocation.CoralStationRight
   };
 
-  private DesiredLocation desiredLocation = DesiredLocation.Reef0;
+  private DesiredLocation desiredLocation = DesiredLocation.Reef9;
   private DesiredLocation intakeLocation = DesiredLocation.CoralStationLeft;
   private boolean goToIntake = false;
 
