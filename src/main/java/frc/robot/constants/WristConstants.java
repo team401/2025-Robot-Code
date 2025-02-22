@@ -38,7 +38,7 @@ public class WristConstants {
    * <p>see talonFX docs:
    * https://api.ctr-electronics.com/phoenix6/latest/java/com/ctre/phoenix6/configs/FeedbackConfigs.html#SensorToMechanismRatio
    */
-  public final Double sensorToMechanismRatio = 1.0; // TODO: Actual value
+  public final Double sensorToMechanismRatio = 1.0;
 
   public final Double wristReduction = 20.0;
 
@@ -66,10 +66,8 @@ public class WristConstants {
   // This value is a a Double because RotationsPerSecond doesn't serialize properly with JSONSync
   public final Double wristMotionMagicCruiseVelocityRotationsPerSecond = 3.0;
 
-  // TODO: Tune this!
-
-  public final Double wristMotionMagicExpo_kA = 0.4; //
-  public final Double wristMotionMagicExpo_kV = 0.1; //
+  public final Double wristMotionMagicExpo_kA = 0.4;
+  public final Double wristMotionMagicExpo_kV = 0.1;
 
   public final Angle wristCANcoderAbsoluteSensorDiscontinuityPoint = Rotations.of(0.5);
   public final Angle wristCANcoderMagnetOffset = Rotations.of(-0.315185546875);
@@ -81,14 +79,11 @@ public class WristConstants {
   public final Angle wristMinMinAngle = Radians.of(-1.68);
   public final Angle wristMaxMaxAngle = Radians.of(2.0);
 
-  /** The maximum angle the wrist can be at while passing by the crossbar without hitting it. */
-  public final Angle maxCrossBarSafeAngle = Radians.of(2.0); // TODO: Actual value
-
   /**
    * The minimum angle the wrist can be at while the elevator is down and not hit the parts of the
    * robot below.
    */
-  public final Angle minElevatorDownSafeAngle = Rotations.of(-0.5); // TODO: Actual value
+  public final Angle minElevatorDownSafeAngle = Rotations.of(0.0); // TODO: Confirm
 
   /** The minimum angle the wrist can be at without hitting the reef when very close to the reef */
   public final Angle minReefSafeAngle = Rotations.of(0.35);
@@ -96,7 +91,7 @@ public class WristConstants {
   /**
    * When less than this distance from the center of the reef, the claw can collide with it the reef
    */
-  public final Distance closeToReefThreshold = Meters.of(2.0); // TODO: Actual value
+  public final Distance closeToReefThreshold = Meters.of(2.0); // TODO: Tune at shop 2/22
 
   /** The wrist can be this far away from the goal and considered "at the setpoint" */
   public final Angle wristSetpointEpsilon = Degrees.of(5.0);
