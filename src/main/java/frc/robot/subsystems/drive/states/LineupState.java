@@ -5,6 +5,7 @@ import coppercore.controls.state_machine.transition.Transition;
 import coppercore.parameter_tools.LoggedTunableNumber;
 import coppercore.vision.VisionLocalizer.DistanceToTag;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -79,6 +80,9 @@ public class LineupState implements PeriodicStateInterface {
           JsonConstants.drivetrainConstants.driveRotationKp,
           JsonConstants.drivetrainConstants.driveRotationKi,
           JsonConstants.drivetrainConstants.driveRotationKd);
+
+  LinearFilter alongTrackFilter = LinearFilter.singlePoleIIR(0.2, 0.02);
+  LinearFilter crossTrackFilter = LinearFilter.singlePoleIIR(0.2, 0.02);
 
   public LineupState(Drive drive) {
     this.drive = drive;
@@ -241,7 +245,7 @@ public class LineupState implements PeriodicStateInterface {
       return 0;
     }
 
-    if (alongTrackDistance < 0.5) {
+    if (alongTrackDistance < 0.2) {
       return -1
           * JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
           * driveAlongTrackLineupController.calculate(alongTrackDistance);
@@ -295,21 +299,30 @@ public class LineupState implements PeriodicStateInterface {
       observationAge = 0;
     }
 
+    double alongTrackDistanceFiltered =
+        alongTrackFilter.calculate(observation.alongTrackDistance());
+    double crossTrackDistanceFiltered =
+        crossTrackFilter.calculate(observation.crossTrackDistance());
+
     Logger.recordOutput("Drive/Lineup/AlongTrackDistance", observation.alongTrackDistance());
     Logger.recordOutput("Drive/Lineup/CrossTrackDistance", observation.crossTrackDistance());
+    Logger.recordOutput("Drive/Lineup/AlongTrackDistanceFiltered", alongTrackDistanceFiltered);
+    Logger.recordOutput("Drive/Lineup/CrossTrackDistanceFiltered", crossTrackDistanceFiltered);
     Logger.recordOutput("Drive/Lineup/IsObservationValid", observation.isValid());
 
     // give to PID Controllers and setGoalSpeeds (robotCentric)
-    double vx =
-        JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
-            // * getAlongTrackVelocityReductionFactor(observation.crossTrackDistance())
-            * getAlongTrackVelocity(observation.alongTrackDistance());
-    double vy = driveCrossTrackLineupController.calculate(observation.crossTrackDistance());
-    double omega =
-        rotationController.calculate(
-            drive.getRotation().getRadians(), this.getRotationForReefSide().getRadians());
+    if (!lineupFinished()) {
+      double vx =
+          JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
+              // * getAlongTrackVelocityReductionFactor(observation.crossTrackDistance())
+              * getAlongTrackVelocity(alongTrackDistanceFiltered);
+      double vy = driveCrossTrackLineupController.calculate(crossTrackDistanceFiltered);
+      double omega =
+          rotationController.calculate(
+              drive.getRotation().getRadians(), this.getRotationForReefSide().getRadians());
 
-    drive.setGoalSpeeds(new ChassisSpeeds(vx, vy, omega), false);
+      drive.setGoalSpeeds(new ChassisSpeeds(vx, vy, omega), false);
+    }
   }
 
   /**
