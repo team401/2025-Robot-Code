@@ -1,5 +1,5 @@
 {
-  "environment": "comp",
+  "environment": "test_drivebase",
   "defaults": "comp",
   "environments": [
     {
