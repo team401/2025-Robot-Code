@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.StrategyManager.AutonomyMode;
 import frc.robot.commands.drive.DesiredLocationSelector;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
@@ -36,7 +37,7 @@ public final class InitBindings {
   private static final CommandXboxController driverController =
       new CommandXboxController(OperatorConstants.synced.getObject().kDriverControllerPort);
 
-  public static void initDriveBindings(Drive drive) {
+  public static void initDriveBindings(Drive drive, StrategyManager strategyManager) {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         new DriveWithJoysticks(
@@ -54,7 +55,10 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                  if (strategyManager.getAutonomyMode() != AutonomyMode.Manual) {
+                    drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                  }
+                  ;
                 },
                 drive));
     rightJoystick
@@ -62,7 +66,11 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+                  if (strategyManager.getAutonomyMode() != AutonomyMode.Manual) {
+                    drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+                    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.CancelWarmup);
+                  }
+                  ;
                 },
                 drive));
 

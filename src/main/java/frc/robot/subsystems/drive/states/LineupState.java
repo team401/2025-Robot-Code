@@ -101,6 +101,10 @@ public class LineupState implements PeriodicStateInterface {
     ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
   }
 
+  public void onExit(Transition transition) {
+    drive.setDriveLinedUp(false);
+  }
+
   /**
    * gets rotation for each side of hexagonal reef for lineup
    *
@@ -161,9 +165,7 @@ public class LineupState implements PeriodicStateInterface {
     }
     this.LineupWithReefLocation();
 
-    // if (lineupFinished()) {
-    //   drive.fireTrigger(DriveTrigger.FinishLineup);
-    // }
+    drive.setDriveLinedUp(lineupFinished());
   }
 
   /**

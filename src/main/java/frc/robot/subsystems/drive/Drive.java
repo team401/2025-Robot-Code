@@ -184,6 +184,8 @@ public class Drive implements DriveTemplate {
 
   private static Drive instance;
 
+  private boolean driveLinedUp = false;
+
   private enum DriveState implements StateContainer {
     Idle(new IdleState(instance)),
     OTF(new OTFState(instance)),
@@ -342,9 +344,6 @@ public class Drive implements DriveTemplate {
       Logger.recordOutput("SwerveStates/Setpoints", new SwerveModuleState[] {});
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
-
-    // check for update from reef touchscreen
-    this.updateDesiredLocationFromNetworkTables();
 
     // allow controlling drive unless we are characterizing
     if (DriverStation.isTestEnabled()) {
@@ -577,8 +576,7 @@ public class Drive implements DriveTemplate {
   }
 
   /** checks for update from reef location network table (SnakeScreen) run periodically in drive */
-  public void updateDesiredLocationFromNetworkTables() {
-    double desiredIndex = reefLocationSelector.get();
+  public void updateDesiredLocationFromNetworkTables(double desiredIndex) {
     if (desiredIndex == -1) {
       return;
     }
@@ -656,16 +654,21 @@ public class Drive implements DriveTemplate {
     stateMachine.fire(trigger);
   }
 
+  public void setDriveLinedUp(boolean linedUp) {
+    this.driveLinedUp = linedUp;
+  }
+
+  public boolean isDriveLineupFinished() {
+    return driveLinedUp;
+  }
+
   /**
    * checks if alignment has run
    *
    * @return true if we are close to otf for intake OR we have finished lineup for reef
    */
   public boolean isDriveAlignmentFinished() {
-    return goToIntake
-        ? this.isDriveCloseToFinalLineupPose()
-        : (this.stateMachine.getCurrentState().equals(DriveState.Joystick)
-            || this.stateMachine.getCurrentState().equals(DriveState.Idle));
+    return goToIntake ? this.isDriveCloseToFinalLineupPose() : this.driveLinedUp;
   }
 
   /**

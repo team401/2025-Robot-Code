@@ -170,6 +170,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     ToggleWarmup, // warmup button toggles warmup <-> idle
     StartWarmup, // drive automatically enters warmup when lineup begins
     WarmupReady,
+    CancelWarmup, // Warmup button was released, go back to idle
     ScoredPiece,
     ReturnToIdle, // Return to idle when a warmup/score state no longer detects a gamepiece
     EnterTestMode,
@@ -220,6 +221,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
             ScoringState.Intake,
             () -> !(isCoralDetected() || isAlgaeDetected()))
         .permit(ScoringTrigger.ToggleWarmup, ScoringState.Warmup)
+        .permit(ScoringTrigger.StartWarmup, ScoringState.Warmup)
         .permitIf(ScoringTrigger.EnterTestMode, ScoringState.Tuning, isScoringTuningSupplier);
 
     stateMachineConfiguration
@@ -241,7 +243,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
             ScoringTrigger.WarmupReady,
             ScoringState.Score,
             () -> autoTransition && isDriveLinedUpSupplier.getAsBoolean())
-        .permit(ScoringTrigger.ReturnToIdle, ScoringState.Idle);
+        .permit(ScoringTrigger.ReturnToIdle, ScoringState.Idle)
+        .permit(ScoringTrigger.CancelWarmup, ScoringState.Idle);
 
     stateMachineConfiguration
         .configure(ScoringState.Score)
@@ -318,6 +321,25 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     if (trigger == ScoringTrigger.StartWarmup
         && stateMachine.getCurrentState() == ScoringState.Init) {
       shouldWarmupAfterInit = true;
+    }
+  }
+
+  public void updateScoringLevelFromNetworkTables(String level) {
+    if (level.equalsIgnoreCase("-1")) {
+      return;
+    }
+
+    if (level.equalsIgnoreCase("level1")) {
+      this.setTarget(FieldTarget.L1);
+    }
+    if (level.equalsIgnoreCase("level2")) {
+      this.setTarget(FieldTarget.L2);
+    }
+    if (level.equalsIgnoreCase("level3")) {
+      this.setTarget(FieldTarget.L3);
+    }
+    if (level.equalsIgnoreCase("level4")) {
+      this.setTarget(FieldTarget.L4);
     }
   }
 

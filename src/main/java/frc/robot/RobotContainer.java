@@ -162,7 +162,7 @@ public class RobotContainer {
   private void configureBindings() {
     // initialize helper commands
     if (FeatureFlags.synced.getObject().runDrive) {
-      InitBindings.initDriveBindings(drive);
+      InitBindings.initDriveBindings(drive, strategyManager);
     }
     if (FeatureFlags.synced.getObject().runRamp) {
       InitBindings.initRampBindings(rampSubsystem);
