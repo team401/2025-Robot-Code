@@ -71,8 +71,7 @@ public class WristConstants {
   public final Double wristMotionMagicExpo_kA = 0.4; //
   public final Double wristMotionMagicExpo_kV = 0.1; //
 
-  public final Angle wristCANcoderAbsoluteSensorDiscontinuityPoint =
-      Rotations.of(0.5);
+  public final Angle wristCANcoderAbsoluteSensorDiscontinuityPoint = Rotations.of(0.5);
   public final Angle wristCANcoderMagnetOffset = Rotations.of(-0.315185546875);
   public final SensorDirectionValue wristCANcoderSensorDirection =
       SensorDirectionValue.Clockwise_Positive;
