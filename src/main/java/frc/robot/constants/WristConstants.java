@@ -90,6 +90,9 @@ public class WristConstants {
    */
   public final Angle minElevatorDownSafeAngle = Rotations.of(-0.5); // TODO: Actual value
 
+  /** The minimum angle the wrist can be at without hitting the reef when very close to the reef */
+  public final Angle minReefSafeAngle = Rotations.of(0.35);
+
   /** The wrist can be this far away from the goal and considered "at the setpoint" */
   public final Angle wristSetpointEpsilon = Degrees.of(5.0);
 

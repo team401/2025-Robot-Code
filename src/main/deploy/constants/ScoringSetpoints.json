@@ -24,11 +24,11 @@
   "L1": {
     "name": "L1",
     "elevatorHeight": {
-      "value": 1.0,
+      "value": 0.15,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": 0.3214,
+      "value": 0.3,
       "unit": "Rotation"
     }
   },
