@@ -93,6 +93,11 @@ public class WristConstants {
   /** The minimum angle the wrist can be at without hitting the reef when very close to the reef */
   public final Angle minReefSafeAngle = Rotations.of(0.35);
 
+  /**
+   * When less than this distance from the center of the reef, the claw can collide with it the reef
+   */
+  public final Distance closeToReefThreshold = Meters.of(1.5); // TODO: Actual value
+
   /** The wrist can be this far away from the goal and considered "at the setpoint" */
   public final Angle wristSetpointEpsilon = Degrees.of(5.0);
 

@@ -33,6 +33,7 @@ import frc.robot.subsystems.scoring.states.TuningState;
 import frc.robot.subsystems.scoring.states.WarmupState;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -182,7 +183,9 @@ public class ScoringSubsystem extends MonitoredSubsystem {
                   || TestModeManager.getTestMode() == TestMode.WristClosedLoopTuning
                   || TestModeManager.getTestMode() == TestMode.WristVoltageTuning
                   || TestModeManager.getTestMode() == TestMode.SetpointTuning);
-  
+
+  private Supplier<Distance> reefDistanceSupplier = () -> Meters.zero();
+
   public ScoringSubsystem(
       ElevatorMechanism elevatorMechanism,
       WristMechanism wristMechanism,
@@ -636,6 +639,16 @@ public class ScoringSubsystem extends MonitoredSubsystem {
   }
 
   /**
+   * Update the reef distance supplier used for reef collision avoidance
+   *
+   * @param newSupplier The new Distance supplier, which should supply the robot's distance from
+   *     reef center
+   */
+  public void setReefDistanceSupplier(Supplier<Distance> newSupplier) {
+    reefDistanceSupplier = newSupplier;
+  }
+
+  /**
    * Based on the state of the wrist and elevator, clamp their positions to avoid collisions
    *
    * <p>This method does not verify that the mechanisms exist, so featureflags should be checked
@@ -669,8 +682,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
               Measure.max(elevatorMinHeight, JsonConstants.elevatorConstants.minWristDownHeight));
     }
 
-    // TODO: Make this only run when we're very close to the reef
-    if (ReefAvoidanceHelper.willPassReefLevel(elevatorHeight, elevatorGoalHeight)) {
+    if (reefDistanceSupplier.get().lt(JsonConstants.wristConstants.closeToReefThreshold)
+        && ReefAvoidanceHelper.willPassReefLevel(elevatorHeight, elevatorGoalHeight)) {
       // If we will pass a reef level, clamp the wrist to be in a safe position to pass the reef
       wristMinAngle.mut_replace(
           (Angle) Measure.max(wristMinAngle, JsonConstants.wristConstants.minReefSafeAngle));

@@ -185,7 +185,7 @@ public final class ElevatorConstants {
 
   public final Distance L2MinHeightAbove = Meters.of(0.32);
   public final Distance L3MinHeightAbove = Meters.of(0.65);
-  public final Distance L4MinHeightAbove = Meters.of(1.4);
+  public final Distance L4MinHeightAbove = Meters.of(1.44);
 
   public final Distance L2MaxHeightBelow = Meters.of(0.32);
   public final Distance L3MaxHeightBelow = Meters.of(0.65);
