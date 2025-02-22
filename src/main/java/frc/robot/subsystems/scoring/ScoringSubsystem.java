@@ -145,7 +145,7 @@ public class ScoringSubsystem extends SubsystemBase {
     Intake(new IntakeState(instance)),
     Warmup(new WarmupState(instance)),
     Score(new ScoreState(instance)),
-    Tuning(new TuningState(instance));
+    Tuning(new TuningState());
 
     private final PeriodicStateInterface state;
 
