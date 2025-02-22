@@ -11,6 +11,7 @@ public final class BuildConstants {
   public static final String GIT_BRANCH = "vision-tune";
   public static final String BUILD_DATE = "2025-02-21 20:58:13 EST";
   public static final long BUILD_UNIX_TIME = 1740189493066L;
+
   public static final int DIRTY = 1;
 
   private BuildConstants() {}
