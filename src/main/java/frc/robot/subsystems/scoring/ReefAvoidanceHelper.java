@@ -39,7 +39,7 @@ public class ReefAvoidanceHelper {
     if (elevatorHeight.lt(elevatorGoalHeight)) {
       return getCollisionHeightUpward(elevatorHeight, elevatorGoalHeight);
     } else {
-      return getCollisionHeightUpward(elevatorHeight, elevatorGoalHeight);
+      return getCollisionHeightDownward(elevatorHeight, elevatorGoalHeight);
     }
   }
 
@@ -53,9 +53,9 @@ public class ReefAvoidanceHelper {
   public static Distance getCollisionHeightDownward(
       Distance elevatorHeight, Distance elevatorGoalHeight) {
     Distance[] heights = {
-      JsonConstants.elevatorConstants.L4MinHeightAbove,
-      JsonConstants.elevatorConstants.L3MinHeightAbove,
-      JsonConstants.elevatorConstants.L2MinHeightAbove
+      JsonConstants.elevatorConstants.L4MaxHeightBelow,
+      JsonConstants.elevatorConstants.L3MaxHeightBelow,
+      JsonConstants.elevatorConstants.L2MaxHeightBelow
     };
 
     for (Distance height : heights) {

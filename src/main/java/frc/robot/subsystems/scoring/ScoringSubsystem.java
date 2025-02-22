@@ -57,6 +57,10 @@ import org.littletonrobotics.junction.Logger;
  *   <li>If the wrist is out beyond a certain angle, clamp elevator between the two reef levels
  *       around it until wrist comes in to Idle, so that it doesn't hit the reef on its way up or
  *       down.
+ *   <li>If the elevator is below a certain height, clamp the wrist to be up so that it doesn't hit
+ *       the base of the reef
+ *   <li>If the wrist is at an angle where it would hit the reef base, clamp the elevator above a
+ *       certain height
  * </ul>
  *
  * <p>Avoiding collisions with the ground: (this part may or may not be necessary, depending on
@@ -193,6 +197,10 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     this.elevatorMechanism = elevatorMechanism;
     this.wristMechanism = wristMechanism;
     this.clawMechanism = clawMechanism;
+
+    if (instance != null) {
+      System.out.println("Warning: Instantiated scoring twice!!!!!");
+    }
 
     instance = this;
 
@@ -666,48 +674,89 @@ public class ScoringSubsystem extends MonitoredSubsystem {
 
     Angle wristAngle = wristMechanism.getWristAngle();
 
+    boolean wristAboveChassis = false;
     // If the elevator is below the minimum safe height for wrist to be down, clamp wrist above its
     // collision point
     if (elevatorHeight.lt(JsonConstants.elevatorConstants.minWristDownHeight)) {
+      wristAboveChassis = true;
       wristMinAngle.mut_replace(
           (Angle)
               Measure.max(wristMinAngle, JsonConstants.wristConstants.minElevatorDownSafeAngle));
     }
+    Logger.recordOutput("scoring/clamps/wristAboveChassis", wristAboveChassis);
 
+    boolean elevatorAboveClaw = false;
     // If the wrist is below the minimum safe angle for the elevator to be down, clamp the elevator
     // above its collision point
     if (wristAngle.lt(JsonConstants.wristConstants.minElevatorDownSafeAngle)) {
+      elevatorAboveClaw = true;
       elevatorMinHeight.mut_replace(
           (Distance)
               Measure.max(elevatorMinHeight, JsonConstants.elevatorConstants.minWristDownHeight));
     }
+    Logger.recordOutput("scoring/clamps/elevatorAboveClaw", elevatorAboveClaw);
+
+    boolean closeToReef = false;
+    boolean wristInToAvoidReefBase = false;
+    boolean elevatorUpToAvoidReefBase = false;
+    boolean wristInToPassReef = false;
+    boolean elevatorBelowReefLevel = false;
+    boolean elevatorAboveReefLevel = false;
 
     Distance reefDistance = reefDistanceSupplier.get();
     Logger.recordOutput("scoring/reefDistanceSupplier", reefDistance);
-    if (reefDistance.lt(JsonConstants.wristConstants.closeToReefThreshold)
-        && ReefAvoidanceHelper.willPassReefLevel(elevatorHeight, elevatorGoalHeight)) {
-      // If we will pass a reef level, clamp the wrist to be in a safe position to pass the reef
-      wristMinAngle.mut_replace(
-          (Angle) Measure.max(wristMinAngle, JsonConstants.wristConstants.minReefSafeAngle));
+    if (reefDistance.lt(JsonConstants.wristConstants.closeToReefThreshold)) {
+      if (elevatorHeight.lte(JsonConstants.elevatorConstants.minReefSafeHeight)) {
+        wristInToAvoidReefBase = true;
+        // If elevator is next to reef base, make sure wrist doesn't hit it
+        wristMinAngle.mut_replace(
+            (Angle) Measure.max(wristMinAngle, JsonConstants.wristConstants.minReefSafeAngle));
+      }
 
-      // If we will pass a reef level and the wrist is in an unsafe position to pass the reef, clamp
-      // the elevator above or below the point of collision
-      if (wristAngle.lt(JsonConstants.wristConstants.minReefSafeAngle)) {
-        if (elevatorHeight.lt(elevatorGoalHeight)) {
-          elevatorMaxHeight.mut_replace(
-              (Distance)
-                  Measure.min(
-                      elevatorMaxHeight,
-                      ReefAvoidanceHelper.getCollisionHeight(elevatorHeight, elevatorGoalHeight)));
-        } else {
+      if (ReefAvoidanceHelper.willPassReefLevel(elevatorHeight, elevatorGoalHeight)) {
+        wristInToPassReef = true;
+        // If we will pass a reef level, clamp the wrist to be in a safe position to pass the reef
+        wristMinAngle.mut_replace(
+            (Angle) Measure.max(wristMinAngle, JsonConstants.wristConstants.minReefSafeAngle));
+
+        // If we will pass a reef level and the wrist is in an unsafe position to pass the reef,
+        // clamp
+        // the elevator above or below the point of collision
+        if (wristAngle.lt(JsonConstants.wristConstants.minReefSafeAngle)) {
+          elevatorUpToAvoidReefBase = true;
+          // If the wrist would hit the reef base, clamp the elevator above the reef base height
           elevatorMinHeight.mut_replace(
               (Distance)
                   Measure.max(
-                      elevatorMinHeight,
-                      ReefAvoidanceHelper.getCollisionHeight(elevatorHeight, elevatorGoalHeight)));
+                      elevatorMinHeight, JsonConstants.elevatorConstants.minReefSafeHeight));
+
+          if (elevatorHeight.lt(elevatorGoalHeight)) {
+            elevatorBelowReefLevel = true;
+            elevatorMaxHeight.mut_replace(
+                (Distance)
+                    Measure.min(
+                        elevatorMaxHeight,
+                        ReefAvoidanceHelper.getCollisionHeight(
+                            elevatorHeight, elevatorGoalHeight)));
+          } else {
+            elevatorAboveReefLevel = true;
+            elevatorMinHeight.mut_replace(
+                (Distance)
+                    Measure.max(
+                        elevatorMinHeight,
+                        ReefAvoidanceHelper.getCollisionHeight(
+                            elevatorHeight, elevatorGoalHeight)));
+          }
         }
       }
     }
+
+    Logger.recordOutput("scoring/clamps/closeToReef", closeToReef);
+    Logger.recordOutput("scoring/clamps/wristInToAvoidReefBase", wristInToAvoidReefBase);
+    Logger.recordOutput("scoring/clamps/elevatorUpToAvoidReefBase", elevatorUpToAvoidReefBase);
+    Logger.recordOutput("scoring/clamps/wristInToPassReef", wristInToPassReef);
+    Logger.recordOutput("scoring/clamps/elevatorBelowReefLevel", elevatorBelowReefLevel);
+    Logger.recordOutput("scoring/clamps/elevatorAboveReefLevel", elevatorAboveReefLevel);
 
     elevatorMechanism.setAllowedRangeOfMotion(elevatorMinHeight, elevatorMaxHeight);
     wristMechanism.setAllowedRangeOfMotion(wristMinAngle, wristMaxAngle);

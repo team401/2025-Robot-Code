@@ -94,14 +94,14 @@ public final class ElevatorConstants {
       elevatorReduction * (double) largeCANCoderTeeth / (double) spoolTeeth;
 
   // TODO: Tune elevator
-  public final Double elevatorkP = 60.0;
+  public final Double elevatorkP = 40.0;
   public final Double elevatorkI = 0.0;
-  public final Double elevatorkD = 0.0;
+  public final Double elevatorkD = 4.0;
 
   public final Double elevatorkS = 0.0;
-  public final Double elevatorkV = 0.1;
-  public final Double elevatorkA = 0.0;
-  public final Double elevatorkG = 11.0;
+  public final Double elevatorkV = 2.0;
+  public final Double elevatorkA = 0.08;
+  public final Double elevatorkG = 11.5;
 
   // TODO: Actual ratios
   @JSONExclude
@@ -122,7 +122,7 @@ public final class ElevatorConstants {
               / elevatorToSpool.in(PerUnit.combine(Meters, Radians)));
 
   /* The Motion Magic Expo kV, measured in Volts per Radian per Second, but represented as a double so it can be synced by JSONSync */
-  public final Double elevatorExpo_kV_raw = 0.0;
+  public final Double elevatorExpo_kV_raw = 0.005;
 
   /**
    * The kV used by Motion Magic Expo to generate a motion profile. Dividing the supply voltage by
@@ -134,7 +134,7 @@ public final class ElevatorConstants {
       VoltsPerRadianPerSecond.ofNative(elevatorExpo_kV_raw);
 
   /* The Motion Magic Expo kA, measured in Volts per Radian per Second Squared, but represented as a double so it can be synced by JSONSync */
-  public final Double elevatorExpo_kA_raw = 0.1;
+  public final Double elevatorExpo_kA_raw = 0.03;
 
   @JSONExclude
   public final Per<VoltageUnit, AngularAccelerationUnit> elevatorExpo_kA =
@@ -183,13 +183,16 @@ public final class ElevatorConstants {
    */
   public final Distance minWristDownHeight = Meters.of(0.2); // TODO: Real value
 
+  /** Minimum height the elevator can be at with the wrist out without hitting the reef base */
+  public final Distance minReefSafeHeight = Meters.of(0.2);
+
   public final Distance L2MinHeightAbove = Meters.of(0.32);
   public final Distance L3MinHeightAbove = Meters.of(0.65);
   public final Distance L4MinHeightAbove = Meters.of(1.44);
 
-  public final Distance L2MaxHeightBelow = Meters.of(0.32);
-  public final Distance L3MaxHeightBelow = Meters.of(0.65);
-  public final Distance L4MaxHeightBelow = Meters.of(1.4);
+  public final Distance L2MaxHeightBelow = Meters.of(0.16);
+  public final Distance L3MaxHeightBelow = Meters.of(0.35);
+  public final Distance L4MaxHeightBelow = Meters.of(0.7);
 
   /** When within this distance, the elevator is considered "at its setpoint" */
   public final Distance elevatorSetpointEpsilon = Meters.of(0.05);
