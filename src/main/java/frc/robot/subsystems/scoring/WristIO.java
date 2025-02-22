@@ -35,7 +35,7 @@ public interface WristIO {
     public MutAngularVelocity wristVelocity = RotationsPerSecond.mutable(0.0);
 
     /** Goal angle of the wrist, as seen by the wrist CANcoder */
-    public MutAngle wristGoalPosition = Rotations.mutable(0.0);
+    public MutAngle wristGoalPosition = Rotations.mutable(0.4);
 
     /** The setpoint target position from Motion Magic Expo */
     public MutAngle wristSetpointPosition = Rotations.mutable(0.0);

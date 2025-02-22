@@ -2,7 +2,6 @@ package frc.robot.subsystems.scoring;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
@@ -70,7 +69,7 @@ public class WristMechanism {
     wristCruiseVelocity =
         new LoggedTunableNumber(
             "WristTunables/wristCruiseVelocity",
-            JsonConstants.wristConstants.wristMotionMagicCruiseVelocity.in(RotationsPerSecond));
+            JsonConstants.wristConstants.wristMotionMagicCruiseVelocityRotationsPerSecond);
     wristExpokV =
         new LoggedTunableNumber(
             "WristTunables/wristExpokV", JsonConstants.wristConstants.wristMotionMagicExpo_kV);

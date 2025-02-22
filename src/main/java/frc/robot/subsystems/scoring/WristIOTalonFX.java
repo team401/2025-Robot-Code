@@ -85,7 +85,8 @@ public class WristIOTalonFX implements WristIO {
             .withMotionMagic(
                 new MotionMagicConfigs()
                     .withMotionMagicCruiseVelocity(
-                        JsonConstants.wristConstants.wristMotionMagicCruiseVelocity)
+                        JsonConstants.wristConstants
+                            .wristMotionMagicCruiseVelocityRotationsPerSecond)
                     .withMotionMagicExpo_kA(JsonConstants.wristConstants.wristMotionMagicExpo_kA)
                     .withMotionMagicExpo_kV(JsonConstants.wristConstants.wristMotionMagicExpo_kV));
 

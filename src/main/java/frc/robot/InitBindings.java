@@ -20,6 +20,9 @@ import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
+import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
+import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 
 public final class InitBindings {
   // Controller
@@ -139,7 +142,7 @@ public final class InitBindings {
                   rampSubsystem.prepareForClimb();
                 }));
     driverController
-        .y()
+        .x()
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -150,6 +153,30 @@ public final class InitBindings {
   public static void initClimbBindings(ClimbSubsystem climb) {
     driverController.a().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)));
     driverController.b().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)));
+  }
+
+  public static void initScoringBindings(ScoringSubsystem scoring) {
+    driverController
+        .y()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  scoring.setTarget(FieldTarget.L4);
+                  scoring.setGamePiece(GamePiece.Coral);
+                  scoring.fireTrigger(ScoringTrigger.StartWarmup);
+                }));
+    driverController
+        .rightBumper()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  scoring.setClawRollerVoltage(JsonConstants.clawConstants.coralScoreVoltage);
+                }))
+        .onFalse(
+            new InstantCommand(
+                () -> {
+                  scoring.setClawRollerVoltage(Volts.zero());
+                }));
   }
 
   /**

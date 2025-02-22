@@ -101,11 +101,11 @@ public class ElevatorMechanism implements Tunable {
     elevatorExpokV =
         new LoggedTunableNumber(
             "ElevatorTunables/elevatorExpokV",
-            ElevatorConstants.synced.getObject().elevatorExpo_kV.magnitude());
+            ElevatorConstants.synced.getObject().elevatorExpo_kV_raw);
     elevatorExpokA =
         new LoggedTunableNumber(
             "ElevatorTunables/elevatorExpokA",
-            ElevatorConstants.synced.getObject().elevatorExpo_kA.magnitude());
+            ElevatorConstants.synced.getObject().elevatorExpo_kA_raw);
 
     elevatorTuningSetpointMeters =
         new LoggedTunableNumber("ElevatorTunables/elevatorTuningSetpointMeters", 0.0);

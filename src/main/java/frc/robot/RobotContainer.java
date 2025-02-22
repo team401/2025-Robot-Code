@@ -170,6 +170,9 @@ public class RobotContainer {
     if (FeatureFlags.synced.getObject().runClimb) {
       InitBindings.initClimbBindings(climbSubsystem);
     }
+    if (FeatureFlags.synced.getObject().runScoring) {
+      InitBindings.initScoringBindings(scoringSubsystem);
+    }
   }
 
   public Command getAutonomousCommand() {

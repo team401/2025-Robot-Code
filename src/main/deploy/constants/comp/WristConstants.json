@@ -19,13 +19,13 @@
   },
   "wristKG": 0.34,
   "wristKS": 0.2,
-  "wristKV": 0.0,
+  "wristKV": 1.0,
   "wristKA": 0.0,
-  "wristKP": 15,
+  "wristKP": 20,
   "wristKI": 0.0,
   "wristKD": 0.5,
-  "wristMotionMagicCruiseVelocityRotationsPerSecond": 0.1,
-  "wristMotionMagicExpo_kA": 0.1,
+  "wristMotionMagicCruiseVelocityRotationsPerSecond": 3.0,
+  "wristMotionMagicExpo_kA": 0.4,
   "wristMotionMagicExpo_kV": 0.1,
   "wristCANcoderAbsoluteSensorDiscontinuityPoint": {
     "value": 0.5,
@@ -37,19 +37,19 @@
   },
   "wristCANcoderSensorDirection": "Clockwise_Positive",
   "wristMinMinAngle": {
-    "value": -0.75,
-    "unit": "Rotation"
+    "value": -1.68,
+    "unit": "Radian"
   },
   "wristMaxMaxAngle": {
-    "value": 0.25,
-    "unit": "Rotation"
+    "value": 2.0,
+    "unit": "Radian"
   },
   "maxCrossBarSafeAngle": {
-    "value": 0.0,
-    "unit": "Rotation"
+    "value": 2.0,
+    "unit": "Radian"
   },
   "minElevatorDownSafeAngle": {
-    "value": -0.5,
+    "value": 0.0,
     "unit": "Rotation"
   }
 }
