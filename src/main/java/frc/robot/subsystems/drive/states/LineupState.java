@@ -199,10 +199,11 @@ public class LineupState implements PeriodicStateInterface {
    * @return offset for camera
    */
   public Double getCrossTrackOffset(int cameraIndex) {
-    if (cameraIndex == 0) {
+    if (cameraIndex == JsonConstants.visionConstants.FrontRightCameraIndex) {
       return JsonConstants.drivetrainConstants.driveCrossTrackFrontRightOffset;
+    } else {
+      return JsonConstants.drivetrainConstants.driveCrossTrackFrontLeftOffset;
     }
-    return 0.0; // front left offset (not added)
   }
 
   /**
