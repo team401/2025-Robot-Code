@@ -8,6 +8,8 @@ import coppercore.controls.state_machine.StateMachine;
 import coppercore.controls.state_machine.StateMachineConfiguration;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.state.StateContainer;
+import coppercore.wpilib_interface.MonitorWithAlert;
+import coppercore.wpilib_interface.MonitoredSubsystem;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
@@ -18,6 +20,8 @@ import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.TestModeManager;
 import frc.robot.TestModeManager.TestMode;
 import frc.robot.constants.JsonConstants;
@@ -30,6 +34,7 @@ import frc.robot.subsystems.scoring.states.ScoreState;
 import frc.robot.subsystems.scoring.states.TuningState;
 import frc.robot.subsystems.scoring.states.WarmupState;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -96,7 +101,7 @@ import org.littletonrobotics.junction.Logger;
  * reset the clamps in an 'else,' allowing a full range of motion when no protection conditions are
  * met.
  */
-public class ScoringSubsystem extends SubsystemBase {
+public class ScoringSubsystem extends MonitoredSubsystem {
   private ElevatorMechanism elevatorMechanism;
   private WristMechanism wristMechanism;
   private ClawMechanism clawMechanism;
@@ -253,6 +258,40 @@ public class ScoringSubsystem extends SubsystemBase {
 
     // Manually call the onEntry for init, since we didn't transition into it
     stateMachine.getCurrentState().state.onEntry(null);
+
+    if (wristMechanism != null) {
+      // Use two monitors: one to alert us if it's temporarily disconnected, one to disable motors
+      // if it's disconnected for a long time
+      addMonitor(
+          new MonitorWithAlert.MonitorWithAlertBuilder()
+              .withName("wristEncoderDisconnected")
+              .withStickyness(false)
+              .withIsStateValidSupplier(() -> wristMechanism.isWristEncoderConnected())
+              .withTimeToFault(0.2)
+              .withFaultCallback(() -> {})
+              .withLoggingEnabled(true)
+              .withAlertText("Wrist encoder not connected!")
+              .withAlertType(AlertType.kWarning)
+              .build());
+
+      // TODO: after https://github.com/team401/coppercore/issues/129, re-enable motors if the
+      // encoder comes back.
+      addMonitor(
+          new MonitorWithAlert.MonitorWithAlertBuilder()
+              .withName("wristEncoderDisconnectedExtended")
+              .withStickyness(true)
+              .withIsStateValidSupplier(
+                  () -> (!DriverStation.isEnabled() || wristMechanism.isWristEncoderConnected()))
+              .withTimeToFault(2.0)
+              .withFaultCallback(
+                  () -> {
+                    wristMechanism.setMotorsDisabled(true);
+                  })
+              .withLoggingEnabled(true)
+              .withAlertText("Wrist encoder disconnected, motor disabled.")
+              .withAlertType(AlertType.kError)
+              .build());
+    }
   }
 
   /**
@@ -457,6 +496,7 @@ public class ScoringSubsystem extends SubsystemBase {
    */
   public void setGamePiece(GamePiece piece) {
     currentPiece = piece;
+    Logger.recordOutput("scoring/gamepiece", piece);
   }
 
   /**
@@ -500,7 +540,7 @@ public class ScoringSubsystem extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
+  public void monitoredPeriodic() {
     if (stateMachine.getCurrentState() == ScoringState.Tuning
         && !isScoringTuningSupplier.getAsBoolean()) {
       fireTrigger(ScoringTrigger.LeaveTestMode);
@@ -525,11 +565,13 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     Logger.recordOutput("scoring/state", stateMachine.getCurrentState());
+    Logger.recordOutput("scoring/isDriveLinedUp", isDriveLinedUpSupplier.getAsBoolean());
   }
 
   /** This method must be called by RobotContainer, as it does not run automatically! */
   public void testPeriodic() {
     switch (TestModeManager.getTestMode()) {
+      case SetpointTuning:
       case ElevatorTuning:
       case WristClosedLoopTuning:
       case WristVoltageTuning:
@@ -612,7 +654,7 @@ public class ScoringSubsystem extends SubsystemBase {
     if (wristAngle.lt(JsonConstants.wristConstants.minElevatorDownSafeAngle)) {
       elevatorMinHeight.mut_replace(
           (Distance)
-              Measure.max(elevatorMaxHeight, JsonConstants.elevatorConstants.minWristDownHeight));
+              Measure.max(elevatorMinHeight, JsonConstants.elevatorConstants.minWristDownHeight));
     }
 
     // If the wrist is in an unsafe position for the elevator to move past the crossbar, clamp the
@@ -653,6 +695,16 @@ public class ScoringSubsystem extends SubsystemBase {
 
     elevatorMechanism.setAllowedRangeOfMotion(elevatorMinHeight, elevatorMaxHeight);
     wristMechanism.setAllowedRangeOfMotion(wristMinAngle, wristMaxAngle);
+  }
+
+  /**
+   * Set the supplier used to get the value of the joystick used to move the elevator setpoint in
+   * setpoint tuning mode
+   */
+  public void setTuningHeightSetpointAdjustmentSupplier(DoubleSupplier newSupplier) {
+    if (elevatorMechanism != null) {
+      elevatorMechanism.setTuningHeightSetpointAdjustmentSupplier(newSupplier);
+    }
   }
 
   /**

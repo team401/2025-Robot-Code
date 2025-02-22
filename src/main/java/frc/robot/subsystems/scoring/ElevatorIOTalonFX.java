@@ -130,10 +130,12 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                     .withKD(ElevatorConstants.synced.getObject().elevatorkD))
             .withMotionMagic(
                 new MotionMagicConfigs()
-                    .withMotionMagicCruiseVelocity(
-                        ElevatorConstants.synced.getObject().elevatorAngularCruiseVelocity)
-                    .withMotionMagicExpo_kA(ElevatorConstants.synced.getObject().elevatorExpo_kA)
-                    .withMotionMagicExpo_kV(ElevatorConstants.synced.getObject().elevatorExpo_kV));
+                    // .withMotionMagicCruiseVelocity(
+                    //     ElevatorConstants.synced.getObject().elevatorAngularCruiseVelocity)
+                    .withMotionMagicExpo_kA(
+                        ElevatorConstants.synced.getObject().elevatorExpo_kA_raw)
+                    .withMotionMagicExpo_kV(
+                        ElevatorConstants.synced.getObject().elevatorExpo_kV_raw));
 
     // Apply talonFX config to both motors
     leadMotor.getConfigurator().apply(talonFXConfigs);

@@ -2,7 +2,6 @@ package frc.robot.subsystems.scoring;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
@@ -70,7 +69,7 @@ public class WristMechanism {
     wristCruiseVelocity =
         new LoggedTunableNumber(
             "WristTunables/wristCruiseVelocity",
-            JsonConstants.wristConstants.wristMotionMagicCruiseVelocity.in(RotationsPerSecond));
+            JsonConstants.wristConstants.wristMotionMagicCruiseVelocityRotationsPerSecond);
     wristExpokV =
         new LoggedTunableNumber(
             "WristTunables/wristExpokV", JsonConstants.wristConstants.wristMotionMagicExpo_kV);
@@ -255,6 +254,18 @@ public class WristMechanism {
    */
   public Angle getWristAngle() {
     return inputs.wristPosition;
+  }
+
+  /**
+   * Check whether or not the wrist encoder is currently connected.
+   *
+   * <p>"Connected" means that last time the position status signal was refreshed, the status code
+   * was OK
+   *
+   * @return True if connected, false if disconnected
+   */
+  public boolean isWristEncoderConnected() {
+    return inputs.isWristEncoderConnected;
   }
 
   /**

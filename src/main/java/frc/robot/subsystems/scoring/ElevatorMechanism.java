@@ -11,6 +11,7 @@ import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
 
+import coppercore.math.Deadband;
 import coppercore.parameter_tools.LoggedTunableNumber;
 import coppercore.wpilib_interface.UnitUtils;
 import coppercore.wpilib_interface.tuning.Tunable;
@@ -32,6 +33,7 @@ import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.subsystems.ElevatorConstants;
 import frc.robot.subsystems.scoring.ElevatorIO.ElevatorOutputMode;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class ElevatorMechanism implements Tunable {
@@ -70,6 +72,8 @@ public class ElevatorMechanism implements Tunable {
   MedianFilter smallCANcoderFilter =
       new MedianFilter(JsonConstants.elevatorConstants.medianFilterWindowSize);
 
+  DoubleSupplier tuningHeightSetpointAdjustmentSupplier = () -> 0.0;
+
   public ElevatorMechanism(ElevatorIO io) {
     elevatorkP =
         new LoggedTunableNumber(
@@ -97,11 +101,11 @@ public class ElevatorMechanism implements Tunable {
     elevatorExpokV =
         new LoggedTunableNumber(
             "ElevatorTunables/elevatorExpokV",
-            ElevatorConstants.synced.getObject().elevatorExpo_kV.magnitude());
+            ElevatorConstants.synced.getObject().elevatorExpo_kV_raw);
     elevatorExpokA =
         new LoggedTunableNumber(
             "ElevatorTunables/elevatorExpokA",
-            ElevatorConstants.synced.getObject().elevatorExpo_kA.magnitude());
+            ElevatorConstants.synced.getObject().elevatorExpo_kA_raw);
 
     elevatorTuningSetpointMeters =
         new LoggedTunableNumber("ElevatorTunables/elevatorTuningSetpointMeters", 0.0);
@@ -196,6 +200,18 @@ public class ElevatorMechanism implements Tunable {
 
       case SetpointTuning:
         // Allow setpointing the elevator in ElevatorTuning and SetpointTuning modes
+        final double deadband = 0.17;
+
+        double deadbandedJoystick =
+            Deadband.oneAxisDeadband(
+                tuningHeightSetpointAdjustmentSupplier.getAsDouble(), deadband);
+
+        if (Math.abs(deadbandedJoystick) > deadband) {
+          double newGoalHeightMeters =
+              elevatorTuningSetpointMeters.getAsDouble() + deadbandedJoystick * 0.02;
+          elevatorTuningSetpointMeters.setValue(newGoalHeightMeters);
+        }
+
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (setpoint) -> {
@@ -204,6 +220,11 @@ public class ElevatorMechanism implements Tunable {
             },
             elevatorTuningSetpointMeters);
         break;
+      case WristClosedLoopTuning:
+      case WristVoltageTuning:
+        // When tuning the wrist, go to half a meter to avoid destroying outselves
+        setGoalHeight(Meters.of(0.5));
+        setOutputMode(ElevatorOutputMode.ClosedLoop);
       default:
         break;
     }
@@ -335,6 +356,8 @@ public class ElevatorMechanism implements Tunable {
    * current bounds.
    */
   private void updateClampedGoalHeight() {
+    Logger.recordOutput("elevator/minHeight", minHeight);
+    Logger.recordOutput("elevator/maxHeight", maxHeight);
     clampedGoalHeight.mut_replace(UnitUtils.clampMeasure(goalHeight, minHeight, maxHeight));
   }
 
@@ -358,6 +381,7 @@ public class ElevatorMechanism implements Tunable {
             (double) ElevatorConstants.synced.getObject().spoolTeeth
                 / (double) ElevatorConstants.synced.getObject().largeCANCoderTeeth);
 
+    Logger.recordOutput("elevator/sentGoalRotations", largeEncoderRotations);
     io.setLargeCANCoderGoalPos(largeEncoderRotations);
   }
 
@@ -445,6 +469,14 @@ public class ElevatorMechanism implements Tunable {
   /** Set whether or not the motors on the elevator should be disabled. */
   public void setMotorsDisabled(boolean disabled) {
     io.setMotorsDisabled(disabled);
+  }
+
+  /**
+   * Set the supplier used to get the value of the joystick used to move the elevator setpoint in
+   * setpoint tuning mode
+   */
+  public void setTuningHeightSetpointAdjustmentSupplier(DoubleSupplier newSupplier) {
+    this.tuningHeightSetpointAdjustmentSupplier = newSupplier;
   }
 
   // ===== Tunable definitions: =====
