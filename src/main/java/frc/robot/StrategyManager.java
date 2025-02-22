@@ -37,6 +37,7 @@ public class StrategyManager {
   private NetworkTable table = inst.getTable("");
   private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
   private StringSubscriber reefLevelSelector = table.getStringTopic("scoreHeight").subscribe("-1");
+  private StringSubscriber autonomySelector = table.getStringTopic("autonomyLevel").subscribe("mid");
 
   public StrategyManager(Drive drive, ScoringSubsystem scoringSubsystem) {
     actions = new LinkedList<>();
@@ -170,6 +171,17 @@ public class StrategyManager {
     // scoring level selection
     if (scoringSubsystem != null) {
       scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
+    }
+
+    // update autonomy level
+    String autonomyLevel = autonomySelector.get();
+
+    if(autonomyLevel == "high") {
+      this.setAutonomyMode(AutonomyMode.Full);
+    } else if (autonomyLevel == "mid") {
+      this.setAutonomyMode(AutonomyMode.Teleop);
+    } else if (autonomyLevel == "low") {
+      this.setAutonomyMode(AutonomyMode.Manual);
     }
   }
 
