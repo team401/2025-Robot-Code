@@ -342,9 +342,6 @@ public class Drive implements DriveTemplate {
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
 
-    // check for update from reef touchscreen
-    this.updateDesiredLocationFromNetworkTables();
-
     // run velocity if not disabled
     if (!DriverStation.isTest() && !DriverStation.isDisabled()) {
       this.runVelocity();
@@ -566,8 +563,7 @@ public class Drive implements DriveTemplate {
   }
 
   /** checks for update from reef location network table (SnakeScreen) run periodically in drive */
-  public void updateDesiredLocationFromNetworkTables() {
-    double desiredIndex = reefLocationSelector.get();
+  public void updateDesiredLocationFromNetworkTables(double desiredIndex) {
     if (desiredIndex == -1) {
       return;
     }

@@ -321,6 +321,25 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     }
   }
 
+  public void updateScoringLevelFromNetworkTables(String level) {
+    if (level.equalsIgnoreCase("-1")) {
+      return;
+    }
+
+    if (level.equalsIgnoreCase("level1")) {
+      this.setTarget(FieldTarget.L1);
+    }
+    if (level.equalsIgnoreCase("level2")) {
+      this.setTarget(FieldTarget.L2);
+    }
+    if (level.equalsIgnoreCase("level3")) {
+      this.setTarget(FieldTarget.L3);
+    }
+    if (level.equalsIgnoreCase("level4")) {
+      this.setTarget(FieldTarget.L4);
+    }
+  }
+
   /**
    * Set whether or not the elevator should override and manually apply a voltage/current, or if it
    * should used closed-loop

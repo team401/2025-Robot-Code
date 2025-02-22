@@ -1,5 +1,9 @@
 package frc.robot;
 
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.strategies.AutoIntake;
@@ -28,6 +32,11 @@ public class StrategyManager {
   private ScoringSubsystem scoringSubsystem;
   private AutonomyMode autonomyMode = AutonomyMode.Full;
   private Action currentAction = null;
+
+  private NetworkTableInstance inst = NetworkTableInstance.getDefault();
+  private NetworkTable table = inst.getTable("");
+  private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
+  private StringSubscriber reefLevelSelector = table.getStringTopic("scoreHeight").subscribe("-1");
 
   public StrategyManager(Drive drive, ScoringSubsystem scoringSubsystem) {
     actions = new LinkedList<>();
@@ -149,6 +158,18 @@ public class StrategyManager {
       }
     } else {
       return null;
+    }
+  }
+
+  public void updateScoringLocationsFromSnakeScreen() {
+    // drive reef location
+    if (drive != null) {
+      drive.updateDesiredLocationFromNetworkTables(reefLocationSelector.get());
+    }
+
+    // scoring level selection
+    if (scoringSubsystem != null) {
+      scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
     }
   }
 
