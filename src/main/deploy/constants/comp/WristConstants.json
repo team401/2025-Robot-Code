@@ -21,7 +21,7 @@
   "wristKS": 0.2,
   "wristKV": 1.0,
   "wristKA": 0.0,
-  "wristKP": 20,
+  "wristKP": 20.0,
   "wristKI": 0.0,
   "wristKD": 0.5,
   "wristMotionMagicCruiseVelocityRotationsPerSecond": 3.0,
@@ -51,6 +51,14 @@
   "minElevatorDownSafeAngle": {
     "value": 0.0,
     "unit": "Rotation"
+  },
+  "minReefSafeAngle": {
+    "value": 0.32,
+    "unit": "Rotation"
+  },
+  "closeToReefThreshold": {
+    "value": 2.0,
+    "unit": "Meter"
   },
   "wristSetpointEpsilon": {
     "value": 5.0,

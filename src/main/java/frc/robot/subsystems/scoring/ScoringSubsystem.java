@@ -682,7 +682,9 @@ public class ScoringSubsystem extends MonitoredSubsystem {
               Measure.max(elevatorMinHeight, JsonConstants.elevatorConstants.minWristDownHeight));
     }
 
-    if (reefDistanceSupplier.get().lt(JsonConstants.wristConstants.closeToReefThreshold)
+    Distance reefDistance = reefDistanceSupplier.get();
+    Logger.recordOutput("scoring/reefDistanceSupplier", reefDistance);
+    if (reefDistance.lt(JsonConstants.wristConstants.closeToReefThreshold)
         && ReefAvoidanceHelper.willPassReefLevel(elevatorHeight, elevatorGoalHeight)) {
       // If we will pass a reef level, clamp the wrist to be in a safe position to pass the reef
       wristMinAngle.mut_replace(
