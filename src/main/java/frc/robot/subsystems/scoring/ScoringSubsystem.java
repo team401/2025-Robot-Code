@@ -170,6 +170,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     ToggleWarmup, // warmup button toggles warmup <-> idle
     StartWarmup, // drive automatically enters warmup when lineup begins
     WarmupReady,
+    CancelWarmup, // Warmup button was released, go back to idle
     ScoredPiece,
     ReturnToIdle, // Return to idle when a warmup/score state no longer detects a gamepiece
     EnterTestMode,
@@ -242,7 +243,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
             ScoringTrigger.WarmupReady,
             ScoringState.Score,
             () -> autoTransition && isDriveLinedUpSupplier.getAsBoolean())
-        .permit(ScoringTrigger.ReturnToIdle, ScoringState.Idle);
+        .permit(ScoringTrigger.ReturnToIdle, ScoringState.Idle)
+        .permit(ScoringTrigger.CancelWarmup, ScoringState.Idle);
 
     stateMachineConfiguration
         .configure(ScoringState.Score)

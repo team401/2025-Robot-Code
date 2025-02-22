@@ -68,6 +68,7 @@ public final class InitBindings {
                 () -> {
                   if (strategyManager.getAutonomyMode() != AutonomyMode.Manual) {
                     drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+                    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.CancelWarmup);
                   }
                   ;
                 },

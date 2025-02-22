@@ -91,7 +91,7 @@ public class WristConstants {
   public final Angle minElevatorDownSafeAngle = Rotations.of(-0.5); // TODO: Actual value
 
   /** The wrist can be this far away from the goal and considered "at the setpoint" */
-  public final Angle wristSetpointEpsilon = Degrees.of(1.0);
+  public final Angle wristSetpointEpsilon = Degrees.of(5.0);
 
   public static final class Sim {
     @JSONExclude
