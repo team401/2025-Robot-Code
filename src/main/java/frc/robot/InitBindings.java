@@ -57,7 +57,8 @@ public final class InitBindings {
                 () -> {
                   if (strategyManager.getAutonomyMode() != AutonomyMode.Manual) {
                     drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
-                  };
+                  }
+                  ;
                 },
                 drive));
     rightJoystick
@@ -65,9 +66,10 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  if(strategyManager.getAutonomyMode() != AutonomyMode.Manual) {
+                  if (strategyManager.getAutonomyMode() != AutonomyMode.Manual) {
                     drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
-                  };
+                  }
+                  ;
                 },
                 drive));
 
