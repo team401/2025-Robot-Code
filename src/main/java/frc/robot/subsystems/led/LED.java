@@ -84,7 +84,6 @@ public class LED extends SubsystemBase {
     this.climbSubsystem = climbSubsystem;
     this.driveSubsystem = drive;
     led.setLength(LEDConstants.totalLength);
-
     led.start();
   }
 
@@ -96,7 +95,7 @@ public class LED extends SubsystemBase {
 
   public void bufferification() { // TODO: make this a real method name
     if (!DriverStation.isDisabled()) {
-      scoringSubsystem.setGamePiece(GamePiece.Coral);
+
       if (scoringSubsystem != null && (scoringSubsystem.getGamePiece() == GamePiece.Algae)) {
         addSplitPattern(holdingAlgae, clear);
       }
@@ -177,60 +176,4 @@ public class LED extends SubsystemBase {
     leftFinal.applyTo(leftData);
     rightFinal.applyTo(rightData);
   }
-
-  /** Runs separate patterns on the top and bottom LED sections. */
-
-  // public Command runCycle() {
-  //   // Just makes sure LEDs aren't destroying themselves or something
-  //   return new Command() {
-  //     private double lastTime;
-  //     private int currentIndex = 0;
-
-  //     private final List<LEDPattern> patterns =
-  //         Arrays.asList(
-  //             LEDPattern.solid(LEDConstants.lockedOnHang),
-  //             LEDPattern.solid(LEDConstants.holdingAlgae),
-  //             LEDPattern.solid(LEDConstants.holdingCoral),
-  //             LEDPattern.solid(LEDConstants.targetOnReefL1),
-  //             LEDPattern.solid(LEDConstants.targetOnReefL2),
-  //             LEDPattern.solid(LEDConstants.targetOnReefL3),
-  //             LEDPattern.solid(LEDConstants.targetOnReefL4),
-  //             LEDPattern.solid(LEDConstants.targetOnReef),
-  //             LEDPattern.solid(LEDConstants.targetOnNet));
-
-  //     @Override
-  //     public void initialize() {
-  //       currentIndex = 0;
-  //       lastTime = Timer.getFPGATimestamp();
-  //       // Apply the first color pattern on both sides.
-  //       runSplitPattern(patterns.get(currentIndex), patterns.get(currentIndex)).schedule();
-  //     }
-
-  //     @Override
-  //     public void execute() {
-  //       double now = Timer.getFPGATimestamp();
-  //       if (now - lastTime >= 5.5) { // One second elapsed
-  //         currentIndex = (currentIndex + 1) % patterns.size();
-  //         if (currentIndex < patterns.size()) {
-  //           // Schedule the next color.
-  //           runSplitPattern(
-  //                   patterns.get(currentIndex), patterns.get((currentIndex + 1) %
-  // patterns.size()))
-  //               .schedule();
-  //           lastTime = now;
-  //         }
-  //       }
-  //     }
-
-  //     @Override
-  //     public boolean isFinished() {
-  //       return false;
-  //     }
-
-  //     @Override
-  //     public void end(boolean interrupted) {
-  //       // Optionally, cancel any running LED command if needed.
-  //     }
-  //   };
-  // }
 }

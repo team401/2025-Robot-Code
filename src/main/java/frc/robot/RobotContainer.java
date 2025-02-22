@@ -212,8 +212,6 @@ public class RobotContainer {
       case DriveSysIdDynamicBackward:
         CommandScheduler.getInstance()
             .schedule(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-      case LEDTest:
-        // CommandScheduler.getInstance().schedule(led.runCycle());
         break;
       default:
         break;
