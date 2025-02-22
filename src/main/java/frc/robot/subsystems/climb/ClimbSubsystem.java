@@ -101,6 +101,10 @@ public class ClimbSubsystem extends SubsystemBase {
     return inputs.lockedToCage;
   }
 
+  public Angle getRotation() {
+    return inputs.motorAngle;
+  }
+
   @Override
   public void periodic() {
 
