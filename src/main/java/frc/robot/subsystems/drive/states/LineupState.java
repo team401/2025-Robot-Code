@@ -11,8 +11,9 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
+import frc.robot.constants.ModeConstants;
+import frc.robot.constants.ModeConstants.Mode;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.drive.Drive.VisionAlignment;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
@@ -156,9 +157,9 @@ public class LineupState implements PeriodicStateInterface {
     }
     this.LineupWithReefLocation();
 
-    if (lineupFinished()) {
-      drive.fireTrigger(DriveTrigger.FinishLineup);
-    }
+    // if (lineupFinished()) {
+    //   drive.fireTrigger(DriveTrigger.FinishLineup);
+    // }
   }
 
   /**
@@ -235,13 +236,25 @@ public class LineupState implements PeriodicStateInterface {
   }
 
   public double getAlongTrackVelocity(double alongTrackDistance) {
-    if (alongTrackDistance < 0) {
+    if (alongTrackDistance < 0
+        && (ModeConstants.currentMode == Mode.MAPLESIM || ModeConstants.currentMode == Mode.SIM)) {
       return 0;
     }
 
+    if (alongTrackDistance < 0.5) {
+      return -1
+          * JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
+          * driveAlongTrackLineupController.calculate(alongTrackDistance);
+    }
+
+    double sign = Math.signum(alongTrackDistance);
+
     double rawVelocity =
-        Math.sqrt(2 * JsonConstants.drivetrainConstants.lineupMaxAcceleration * alongTrackDistance);
-    return Math.min(rawVelocity, JsonConstants.drivetrainConstants.lineupMaxVelocity);
+        Math.sqrt(
+            2
+                * JsonConstants.drivetrainConstants.lineupMaxAcceleration
+                * Math.abs(alongTrackDistance));
+    return sign * Math.min(rawVelocity, JsonConstants.drivetrainConstants.lineupMaxVelocity);
   }
 
   public double getAlongTrackVelocityReductionFactor(double crossTrackDistance) {
@@ -289,7 +302,7 @@ public class LineupState implements PeriodicStateInterface {
     // give to PID Controllers and setGoalSpeeds (robotCentric)
     double vx =
         JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
-            * getAlongTrackVelocityReductionFactor(observation.crossTrackDistance())
+            // * getAlongTrackVelocityReductionFactor(observation.crossTrackDistance())
             * getAlongTrackVelocity(observation.alongTrackDistance());
     double vy = driveCrossTrackLineupController.calculate(observation.crossTrackDistance());
     double omega =
