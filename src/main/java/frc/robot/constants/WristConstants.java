@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -15,7 +14,6 @@ import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
 import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MomentOfInertia;
@@ -67,9 +65,7 @@ public class WristConstants {
   // This value is a a Double because RotationsPerSecond doesn't serialize properly with JSONSync
   public final Double wristMotionMagicCruiseVelocityRotationsPerSecond = 0.1;
 
-  @JSONExclude
-  public final AngularVelocity wristMotionMagicCruiseVelocity =
-      RotationsPerSecond.of(wristMotionMagicCruiseVelocityRotationsPerSecond); // TODO: Tune this!
+  // TODO: Tune this!
 
   public final Double wristMotionMagicExpo_kA = 6.0; //
   public final Double wristMotionMagicExpo_kV = 6.0; //
