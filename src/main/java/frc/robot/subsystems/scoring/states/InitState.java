@@ -41,6 +41,8 @@ public class InitState implements PeriodicStateInterface {
 
   @Override
   public void periodic() {
+    scoringSubsystem.setWristGoalAngle(JsonConstants.scoringSetpoints.idle.wristAngle());
+
     if (!DriverStation.isEnabled()) {
       homingTimer.restart();
       return;
