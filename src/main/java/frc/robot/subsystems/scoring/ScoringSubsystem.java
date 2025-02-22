@@ -220,6 +220,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
             ScoringState.Intake,
             () -> !(isCoralDetected() || isAlgaeDetected()))
         .permit(ScoringTrigger.ToggleWarmup, ScoringState.Warmup)
+        .permit(ScoringTrigger.StartWarmup, ScoringState.Warmup)
         .permitIf(ScoringTrigger.EnterTestMode, ScoringState.Tuning, isScoringTuningSupplier);
 
     stateMachineConfiguration
