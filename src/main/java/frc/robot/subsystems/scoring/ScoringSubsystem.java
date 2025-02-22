@@ -18,8 +18,6 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.TestModeManager;
@@ -575,7 +573,6 @@ public class ScoringSubsystem extends MonitoredSubsystem {
       case ElevatorTuning:
       case WristClosedLoopTuning:
       case WristVoltageTuning:
-      case SetpointTuning:
         if (stateMachine.getCurrentState() != ScoringState.Tuning) {
           fireTrigger(ScoringTrigger.EnterTestMode);
         }
