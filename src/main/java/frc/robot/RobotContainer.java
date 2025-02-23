@@ -118,8 +118,12 @@ public class RobotContainer {
         scoringSubsystem.setIsDriveLinedUpSupplier(() -> true);
       }
     }
+
+    if (FeatureFlags.synced.getObject().runLEDs) {
+      led = InitSubsystems.initLEDs(scoringSubsystem, climbSubsystem, drive);
+    }
+
     strategyManager = new StrategyManager(drive, scoringSubsystem);
-    led = new LED(scoringSubsystem, climbSubsystem, drive);
   }
 
   /**
@@ -213,6 +217,9 @@ public class RobotContainer {
         CommandScheduler.getInstance()
             .schedule(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         break;
+
+      case LEDTest:
+        CommandScheduler.getInstance().schedule(led.runCycle());
       default:
         break;
     }

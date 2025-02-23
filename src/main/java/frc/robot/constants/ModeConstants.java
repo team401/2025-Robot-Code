@@ -15,7 +15,7 @@ public final class ModeConstants {
    * mode. The robot will automatically detect a real robot, so this value doesn't need to be
    * changed to Mode.Real when on a real robot.
    */
-  public static final Mode simMode = Mode.SIM;
+  public static final Mode simMode = Mode.MAPLESIM;
 
   public static final Mode currentMode = Robot.isReal() ? Mode.REAL : simMode;
 }
