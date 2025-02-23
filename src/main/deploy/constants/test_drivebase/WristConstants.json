@@ -41,7 +41,7 @@
     "unit": "Rotation"
   },
   "wristMaxMaxAngle": {
-    "value": 0.25,
+    "value": 0.34,
     "unit": "Rotation"
   },
   "maxCrossBarSafeAngle": {

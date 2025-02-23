@@ -9,7 +9,7 @@
     "unit": "Rotation"
   },
   "wristMaxAngle": {
-    "value": 0.3,
+    "value": 0.34,
     "unit": "Rotation"
   },
   "wristStartingAngle": {
