@@ -1,19 +1,20 @@
 package frc.robot.subsystems.ramp;
 
 import org.littletonrobotics.junction.AutoLog;
-
+import static edu.wpi.first.units.Units.RadiansPerSecond;
 public interface RampIO {
 
   @AutoLog
   public static class RampInputs {
-    public double position = 0.0;
-    public boolean inPosition;
+     public double position = 0.0;
+     public boolean positionControl = false;
+     public double controlValue = 0.0;
   }
 
   @AutoLog
   public static class RampOutputs {
-    public double targetPosition;
-    public double appliedVolts;
+     public double appliedVolts;
+     public double velocity;
   }
 
   /**
@@ -27,6 +28,8 @@ public interface RampIO {
    */
   public void setPID(double kP, double kI, double kD);
 
+  public void addOffset(double offset);
+  
   public void updateInputs(RampInputs inputs);
 
   public void updateOutputs(RampInputs inputs, RampOutputs outputs);
