@@ -33,4 +33,6 @@ public interface ClimbIO {
   public default void setOverrideVoltage(Voltage voltage) {}
 
   public default void setPID(double p, double i, double d) {}
+
+  public default void setBrakeMode(boolean brake) {}
 }

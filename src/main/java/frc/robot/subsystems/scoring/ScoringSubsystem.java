@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.TestModeManager;
 import frc.robot.TestModeManager.TestMode;
 import frc.robot.constants.JsonConstants;
+import frc.robot.constants.ScoringFeatureFlags;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.ElevatorIO.ElevatorOutputMode;
 import frc.robot.subsystems.scoring.states.IdleState;
@@ -735,5 +736,14 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   public static ScoringSubsystem getInstance() {
     return instance;
+  }
+
+  public void setBrakeMode(boolean brake) {
+    if (ScoringFeatureFlags.synced.getObject().runElevator) {
+      elevatorMechanism.getIO().setBrakeMode(brake);
+    }
+    if (ScoringFeatureFlags.synced.getObject().runWrist) {
+      wristMechanism.getIO().setBrakeMode(brake);
+    }
   }
 }

@@ -28,9 +28,11 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.led.LED;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import java.io.File;
+import java.util.function.BooleanSupplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -48,12 +50,16 @@ public class RobotContainer {
   private Drive drive = null;
   private ClimbSubsystem climbSubsystem = null;
   private VisionLocalizer vision = null;
+  private LED led = null;
   private StrategyManager strategyManager = null;
   private AutoStrategyContainer strategyContainer = null;
 
   private SendableChooser<AutoStrategy> autoChooser = new SendableChooser<>();
 
   public static SwerveDriveSimulation driveSim = null;
+
+  private BooleanSupplier ledSwitch = () -> true;
+  private BooleanSupplier brakeSwitch = () -> true;
 
   public void updateRobotModel() {
     double height = 0.0;
@@ -71,6 +77,7 @@ public class RobotContainer {
       ramp_rotation = rampSubsystem.getPosition();
     }
     height = Math.min(height, 1.87);
+
     double stage_one_height = Math.max(height - 0.55, 0.0);
     double stage_two_height = Math.max(stage_one_height - 0.66, 0.0);
     // Logger.recordOutput(
@@ -150,7 +157,18 @@ public class RobotContainer {
         scoringSubsystem.setIsDriveLinedUpSupplier(() -> true);
       }
     }
+
+    if (FeatureFlags.synced.getObject().runLEDs) {
+      led = InitSubsystems.initLEDs(scoringSubsystem, climbSubsystem, drive);
+    }
+
     strategyManager = new StrategyManager(drive, scoringSubsystem);
+
+    SmartDashboard.setDefaultBoolean("LEDs On During Disabled", true);
+    ledSwitch = () -> SmartDashboard.getBoolean("LEDs On During Disabled", true);
+
+    SmartDashboard.setDefaultBoolean("Brake Mode On During Disabled", true);
+    brakeSwitch = () -> SmartDashboard.getBoolean("Brake Mode On During Disabled", true);
   }
 
   /**
@@ -181,6 +199,7 @@ public class RobotContainer {
   }
 
   public void periodic() {
+
     strategyManager.periodic();
   }
 
@@ -189,12 +208,37 @@ public class RobotContainer {
 
     // load chosen strategy
     strategyManager.addActionsFromAutoStrategy(autoChooser.getSelected());
+
+    if (FeatureFlags.synced.getObject().runLEDs) {
+      led.enabled(true);
+    }
+
+    if (FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem.setBrakeMode(true);
+    }
+
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem.setBrakeMode(true);
+    }
   }
 
   public void teleopInit() {
+
     strategyManager.setAutonomyMode(AutonomyMode.Teleop);
     // clear leftover actions from auto
     strategyManager.clearActions();
+
+    if (FeatureFlags.synced.getObject().runLEDs) {
+      led.enabled(true);
+    }
+
+    if (FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem.setBrakeMode(true);
+    }
+
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem.setBrakeMode(true);
+    }
   }
 
   /** This method must be called from robot, as it isn't called automatically */
@@ -244,8 +288,23 @@ public class RobotContainer {
         CommandScheduler.getInstance()
             .schedule(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         break;
+
+      case LEDTest:
+        CommandScheduler.getInstance().schedule(led.runCycle());
       default:
         break;
+    }
+
+    if (FeatureFlags.synced.getObject().runLEDs) {
+      led.enabled(true);
+    }
+
+    if (FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem.setBrakeMode(true);
+    }
+
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem.setBrakeMode(true);
     }
   }
 
@@ -265,8 +324,21 @@ public class RobotContainer {
   }
 
   public void disabledPeriodic() {
+    led.periodic();
     // Logger.recordOutput("feature_flags/drive", FeatureFlags.synced.getObject().runDrive);
     strategyManager.logActions();
+
+    if (FeatureFlags.synced.getObject().runLEDs) {
+      led.enabled(ledSwitch.getAsBoolean());
+    }
+
+    if (FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem.setBrakeMode(brakeSwitch.getAsBoolean());
+    }
+
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem.setBrakeMode(brakeSwitch.getAsBoolean());
+    }
   }
 
   public void disabledInit() {
