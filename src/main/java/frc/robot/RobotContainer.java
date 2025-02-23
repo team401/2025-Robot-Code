@@ -141,7 +141,7 @@ public class RobotContainer {
     if (FeatureFlags.synced.getObject().runClimb) {
       climbSubsystem = InitSubsystems.initClimbSubsystem();
       if (FeatureFlags.synced.getObject().runRamp) {
-        climbSubsystem.setRampClear(rampSubsystem.isInPosition());
+        climbSubsystem.setRampClear(() -> rampSubsystem.isInPosition());
       }
     }
 

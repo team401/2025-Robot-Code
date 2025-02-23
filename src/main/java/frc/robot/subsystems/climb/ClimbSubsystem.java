@@ -16,7 +16,6 @@ import frc.robot.subsystems.climb.states.IdleState;
 import frc.robot.subsystems.climb.states.LiftingState;
 import frc.robot.subsystems.climb.states.SearchingState;
 import frc.robot.subsystems.climb.states.WaitingState;
-import frc.robot.subsystems.ramp.RampSubsystem;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
