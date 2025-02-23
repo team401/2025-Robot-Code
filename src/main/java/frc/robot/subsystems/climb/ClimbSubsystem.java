@@ -97,6 +97,10 @@ public class ClimbSubsystem extends SubsystemBase {
         .configure(ClimbState.LIFTING)
         .permit(ClimbAction.CANCEL, ClimbState.IDLE);
 
+      climbMachineConfiguration
+        .configure(ClimbState.OVERRIDE)
+        .permit(ClimbAction.CANCEL, ClimbState.IDLE);
+
     climbMachine =
         new StateMachine<ClimbState, ClimbAction>(climbMachineConfiguration, ClimbState.IDLE);
 
@@ -166,6 +170,7 @@ public class ClimbSubsystem extends SubsystemBase {
   public void testPeriodic() {
     switch (TestModeManager.getTestMode()) {
       case ClimbTuning:
+        fireTrigger(ClimbAction.OVERRIDE);
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (pid) -> {
@@ -188,7 +193,6 @@ public class ClimbSubsystem extends SubsystemBase {
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (setpoint) -> {
-              fireTrigger(ClimbAction.OVERRIDE);
               io.setOverrideVoltage(Volts.of(setpoint[0]));
             },
             climbTuningOverrideVolts);

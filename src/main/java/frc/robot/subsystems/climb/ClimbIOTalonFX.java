@@ -89,12 +89,13 @@ public class ClimbIOTalonFX implements ClimbIO {
 
     calculator.withPosition(goalAngle);
 
-    /*if (override) {
+    if (override) {
       leadMotor.setVoltage(overrideVoltage.in(Volts));
     } else {
       leadMotor.setControl(calculator);
-    }*/
-    leadMotor.setControl(new VoltageOut(5));
+    }
+    //tried to replace the above if statement with leadMotor.setControl(new VoltageOut(5));, doesn't work
+    //the getMotorVoltage continuously returns 0 despite leadMotor's literal voltage being set to 5
     outputs.appliedVoltage.mut_replace(leadMotor.getMotorVoltage().getValue());
   }
 
