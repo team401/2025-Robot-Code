@@ -19,12 +19,12 @@ public class ClimbConstants {
           EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
-  public final Angle restingAngle = Degrees.of(20);
+  public final Angle restingAngle = Degrees.of(0);
   public final Angle searchingAngle = Degrees.of(60);
   public final Angle finalHangingAngle = Degrees.of(0);
 
-  public final Integer leadClimbMotorId = 0;
-  public final Integer followerClimbMotorId = 1;
+  public final Integer leadClimbMotorId = 16;
+  public final Integer followerClimbMotorId = 17;
 
   public final Double climbkS = 0.0;
   public final Double climbkV = 0.0;
@@ -36,7 +36,7 @@ public class ClimbConstants {
 
   public final Double climbCurrentLimit = 60.0;
 
-  public final Boolean invertFollowerClimbMotor = false;
+  public final Boolean invertFollowerClimbMotor = true;
 
   public static final class Sim {
     @JSONExclude

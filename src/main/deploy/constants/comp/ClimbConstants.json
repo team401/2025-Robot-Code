@@ -1,10 +1,10 @@
 {
   "restingAngle": {
-    "value": 20.0,
+    "value": 0.0,
     "unit": "Degree"
   },
   "searchingAngle": {
-    "value": 60.0,
+    "value": 74.35,
     "unit": "Degree"
   },
   "finalHangingAngle": {

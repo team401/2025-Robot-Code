@@ -166,7 +166,6 @@ public class ClimbSubsystem extends SubsystemBase {
   public void testPeriodic() {
     switch (TestModeManager.getTestMode()) {
       case ClimbTuning:
-        fireTrigger(ClimbAction.OVERRIDE);
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (pid) -> {
@@ -189,6 +188,7 @@ public class ClimbSubsystem extends SubsystemBase {
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (setpoint) -> {
+              fireTrigger(ClimbAction.OVERRIDE);
               io.setOverrideVoltage(Volts.of(setpoint[0]));
             },
             climbTuningOverrideVolts);

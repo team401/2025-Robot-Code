@@ -9,6 +9,8 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
@@ -22,6 +24,7 @@ public class ClimbIOTalonFX implements ClimbIO {
 
   TalonFX leadMotor;
   TalonFX followerMotor;
+  CANcoder climbAngleCoder;
 
   TalonFXConfiguration talonFXConfigs;
 
@@ -38,8 +41,9 @@ public class ClimbIOTalonFX implements ClimbIO {
       new MotionMagicVoltage(ClimbConstants.synced.getObject().restingAngle);
 
   public ClimbIOTalonFX() {
-    leadMotor = new TalonFX(ClimbConstants.synced.getObject().leadClimbMotorId);
-    followerMotor = new TalonFX(ClimbConstants.synced.getObject().followerClimbMotorId);
+    leadMotor = new TalonFX(16);
+    followerMotor = new TalonFX(17);
+    climbAngleCoder = new CANcoder(17, "canivore");
 
     followerMotor.setControl(
         new Follower(
@@ -77,7 +81,7 @@ public class ClimbIOTalonFX implements ClimbIO {
 
     inputs.lockedToCage = this.lockedToCage.getAsBoolean();
     inputs.goalAngle.mut_replace(goalAngle);
-    inputs.motorAngle.mut_replace(leadMotor.getPosition().getValue());
+    inputs.motorAngle.mut_replace(climbAngleCoder.getAbsolutePosition().getValue());
   }
 
   @Override
@@ -85,12 +89,12 @@ public class ClimbIOTalonFX implements ClimbIO {
 
     calculator.withPosition(goalAngle);
 
-    if (override) {
-      leadMotor.setVoltage(0);
+    /*if (override) {
+      leadMotor.setVoltage(overrideVoltage.in(Volts));
     } else {
       leadMotor.setControl(calculator);
-    }
-
+    }*/
+    leadMotor.setControl(new VoltageOut(5));
     outputs.appliedVoltage.mut_replace(leadMotor.getMotorVoltage().getValue());
   }
 
