@@ -5,14 +5,16 @@ import coppercore.controls.state_machine.transition.Transition;
 import coppercore.parameter_tools.LoggedTunableNumber;
 import coppercore.vision.VisionLocalizer.DistanceToTag;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
+import frc.robot.constants.ModeConstants;
+import frc.robot.constants.ModeConstants.Mode;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.drive.Drive.VisionAlignment;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
@@ -79,6 +81,9 @@ public class LineupState implements PeriodicStateInterface {
           JsonConstants.drivetrainConstants.driveRotationKi,
           JsonConstants.drivetrainConstants.driveRotationKd);
 
+  LinearFilter alongTrackFilter = LinearFilter.singlePoleIIR(0.2, 0.02);
+  LinearFilter crossTrackFilter = LinearFilter.singlePoleIIR(0.2, 0.02);
+
   public LineupState(Drive drive) {
     this.drive = drive;
     rotationController.enableContinuousInput(-Math.PI / 2, Math.PI / 2);
@@ -94,6 +99,10 @@ public class LineupState implements PeriodicStateInterface {
 
     // begin warming up elevator/wrist when lineup starts
     ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+  }
+
+  public void onExit(Transition transition) {
+    drive.setDriveLinedUp(false);
   }
 
   /**
@@ -156,9 +165,7 @@ public class LineupState implements PeriodicStateInterface {
     }
     this.LineupWithReefLocation();
 
-    if (lineupFinished()) {
-      drive.fireTrigger(DriveTrigger.FinishLineup);
-    }
+    drive.setDriveLinedUp(lineupFinished());
   }
 
   /**
@@ -199,10 +206,11 @@ public class LineupState implements PeriodicStateInterface {
    * @return offset for camera
    */
   public Double getCrossTrackOffset(int cameraIndex) {
-    if (cameraIndex == 0) {
+    if (cameraIndex == JsonConstants.visionConstants.FrontRightCameraIndex) {
       return JsonConstants.drivetrainConstants.driveCrossTrackFrontRightOffset;
+    } else {
+      return JsonConstants.drivetrainConstants.driveCrossTrackFrontLeftOffset;
     }
-    return 0.0; // front left offset (not added)
   }
 
   /**
@@ -234,13 +242,25 @@ public class LineupState implements PeriodicStateInterface {
   }
 
   public double getAlongTrackVelocity(double alongTrackDistance) {
-    if (alongTrackDistance < 0) {
+    if (alongTrackDistance < 0
+        && (ModeConstants.currentMode == Mode.MAPLESIM || ModeConstants.currentMode == Mode.SIM)) {
       return 0;
     }
 
+    if (alongTrackDistance < 0.2) {
+      return -1
+          * JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
+          * driveAlongTrackLineupController.calculate(alongTrackDistance);
+    }
+
+    double sign = Math.signum(alongTrackDistance);
+
     double rawVelocity =
-        Math.sqrt(2 * JsonConstants.drivetrainConstants.lineupMaxAcceleration * alongTrackDistance);
-    return Math.min(rawVelocity, JsonConstants.drivetrainConstants.lineupMaxVelocity);
+        Math.sqrt(
+            2
+                * JsonConstants.drivetrainConstants.lineupMaxAcceleration
+                * Math.abs(alongTrackDistance));
+    return sign * Math.min(rawVelocity, JsonConstants.drivetrainConstants.lineupMaxVelocity);
   }
 
   public double getAlongTrackVelocityReductionFactor(double crossTrackDistance) {
@@ -281,21 +301,30 @@ public class LineupState implements PeriodicStateInterface {
       observationAge = 0;
     }
 
+    double alongTrackDistanceFiltered =
+        alongTrackFilter.calculate(observation.alongTrackDistance());
+    double crossTrackDistanceFiltered =
+        crossTrackFilter.calculate(observation.crossTrackDistance());
+
     Logger.recordOutput("Drive/Lineup/AlongTrackDistance", observation.alongTrackDistance());
     Logger.recordOutput("Drive/Lineup/CrossTrackDistance", observation.crossTrackDistance());
+    Logger.recordOutput("Drive/Lineup/AlongTrackDistanceFiltered", alongTrackDistanceFiltered);
+    Logger.recordOutput("Drive/Lineup/CrossTrackDistanceFiltered", crossTrackDistanceFiltered);
     Logger.recordOutput("Drive/Lineup/IsObservationValid", observation.isValid());
 
     // give to PID Controllers and setGoalSpeeds (robotCentric)
-    double vx =
-        JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
-            * getAlongTrackVelocityReductionFactor(observation.crossTrackDistance())
-            * getAlongTrackVelocity(observation.alongTrackDistance());
-    double vy = driveCrossTrackLineupController.calculate(observation.crossTrackDistance());
-    double omega =
-        rotationController.calculate(
-            drive.getRotation().getRadians(), this.getRotationForReefSide().getRadians());
+    if (!lineupFinished()) {
+      double vx =
+          JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
+              // * getAlongTrackVelocityReductionFactor(observation.crossTrackDistance())
+              * getAlongTrackVelocity(alongTrackDistanceFiltered);
+      double vy = driveCrossTrackLineupController.calculate(crossTrackDistanceFiltered);
+      double omega =
+          rotationController.calculate(
+              drive.getRotation().getRadians(), this.getRotationForReefSide().getRadians());
 
-    drive.setGoalSpeeds(new ChassisSpeeds(vx, vy, omega), false);
+      drive.setGoalSpeeds(new ChassisSpeeds(vx, vy, omega), false);
+    }
   }
 
   /**

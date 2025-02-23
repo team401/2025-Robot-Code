@@ -6,7 +6,7 @@
       "unit": "Inch"
     },
     "wristAngle": {
-      "value": 0.0,
+      "value": 0.3214,
       "unit": "Rotation"
     }
   },
@@ -28,40 +28,40 @@
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": 0.0,
+      "value": 0.3214,
       "unit": "Rotation"
     }
   },
   "L2": {
     "name": "L2",
     "elevatorHeight": {
-      "value": 1.5,
+      "value": 0.33,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": -0.15,
+      "value": 0.275,
       "unit": "Rotation"
     }
   },
   "L3": {
     "name": "L3",
     "elevatorHeight": {
-      "value": 2.0,
+      "value": 0.7,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": -0.15,
+      "value": 0.275,
       "unit": "Rotation"
     }
   },
   "L4": {
     "name": "L4",
     "elevatorHeight": {
-      "value": 2.5,
+      "value": 1.45,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": -0.25,
+      "value": 0.2,
       "unit": "Rotation"
     }
   },

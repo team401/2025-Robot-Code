@@ -165,13 +165,16 @@ public class RobotContainer {
   private void configureBindings() {
     // initialize helper commands
     if (FeatureFlags.synced.getObject().runDrive) {
-      InitBindings.initDriveBindings(drive);
+      InitBindings.initDriveBindings(drive, strategyManager);
     }
     if (FeatureFlags.synced.getObject().runRamp) {
       InitBindings.initRampBindings(rampSubsystem);
     }
     if (FeatureFlags.synced.getObject().runClimb) {
       InitBindings.initClimbBindings(climbSubsystem);
+    }
+    if (FeatureFlags.synced.getObject().runScoring) {
+      InitBindings.initScoringBindings(scoringSubsystem);
     }
   }
 
@@ -203,7 +206,6 @@ public class RobotContainer {
 
     switch (TestModeManager.getTestMode()) {
       case ElevatorCharacterization:
-        scoringSubsystem.setOverrideStateMachine(true);
         CommandScheduler.getInstance()
             .schedule(
                 new SequentialCommandGroup(
@@ -262,6 +264,10 @@ public class RobotContainer {
 
     if (FeatureFlags.synced.getObject().runClimb) {
       climbSubsystem.testPeriodic();
+    }
+
+    if (FeatureFlags.synced.getObject().runDrive) {
+      drive.periodic();
     }
   }
 
