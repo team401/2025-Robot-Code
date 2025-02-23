@@ -52,18 +52,9 @@ public class ReefAvoidanceHelper {
    */
   public static Distance getCollisionHeightDownward(
       Distance elevatorHeight, Distance elevatorGoalHeight) {
-    Distance[] heights = {
-      JsonConstants.elevatorConstants.L4MaxHeightBelow,
-      JsonConstants.elevatorConstants.L3MaxHeightBelow,
-      JsonConstants.elevatorConstants.L2MaxHeightBelow
-    };
-
-    for (Distance height : heights) {
-      // If the elevator is above the height and the elevator goal height is below the height, we
-      // will collide
-      if (elevatorHeight.gte(height) && elevatorGoalHeight.lte(height)) {
-        return height;
-      }
+    if (elevatorHeight.gte(JsonConstants.elevatorConstants.L4MinHeightAbove)
+        && elevatorGoalHeight.lte(JsonConstants.elevatorConstants.L4MinHeightAbove)) {
+      return JsonConstants.elevatorConstants.L4MinHeightAbove;
     }
 
     return null;
@@ -79,18 +70,9 @@ public class ReefAvoidanceHelper {
    */
   public static Distance getCollisionHeightUpward(
       Distance elevatorHeight, Distance elevatorGoalHeight) {
-    Distance[] heights = {
-      JsonConstants.elevatorConstants.L2MinHeightAbove,
-      JsonConstants.elevatorConstants.L3MinHeightAbove,
-      JsonConstants.elevatorConstants.L4MinHeightAbove
-    };
-
-    for (Distance height : heights) {
-      // If the elevator is below the height and the elevator goal height is above the height, we
-      // will collide
-      if (elevatorHeight.lte(height) && elevatorGoalHeight.gte(height)) {
-        return height;
-      }
+    if (elevatorHeight.lte(JsonConstants.elevatorConstants.L4MinHeightAbove)
+        && elevatorGoalHeight.gte(JsonConstants.elevatorConstants.L4MinHeightAbove)) {
+      return JsonConstants.elevatorConstants.L4MinHeightAbove;
     }
 
     return null;

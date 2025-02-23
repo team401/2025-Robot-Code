@@ -83,7 +83,7 @@
     "unit": "Meter"
   },
   "L4MinHeightAbove": {
-    "value": 1.44,
+    "value": 1.74,
     "unit": "Meter"
   },
   "L2MaxHeightBelow": {
@@ -95,7 +95,7 @@
     "unit": "Meter"
   },
   "L4MaxHeightBelow": {
-    "value": 0.7,
+    "value": 1.7,
     "unit": "Meter"
   },
   "elevatorSetpointEpsilon": {

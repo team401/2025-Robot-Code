@@ -35,7 +35,7 @@
   "L2": {
     "name": "L2",
     "elevatorHeight": {
-      "value": 0.33,
+      "value": 0.23,
       "unit": "Meter"
     },
     "wristAngle": {
@@ -46,7 +46,7 @@
   "L3": {
     "name": "L3",
     "elevatorHeight": {
-      "value": 0.7,
+      "value": 0.65,
       "unit": "Meter"
     },
     "wristAngle": {
@@ -57,11 +57,11 @@
   "L4": {
     "name": "L4",
     "elevatorHeight": {
-      "value": 1.45,
+      "value": 1.78,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": 0.2,
+      "value": -0.01,
       "unit": "Rotation"
     }
   },
