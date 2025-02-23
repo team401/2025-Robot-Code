@@ -17,10 +17,10 @@ import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.JsonConstants;
 
 public class ClawIOTalonFX implements ClawIO {
-  CANrange coralRange = new CANrange(JsonConstants.clawConstants.coralCANrangeID);
-  CANrange algaeRange = new CANrange(JsonConstants.clawConstants.algaeCANrangeID);
+  CANrange coralRange = new CANrange(JsonConstants.clawConstants.coralCANrangeID, "canivore");
+  CANrange algaeRange = new CANrange(JsonConstants.clawConstants.algaeCANrangeID, "canivore");
 
-  TalonFX rollerMotor = new TalonFX(JsonConstants.clawConstants.clawMotorID);
+  TalonFX rollerMotor = new TalonFX(JsonConstants.clawConstants.clawMotorID, "canivore");
 
   private MutVoltage outputVoltage = Volts.mutable(0.0);
   private VoltageOut voltageRequest = new VoltageOut(outputVoltage);

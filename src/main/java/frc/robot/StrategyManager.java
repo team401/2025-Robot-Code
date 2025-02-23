@@ -1,5 +1,10 @@
 package frc.robot;
 
+import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.strategies.AutoIntake;
@@ -28,6 +33,15 @@ public class StrategyManager {
   private ScoringSubsystem scoringSubsystem;
   private AutonomyMode autonomyMode = AutonomyMode.Full;
   private Action currentAction = null;
+
+  private NetworkTableInstance inst = NetworkTableInstance.getDefault();
+  private NetworkTable table = inst.getTable("");
+  private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
+  private StringSubscriber reefLevelSelector = table.getStringTopic("scoreHeight").subscribe("-1");
+  private StringSubscriber autonomySelector =
+      table.getStringTopic("autonomyLevel").subscribe("mid");
+  private BooleanPublisher hasCoralPublisher = table.getBooleanTopic("hasCoral").publish();
+  private BooleanPublisher hasAlgaePublisher = table.getBooleanTopic("hasAlgae").publish();
 
   public StrategyManager(Drive drive, ScoringSubsystem scoringSubsystem) {
     actions = new LinkedList<>();
@@ -152,6 +166,36 @@ public class StrategyManager {
     }
   }
 
+  public void updateScoringLocationsFromSnakeScreen() {
+    // drive reef location
+    if (drive != null) {
+      drive.updateDesiredLocationFromNetworkTables(reefLocationSelector.get());
+    }
+
+    // scoring level selection
+    if (scoringSubsystem != null) {
+      scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
+    }
+
+    // update autonomy level
+    String autonomyLevel = autonomySelector.get();
+
+    if (autonomyLevel == "high") {
+      this.setAutonomyMode(AutonomyMode.Full);
+    } else if (autonomyLevel == "mid") {
+      this.setAutonomyMode(AutonomyMode.Teleop);
+    } else if (autonomyLevel == "low") {
+      this.setAutonomyMode(AutonomyMode.Manual);
+    }
+  }
+
+  public void publishCoralAndAlgae() {
+    if (scoringSubsystem != null) {
+      hasCoralPublisher.accept(scoringSubsystem.isCoralDetected());
+      hasAlgaePublisher.accept(scoringSubsystem.isAlgaeDetected());
+    }
+  }
+
   public void periodic() {
     if (currentCommand == null || currentCommand.isFinished()) {
       currentAction = getNextAction();
@@ -162,5 +206,9 @@ public class StrategyManager {
     }
 
     this.logActions();
+
+    // send and receive from SnakeScreen
+    this.updateScoringLocationsFromSnakeScreen();
+    this.publishCoralAndAlgae();
   }
 }
