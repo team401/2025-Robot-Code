@@ -1,6 +1,7 @@
 package frc.robot.subsystems.climb;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
@@ -26,7 +27,7 @@ public class ClimbIOTalonFX implements ClimbIO {
   TalonFXConfiguration talonFXConfigs;
 
   // TODO: replace when sensors become available
-  private BooleanSupplier lockedToCage = () -> true;
+  private BooleanSupplier lockedToCage = () -> false;
 
   private MutAngle goalAngle = Radians.mutable(0);
   private MutVoltage overrideVoltage = Volts.mutable(0.0);
