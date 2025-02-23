@@ -4,6 +4,7 @@ import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -40,7 +41,12 @@ public class StrategyManager {
   private StringSubscriber reefLevelSelector = table.getStringTopic("scoreHeight").subscribe("-1");
   private StringSubscriber autonomySelector =
       table.getStringTopic("autonomyLevel").subscribe("mid");
-      private StringSubscriber gamePieceSelector = table.getStringTopic("gpMode").subscribe("-1");
+  private StringSubscriber gamePieceSelector = table.getStringTopic("gpMode").subscribe("-1");
+
+  private StringPublisher autonomyPublisher = table.getStringTopic("autonomyLevel").publish();
+  private StringPublisher reefLocationPublisher = table.getStringTopic("reefTarget").publish();
+  private StringPublisher reefLevelPublisher = table.getStringTopic("scoreHeight").publish();
+  private StringPublisher gamePiecePublisher = table.getStringTopic("gpMode").publish();
   private BooleanPublisher hasCoralPublisher = table.getBooleanTopic("hasCoral").publish();
   private BooleanPublisher hasAlgaePublisher = table.getBooleanTopic("hasAlgae").publish();
 
@@ -220,5 +226,95 @@ public class StrategyManager {
     // send and receive from SnakeScreen
     this.updateScoringLocationsFromSnakeScreen();
     this.publishCoralAndAlgae();
+  }
+
+  public void publishDefaultSubsystemValues() {
+    if(scoringSubsystem != null) {
+      // publish default game piece
+      switch(scoringSubsystem.getGamePiece()) {
+        case Coral:
+          gamePiecePublisher.accept("coral");
+          break;
+        case Algae:
+          gamePiecePublisher.accept("algae");
+          break;
+        default:
+          break;
+      }
+
+      //publish default level
+      switch(scoringSubsystem.getTarget()) {
+        case L1:
+          reefLevelPublisher.accept("level1");
+          break;
+        case L2:
+          reefLevelPublisher.accept("level2");
+          break;
+        case L3:
+          reefLevelPublisher.accept("level3");
+          break;
+        case L4:
+          reefLevelPublisher.accept("level4");
+          break;
+        default:
+          break;
+      }
+    }
+
+    if(drive != null) {
+
+      //publish default reef location
+      String reefLocation = "";
+      switch (drive.getDesiredLocation()) {
+        case Processor:
+        case CoralStationLeft:
+        case CoralStationRight:
+          break;
+        default:
+          reefLocation = drive.getDesiredLocation().toString().toLowerCase();
+      }
+
+      if(!reefLocation.equalsIgnoreCase("")) {
+        reefLocationPublisher.accept(reefLocation);
+      }
+    }
+
+    // publish autonomy mode
+    switch(this.getAutonomyMode()) {
+      case Full:
+        autonomyPublisher.accept("high");
+        break;
+      case Teleop:
+        autonomyPublisher.accept("mid");
+        break;
+      case Manual:
+        autonomyPublisher.accept("low");
+        break;
+      default:
+        break;
+    }
+  }
+
+  /**
+   * call in robot container autonomous init to schedule actions and publish to snakescreen
+   * @param strategy the auto actions to run
+   */
+  public void autonomousInit(AutoStrategy strategy) {
+    this.setAutonomyMode(AutonomyMode.Full);
+
+    this.addActionsFromAutoStrategy(strategy);
+
+    this.publishDefaultSubsystemValues();
+  }
+
+  /**
+   * call in robot container teleop init to clear actions from auto and publish default snakescreen values
+   */
+  public void teleopInit() {
+    this.setAutonomyMode(AutonomyMode.Teleop);
+
+    this.clearActions();
+
+    this.publishDefaultSubsystemValues();
   }
 }
