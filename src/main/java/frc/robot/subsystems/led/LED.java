@@ -59,6 +59,8 @@ public class LED extends SubsystemBase {
   private ClimbSubsystem climbSubsystem;
   private Drive driveSubsystem;
 
+  private boolean enabled = true;
+
   /**
    * Constructs the LED subsystem.
    *
@@ -168,6 +170,15 @@ public class LED extends SubsystemBase {
 
     leftFinal.applyTo(leftData);
     rightFinal.applyTo(rightData);
+  }
+
+  public void enabled(boolean enabled) {
+    this.enabled = enabled;
+    if (enabled) {
+      led.start();
+    } else {
+      led.stop();
+    }
   }
 
   public Command runCycle() {

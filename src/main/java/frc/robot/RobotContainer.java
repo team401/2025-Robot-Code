@@ -4,9 +4,6 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import coppercore.vision.VisionLocalizer;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DigitalInput;
 import coppercore.wpilib_interface.tuning.TuneS;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -28,8 +25,6 @@ import frc.robot.constants.AutoStrategyContainer;
 import frc.robot.constants.ClimbConstants;
 import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
-import frc.robot.constants.LEDConstants;
-import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
@@ -37,6 +32,7 @@ import frc.robot.subsystems.led.LED;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import java.io.File;
+import java.util.function.BooleanSupplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -62,7 +58,8 @@ public class RobotContainer {
 
   public static SwerveDriveSimulation driveSim = null;
 
-  DigitalInput ledSwitch = new DigitalInput(LEDConstants.ledSwitch);
+  private BooleanSupplier ledSwitch = () -> true;
+  private BooleanSupplier brakeSwitch = () -> true;
 
   public void updateRobotModel() {
     double height = 0.0;
@@ -80,6 +77,7 @@ public class RobotContainer {
       ramp_rotation = rampSubsystem.getPosition();
     }
     height = Math.min(height, 1.87);
+
     double stage_one_height = Math.max(height - 0.55, 0.0);
     double stage_two_height = Math.max(stage_one_height - 0.66, 0.0);
     // Logger.recordOutput(
@@ -165,6 +163,12 @@ public class RobotContainer {
     }
 
     strategyManager = new StrategyManager(drive, scoringSubsystem);
+
+    SmartDashboard.setDefaultBoolean("LEDs On During Disabled", true);
+    ledSwitch = () -> SmartDashboard.getBoolean("LEDs On During Disabled", true);
+
+    SmartDashboard.setDefaultBoolean("Brake Mode On During Disabled", true);
+    brakeSwitch = () -> SmartDashboard.getBoolean("Brake Mode On During Disabled", true);
   }
 
   /**
@@ -205,7 +209,17 @@ public class RobotContainer {
     // load chosen strategy
     strategyManager.addActionsFromAutoStrategy(autoChooser.getSelected());
 
-    led.enabled(FeatureFlags.synced.getObject().runLEDs);
+    if (FeatureFlags.synced.getObject().runLEDs) {
+      led.enabled(true);
+    }
+
+    if (FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem.setBrakeMode(true);
+    }
+
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem.setBrakeMode(true);
+    }
   }
 
   public void teleopInit() {
@@ -214,7 +228,17 @@ public class RobotContainer {
     // clear leftover actions from auto
     strategyManager.clearActions();
 
-    led.enabled(FeatureFlags.synced.getObject().runLEDs);
+    if (FeatureFlags.synced.getObject().runLEDs) {
+      led.enabled(true);
+    }
+
+    if (FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem.setBrakeMode(true);
+    }
+
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem.setBrakeMode(true);
+    }
   }
 
   /** This method must be called from robot, as it isn't called automatically */
@@ -271,7 +295,17 @@ public class RobotContainer {
         break;
     }
 
-    led.enabled(FeatureFlags.synced.getObject().runLEDs);
+    if (FeatureFlags.synced.getObject().runLEDs) {
+      led.enabled(true);
+    }
+
+    if (FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem.setBrakeMode(true);
+    }
+
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem.setBrakeMode(true);
+    }
   }
 
   /** This method must be called from the robot, as it isn't called automatically. */
@@ -294,8 +328,16 @@ public class RobotContainer {
     // Logger.recordOutput("feature_flags/drive", FeatureFlags.synced.getObject().runDrive);
     strategyManager.logActions();
 
-    if (ledSwitch != null && led != null) {
-      led.enabled(!ledSwitch.get());
+    if (FeatureFlags.synced.getObject().runLEDs) {
+      led.enabled(ledSwitch.getAsBoolean());
+    }
+
+    if (FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem.setBrakeMode(brakeSwitch.getAsBoolean());
+    }
+
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem.setBrakeMode(brakeSwitch.getAsBoolean());
     }
   }
 

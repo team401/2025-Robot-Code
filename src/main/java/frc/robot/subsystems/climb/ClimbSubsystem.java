@@ -105,6 +105,10 @@ public class ClimbSubsystem extends SubsystemBase {
     return inputs.motorAngle;
   }
 
+  public void setBrakeMode(boolean brake) {
+    io.setBrakeMode(brake);
+  }
+
   @Override
   public void periodic() {
 

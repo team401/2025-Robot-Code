@@ -117,4 +117,10 @@ public class ClimbIOTalonFX implements ClimbIO {
     leadMotor.getConfigurator().apply(configs);
     followerMotor.getConfigurator().apply(configs);
   }
+
+  @Override
+  public void setBrakeMode(boolean brakeMode) {
+    leadMotor.setNeutralMode(brakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+    followerMotor.setNeutralMode(brakeMode ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+  }
 }
