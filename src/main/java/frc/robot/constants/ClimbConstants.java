@@ -30,7 +30,7 @@ public class ClimbConstants {
   public final Double climbkV = 0.0;
   public final Double climbkA = 0.0;
   public final Double climbkG = 0.0;
-  public final Double climbkP = 50.0;
+  public final Double climbkP = 5.0;
   public final Double climbkI = 0.0;
   public final Double climbkD = 0.0;
 

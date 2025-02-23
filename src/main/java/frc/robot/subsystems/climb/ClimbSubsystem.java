@@ -101,25 +101,25 @@ public class ClimbSubsystem extends SubsystemBase {
         new StateMachine<ClimbState, ClimbAction>(climbMachineConfiguration, ClimbState.IDLE);
 
     climbkP =
-        new LoggedTunableNumber("climbTunables/climbkP", ClimbConstants.synced.getObject().climbkP);
+        new LoggedTunableNumber("ClimbTunables/climbkP", ClimbConstants.synced.getObject().climbkP);
     climbkI =
-        new LoggedTunableNumber("climbTunables/climbkI", ClimbConstants.synced.getObject().climbkI);
+        new LoggedTunableNumber("ClimbTunables/climbkI", ClimbConstants.synced.getObject().climbkI);
     climbkD =
-        new LoggedTunableNumber("climbTunables/climbkD", ClimbConstants.synced.getObject().climbkD);
+        new LoggedTunableNumber("ClimbTunables/climbkD", ClimbConstants.synced.getObject().climbkD);
 
     climbkS =
-        new LoggedTunableNumber("climbTunables/climbkS", ClimbConstants.synced.getObject().climbkS);
+        new LoggedTunableNumber("ClimbTunables/climbkS", ClimbConstants.synced.getObject().climbkS);
     climbkV =
-        new LoggedTunableNumber("climbTunables/climbkV", ClimbConstants.synced.getObject().climbkV);
+        new LoggedTunableNumber("ClimbTunables/climbkV", ClimbConstants.synced.getObject().climbkV);
     climbkA =
-        new LoggedTunableNumber("climbTunables/climbkA", ClimbConstants.synced.getObject().climbkA);
+        new LoggedTunableNumber("ClimbTunables/climbkA", ClimbConstants.synced.getObject().climbkA);
     climbkG =
-        new LoggedTunableNumber("climbTunables/climbkG", ClimbConstants.synced.getObject().climbkG);
+        new LoggedTunableNumber("ClimbTunables/climbkG", ClimbConstants.synced.getObject().climbkG);
 
     climbTuningSetpointDegrees =
-        new LoggedTunableNumber("climbTunables/climbTuningSetpointDegrees", 0.0);
+        new LoggedTunableNumber("ClimbTunables/climbTuningSetpointDegrees", 0.0);
     climbTuningOverrideVolts =
-        new LoggedTunableNumber("climbTunables/climbTuningOverrideVolts", 0.0);
+        new LoggedTunableNumber("ClimbTunables/climbTuningOverrideVolts", 0.0);
   }
 
   public void fireTrigger(ClimbAction action) {
