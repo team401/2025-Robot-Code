@@ -21,6 +21,8 @@ public class JsonConstants {
     WristConstants.Sim.synced.loadData();
     ScoringFeatureFlags.synced.loadData();
     ScoringSetpoints.synced.loadData();
+    ClimbConstants.synced.loadData();
+    ClimbConstants.Sim.synced.loadData();
     RedFieldLocations.synced.loadData();
     RampConstants.synced.loadData();
     BlueFieldLocations.synced.loadData();
@@ -34,6 +36,8 @@ public class JsonConstants {
     clawConstantsSim = ClawConstants.Sim.synced.getObject();
     scoringFeatureFlags = ScoringFeatureFlags.synced.getObject();
     scoringSetpoints = ScoringSetpoints.synced.getObject();
+    climbConstants = ClimbConstants.synced.getObject();
+    climbConstantsSim = ClimbConstants.Sim.synced.getObject();
     redFieldLocations = RedFieldLocations.synced.getObject();
     rampConstants = RampConstants.synced.getObject();
     blueFieldLocations = BlueFieldLocations.synced.getObject();
@@ -49,6 +53,8 @@ public class JsonConstants {
   public static ClawConstants.Sim clawConstantsSim;
   public static ScoringFeatureFlags scoringFeatureFlags;
   public static ScoringSetpoints scoringSetpoints;
+  public static ClimbConstants climbConstants;
+  public static ClimbConstants.Sim climbConstantsSim;
   public static RedFieldLocations redFieldLocations;
   public static RampConstants rampConstants;
   public static BlueFieldLocations blueFieldLocations;

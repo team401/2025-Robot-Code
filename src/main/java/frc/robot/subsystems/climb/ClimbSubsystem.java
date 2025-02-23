@@ -1,11 +1,17 @@
 package frc.robot.subsystems.climb;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Volts;
+
 import coppercore.controls.state_machine.StateMachine;
 import coppercore.controls.state_machine.StateMachineConfiguration;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.state.StateContainer;
-import edu.wpi.first.units.measure.Angle;
+import coppercore.parameter_tools.LoggedTunableNumber;
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.TestModeManager;
+import frc.robot.constants.ClimbConstants;
 import frc.robot.subsystems.climb.states.IdleState;
 import frc.robot.subsystems.climb.states.LiftingState;
 import frc.robot.subsystems.climb.states.SearchingState;
@@ -21,7 +27,6 @@ public class ClimbSubsystem extends SubsystemBase {
   private ClimbInputsAutoLogged inputs = new ClimbInputsAutoLogged();
   private ClimbOutputsAutoLogged outputs = new ClimbOutputsAutoLogged();
 
-  // TODO: replace when ramp becomes a thing
   private BooleanSupplier rampClear = () -> true;
 
   public enum ClimbAction {
@@ -52,6 +57,18 @@ public class ClimbSubsystem extends SubsystemBase {
     }
   }
 
+  LoggedTunableNumber climbkP;
+  LoggedTunableNumber climbkI;
+  LoggedTunableNumber climbkD;
+
+  LoggedTunableNumber climbkS;
+  LoggedTunableNumber climbkV;
+  LoggedTunableNumber climbkA;
+  LoggedTunableNumber climbkG;
+
+  LoggedTunableNumber climbTuningSetpointDegrees;
+  LoggedTunableNumber climbTuningOverrideVolts;
+
   public StateMachineConfiguration<ClimbState, ClimbAction> climbMachineConfiguration;
   public StateMachine<ClimbState, ClimbAction> climbMachine;
 
@@ -73,7 +90,7 @@ public class ClimbSubsystem extends SubsystemBase {
 
     climbMachineConfiguration
         .configure(ClimbState.SEARCHING)
-        .permitIf(ClimbAction.CLIMB, ClimbState.LIFTING, () -> inputs.lockedToCage)
+        .permit(ClimbAction.CLIMB, ClimbState.LIFTING) // , () -> inputs.lockedToCage)
         .permit(ClimbAction.CANCEL, ClimbState.IDLE);
 
     climbMachineConfiguration
@@ -82,6 +99,27 @@ public class ClimbSubsystem extends SubsystemBase {
 
     climbMachine =
         new StateMachine<ClimbState, ClimbAction>(climbMachineConfiguration, ClimbState.IDLE);
+
+    climbkP =
+        new LoggedTunableNumber("climbTunables/climbkP", ClimbConstants.synced.getObject().climbkP);
+    climbkI =
+        new LoggedTunableNumber("climbTunables/climbkI", ClimbConstants.synced.getObject().climbkI);
+    climbkD =
+        new LoggedTunableNumber("climbTunables/climbkD", ClimbConstants.synced.getObject().climbkD);
+
+    climbkS =
+        new LoggedTunableNumber("climbTunables/climbkS", ClimbConstants.synced.getObject().climbkS);
+    climbkV =
+        new LoggedTunableNumber("climbTunables/climbkV", ClimbConstants.synced.getObject().climbkV);
+    climbkA =
+        new LoggedTunableNumber("climbTunables/climbkA", ClimbConstants.synced.getObject().climbkA);
+    climbkG =
+        new LoggedTunableNumber("climbTunables/climbkG", ClimbConstants.synced.getObject().climbkG);
+
+    climbTuningSetpointDegrees =
+        new LoggedTunableNumber("climbTunables/climbTuningSetpointDegrees", 0.0);
+    climbTuningOverrideVolts =
+        new LoggedTunableNumber("climbTunables/climbTuningOverrideVolts", 0.0);
   }
 
   public void fireTrigger(ClimbAction action) {
@@ -95,6 +133,10 @@ public class ClimbSubsystem extends SubsystemBase {
 
   public boolean getRampClear() {
     return rampClear.getAsBoolean();
+  }
+
+  public void setRampClear(BooleanSupplier rClear) {
+    rampClear = rClear;
   }
 
   public boolean getLockedToCage() {
@@ -118,5 +160,48 @@ public class ClimbSubsystem extends SubsystemBase {
     Logger.recordOutput("climb/rampClear", rampClear);
     Logger.recordOutput("climb/State", climbMachine.getCurrentState());
     Logger.recordOutput("climb/Action", currentAction);
+  }
+
+  /** This method must be called from the subsystem's test periodic! */
+  public void testPeriodic() {
+    switch (TestModeManager.getTestMode()) {
+      case ClimbTuning:
+        fireTrigger(ClimbAction.OVERRIDE);
+        LoggedTunableNumber.ifChanged(
+            hashCode(),
+            (pid) -> {
+              io.setPID(pid[0], pid[1], pid[2]);
+            },
+            climbkP,
+            climbkI,
+            climbkD);
+
+        LoggedTunableNumber.ifChanged(
+            hashCode(),
+            (ff) -> {
+              io.setFF(ff[0], ff[1], ff[2], ff[3]);
+            },
+            climbkS,
+            climbkV,
+            climbkA,
+            climbkG);
+
+        LoggedTunableNumber.ifChanged(
+            hashCode(),
+            (setpoint) -> {
+              io.setOverrideVoltage(Volts.of(setpoint[0]));
+            },
+            climbTuningOverrideVolts);
+
+        LoggedTunableNumber.ifChanged(
+            hashCode(),
+            (setpoint) -> {
+              setGoalAngle(Degrees.of(setpoint[0]));
+            },
+            climbTuningSetpointDegrees);
+        break;
+      default:
+        break;
+    }
   }
 }

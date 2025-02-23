@@ -2,11 +2,13 @@ package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Degrees;
 
+import coppercore.parameter_tools.json.JSONExclude;
 import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
 import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 import edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.Filesystem;
 
 public class ClimbConstants {
 
@@ -28,21 +30,24 @@ public class ClimbConstants {
   public final Double climbkV = 0.0;
   public final Double climbkA = 0.0;
   public final Double climbkG = 0.0;
-  public final Double climbP = 50.0;
-  public final Double climbI = 0.0;
-  public final Double climbD = 0.0;
+  public final Double climbkP = 50.0;
+  public final Double climbkI = 0.0;
+  public final Double climbkD = 0.0;
 
   public final Double climbCurrentLimit = 60.0;
 
   public final Boolean invertFollowerClimbMotor = false;
 
   public static final class Sim {
+    @JSONExclude
     public static final JSONSync<ClimbConstants.Sim> synced =
         new JSONSync<ClimbConstants.Sim>(
             new ClimbConstants.Sim(),
-            "ClimbConstants.Sim.json",
-            EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
-            new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
+            Filesystem.getDeployDirectory()
+                .toPath()
+                .resolve("constants/ClimbConstants.Sim.json")
+                .toString(),
+            new JSONSyncConfigBuilder().build());
 
     public final Double climbArmLengthMeters = 0.5;
     public final Double climbArmMassKg = 0.5;
