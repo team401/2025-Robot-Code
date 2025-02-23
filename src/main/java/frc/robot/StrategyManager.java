@@ -40,6 +40,7 @@ public class StrategyManager {
   private StringSubscriber reefLevelSelector = table.getStringTopic("scoreHeight").subscribe("-1");
   private StringSubscriber autonomySelector =
       table.getStringTopic("autonomyLevel").subscribe("mid");
+      private StringSubscriber gamePieceSelector = table.getStringTopic("gpMode").subscribe("-1");
   private BooleanPublisher hasCoralPublisher = table.getBooleanTopic("hasCoral").publish();
   private BooleanPublisher hasAlgaePublisher = table.getBooleanTopic("hasAlgae").publish();
 
@@ -180,12 +181,21 @@ public class StrategyManager {
     // update autonomy level
     String autonomyLevel = autonomySelector.get();
 
-    if (autonomyLevel == "high") {
+    if (autonomyLevel.equalsIgnoreCase("high")) {
       this.setAutonomyMode(AutonomyMode.Full);
-    } else if (autonomyLevel == "mid") {
+    } else if (autonomyLevel.equalsIgnoreCase("mid")) {
       this.setAutonomyMode(AutonomyMode.Teleop);
-    } else if (autonomyLevel == "low") {
+    } else if (autonomyLevel.equalsIgnoreCase("low")) {
       this.setAutonomyMode(AutonomyMode.Manual);
+    }
+
+    // update scoring gamepiece
+    String gamePiece = gamePieceSelector.get();
+
+    if(gamePiece.equalsIgnoreCase("coral")) {
+      scoringSubsystem.setGamePiece(GamePiece.Coral);
+    } else if (gamePiece.equalsIgnoreCase("algae")) {
+      scoringSubsystem.setGamePiece(GamePiece.Algae);
     }
   }
 
