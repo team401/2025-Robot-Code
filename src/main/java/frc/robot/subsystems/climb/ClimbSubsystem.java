@@ -66,7 +66,7 @@ public class ClimbSubsystem extends SubsystemBase {
   LoggedTunableNumber climbkA;
   LoggedTunableNumber climbkG;
 
-  LoggedTunableNumber climbTuningSetpointMeters;
+  LoggedTunableNumber climbTuningSetpointDegrees;
   LoggedTunableNumber climbTuningOverrideVolts;
 
   public StateMachineConfiguration<ClimbState, ClimbAction> climbMachineConfiguration;
@@ -116,8 +116,8 @@ public class ClimbSubsystem extends SubsystemBase {
     climbkG =
         new LoggedTunableNumber("climbTunables/climbkG", ClimbConstants.synced.getObject().climbkG);
 
-    climbTuningSetpointMeters =
-        new LoggedTunableNumber("climbTunables/climbTuningSetpointMeters", 0.0);
+    climbTuningSetpointDegrees =
+        new LoggedTunableNumber("climbTunables/climbTuningSetpointDegrees", 0.0);
     climbTuningOverrideVolts =
         new LoggedTunableNumber("climbTunables/climbTuningOverrideVolts", 0.0);
   }
@@ -166,6 +166,7 @@ public class ClimbSubsystem extends SubsystemBase {
   public void testPeriodic() {
     switch (TestModeManager.getTestMode()) {
       case ClimbTuning:
+        fireTrigger(ClimbAction.OVERRIDE);
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (pid) -> {
@@ -192,15 +193,12 @@ public class ClimbSubsystem extends SubsystemBase {
             },
             climbTuningOverrideVolts);
 
-      case SetpointTuning:
-        // Allow setpointing the climb in climbTuning and SetpointTuning modes
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (setpoint) -> {
               setGoalAngle(Degrees.of(setpoint[0]));
             },
-            climbTuningSetpointMeters);
-
+            climbTuningSetpointDegrees);
         break;
       default:
         break;
