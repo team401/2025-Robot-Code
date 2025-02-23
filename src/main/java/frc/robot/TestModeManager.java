@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /** Object to handle switching between test modes. */
 public class TestModeManager {
   public enum TestMode {
+    RampTuning,
     ElevatorTuning,
+    ElevatorCharacterization,
     WristVoltageTuning,
     WristClosedLoopTuning,
     ClawTuning,
@@ -21,6 +23,7 @@ public class TestModeManager {
     DriveSysIdDynamicForward,
     DriveSysIdDynamicBackward,
     DriveLineupTuning,
+    LEDTest,
     None, // Default test mode that does nothing until a new one is selected.
   }
 
@@ -34,8 +37,11 @@ public class TestModeManager {
     testModeChooser = new SendableChooser<TestMode>();
 
     testModeChooser.setDefaultOption("None", TestMode.None);
+    // Ramp Test Mode
+    testModeChooser.addOption("Ramp Tuning", TestMode.RampTuning);
     // Scoring Test Modes
     testModeChooser.addOption("Elevator Tuning", TestMode.ElevatorTuning);
+    testModeChooser.addOption("Elevator Characterization", TestMode.ElevatorCharacterization);
     testModeChooser.addOption("Wrist Voltage Tuning", TestMode.WristVoltageTuning);
     testModeChooser.addOption("Wrist Closed-Loop Tuning", TestMode.WristClosedLoopTuning);
     testModeChooser.addOption("Claw Tuning", TestMode.ClawTuning);
@@ -55,6 +61,9 @@ public class TestModeManager {
     testModeChooser.addOption("Drive SysId (Dynamic Forward)", TestMode.DriveSysIdDynamicForward);
     testModeChooser.addOption("Drive SysId (Dynamic Reverse)", TestMode.DriveSysIdDynamicBackward);
     testModeChooser.addOption("Drive Lineup Tuning", TestMode.DriveLineupTuning);
+
+    // LED
+    testModeChooser.addOption("LED Cycle Test", TestMode.LEDTest);
 
     SmartDashboard.putData("Test Mode Selector", testModeChooser);
   }

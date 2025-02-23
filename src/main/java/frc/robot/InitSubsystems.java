@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.subsystems.climb.ClimbIOSim;
+import frc.robot.subsystems.climb.ClimbIOTalonFX;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConfiguration;
@@ -24,6 +25,11 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMapleSim;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.led.LED;
+import frc.robot.subsystems.ramp.RampIOSim;
+import frc.robot.subsystems.ramp.RampIOTalonFX;
+import frc.robot.subsystems.ramp.RampMechanism;
+import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ClawIOSim;
 import frc.robot.subsystems.scoring.ClawIOTalonFX;
 import frc.robot.subsystems.scoring.ClawMechanism;
@@ -86,8 +92,9 @@ public final class InitSubsystems {
   public static ClimbSubsystem initClimbSubsystem() {
     switch (ModeConstants.currentMode) {
       case REAL:
-        throw new UnsupportedOperationException("Climb real functions are not yet implemented.");
+        return new ClimbSubsystem(new ClimbIOTalonFX());
       case SIM:
+      case MAPLESIM:
         return new ClimbSubsystem(new ClimbIOSim());
       case REPLAY:
         throw new UnsupportedOperationException("Climb replay is not yet implemented.");
@@ -151,6 +158,19 @@ public final class InitSubsystems {
     }
   }
 
+  public static RampSubsystem initRampSubsystem() {
+    switch (ModeConstants.currentMode) {
+      case REAL:
+        return new RampSubsystem(new RampMechanism(new RampIOTalonFX()));
+      case SIM:
+      case MAPLESIM:
+        return new RampSubsystem(new RampMechanism(new RampIOSim()));
+      default:
+        throw new UnsupportedOperationException(
+            "Non-exhaustive list of mode types supported in InitSubsystems");
+    }
+  }
+
   public static VisionLocalizer initVisionSubsystem(Drive drive) {
     AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
     switch (ModeConstants.currentMode) {
@@ -160,7 +180,8 @@ public final class InitSubsystems {
             tagLayout,
             new double[0],
             new VisionIOPhotonReal(
-                "Front-Right", JsonConstants.visionConstants.FrontRightTransform));
+                "Front-Right", JsonConstants.visionConstants.FrontRightTransform),
+            new VisionIOPhotonReal("Front-Left", JsonConstants.visionConstants.FrontLeftTransform));
       case SIM:
         return new VisionLocalizer(
             drive::addVisionMeasurement,
@@ -188,6 +209,26 @@ public final class InitSubsystems {
             new double[0],
             new VisionIO() {},
             new VisionIO() {});
+    }
+  }
+
+  public static LED initLEDs(
+      ScoringSubsystem scoringSubsystem, ClimbSubsystem climbSubsystem, Drive drive) {
+
+    switch (ModeConstants.currentMode) {
+      case REAL:
+        return new LED(scoringSubsystem, climbSubsystem, drive);
+      case SIM:
+      case MAPLESIM:
+        return new LED(scoringSubsystem, climbSubsystem, drive);
+
+      case REPLAY:
+        throw new UnsupportedOperationException("LED replay is not yet implemented.");
+      default:
+        throw new UnsupportedOperationException(
+            "Non-exhaustive list of mode types supported in InitSubsystems (got "
+                + ModeConstants.currentMode
+                + ")");
     }
   }
 }

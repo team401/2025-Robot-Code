@@ -1,7 +1,7 @@
 {
-  "leadElevatorMotorId": 9,
-  "followerElevatorMotorId": 10,
-  "invertFollowerElevatorMotor": false,
+  "leadElevatorMotorId": 12,
+  "followerElevatorMotorId": 11,
+  "invertFollowerElevatorMotor": true,
   "smallCANCoderTeeth": 17,
   "largeCANCoderTeeth": 19,
   "spoolTeeth": 18,
@@ -19,22 +19,28 @@
     "unit": "Inch"
   },
   "elevatorCANCoderDiscontinuityPoint": 1.0,
-  "elevatorLargeCANCoderID": 11,
-  "isLargeCANcoderClockwisePositive": true,
-  "elevatorSmallCANCoderID": 12,
-  "isSmallCANcoderClockwisePositive": true,
-  "elevatorkP": 20.0,
-  "elevatorkI": 1.0,
-  "elevatorkD": 0.0,
+  "elevatorLargeCANCoderID": 14,
+  "elevatorLargeCANCoderDirection": "Clockwise_Positive",
+  "elevatorSmallCANCoderID": 15,
+  "elevatorSmallCANCoderDirection": "CounterClockwise_Positive",
+  "elevatorkP": 40.0,
+  "elevatorkI": 0.0,
+  "elevatorkD": 4.0,
   "elevatorkS": 0.0,
-  "elevatorkV": 0.0,
-  "elevatorkA": 0.0,
-  "elevatorkG": 8.7,
+  "elevatorkV": 2.0,
+  "elevatorkA": 0.08,
+  "elevatorkG": 11.5,
   "elevatorCruiseVelocityMetersPerSecond": 3.0,
-  "elevatorExpo_kV_raw": 0.0,
-  "elevatorExpo_kA_raw": 0.1,
-  "minElevatorHeightMeters": 0.0,
-  "maxElevatorHeightMeters": 3.0,
+  "elevatorExpo_kV_raw": 0.005,
+  "elevatorExpo_kA_raw": 0.03,
+  "minElevatorHeight": {
+    "value": 0.0,
+    "unit": "Meter"
+  },
+  "maxElevatorHeight": {
+    "value": 1.9,
+    "unit": "Meter"
+  },
   "elevatorStatorCurrentLimit": {
     "value": 80.0,
     "unit": "Amp"
@@ -44,6 +50,22 @@
     "value": 0.03,
     "unit": "Meter"
   },
+  "medianFilterWindowSize": 10,
+  "ignoreCRT": true,
+  "homingVoltage": {
+    "value": -3.0,
+    "unit": "Volt"
+  },
+  "homingVelocityThresholdMetersPerSecond": 0.1,
+  "homingMaxTime": {
+    "value": 3.0,
+    "unit": "Second"
+  },
+  "homingMaxUnmovingTime": {
+    "value": 0.25,
+    "unit": "Second"
+  },
+  "homingVelocityFilterWindowSize": 5,
   "maxWristInBelowCrossBarHeight": {
     "value": 1.0,
     "unit": "Meter"
@@ -54,6 +76,10 @@
   },
   "minWristDownHeight": {
     "value": 0.2,
+    "unit": "Meter"
+  },
+  "elevatorSetpointEpsilon": {
+    "value": 0.01,
     "unit": "Meter"
   }
 }

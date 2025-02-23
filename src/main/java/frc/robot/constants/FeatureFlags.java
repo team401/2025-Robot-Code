@@ -14,6 +14,7 @@ public final class FeatureFlags {
           EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
+  public Boolean runRamp = true;
   public final Boolean runClimb = true;
   public final Boolean runDrive = true;
   public Boolean runVision = true;
@@ -22,4 +23,5 @@ public final class FeatureFlags {
   // public final Boolean runElevator = true; // TODO: Figure out if we need Mechanism-level feature
   // flags
   // public final Boolean runClaw = true;
+
 }

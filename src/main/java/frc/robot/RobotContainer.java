@@ -1,36 +1,45 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DigitalInput;
+import coppercore.wpilib_interface.tuning.TuneS;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.StrategyManager.AutonomyMode;
 import frc.robot.commands.drive.AkitDriveCommands;
 import frc.robot.constants.AutoStrategy;
 import frc.robot.constants.AutoStrategyContainer;
+import frc.robot.constants.ClimbConstants;
 import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.LEDConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.constants.OperatorConstants;
-import frc.robot.subsystems.LED;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.led.LED;
+import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import java.io.File;
+import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -40,19 +49,55 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here
+  private RampSubsystem rampSubsystem = null;
   private ScoringSubsystem scoringSubsystem = null;
   private Drive drive = null;
   private ClimbSubsystem climbSubsystem = null;
   private VisionLocalizer vision = null;
+  private LED led = null;
   private StrategyManager strategyManager = null;
   private AutoStrategyContainer strategyContainer = null;
-  private final LED led = new LED();
 
   private SendableChooser<AutoStrategy> autoChooser = new SendableChooser<>();
 
   public static SwerveDriveSimulation driveSim = null;
 
   DigitalInput ledSwitch = new DigitalInput(LEDConstants.ledSwitch);
+
+  public void updateRobotModel() {
+    double height = 0.0;
+    double claw_rotation = 0.0;
+    double ramp_rotation = 0.0;
+    double climb_rotation = 0.0;
+    if (scoringSubsystem != null) {
+      height = scoringSubsystem.getElevatorHeight().magnitude();
+      claw_rotation = scoringSubsystem.getWristAngle().in(Radians);
+    }
+    if (climbSubsystem != null) {
+      climb_rotation = climbSubsystem.getRotation().magnitude();
+    }
+    if (rampSubsystem != null) {
+      ramp_rotation = rampSubsystem.getPosition();
+    }
+    height = Math.min(height, 1.87);
+    double stage_one_height = Math.max(height - 0.55, 0.0);
+    double stage_two_height = Math.max(stage_one_height - 0.66, 0.0);
+    // Logger.recordOutput(
+    // "testingPose", new Pose3d(new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0.0, 0.0, 0.0)));
+    Logger.recordOutput(
+        "componentPositions",
+        new Pose3d[] {
+          new Pose3d(new Translation3d(0.05, 0.01, 0.9), new Rotation3d(0.0, ramp_rotation, 0.0)),
+          new Pose3d(
+              new Translation3d(-0.16, 0.31, 0.115), new Rotation3d(climb_rotation, 0.0, 0.0)),
+          new Pose3d(
+              new Translation3d(0.34, 0.12, height + 0.35),
+              new Rotation3d(0.0, -claw_rotation + 0.465719787 * 180.0, 0.0)),
+          new Pose3d(new Translation3d(0.0, 0.0, height), new Rotation3d(0.0, 0.0, 0.0)),
+          new Pose3d(new Translation3d(0.0, 0.0, stage_two_height), new Rotation3d(0.0, 0.0, 0.0)),
+          new Pose3d(new Translation3d(0.0, 0.0, stage_one_height), new Rotation3d(0.0, 0.0, 0.0))
+        });
+  }
 
   // The robot's subsystems and commands are defined here
 
@@ -70,6 +115,7 @@ public class RobotContainer {
     JsonConstants.loadConstants();
     FeatureFlags.synced.loadData();
     OperatorConstants.synced.loadData();
+    ClimbConstants.synced.loadData();
   }
 
   public void configureAutos() {
@@ -90,18 +136,16 @@ public class RobotContainer {
   }
 
   public void configureSubsystems() {
-
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
-      if (ModeConstants.simMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
-        drive.setPose(
-            new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
-      }
       if (FeatureFlags.synced.getObject().runVision) {
         vision = InitSubsystems.initVisionSubsystem(drive);
 
         drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
       }
+    }
+    if (FeatureFlags.synced.getObject().runRamp) {
+      rampSubsystem = InitSubsystems.initRampSubsystem();
     }
     if (FeatureFlags.synced.getObject().runClimb) {
       climbSubsystem = InitSubsystems.initClimbSubsystem();
@@ -116,6 +160,10 @@ public class RobotContainer {
       }
     }
 
+    if (FeatureFlags.synced.getObject().runLEDs) {
+      led = InitSubsystems.initLEDs(scoringSubsystem, climbSubsystem, drive);
+    }
+
     strategyManager = new StrategyManager(drive, scoringSubsystem);
   }
 
@@ -128,10 +176,16 @@ public class RobotContainer {
   private void configureBindings() {
     // initialize helper commands
     if (FeatureFlags.synced.getObject().runDrive) {
-      InitBindings.initDriveBindings(drive);
+      InitBindings.initDriveBindings(drive, strategyManager);
+    }
+    if (FeatureFlags.synced.getObject().runRamp) {
+      InitBindings.initRampBindings(rampSubsystem);
     }
     if (FeatureFlags.synced.getObject().runClimb) {
       InitBindings.initClimbBindings(climbSubsystem);
+    }
+    if (FeatureFlags.synced.getObject().runScoring) {
+      InitBindings.initScoringBindings(scoringSubsystem);
     }
   }
 
@@ -141,6 +195,7 @@ public class RobotContainer {
   }
 
   public void periodic() {
+
     strategyManager.periodic();
   }
 
@@ -154,13 +209,6 @@ public class RobotContainer {
   }
 
   public void teleopInit() {
-    LEDPattern leftPattern = LEDPattern.solid(Color.kBlueViolet);
-    LEDPattern middlePattern = LEDPattern.solid(Color.kDarkBlue);
-    LEDPattern rightPattern = LEDPattern.solid(Color.kCyan);
-
-    // Schedule the command to display the "message" on the three sections.
-    CommandScheduler.getInstance()
-        .schedule(led.getMessageCommand(leftPattern, middlePattern, rightPattern));
 
     strategyManager.setAutonomyMode(AutonomyMode.Teleop);
     // clear leftover actions from auto
@@ -174,6 +222,16 @@ public class RobotContainer {
     InitBindings.initTestModeBindings();
 
     switch (TestModeManager.getTestMode()) {
+      case ElevatorCharacterization:
+        CommandScheduler.getInstance()
+            .schedule(
+                new SequentialCommandGroup(
+                    new WaitCommand(2.0),
+                    new TuneS(
+                        scoringSubsystem.getElevatorMechanismForTuning(),
+                        RotationsPerSecond.of(0.001),
+                        0.1)));
+        break;
       case DriveFeedForwardCharacterization:
         CommandScheduler.getInstance()
             .schedule(AkitDriveCommands.feedforwardCharacterization(drive));
@@ -206,6 +264,9 @@ public class RobotContainer {
         CommandScheduler.getInstance()
             .schedule(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         break;
+
+      case LEDTest:
+        CommandScheduler.getInstance().schedule(led.runCycle());
       default:
         break;
     }
@@ -218,9 +279,18 @@ public class RobotContainer {
     if (FeatureFlags.synced.getObject().runScoring) {
       scoringSubsystem.testPeriodic();
     }
+
+    if (FeatureFlags.synced.getObject().runRamp) {
+      rampSubsystem.testPeriodic();
+    }
+
+    if (FeatureFlags.synced.getObject().runDrive) {
+      drive.periodic();
+    }
   }
 
   public void disabledPeriodic() {
+    led.periodic();
     // Logger.recordOutput("feature_flags/drive", FeatureFlags.synced.getObject().runDrive);
     strategyManager.logActions();
 
@@ -231,5 +301,17 @@ public class RobotContainer {
 
   public void disabledInit() {
     CommandScheduler.getInstance().cancelAll();
+  }
+
+  public void updateMapleSim() {
+    SimulatedArena.getInstance().simulationPeriodic();
+    if (driveSim != null) {
+      Logger.recordOutput(
+          "FieldSimulation/RobotPosition", RobotContainer.driveSim.getSimulatedDriveTrainPose());
+    }
+    Logger.recordOutput(
+        "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
+    Logger.recordOutput(
+        "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
   }
 }

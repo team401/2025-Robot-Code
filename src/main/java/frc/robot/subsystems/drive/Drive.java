@@ -44,6 +44,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.subsystems.drive.states.IdleState;
@@ -122,12 +123,12 @@ public class Drive implements DriveTemplate {
 
   public ProfiledPIDController angleController =
       new ProfiledPIDController(
-          JsonConstants.drivetrainConstants.angleControllerKp,
-          JsonConstants.drivetrainConstants.angleControllerKi,
-          JsonConstants.drivetrainConstants.angleControllerKd,
+          JsonConstants.drivetrainConstants.rotationAlignKp,
+          JsonConstants.drivetrainConstants.rotationAlignKi,
+          JsonConstants.drivetrainConstants.rotationAlignKd,
           new TrapezoidProfile.Constraints(
-              JsonConstants.drivetrainConstants.maxPIDVelocity,
-              JsonConstants.drivetrainConstants.maxPIDAcceleration));
+              JsonConstants.drivetrainConstants.maxRotationAlignVelocity,
+              JsonConstants.drivetrainConstants.maxRotationAlignAcceleration));
 
   public enum DesiredLocation {
     Reef0,
@@ -165,7 +166,7 @@ public class Drive implements DriveTemplate {
     DesiredLocation.CoralStationRight
   };
 
-  private DesiredLocation desiredLocation = DesiredLocation.Reef0;
+  private DesiredLocation desiredLocation = DesiredLocation.Reef9;
   private DesiredLocation intakeLocation = DesiredLocation.CoralStationLeft;
   private boolean goToIntake = false;
 
@@ -182,6 +183,8 @@ public class Drive implements DriveTemplate {
   private VisionAlignment alignmentSupplier = null;
 
   private static Drive instance;
+
+  private boolean driveLinedUp = false;
 
   private enum DriveState implements StateContainer {
     Idle(new IdleState(instance)),
@@ -244,7 +247,7 @@ public class Drive implements DriveTemplate {
         this::getChassisSpeeds,
         (ChassisSpeeds speeds) -> this.setGoalSpeeds(speeds, false),
         new PPHolonomicDriveController(
-            new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
+            new PIDConstants(1.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
         PP_CONFIG,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);
@@ -342,11 +345,18 @@ public class Drive implements DriveTemplate {
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
 
-    // check for update from reef touchscreen
-    this.updateDesiredLocationFromNetworkTables();
-
+    // allow controlling drive unless we are characterizing
+    if (DriverStation.isTestEnabled()) {
+      switch (TestModeManager.getTestMode()) {
+        case DriveFeedForwardCharacterization:
+        case DriveSteerMotorCharacterization:
+          break;
+        default:
+          this.runVelocity();
+      }
+    }
     // run velocity if not disabled
-    if (!DriverStation.isTest() && !DriverStation.isDisabled()) {
+    else if (!DriverStation.isDisabled()) {
       this.runVelocity();
     }
 
@@ -566,8 +576,7 @@ public class Drive implements DriveTemplate {
   }
 
   /** checks for update from reef location network table (SnakeScreen) run periodically in drive */
-  public void updateDesiredLocationFromNetworkTables() {
-    double desiredIndex = reefLocationSelector.get();
+  public void updateDesiredLocationFromNetworkTables(double desiredIndex) {
     if (desiredIndex == -1) {
       return;
     }
@@ -645,16 +654,21 @@ public class Drive implements DriveTemplate {
     stateMachine.fire(trigger);
   }
 
+  public void setDriveLinedUp(boolean linedUp) {
+    this.driveLinedUp = linedUp;
+  }
+
+  public boolean isDriveLineupFinished() {
+    return driveLinedUp;
+  }
+
   /**
    * checks if alignment has run
    *
    * @return true if we are close to otf for intake OR we have finished lineup for reef
    */
   public boolean isDriveAlignmentFinished() {
-    return goToIntake
-        ? this.isDriveCloseToFinalLineupPose()
-        : (this.stateMachine.getCurrentState().equals(DriveState.Joystick)
-            || this.stateMachine.getCurrentState().equals(DriveState.Idle));
+    return goToIntake ? this.isDriveCloseToFinalLineupPose() : this.driveLinedUp;
   }
 
   /**

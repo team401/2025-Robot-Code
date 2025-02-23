@@ -1,0 +1,12 @@
+{
+  "intakePosition": 0.0,
+  "climbPosition": 1.5,
+  "motorId": 1,
+  "positionRange": 0.02,
+  "PID_TalonFX_P": 0.0,
+  "PID_TalonFX_I": 0.0,
+  "PID_TalonFX_D": 0.0,
+  "PID_SIM_P": 5,
+  "PID_SIM_I": 0.0,
+  "PID_SIM_D": 0.0
+}
