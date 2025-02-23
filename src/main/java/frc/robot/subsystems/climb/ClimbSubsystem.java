@@ -90,7 +90,7 @@ public class ClimbSubsystem extends SubsystemBase {
 
     climbMachineConfiguration
         .configure(ClimbState.SEARCHING)
-        .permitIf(ClimbAction.CLIMB, ClimbState.LIFTING, () -> inputs.lockedToCage)
+        .permit(ClimbAction.CLIMB, ClimbState.LIFTING) // , () -> inputs.lockedToCage)
         .permit(ClimbAction.CANCEL, ClimbState.IDLE);
 
     climbMachineConfiguration

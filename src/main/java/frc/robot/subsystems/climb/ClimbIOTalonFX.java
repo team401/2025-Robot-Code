@@ -25,8 +25,9 @@ public class ClimbIOTalonFX implements ClimbIO {
 
   TalonFXConfiguration talonFXConfigs;
 
-  // TODO: replace when sensors become available
-  private BooleanSupplier lockedToCage = () -> true;
+  // TODO: replace when sensors become available - apparently this is not happening actually but
+  // leaving this in case a better solution happens later
+  private BooleanSupplier lockedToCage = () -> false;
 
   private MutAngle goalAngle = Radians.mutable(0);
   private MutVoltage overrideVoltage = Volts.mutable(0.0);
