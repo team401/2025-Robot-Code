@@ -182,6 +182,15 @@ public class StrategyManager {
     // scoring level selection
     if (scoringSubsystem != null) {
       scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
+
+      // update scoring gamepiece
+      String gamePiece = gamePieceSelector.get();
+
+      if (gamePiece.equalsIgnoreCase("coral")) {
+        scoringSubsystem.setGamePiece(GamePiece.Coral);
+      } else if (gamePiece.equalsIgnoreCase("algae")) {
+        scoringSubsystem.setGamePiece(GamePiece.Algae);
+      }
     }
 
     // update autonomy level
@@ -193,15 +202,6 @@ public class StrategyManager {
       this.setAutonomyMode(AutonomyMode.Teleop);
     } else if (autonomyLevel.equalsIgnoreCase("low")) {
       this.setAutonomyMode(AutonomyMode.Manual);
-    }
-
-    // update scoring gamepiece
-    String gamePiece = gamePieceSelector.get();
-
-    if(gamePiece.equalsIgnoreCase("coral")) {
-      scoringSubsystem.setGamePiece(GamePiece.Coral);
-    } else if (gamePiece.equalsIgnoreCase("algae")) {
-      scoringSubsystem.setGamePiece(GamePiece.Algae);
     }
   }
 
@@ -229,9 +229,9 @@ public class StrategyManager {
   }
 
   public void publishDefaultSubsystemValues() {
-    if(scoringSubsystem != null) {
+    if (scoringSubsystem != null) {
       // publish default game piece
-      switch(scoringSubsystem.getGamePiece()) {
+      switch (scoringSubsystem.getGamePiece()) {
         case Coral:
           gamePiecePublisher.accept("coral");
           break;
@@ -242,8 +242,8 @@ public class StrategyManager {
           break;
       }
 
-      //publish default level
-      switch(scoringSubsystem.getTarget()) {
+      // publish default level
+      switch (scoringSubsystem.getTarget()) {
         case L1:
           reefLevelPublisher.accept("level1");
           break;
@@ -261,9 +261,9 @@ public class StrategyManager {
       }
     }
 
-    if(drive != null) {
+    if (drive != null) {
 
-      //publish default reef location
+      // publish default reef location
       String reefLocation = "";
       switch (drive.getDesiredLocation()) {
         case Processor:
@@ -274,13 +274,13 @@ public class StrategyManager {
           reefLocation = drive.getDesiredLocation().toString().toLowerCase();
       }
 
-      if(!reefLocation.equalsIgnoreCase("")) {
+      if (!reefLocation.equalsIgnoreCase("")) {
         reefLocationPublisher.accept(reefLocation);
       }
     }
 
     // publish autonomy mode
-    switch(this.getAutonomyMode()) {
+    switch (this.getAutonomyMode()) {
       case Full:
         autonomyPublisher.accept("high");
         break;
@@ -297,6 +297,7 @@ public class StrategyManager {
 
   /**
    * call in robot container autonomous init to schedule actions and publish to snakescreen
+   *
    * @param strategy the auto actions to run
    */
   public void autonomousInit(AutoStrategy strategy) {
@@ -308,7 +309,8 @@ public class StrategyManager {
   }
 
   /**
-   * call in robot container teleop init to clear actions from auto and publish default snakescreen values
+   * call in robot container teleop init to clear actions from auto and publish default snakescreen
+   * values
    */
   public void teleopInit() {
     this.setAutonomyMode(AutonomyMode.Teleop);
