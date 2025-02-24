@@ -81,5 +81,6 @@
   "elevatorSetpointEpsilon": {
     "value": 0.01,
     "unit": "Meter"
-  }
+  },
+  "maxElevatorSetpointVelocityMetersPerSecond": 0.01
 }

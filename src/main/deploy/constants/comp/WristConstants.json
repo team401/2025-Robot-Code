@@ -21,7 +21,7 @@
   "wristKS": 0.2,
   "wristKV": 1.0,
   "wristKA": 0.0,
-  "wristKP": 20,
+  "wristKP": 20.0,
   "wristKI": 0.0,
   "wristKD": 0.5,
   "wristMotionMagicCruiseVelocityRotationsPerSecond": 3.0,
@@ -55,5 +55,6 @@
   "wristSetpointEpsilon": {
     "value": 5.0,
     "unit": "Degree"
-  }
+  },
+  "maxWristSetpointVelocityRotationsPerSecond": 0.008333
 }

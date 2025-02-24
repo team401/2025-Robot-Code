@@ -1,8 +1,6 @@
 package frc.robot.subsystems.scoring.states;
 
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -33,18 +31,23 @@ public class WarmupState implements PeriodicStateInterface {
     }
 
     boolean elevatorAtSetpoint =
-        scoringSubsystem.getElevatorHeight().minus(setpoint.elevatorHeight()).abs(Meters)
-            <= JsonConstants.elevatorConstants.elevatorSetpointEpsilon.in(Meters);
+        scoringSubsystem
+            .getElevatorHeight()
+            .isNear(
+                setpoint.elevatorHeight(), JsonConstants.elevatorConstants.elevatorSetpointEpsilon);
+
     boolean elevatorStable =
         scoringSubsystem.getElevatorVelocity().abs(MetersPerSecond)
-            <= JsonConstants.elevatorConstants.maxElevatorSetpointVelocity.in(MetersPerSecond);
+            <= JsonConstants.elevatorConstants.maxElevatorSetpointVelocityMetersPerSecond;
 
     boolean wristAtSetpoint =
-        scoringSubsystem.getWristAngle().minus(setpoint.wristAngle()).abs(Rotations)
-            <= JsonConstants.wristConstants.wristSetpointEpsilon.in(Rotations);
+        scoringSubsystem
+            .getWristAngle()
+            .isNear(setpoint.wristAngle(), JsonConstants.wristConstants.wristSetpointEpsilon);
+
     boolean wristStable =
         scoringSubsystem.getWristVelocity().abs(RotationsPerSecond)
-            <= JsonConstants.wristConstants.maxWristSetpointVelocity.in(RotationsPerSecond);
+            <= JsonConstants.wristConstants.maxWristSetpointVelocityRotationsPerSecond;
 
     Logger.recordOutput("scoring/warmup/elevatorAtSetpoint", elevatorAtSetpoint);
     Logger.recordOutput("scoring/warmup/elevatorStable", elevatorStable);

@@ -198,8 +198,12 @@ public final class ElevatorConstants {
   /** When within this distance, the elevator is considered "at its setpoint" */
   public final Distance elevatorSetpointEpsilon = Meters.of(0.05);
 
-  /** How slow must the elevator move before it is considered to be stable at its goal position */
-  public final LinearVelocity maxElevatorSetpointVelocity = MetersPerSecond.of(0.01);
+  /**
+   * How slow must the elevator move before it is considered to be stable at its goal position
+   *
+   * <p>This value is a unit because MetersPerSecond can't be serialized properly by JSONSync
+   */
+  public final Double maxElevatorSetpointVelocityMetersPerSecond = 0.01;
 
   public static final class Sim {
     @JSONExclude
