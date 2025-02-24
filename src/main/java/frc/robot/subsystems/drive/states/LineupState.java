@@ -247,11 +247,11 @@ public class LineupState implements PeriodicStateInterface {
       return 0;
     }
 
-    if (alongTrackDistance < 0.2) {
-      return -1
-          * JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
-          * driveAlongTrackLineupController.calculate(alongTrackDistance);
-    }
+    // if (alongTrackDistance < 0.2) {
+    //   return -1
+    //       * JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
+    //       * driveAlongTrackLineupController.calculate(alongTrackDistance);
+    // }
 
     double sign = Math.signum(alongTrackDistance);
 
@@ -264,7 +264,7 @@ public class LineupState implements PeriodicStateInterface {
   }
 
   public double getAlongTrackVelocityReductionFactor(double crossTrackDistance) {
-    return (0.5 - Math.abs(crossTrackDistance));
+    return 2 * (0.5 - Math.abs(crossTrackDistance));
   }
 
   /** take over goal speeds to align to reef exactly */
@@ -316,7 +316,7 @@ public class LineupState implements PeriodicStateInterface {
     if (!lineupFinished()) {
       double vx =
           JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
-              // * getAlongTrackVelocityReductionFactor(observation.crossTrackDistance())
+              * getAlongTrackVelocityReductionFactor(observation.crossTrackDistance())
               * getAlongTrackVelocity(alongTrackDistanceFiltered);
       double vy = driveCrossTrackLineupController.calculate(crossTrackDistanceFiltered);
       double omega =
