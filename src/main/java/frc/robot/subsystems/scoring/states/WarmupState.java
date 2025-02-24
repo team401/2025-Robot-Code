@@ -1,7 +1,9 @@
 package frc.robot.subsystems.scoring.states;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
@@ -33,14 +35,23 @@ public class WarmupState implements PeriodicStateInterface {
     boolean elevatorAtSetpoint =
         scoringSubsystem.getElevatorHeight().minus(setpoint.elevatorHeight()).abs(Meters)
             <= JsonConstants.elevatorConstants.elevatorSetpointEpsilon.in(Meters);
+    boolean elevatorStable =
+        scoringSubsystem.getElevatorVelocity().abs(MetersPerSecond)
+            <= JsonConstants.elevatorConstants.maxElevatorSetpointVelocity.in(MetersPerSecond);
+
     boolean wristAtSetpoint =
         scoringSubsystem.getWristAngle().minus(setpoint.wristAngle()).abs(Rotations)
             <= JsonConstants.wristConstants.wristSetpointEpsilon.in(Rotations);
+    boolean wristStable =
+        scoringSubsystem.getWristVelocity().abs(RotationsPerSecond)
+            <= JsonConstants.wristConstants.maxWristSetpointVelocity.in(RotationsPerSecond);
 
     Logger.recordOutput("scoring/warmup/elevatorAtSetpoint", elevatorAtSetpoint);
+    Logger.recordOutput("scoring/warmup/elevatorStable", elevatorStable);
     Logger.recordOutput("scoring/warmup/wristAtSetpoint", wristAtSetpoint);
+    Logger.recordOutput("scoring/warmup/wristStable", wristStable);
 
-    if (elevatorAtSetpoint && wristAtSetpoint) {
+    if (elevatorAtSetpoint && elevatorStable && wristAtSetpoint && wristStable) {
       scoringSubsystem.fireTrigger(ScoringTrigger.WarmupReady);
     }
   }

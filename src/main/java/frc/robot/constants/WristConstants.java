@@ -2,6 +2,7 @@ package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
@@ -14,6 +15,7 @@ import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
 import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.MomentOfInertia;
@@ -92,6 +94,9 @@ public class WristConstants {
 
   /** The wrist can be this far away from the goal and considered "at the setpoint" */
   public final Angle wristSetpointEpsilon = Degrees.of(5.0);
+
+  /** How slow the wrist must be moving before it is considered to be stable at its goal position */
+  public final AngularVelocity maxWristSetpointVelocity = DegreesPerSecond.of(3.0);
 
   public static final class Sim {
     @JSONExclude
