@@ -566,6 +566,20 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * returns index of reef location for interfacing with snakescreen
+   *
+   * @return a double representing the index of reef location
+   */
+  public int getDesiredLocationIndex() {
+    for (int i = 0; i < locationArray.length; i++) {
+      if (locationArray[i] == desiredLocation) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /**
    * sets desired path location calling this and then setting OTF to true will cause robot to drive
    * path from current pose to the location
    *

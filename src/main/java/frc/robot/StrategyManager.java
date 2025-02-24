@@ -1,7 +1,8 @@
 package frc.robot;
 
 import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.IntegerPublisher;
+import edu.wpi.first.networktables.IntegerSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
@@ -37,14 +38,15 @@ public class StrategyManager {
 
   private NetworkTableInstance inst = NetworkTableInstance.getDefault();
   private NetworkTable table = inst.getTable("");
-  private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
+  private IntegerSubscriber reefLocationSelector =
+      table.getIntegerTopic("reefTarget").subscribe(-1);
   private StringSubscriber reefLevelSelector = table.getStringTopic("scoreHeight").subscribe("-1");
   private StringSubscriber autonomySelector =
       table.getStringTopic("autonomyLevel").subscribe("mid");
   private StringSubscriber gamePieceSelector = table.getStringTopic("gpMode").subscribe("-1");
 
   private StringPublisher autonomyPublisher = table.getStringTopic("autonomyLevel").publish();
-  private StringPublisher reefLocationPublisher = table.getStringTopic("reefTarget").publish();
+  private IntegerPublisher reefLocationPublisher = table.getIntegerTopic("reefTarget").publish();
   private StringPublisher reefLevelPublisher = table.getStringTopic("scoreHeight").publish();
   private StringPublisher gamePiecePublisher = table.getStringTopic("gpMode").publish();
   private BooleanPublisher hasCoralPublisher = table.getBooleanTopic("hasCoral").publish();
@@ -262,21 +264,15 @@ public class StrategyManager {
     }
 
     if (drive != null) {
-
       // publish default reef location
-      String reefLocation = "";
-      switch (drive.getDesiredLocation()) {
-        case Processor:
-        case CoralStationLeft:
-        case CoralStationRight:
-          break;
-        default:
-          reefLocation = drive.getDesiredLocation().toString().toLowerCase();
-      }
+      int reefLocation = drive.getDesiredLocationIndex();
 
-      if (!reefLocation.equalsIgnoreCase("")) {
+      if (reefLocation != -1) {
+        System.out.println("publishing default reef" + reefLocation);
         reefLocationPublisher.accept(reefLocation);
       }
+
+      // publish default intake location
     }
 
     // publish autonomy mode
