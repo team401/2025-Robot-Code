@@ -28,7 +28,7 @@
   "driveRotationKi": 0.0,
   "driveRotationKd": 0.0,
   "driveAlongTrackMultiplier": 1,
-  "driveAlongTrackOffset": 0.3,
+  "driveAlongTrackOffset": 0.2286,
   "driveCrossTrackFrontRightOffset": 0.0,
   "driveCrossTrackFrontLeftOffset": 0.0,
   "otfPoseDistanceLimit": 0.1,

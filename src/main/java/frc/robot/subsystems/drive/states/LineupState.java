@@ -15,6 +15,7 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.constants.ModeConstants.Mode;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.drive.Drive.VisionAlignment;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
@@ -84,6 +85,8 @@ public class LineupState implements PeriodicStateInterface {
   LinearFilter alongTrackFilter = LinearFilter.singlePoleIIR(0.2, 0.02);
   LinearFilter crossTrackFilter = LinearFilter.singlePoleIIR(0.2, 0.02);
 
+  private boolean otherCameraTried = false;
+
   public LineupState(Drive drive) {
     this.drive = drive;
     rotationController.enableContinuousInput(-Math.PI / 2, Math.PI / 2);
@@ -94,11 +97,13 @@ public class LineupState implements PeriodicStateInterface {
     drive.disableAlign();
 
     // dont rely on previous estimates
-    latestObservation = null;
+    latestObservation = new DistanceToTag(0.0, 0.0, true);
     observationAge = 0;
 
     // begin warming up elevator/wrist when lineup starts
-    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+    if (ScoringSubsystem.getInstance() != null) {
+      ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+    }
   }
 
   public void onExit(Transition transition) {
@@ -247,6 +252,10 @@ public class LineupState implements PeriodicStateInterface {
       return 0;
     }
 
+    if (Math.abs(alongTrackDistance) < 0.01) {
+      return 0;
+    }
+
     // if (alongTrackDistance < 0.2) {
     //   return -1
     //       * JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
@@ -265,6 +274,31 @@ public class LineupState implements PeriodicStateInterface {
 
   public double getAlongTrackVelocityReductionFactor(double crossTrackDistance) {
     return 2 * (0.5 - Math.abs(crossTrackDistance));
+  }
+
+  /**
+   * check the other camera index for a valid observation
+   *
+   * @param alignmentSupplier vision supplier
+   * @param tagId tag to check for
+   * @param cameraIndex the camera index already tried
+   * @return
+   */
+  public DistanceToTag tryOtherCamera(
+      VisionAlignment alignmentSupplier, int tagId, int cameraIndex) {
+    int otherCameraIndex = cameraIndex == 0 ? 1 : 0;
+    otherCameraTried = true;
+    DistanceToTag observationOtherCamera =
+        alignmentSupplier.get(
+            tagId,
+            otherCameraIndex,
+            this.getCrossTrackOffset(otherCameraIndex),
+            JsonConstants.drivetrainConstants.driveAlongTrackOffset);
+    if (observationOtherCamera.isValid()) {
+      return observationOtherCamera;
+    }
+
+    return null;
   }
 
   /** take over goal speeds to align to reef exactly */
@@ -295,6 +329,17 @@ public class LineupState implements PeriodicStateInterface {
       if (latestObservation != null && observationAge < 5) {
         observation = latestObservation;
         observationAge++;
+      }
+      // } else if (!otherCameraTried) {
+      //   // check other camera (for when otf comes in from other side)
+      //   DistanceToTag otherCameraObs = tryOtherCamera(alignmentSupplier, tagId, cameraIndex);
+
+      //   if (otherCameraObs != null) {
+      //     observation = otherCameraObs;
+      //   }
+      // }
+      else {
+        drive.fireTrigger(DriveTrigger.BeginOTF);
       }
     } else {
       latestObservation = observation;
