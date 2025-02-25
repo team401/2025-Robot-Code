@@ -566,6 +566,15 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * get intake location currently set
+   *
+   * @return the intake location currently set
+   */
+  public DesiredLocation getDesiredIntakeLocation() {
+    return this.intakeLocation;
+  }
+
+  /**
    * returns index of reef location for interfacing with snakescreen
    *
    * @return a double representing the index of reef location

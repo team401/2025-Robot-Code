@@ -1,8 +1,8 @@
 package frc.robot;
 
 import edu.wpi.first.networktables.BooleanPublisher;
-import edu.wpi.first.networktables.IntegerPublisher;
-import edu.wpi.first.networktables.IntegerSubscriber;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
@@ -15,6 +15,7 @@ import frc.robot.constants.AutoStrategy;
 import frc.robot.constants.AutoStrategyContainer.Action;
 import frc.robot.constants.AutoStrategyContainer.ActionType;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
@@ -38,15 +39,17 @@ public class StrategyManager {
 
   private NetworkTableInstance inst = NetworkTableInstance.getDefault();
   private NetworkTable table = inst.getTable("");
-  private IntegerSubscriber reefLocationSelector =
-      table.getIntegerTopic("reefTarget").subscribe(-1);
+  private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
+  private DoubleSubscriber intakeLocationSelector =
+      table.getDoubleTopic("stationTarget").subscribe(-1);
   private StringSubscriber reefLevelSelector = table.getStringTopic("scoreHeight").subscribe("-1");
   private StringSubscriber autonomySelector =
       table.getStringTopic("autonomyLevel").subscribe("mid");
   private StringSubscriber gamePieceSelector = table.getStringTopic("gpMode").subscribe("-1");
 
   private StringPublisher autonomyPublisher = table.getStringTopic("autonomyLevel").publish();
-  private IntegerPublisher reefLocationPublisher = table.getIntegerTopic("reefTarget").publish();
+  private DoublePublisher reefLocationPublisher = table.getDoubleTopic("reefTarget").publish();
+  private DoublePublisher intakeLocationPublisher = table.getDoubleTopic("stationTarget").publish();
   private StringPublisher reefLevelPublisher = table.getStringTopic("scoreHeight").publish();
   private StringPublisher gamePiecePublisher = table.getStringTopic("gpMode").publish();
   private BooleanPublisher hasCoralPublisher = table.getBooleanTopic("hasCoral").publish();
@@ -179,6 +182,11 @@ public class StrategyManager {
     // drive reef location
     if (drive != null) {
       drive.updateDesiredLocationFromNetworkTables(reefLocationSelector.get());
+
+      drive.setDesiredIntakeLocation(
+          intakeLocationSelector.get() == 20
+              ? DesiredLocation.CoralStationLeft
+              : DesiredLocation.CoralStationRight);
     }
 
     // scoring level selection
@@ -273,6 +281,9 @@ public class StrategyManager {
       }
 
       // publish default intake location
+      double intakeLocation =
+          drive.getDesiredIntakeLocation() == DesiredLocation.CoralStationLeft ? 20 : 21;
+      intakeLocationPublisher.accept(intakeLocation);
     }
 
     // publish autonomy mode
