@@ -97,7 +97,7 @@ public class ClimbSubsystem extends SubsystemBase {
         .configure(ClimbState.LIFTING)
         .permit(ClimbAction.CANCEL, ClimbState.IDLE);
 
-      climbMachineConfiguration
+    climbMachineConfiguration
         .configure(ClimbState.OVERRIDE)
         .permit(ClimbAction.CANCEL, ClimbState.IDLE);
 

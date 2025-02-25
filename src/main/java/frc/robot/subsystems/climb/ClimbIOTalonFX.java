@@ -9,7 +9,6 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -41,8 +40,8 @@ public class ClimbIOTalonFX implements ClimbIO {
       new MotionMagicVoltage(ClimbConstants.synced.getObject().restingAngle);
 
   public ClimbIOTalonFX() {
-    leadMotor = new TalonFX(16);
-    followerMotor = new TalonFX(17);
+    leadMotor = new TalonFX(16, "canivore");
+    followerMotor = new TalonFX(17, "canivore");
     climbAngleCoder = new CANcoder(17, "canivore");
 
     followerMotor.setControl(
@@ -94,8 +93,9 @@ public class ClimbIOTalonFX implements ClimbIO {
     } else {
       leadMotor.setControl(calculator);
     }
-    //tried to replace the above if statement with leadMotor.setControl(new VoltageOut(5));, doesn't work
-    //the getMotorVoltage continuously returns 0 despite leadMotor's literal voltage being set to 5
+    // tried to replace the above if statement with leadMotor.setControl(new VoltageOut(5));,
+    // doesn't work
+    // the getMotorVoltage continuously returns 0 despite leadMotor's literal voltage being set to 5
     outputs.appliedVoltage.mut_replace(leadMotor.getMotorVoltage().getValue());
   }
 
