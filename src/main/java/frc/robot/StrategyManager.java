@@ -183,6 +183,7 @@ public class StrategyManager {
     if (drive != null) {
       drive.updateDesiredLocationFromNetworkTables(reefLocationSelector.get());
 
+      // 20: left; 21: right
       drive.setDesiredIntakeLocation(
           intakeLocationSelector.get() == 20
               ? DesiredLocation.CoralStationLeft
@@ -281,6 +282,7 @@ public class StrategyManager {
       }
 
       // publish default intake location
+      // 20: left; 21: right
       double intakeLocation =
           drive.getDesiredIntakeLocation() == DesiredLocation.CoralStationLeft ? 20 : 21;
       intakeLocationPublisher.accept(intakeLocation);
