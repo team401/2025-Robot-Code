@@ -4,20 +4,34 @@ Guide for how LEDs work / how we use LEDs :D
 
 List of Colors:
 ``lockedOnHang  =  Color.kGreen;``
+
 `` holdingAlgae  =  Color.kYellow;``
+
 ``holdingCoral  =  Color.kMagenta;``
+
  ``targetOnReef  =  Color.kBlue;``
+ 
 ``targetOnReefL1  =  Color.kCyan;``
+
 ``targetOnReefL2  =  Color.kTeal;``
+
 ``targetOnReefL3  =  Color.kPurple;``
+
 ``targetOnReefL4  =  Color.kMagenta;``
+
 ``targetOnProcessor  =  Color.kYellow;``
+
 ``targetOnNet  =  Color.kWhite;``
+
 ``targetOnCoral  =  Color.kLime;``
+
 ``off  =  Color.kBlack;``
+
 Pretty simple to use. You make a Color and then give it a pre-made color or use RGB to make your own.
 Ex:
+
 ``public static final Color red = new Color(255,0,0);``
+
 ``public static final Color red = Color.kRed;``
 
 
