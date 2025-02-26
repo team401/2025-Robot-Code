@@ -1,7 +1,8 @@
 {
   "runDrive": true,
   "runVision": true,
-  "runScoring": true,
+  "runScoring": false,
   "runClimb": true,
-  "runRamp": true
+  "runRamp": false,
+  "runLEDs": true
 }
