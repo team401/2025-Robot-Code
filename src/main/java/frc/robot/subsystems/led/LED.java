@@ -45,7 +45,8 @@ public class LED extends SubsystemBase {
       LEDPattern.steps(Map.of(0, LEDConstants.holdingAlgae, 1 / 3.0, LEDConstants.off));
   public LEDPattern holdingCoral =
       LEDPattern.steps(Map.of(0, LEDConstants.holdingCoral, 1 / 3.0, LEDConstants.off));
-  public LEDPattern targetOnReefL1 = LEDPattern.steps(Map.of(1 / 3.0, LEDConstants.targetOnReefL1));
+      public LEDPattern targetOnReefL1 = LEDPattern.steps(Map.of(1 / 3.0, LEDConstants.targetOnReefL1));
+      public LEDPattern targetOnReefOTF = LEDPattern.steps(Map.of(1 / 3.0, LEDConstants.targetOnReef));
   public LEDPattern targetOnReefL2 = LEDPattern.steps(Map.of(1 / 3.0, LEDConstants.targetOnReefL2));
   public LEDPattern targetOnReefL3 = LEDPattern.steps(Map.of(1 / 3.0, LEDConstants.targetOnReefL3));
   public LEDPattern targetOnReefL4 = LEDPattern.steps(Map.of(1 / 3.0, LEDConstants.targetOnReefL4));
@@ -100,7 +101,7 @@ public class LED extends SubsystemBase {
         addPattern(lockedOnHang);
       }
       if (driveSubsystem != null && driveSubsystem.isDesiredLocationReef()) {
-        addSplitPattern(clear, targetOnReefL1);
+        addSplitPattern(clear, targetOnReefOTF);
       }
       applyPatterns();
     } else {
