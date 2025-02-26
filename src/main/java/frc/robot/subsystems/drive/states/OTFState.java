@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import org.littletonrobotics.junction.Logger;
 
@@ -105,6 +106,9 @@ public class OTFState implements PeriodicStateInterface {
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueReef1011Translation,
                 JsonConstants.blueFieldLocations.blueReef1011Rotation);
+      case Processor:
+      case Net:
+        return new Pose2d();
       case CoralStationRight:
         return driveInput.isAllianceRed()
             ? new Pose2d(
@@ -138,13 +142,24 @@ public class OTFState implements PeriodicStateInterface {
       return null;
     }
 
-    // Create the constraints to use while pathfinding
-    PathConstraints constraints =
-        new PathConstraints(
-            JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
-            JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
-            JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
-            JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
+    PathConstraints constraints;
+    if (drive.getDesiredLocation() == DesiredLocation.Net) {
+      // Create the constraints to use while pathfinding
+      constraints =
+          new PathConstraints(
+              JsonConstants.drivetrainConstants.OTFSlowLinearVelocity,
+              JsonConstants.drivetrainConstants.OTFSlowLinearAccel,
+              JsonConstants.drivetrainConstants.OTFSlowAngularVelocity,
+              JsonConstants.drivetrainConstants.OTFSlowAngularAccel);
+    } else {
+      // Create the constraints to use while pathfinding
+      constraints =
+          new PathConstraints(
+              JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
+              JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
+              JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
+              JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
+    }
 
     return AutoBuilder.pathfindToPose(
         otfPose, constraints, JsonConstants.drivetrainConstants.otfPoseEndingVelocity);
