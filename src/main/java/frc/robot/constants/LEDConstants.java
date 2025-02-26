@@ -1,10 +1,6 @@
 package frc.robot.constants;
 
-import org.checkerframework.checker.units.qual.C;
-import org.w3c.dom.css.RGBColor;
-
 import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color.RGBChannel;
 
 public final class LEDConstants {
 
@@ -25,6 +21,6 @@ public final class LEDConstants {
   public static final Color targetOnNet = Color.kWhite;
   public static final Color targetOnCoral = Color.kLime;
   public static final Color off = Color.kBlack;
-  
+
   public static final double rainbowSpeed = 20;
 }

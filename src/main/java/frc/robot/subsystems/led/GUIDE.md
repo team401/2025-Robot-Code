@@ -24,7 +24,7 @@ Ex:
 
 >All Colors are defined in [``LEDConstants``](#our-led-subsystem)
 ## LED Patterns
-LEDPatterns are where things get interesting because this is where the magic happens. When you make an LED do something it is going to be through a LEDPattern. There are a lot of things that they can do so if you want to read up on the go to the [WPILib Documentation](https://docs.wpilib.org/en/stable/docs/software/hardware-apis/misc/addressable-leds.html) & [Github API Pull request](https://github.com/wpilibsuite/allwpilib/pull/6344). 
+LEDPatterns are where things get interesting because this is where the magic happens. When you make an LED do something it is going to be through a LEDPattern. There are a lot of things that they can do so if you want to read up on the go to the [WPILib Documentation](https://docs.wpilib.org/en/stable/docs/software/hardware-apis/misc/addressable-leds.html) & [Github API Pull request](https://github.com/wpilibsuite/allwpilib/pull/6344).
 
 The way we use them is to split each AddressableLEDBufferView into thirds using ``.steps(Map.of(0,  (Insert Color Here),  1  /  3.0,  (Insert Color Here)));`` This splits the view into thrids and applies a color to the first third, and then another color for the rest of the section.
 > **Note:** **This is how we run every LEDPattern** except rainbow.
@@ -43,27 +43,27 @@ This is where we do everything for making the LEDs run. The few main parts are: 
 
 
 **addPattern/addSplitPattern**
-	 adds the LEDPattern to an ArrayList to be applied with ``applyPatterns()``
+   adds the LEDPattern to an ArrayList to be applied with ``applyPatterns()``
 **runPattern/runSplitPattern**
-	rather than adding a LEDPattern to a list it just directly applies the pattern to the LEDs
+  rather than adding a LEDPattern to a list it just directly applies the pattern to the LEDs
 **applyPatterns**
-	uses  ``LEDPattern.overlayOn();``  to add LEDPatterns from the ArrayList and checks adds them to the LEDPattern ``leftFinal``, ``rightFinal`` respectfully. 
+  uses  ``LEDPattern.overlayOn();``  to add LEDPatterns from the ArrayList and checks adds them to the LEDPattern ``leftFinal``, ``rightFinal`` respectfully.
 > **Note:** When you run this in periodic() it will implicitly be creating a priority order of which LEDPatterns to run based off of which LEDPattern comes last on the list.
 >
 >Ex.
 ```java @Override
 
 public  void  periodic()  {
-	addSplitPattern(Color.kBlack,Color,kGreen);
-	addPattern(Color.kRed);
-	applyPatterns();
+  addSplitPattern(Color.kBlack,Color,kGreen);
+  addPattern(Color.kRed);
+  applyPatterns();
 }
 ```
 >Only the ``Color.kRed`` would be displayed. This also goes for parts that are using steps or maps.
 
 **periodic()**
 When you look at ``periodic()`` it will have a bunch of if-else statements these are used to determine what is happening on the robot at that time.
-The first if statement simply checks if the robot is disabled/disconnected. If it is then it will use the ``runPattern();`` to display a rainbow animation. When it gets enabled it runs a list of if statements and then adds the patterns to the [applyPatterns](#applypattern) ArrayList. 
+The first if statement simply checks if the robot is disabled/disconnected. If it is then it will use the ``runPattern();`` to display a rainbow animation. When it gets enabled it runs a list of if statements and then adds the patterns to the [applyPatterns](#applypattern) ArrayList.
 Ex.
 ```java
 if  (scoringSubsystem !=  null  &&  scoringSubsystem.getGamePiece()  ==  GamePiece.Algae)  {
@@ -91,7 +91,7 @@ This is a list of what if statement does:
 
 
 ## Usages
-We use this in our own ``initSubsystems.java`` 
+We use this in our own ``initSubsystems.java``
 ```java
 public static LED initLEDs(
       ScoringSubsystem scoringSubsystem, ClimbSubsystem climbSubsystem, Drive drive) {
