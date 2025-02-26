@@ -23,6 +23,7 @@ public class TestModeManager {
     DriveSysIdDynamicForward,
     DriveSysIdDynamicBackward,
     DriveLineupTuning,
+    ClimbTuning,
     None, // Default test mode that does nothing until a new one is selected.
   }
 
@@ -60,6 +61,8 @@ public class TestModeManager {
     testModeChooser.addOption("Drive SysId (Dynamic Forward)", TestMode.DriveSysIdDynamicForward);
     testModeChooser.addOption("Drive SysId (Dynamic Reverse)", TestMode.DriveSysIdDynamicBackward);
     testModeChooser.addOption("Drive Lineup Tuning", TestMode.DriveLineupTuning);
+    // Climb Test Modes
+    testModeChooser.addOption("Climb Tuning", TestMode.ClimbTuning);
 
     SmartDashboard.putData("Test Mode Selector", testModeChooser);
   }

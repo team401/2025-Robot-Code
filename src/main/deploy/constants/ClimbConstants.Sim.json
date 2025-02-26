@@ -2,5 +2,9 @@
   "climbArmLengthMeters": 0.5,
   "climbArmMassKg": 0.5,
   "climbGearing": 75,
-  "climbStdDevs": 0.005
+  "climbStdDevs": 0.005,
+  "minAngleRads": 0.0,
+  "maxAngleRads": 6.282,
+  "startAngleRads": 0.0,
+  "simGravity": false
 }
