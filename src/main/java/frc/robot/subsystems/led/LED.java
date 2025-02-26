@@ -157,6 +157,7 @@ public class LED extends SubsystemBase {
 
   /** Applies all active LED patterns by overlaying them and displaying the final effect. */
   public void applyPatterns() {
+
     LEDPattern leftFinal = LEDPattern.solid(Color.kBlack);
     LEDPattern rightFinal = LEDPattern.solid(Color.kBlack);
 
@@ -169,6 +170,9 @@ public class LED extends SubsystemBase {
 
     leftFinal.applyTo(leftData);
     rightFinal.applyTo(rightData);
+
+    leftPatterns.clear();
+    rightPatterns.clear();
   }
 
   public Command runCycle() {
