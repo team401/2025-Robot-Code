@@ -7,6 +7,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StringSubscriber;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.strategies.AutoIntake;
@@ -230,6 +231,11 @@ public class StrategyManager {
       if (currentCommand != null) {
         CommandScheduler.getInstance().schedule(currentCommand);
       }
+    }
+
+    // updates snakescreen with current locations to watch auto run
+    if(DriverStation.isAutonomousEnabled()) {
+      this.publishDefaultSubsystemValues();
     }
 
     this.logActions();
