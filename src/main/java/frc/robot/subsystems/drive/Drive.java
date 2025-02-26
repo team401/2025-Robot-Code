@@ -35,9 +35,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.networktables.DoubleSubscriber;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -144,6 +141,7 @@ public class Drive implements DriveTemplate {
     Reef10,
     Reef11,
     Processor,
+    Net,
     CoralStationLeft,
     CoralStationRight,
   }
@@ -162,6 +160,7 @@ public class Drive implements DriveTemplate {
     DesiredLocation.Reef10,
     DesiredLocation.Reef11,
     DesiredLocation.Processor,
+    DesiredLocation.Net,
     DesiredLocation.CoralStationLeft,
     DesiredLocation.CoralStationRight
   };
@@ -169,10 +168,6 @@ public class Drive implements DriveTemplate {
   private DesiredLocation desiredLocation = DesiredLocation.Reef9;
   private DesiredLocation intakeLocation = DesiredLocation.CoralStationLeft;
   private boolean goToIntake = false;
-
-  private NetworkTableInstance inst = NetworkTableInstance.getDefault();
-  private NetworkTable table = inst.getTable("");
-  private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
 
   @AutoLogOutput(key = "Drive/waitOnScore")
   private BooleanSupplier waitOnScore = () -> false;
@@ -531,7 +526,8 @@ public class Drive implements DriveTemplate {
   public boolean isDesiredLocationReef() {
     return !(desiredLocation == DesiredLocation.CoralStationLeft
             || desiredLocation == DesiredLocation.CoralStationRight
-            || desiredLocation == DesiredLocation.Processor)
+            || desiredLocation == DesiredLocation.Processor
+            || desiredLocation == DesiredLocation.Net)
         && !goToIntake; // only want reef if intake is false
   }
 
