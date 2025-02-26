@@ -155,7 +155,6 @@ public class ClimbSubsystem extends SubsystemBase {
   public void periodic() {
 
     climbMachine.periodic();
-
     io.updateInputs(inputs);
     io.applyOutputs(outputs);
 

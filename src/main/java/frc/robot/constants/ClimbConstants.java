@@ -1,6 +1,6 @@
 package frc.robot.constants;
 
-import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Radians;
 
 import coppercore.parameter_tools.json.JSONExclude;
 import coppercore.parameter_tools.json.JSONSync;
@@ -19,9 +19,9 @@ public class ClimbConstants {
           EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
-  public final Angle restingAngle = Degrees.of(0);
-  public final Angle searchingAngle = Degrees.of(60);
-  public final Angle finalHangingAngle = Degrees.of(0);
+  public final Angle restingAngle = Radians.of(0);
+  public final Angle searchingAngle = Radians.of(60);
+  public final Angle finalHangingAngle = Radians.of(0);
 
   public final Integer leadClimbMotorId = 16;
   public final Integer followerClimbMotorId = 17;

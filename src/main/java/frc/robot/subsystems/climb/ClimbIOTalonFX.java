@@ -3,6 +3,7 @@ package frc.robot.subsystems.climb;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -11,6 +12,7 @@ import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MutAngle;
@@ -18,6 +20,7 @@ import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.ClimbConstants;
 import java.util.function.BooleanSupplier;
+import org.littletonrobotics.junction.Logger;
 
 public class ClimbIOTalonFX implements ClimbIO {
 
@@ -50,6 +53,10 @@ public class ClimbIOTalonFX implements ClimbIO {
 
     talonFXConfigs =
         new TalonFXConfiguration()
+            .withFeedback(
+                new FeedbackConfigs()
+                    .withFeedbackRemoteSensorID(climbAngleCoder.getDeviceID())
+                    .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder))
             .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
@@ -86,7 +93,9 @@ public class ClimbIOTalonFX implements ClimbIO {
   @Override
   public void applyOutputs(ClimbOutputs outputs) {
 
-    calculator.withPosition(goalAngle);
+    calculator.withPosition(goalAngle.in(Rotations));
+
+    Logger.recordOutput("climb/calculatorAngle", leadMotor.getPosition().getValueAsDouble());
 
     if (override) {
       leadMotor.setVoltage(overrideVoltage.in(Volts));
