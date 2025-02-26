@@ -20,6 +20,14 @@ import org.littletonrobotics.junction.AutoLog;
 public interface WristIO {
   @AutoLog
   public static class WristInputs {
+    /**
+     * Whether or not the wrist CANcoder is connected
+     *
+     * <p>This value is determined by whether or not refreshing the Position status signal returns
+     * an OK signal
+     */
+    public boolean isWristEncoderConnected = false;
+
     /** Current wrist position as reported by the CANcoder */
     public MutAngle wristPosition = Rotations.mutable(0.0);
 
@@ -27,7 +35,7 @@ public interface WristIO {
     public MutAngularVelocity wristVelocity = RotationsPerSecond.mutable(0.0);
 
     /** Goal angle of the wrist, as seen by the wrist CANcoder */
-    public MutAngle wristGoalPosition = Rotations.mutable(0.0);
+    public MutAngle wristGoalPosition = Rotations.mutable(0.4);
 
     /** The setpoint target position from Motion Magic Expo */
     public MutAngle wristSetpointPosition = Rotations.mutable(0.0);

@@ -1,6 +1,6 @@
 {
-  "leadElevatorMotorId": 9,
-  "followerElevatorMotorId": 10,
+  "leadElevatorMotorId": 30,
+  "followerElevatorMotorId": 31,
   "invertFollowerElevatorMotor": false,
   "smallCANCoderTeeth": 17,
   "largeCANCoderTeeth": 19,
@@ -19,10 +19,10 @@
     "unit": "Inch"
   },
   "elevatorCANCoderDiscontinuityPoint": 1.0,
-  "elevatorLargeCANCoderID": 11,
-  "isLargeCANcoderClockwisePositive": true,
-  "elevatorSmallCANCoderID": 12,
-  "isSmallCANcoderClockwisePositive": true,
+  "elevatorLargeCANCoderID": 32,
+  "elevatorLargeCANCoderDirection": "CounterClockwise_Positive",
+  "elevatorSmallCANCoderID": 33,
+  "elevatorSmallCANCoderDirection": "Clockwise_Positive",
   "elevatorkP": 40.0,
   "elevatorkI": 0.0,
   "elevatorkD": 0.0,

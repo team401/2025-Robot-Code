@@ -3,6 +3,7 @@ package frc.robot.subsystems.scoring;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -31,8 +32,8 @@ import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.JsonConstants;
 
 public class WristIOTalonFX implements WristIO {
-  TalonFX wristMotor = new TalonFX(JsonConstants.wristConstants.wristMotorId);
-  CANcoder wristCANcoder = new CANcoder(JsonConstants.wristConstants.wristCANcoderId);
+  TalonFX wristMotor = new TalonFX(JsonConstants.wristConstants.wristMotorId, "canivore");
+  CANcoder wristCANcoder = new CANcoder(JsonConstants.wristConstants.wristCANcoderId, "canivore");
 
   // Keep track of talonFX configs and only update FF/PID when necessary to avoid unnecessary object
   // creation
@@ -84,7 +85,8 @@ public class WristIOTalonFX implements WristIO {
             .withMotionMagic(
                 new MotionMagicConfigs()
                     .withMotionMagicCruiseVelocity(
-                        JsonConstants.wristConstants.wristMotionMagicCruiseVelocity)
+                        JsonConstants.wristConstants
+                            .wristMotionMagicCruiseVelocityRotationsPerSecond)
                     .withMotionMagicExpo_kA(JsonConstants.wristConstants.wristMotionMagicExpo_kA)
                     .withMotionMagicExpo_kV(JsonConstants.wristConstants.wristMotionMagicExpo_kV));
 
@@ -108,7 +110,10 @@ public class WristIOTalonFX implements WristIO {
     inputs.wristSetpointPosition.mut_replace(
         Rotations.of(wristMotor.getClosedLoopReference().getValue()));
 
-    inputs.wristPosition.mut_replace(wristCANcoder.getPosition().getValue());
+    StatusSignal<Angle> positionSignal = wristCANcoder.getPosition();
+    inputs.isWristEncoderConnected = positionSignal.getStatus().isOK();
+
+    inputs.wristPosition.mut_replace(positionSignal.getValue());
     inputs.wristVelocity.mut_replace(wristCANcoder.getVelocity().getValue());
 
     inputs.wristTargetVelocity.mut_setMagnitude(
