@@ -1,15 +1,15 @@
 {
   "restingAngle": {
     "value": 20.0,
-    "unit": "Degrees"
+    "unit": "Degree"
   },
   "searchingAngle": {
     "value": 60.0,
-    "unit": "Degrees"
+    "unit": "Degree"
   },
   "finalHangingAngle": {
     "value": 0.0,
-    "unit": "Degrees"
+    "unit": "Degree"
   },
   "leadClimbMotorId": 0,
   "followerClimbMotorId": 1,

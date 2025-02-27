@@ -76,12 +76,12 @@ public final class ElevatorConstants {
   public final Integer elevatorLargeCANCoderID = 14;
 
   public final SensorDirectionValue elevatorLargeCANCoderDirection =
-      SensorDirectionValue.CounterClockwise_Positive;
+      SensorDirectionValue.Clockwise_Positive;
 
   public final Integer elevatorSmallCANCoderID = 15;
 
   public final SensorDirectionValue elevatorSmallCANCoderDirection =
-      SensorDirectionValue.Clockwise_Positive;
+      SensorDirectionValue.CounterClockwise_Positive;
 
   /*
    * The large CANCoder is represented as the mechanism in our Phoenix configs.
@@ -94,14 +94,14 @@ public final class ElevatorConstants {
       elevatorReduction * (double) largeCANCoderTeeth / (double) spoolTeeth;
 
   // TODO: Tune elevator
-  public final Double elevatorkP = 60.0;
+  public final Double elevatorkP = 40.0;
   public final Double elevatorkI = 0.0;
-  public final Double elevatorkD = 0.0;
+  public final Double elevatorkD = 4.0;
 
   public final Double elevatorkS = 0.0;
-  public final Double elevatorkV = 0.1;
-  public final Double elevatorkA = 0.0;
-  public final Double elevatorkG = 11.0;
+  public final Double elevatorkV = 2.0;
+  public final Double elevatorkA = 0.08;
+  public final Double elevatorkG = 11.5;
 
   // TODO: Actual ratios
   @JSONExclude
@@ -122,7 +122,7 @@ public final class ElevatorConstants {
               / elevatorToSpool.in(PerUnit.combine(Meters, Radians)));
 
   /* The Motion Magic Expo kV, measured in Volts per Radian per Second, but represented as a double so it can be synced by JSONSync */
-  public final Double elevatorExpo_kV_raw = 0.0;
+  public final Double elevatorExpo_kV_raw = 0.005;
 
   /**
    * The kV used by Motion Magic Expo to generate a motion profile. Dividing the supply voltage by
@@ -134,7 +134,7 @@ public final class ElevatorConstants {
       VoltsPerRadianPerSecond.ofNative(elevatorExpo_kV_raw);
 
   /* The Motion Magic Expo kA, measured in Volts per Radian per Second Squared, but represented as a double so it can be synced by JSONSync */
-  public final Double elevatorExpo_kA_raw = 0.1;
+  public final Double elevatorExpo_kA_raw = 0.03;
 
   @JSONExclude
   public final Per<VoltageUnit, AngularAccelerationUnit> elevatorExpo_kA =
@@ -165,7 +165,7 @@ public final class ElevatorConstants {
    * What reported velocity should be considered "moving" while homing, stored as a Double because
    * we can't serialize a MetersPerSecond
    */
-  public final Double homingVelocityThresholdMetersPerSecond = 0.001;
+  public final Double homingVelocityThresholdMetersPerSecond = 0.1;
 
   /** The maximum amount of time the elevator can home for before saying it's at 0 and giving up */
   public final Time homingMaxTime = Seconds.of(3.0);
@@ -173,27 +173,22 @@ public final class ElevatorConstants {
   /**
    * The maximum amount of time the elevator can home without ever moving before it knows its at 0
    */
-  public final Time homingMaxUnmovingTime = Seconds.of(1.0);
+  public final Time homingMaxUnmovingTime = Seconds.of(0.25);
 
   public final Integer homingVelocityFilterWindowSize = 5;
-
-  /**
-   * This is the maximum height the elevator can reach while the wrist is "in" without smashing it
-   * into the crossbar.
-   */
-  public final Distance maxWristInBelowCrossBarHeight = Meters.of(1.0); // TODO: Real value
-
-  /**
-   * This is the minimum height the elevator can go down to if the wrist is "in" while above the
-   * crossbar.
-   */
-  public final Distance minWristInAboveCrossBarHeight = Meters.of(1.1); // TODO: Real value
 
   /**
    * This is the minimum height the elevator can reach while the wrist is down without hitting it on
    * the chassis below
    */
   public final Distance minWristDownHeight = Meters.of(0.2); // TODO: Real value
+
+  /** Minimum height the elevator can be at with the wrist out without hitting the reef base */
+  public final Distance minReefSafeHeight = Meters.of(0.6);
+
+  public final Distance L4MinHeightAbove = Meters.of(1.74);
+
+  public final Distance L2MaxHeightBelow = Meters.of(0.16);
 
   /** When within this distance, the elevator is considered "at its setpoint" */
   public final Distance elevatorSetpointEpsilon = Meters.of(0.05);

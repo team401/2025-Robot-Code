@@ -23,16 +23,16 @@
   "elevatorLargeCANCoderDirection": "Clockwise_Positive",
   "elevatorSmallCANCoderID": 15,
   "elevatorSmallCANCoderDirection": "CounterClockwise_Positive",
-  "elevatorkP": 60.0,
+  "elevatorkP": 40.0,
   "elevatorkI": 0.0,
-  "elevatorkD": 0.0,
+  "elevatorkD": 4.0,
   "elevatorkS": 0.0,
-  "elevatorkV": 0.1,
-  "elevatorkA": 0.0,
-  "elevatorkG": 11.0,
+  "elevatorkV": 2.0,
+  "elevatorkA": 0.08,
+  "elevatorkG": 11.5,
   "elevatorCruiseVelocityMetersPerSecond": 3.0,
-  "elevatorExpo_kV_raw": 0.0,
-  "elevatorExpo_kA_raw": 0.1,
+  "elevatorExpo_kV_raw": 0.005,
+  "elevatorExpo_kA_raw": 0.03,
   "minElevatorHeight": {
     "value": 0.0,
     "unit": "Meter"
@@ -66,16 +66,20 @@
     "unit": "Second"
   },
   "homingVelocityFilterWindowSize": 5,
-  "maxWristInBelowCrossBarHeight": {
-    "value": 1.0,
-    "unit": "Meter"
-  },
-  "minWristInAboveCrossBarHeight": {
-    "value": 1.1,
-    "unit": "Meter"
-  },
   "minWristDownHeight": {
     "value": 0.2,
+    "unit": "Meter"
+  },
+  "minReefSafeHeight": {
+    "value": 0.6,
+    "unit": "Meter"
+  },
+  "L4MinHeightAbove": {
+    "value": 1.74,
+    "unit": "Meter"
+  },
+  "L2MaxHeightBelow": {
+    "value": 0.16,
     "unit": "Meter"
   },
   "elevatorSetpointEpsilon": {

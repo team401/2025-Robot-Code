@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
@@ -7,6 +8,7 @@ import coppercore.vision.VisionLocalizer;
 import coppercore.wpilib_interface.tuning.TuneS;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -146,6 +148,14 @@ public class RobotContainer {
       scoringSubsystem = InitSubsystems.initScoringSubsystem();
       if (FeatureFlags.synced.getObject().runDrive) {
         scoringSubsystem.setIsDriveLinedUpSupplier(() -> drive.isDriveAlignmentFinished());
+        scoringSubsystem.setReefDistanceSupplier(
+            () -> {
+              Translation2d reefCenter =
+                  drive.isAllianceRed()
+                      ? JsonConstants.redFieldLocations.redReefCenterTranslation
+                      : JsonConstants.blueFieldLocations.blueReefCenterTranslation;
+              return Meters.of(drive.getPose().getTranslation().getDistance(reefCenter));
+            });
       } else {
         scoringSubsystem.setIsDriveLinedUpSupplier(() -> true);
       }
@@ -162,13 +172,16 @@ public class RobotContainer {
   private void configureBindings() {
     // initialize helper commands
     if (FeatureFlags.synced.getObject().runDrive) {
-      InitBindings.initDriveBindings(drive);
+      InitBindings.initDriveBindings(drive, strategyManager);
     }
     if (FeatureFlags.synced.getObject().runRamp) {
       InitBindings.initRampBindings(rampSubsystem);
     }
     if (FeatureFlags.synced.getObject().runClimb) {
       InitBindings.initClimbBindings(climbSubsystem);
+    }
+    if (FeatureFlags.synced.getObject().runScoring) {
+      InitBindings.initScoringBindings(scoringSubsystem);
     }
   }
 
@@ -200,7 +213,6 @@ public class RobotContainer {
 
     switch (TestModeManager.getTestMode()) {
       case ElevatorCharacterization:
-        scoringSubsystem.setOverrideStateMachine(true);
         CommandScheduler.getInstance()
             .schedule(
                 new SequentialCommandGroup(
@@ -255,6 +267,10 @@ public class RobotContainer {
 
     if (FeatureFlags.synced.getObject().runRamp) {
       rampSubsystem.testPeriodic();
+    }
+
+    if (FeatureFlags.synced.getObject().runDrive) {
+      drive.periodic();
     }
   }
 
