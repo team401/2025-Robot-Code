@@ -59,8 +59,8 @@ public class WristConstants {
   public final Double wristKV = 1.0;
   public final Double wristKA = 0.0;
 
-  public final Double wristKP = 20.0;
-  public final Double wristKI = 0.0;
+  public final Double wristKP = 25.0;
+  public final Double wristKI = 1.0;
   public final Double wristKD = 0.5;
 
   // This value is a a Double because RotationsPerSecond doesn't serialize properly with JSONSync
@@ -83,7 +83,7 @@ public class WristConstants {
    * The minimum angle the wrist can be at while the elevator is down and not hit the parts of the
    * robot below.
    */
-  public final Angle minElevatorDownSafeAngle = Rotations.of(0.0); // TODO: Confirm
+  public final Angle minElevatorDownSafeAngle = Radians.of(-0.503); // TODO: Confirm
 
   /** The minimum angle the wrist can be at without hitting the reef when very close to the reef */
   public final Angle minReefSafeAngle = Rotations.of(0.32);

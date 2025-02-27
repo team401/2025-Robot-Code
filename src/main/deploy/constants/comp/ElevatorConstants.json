@@ -62,7 +62,7 @@
     "unit": "Second"
   },
   "homingMaxUnmovingTime": {
-    "value": 1.0,
+    "value": 0.25,
     "unit": "Second"
   },
   "homingVelocityFilterWindowSize": 5,

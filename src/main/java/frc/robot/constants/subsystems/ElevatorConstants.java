@@ -173,7 +173,7 @@ public final class ElevatorConstants {
   /**
    * The maximum amount of time the elevator can home without ever moving before it knows its at 0
    */
-  public final Time homingMaxUnmovingTime = Seconds.of(1.0);
+  public final Time homingMaxUnmovingTime = Seconds.of(0.25);
 
   public final Integer homingVelocityFilterWindowSize = 5;
 
@@ -186,7 +186,7 @@ public final class ElevatorConstants {
   /** Minimum height the elevator can be at with the wrist out without hitting the reef base */
   public final Distance minReefSafeHeight = Meters.of(0.6);
 
-  public final Distance L4MinHeightAbove = Meters.of(1.44);
+  public final Distance L4MinHeightAbove = Meters.of(1.74);
 
   public final Distance L2MaxHeightBelow = Meters.of(0.16);
 
