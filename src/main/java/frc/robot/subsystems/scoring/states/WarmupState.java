@@ -5,6 +5,9 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
+import coppercore.controls.state_machine.transition.Transition;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
@@ -15,8 +18,22 @@ import org.littletonrobotics.junction.Logger;
 public class WarmupState implements PeriodicStateInterface {
   private ScoringSubsystem scoringSubsystem;
 
+  // Cache measure versions of the Doubles from JSON constants
+  private LinearVelocity elevatorStableVelocityMeasure;
+  private AngularVelocity wristStableVelocityMeasure;
+
   public WarmupState(ScoringSubsystem scoringSubsystem) {
     this.scoringSubsystem = scoringSubsystem;
+  }
+
+  @Override
+  public void onEntry(Transition transition) {
+    elevatorStableVelocityMeasure =
+        MetersPerSecond.of(
+            JsonConstants.elevatorConstants.maxElevatorSetpointVelocityMetersPerSecond);
+    wristStableVelocityMeasure =
+        RotationsPerSecond.of(
+            JsonConstants.wristConstants.maxWristSetpointVelocityRotationsPerSecond);
   }
 
   @Override
@@ -37,8 +54,9 @@ public class WarmupState implements PeriodicStateInterface {
                 setpoint.elevatorHeight(), JsonConstants.elevatorConstants.elevatorSetpointEpsilon);
 
     boolean elevatorStable =
-        scoringSubsystem.getElevatorVelocity().abs(MetersPerSecond)
-            <= JsonConstants.elevatorConstants.maxElevatorSetpointVelocityMetersPerSecond;
+        scoringSubsystem
+            .getElevatorVelocity()
+            .isNear(MetersPerSecond.zero(), elevatorStableVelocityMeasure);
 
     boolean wristAtSetpoint =
         scoringSubsystem
@@ -46,8 +64,9 @@ public class WarmupState implements PeriodicStateInterface {
             .isNear(setpoint.wristAngle(), JsonConstants.wristConstants.wristSetpointEpsilon);
 
     boolean wristStable =
-        scoringSubsystem.getWristVelocity().abs(RotationsPerSecond)
-            <= JsonConstants.wristConstants.maxWristSetpointVelocityRotationsPerSecond;
+        scoringSubsystem
+            .getWristVelocity()
+            .isNear(RotationsPerSecond.zero(), wristStableVelocityMeasure);
 
     Logger.recordOutput("scoring/warmup/elevatorAtSetpoint", elevatorAtSetpoint);
     Logger.recordOutput("scoring/warmup/elevatorStable", elevatorStable);
