@@ -1,5 +1,6 @@
 package frc.robot.subsystems.scoring;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import edu.wpi.first.math.geometry.Pose3d;
@@ -26,7 +27,9 @@ public class ScoringSubsystemMapleSim {
                     new Translation2d(0.5, 0),
                     drive.getChassisSpeeds(),
                     drive.getPose().getRotation(),
-                    scoring.getElevatorHeight(), // initial height of the ball, in meters
+                    Meters.of(
+                        scoring.getElevatorHeight().in(Meters)
+                            + 0.5), // initial height of the ball, in meters
                     MetersPerSecond.of(5), // initial velocity, in m/s
                     scoring.getWristAngle()) // shooter angle
                 .withProjectileTrajectoryDisplayCallBack(
@@ -49,7 +52,9 @@ public class ScoringSubsystemMapleSim {
                     new Translation2d(0.5, 0),
                     drive.getChassisSpeeds(),
                     drive.getPose().getRotation(),
-                    scoring.getElevatorHeight(), // initial height of the ball, in meters
+                    Meters.of(
+                        scoring.getElevatorHeight().in(Meters)
+                            + 0.5), // initial height of the ball, in meters
                     MetersPerSecond.of(5), // initial velocity, in m/s
                     scoring.getWristAngle()) // shooter angle
                 .withProjectileTrajectoryDisplayCallBack(

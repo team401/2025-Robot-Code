@@ -260,6 +260,7 @@ public class RobotContainer {
 
     ScoringSubsystemMapleSim.configDrive(drive);
     ScoringSubsystemMapleSim.configScoring(scoringSubsystem);
+    InitBindings.initScoringBindingsMaple();
   }
 
   public void updateMapleSim() {

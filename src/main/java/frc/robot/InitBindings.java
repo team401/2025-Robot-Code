@@ -20,6 +20,7 @@ import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystemMapleSim;
 
 public final class InitBindings {
   // Controller
@@ -139,7 +140,7 @@ public final class InitBindings {
                   rampSubsystem.prepareForClimb();
                 }));
     driverController
-        .y()
+        .b()
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -150,6 +151,11 @@ public final class InitBindings {
   public static void initClimbBindings(ClimbSubsystem climb) {
     driverController.a().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)));
     driverController.b().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)));
+  }
+
+  public static void initScoringBindingsMaple() {
+    driverController.x().onTrue(new InstantCommand(() -> ScoringSubsystemMapleSim.shootAlgae()));
+    driverController.y().onTrue(new InstantCommand(() -> ScoringSubsystemMapleSim.shootCoral()));
   }
 
   /**
