@@ -37,6 +37,13 @@ public class RampIOSim implements RampIO {
           startingRads);
 
   @Override
+  public void setPID(double kP, double kI, double kD) {
+    controller.setP(kP);
+    controller.setI(kI);
+    controller.setD(kD);
+  }
+
+  @Override
   public void updateInputs(RampInputs inputs) {
     sim.update(0.02);
     inputs.position = sim.getAngleRads();

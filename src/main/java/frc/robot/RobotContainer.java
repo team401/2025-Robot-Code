@@ -3,6 +3,10 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Radians;
 
 import coppercore.vision.VisionLocalizer;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+
+import coppercore.vision.VisionLocalizer;
+import coppercore.wpilib_interface.tuning.TuneS;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -13,6 +17,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.StrategyManager.AutonomyMode;
 import frc.robot.commands.drive.AkitDriveCommands;
@@ -71,17 +77,17 @@ public class RobotContainer {
     height = Math.min(height, 1.87);
     double stage_one_height = Math.max(height - 0.55, 0.0);
     double stage_two_height = Math.max(stage_one_height - 0.66, 0.0);
+    // Logger.recordOutput(
+    // "testingPose", new Pose3d(new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0.0, 0.0, 0.0)));
     Logger.recordOutput(
-        "testingPose", new Pose3d(new Translation3d(0.0, 0.0, 0.0), new Rotation3d(0.0, 0.0, 0.0)));
-    Logger.recordOutput(
-        "componetPositions",
+        "componentPositions",
         new Pose3d[] {
           new Pose3d(new Translation3d(0.05, 0.01, 0.9), new Rotation3d(0.0, ramp_rotation, 0.0)),
           new Pose3d(
               new Translation3d(-0.16, 0.31, 0.115), new Rotation3d(climb_rotation, 0.0, 0.0)),
           new Pose3d(
               new Translation3d(0.34, 0.12, height + 0.35),
-              new Rotation3d(0.0, -claw_rotation, 0.0)),
+              new Rotation3d(0.0, -claw_rotation + 0.465719787 * 180.0, 0.0)),
           new Pose3d(new Translation3d(0.0, 0.0, height), new Rotation3d(0.0, 0.0, 0.0)),
           new Pose3d(new Translation3d(0.0, 0.0, stage_two_height), new Rotation3d(0.0, 0.0, 0.0)),
           new Pose3d(new Translation3d(0.0, 0.0, stage_one_height), new Rotation3d(0.0, 0.0, 0.0))
@@ -127,10 +133,6 @@ public class RobotContainer {
   public void configureSubsystems() {
     if (FeatureFlags.synced.getObject().runDrive) {
       drive = InitSubsystems.initDriveSubsystem();
-      // if (ModeConstants.simMode == frc.robot.constants.ModeConstants.Mode.MAPLESIM) {
-      //   drive.setPose(
-      //       new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
-      // }
       if (FeatureFlags.synced.getObject().runVision) {
         vision = InitSubsystems.initVisionSubsystem(drive);
 
@@ -164,13 +166,16 @@ public class RobotContainer {
   private void configureBindings() {
     // initialize helper commands
     if (FeatureFlags.synced.getObject().runDrive) {
-      InitBindings.initDriveBindings(drive);
+      InitBindings.initDriveBindings(drive, strategyManager);
     }
     if (FeatureFlags.synced.getObject().runRamp) {
       InitBindings.initRampBindings(rampSubsystem);
     }
     if (FeatureFlags.synced.getObject().runClimb) {
       InitBindings.initClimbBindings(climbSubsystem);
+    }
+    if (FeatureFlags.synced.getObject().runScoring) {
+      InitBindings.initScoringBindings(scoringSubsystem);
     }
   }
 
@@ -201,6 +206,16 @@ public class RobotContainer {
     InitBindings.initTestModeBindings();
 
     switch (TestModeManager.getTestMode()) {
+      case ElevatorCharacterization:
+        CommandScheduler.getInstance()
+            .schedule(
+                new SequentialCommandGroup(
+                    new WaitCommand(2.0),
+                    new TuneS(
+                        scoringSubsystem.getElevatorMechanismForTuning(),
+                        RotationsPerSecond.of(0.001),
+                        0.1)));
+        break;
       case DriveFeedForwardCharacterization:
         CommandScheduler.getInstance()
             .schedule(AkitDriveCommands.feedforwardCharacterization(drive));
@@ -242,6 +257,14 @@ public class RobotContainer {
   public void testPeriodic() {
     if (FeatureFlags.synced.getObject().runScoring) {
       scoringSubsystem.testPeriodic();
+    }
+
+    if (FeatureFlags.synced.getObject().runRamp) {
+      rampSubsystem.testPeriodic();
+    }
+
+    if (FeatureFlags.synced.getObject().runDrive) {
+      drive.periodic();
     }
   }
 

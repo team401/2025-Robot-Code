@@ -8,6 +8,8 @@ import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
 import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
 
@@ -28,6 +30,8 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Per;
+import edu.wpi.first.units.measure.Time;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Filesystem;
 
 public final class ElevatorConstants {
@@ -39,11 +43,9 @@ public final class ElevatorConstants {
           EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
-  // TODO: Rename these
-  // see ElevatorIOTalonFX
-  public final Integer leadElevatorMotorId = 9; // TODO: Actual CAN IDs
-  public final Integer followerElevatorMotorId = 10;
-  public final Boolean invertFollowerElevatorMotor = false;
+  public final Integer leadElevatorMotorId = 12;
+  public final Integer followerElevatorMotorId = 11;
+  public final Boolean invertFollowerElevatorMotor = true;
 
   public final Integer smallCANCoderTeeth = 17;
   public final Integer largeCANCoderTeeth = 19;
@@ -71,23 +73,15 @@ public final class ElevatorConstants {
   public final Double elevatorCANCoderDiscontinuityPoint = 1.0;
 
   // TODO: Tune encoder directions!
-  public final Integer elevatorLargeCANCoderID = 11;
-  public final Boolean isLargeCANcoderClockwisePositive = true;
+  public final Integer elevatorLargeCANCoderID = 14;
 
-  @JSONExclude
   public final SensorDirectionValue elevatorLargeCANCoderDirection =
-      isLargeCANcoderClockwisePositive
-          ? SensorDirectionValue.CounterClockwise_Positive
-          : SensorDirectionValue.Clockwise_Positive;
+      SensorDirectionValue.CounterClockwise_Positive;
 
-  public final Integer elevatorSmallCANCoderID = 12;
-  public final Boolean isSmallCANcoderClockwisePositive = true;
+  public final Integer elevatorSmallCANCoderID = 15;
 
-  @JSONExclude
   public final SensorDirectionValue elevatorSmallCANCoderDirection =
-      isSmallCANcoderClockwisePositive
-          ? SensorDirectionValue.CounterClockwise_Positive
-          : SensorDirectionValue.Clockwise_Positive;
+      SensorDirectionValue.Clockwise_Positive;
 
   /*
    * The large CANCoder is represented as the mechanism in our Phoenix configs.
@@ -100,14 +94,14 @@ public final class ElevatorConstants {
       elevatorReduction * (double) largeCANCoderTeeth / (double) spoolTeeth;
 
   // TODO: Tune elevator
-  public final Double elevatorkP = 20.0;
-  public final Double elevatorkI = 1.0;
+  public final Double elevatorkP = 60.0;
+  public final Double elevatorkI = 0.0;
   public final Double elevatorkD = 0.0;
 
   public final Double elevatorkS = 0.0;
-  public final Double elevatorkV = 0.0;
+  public final Double elevatorkV = 0.1;
   public final Double elevatorkA = 0.0;
-  public final Double elevatorkG = 8.7;
+  public final Double elevatorkG = 11.0;
 
   // TODO: Actual ratios
   @JSONExclude
@@ -146,13 +140,8 @@ public final class ElevatorConstants {
   public final Per<VoltageUnit, AngularAccelerationUnit> elevatorExpo_kA =
       VoltsPerRadianPerSecondSquared.ofNative(elevatorExpo_kA_raw);
 
-  // TODO: Find actual values for these!
-  /* Minimum elevator height in meters, stored as a double so it can be synced by JSONSync */
-  public final Double minElevatorHeightMeters = 0.0;
-  @JSONExclude public final Distance minElevatorHeight = Meters.of(minElevatorHeightMeters);
-  /* Maximum elevator height in meters, stored as a double so it can be synced by JSONSync */
-  public final Double maxElevatorHeightMeters = 3.0;
-  @JSONExclude public final Distance maxElevatorHeight = Meters.of(maxElevatorHeightMeters);
+  public final Distance minElevatorHeight = Meters.of(0.0);
+  public final Distance maxElevatorHeight = Meters.of(1.9);
 
   // TODO: Tune this value
   public final Current elevatorStatorCurrentLimit = Amps.of(80.0);
@@ -165,6 +154,28 @@ public final class ElevatorConstants {
    * the setpoint"
    */
   public final Distance elevatorTargetThresholdMeters = Meters.of(0.03);
+
+  public final Integer medianFilterWindowSize = 10; // We might want to go smaller with this value
+
+  public final Boolean ignoreCRT = true;
+
+  public final Voltage homingVoltage = Volts.of(-3);
+
+  /**
+   * What reported velocity should be considered "moving" while homing, stored as a Double because
+   * we can't serialize a MetersPerSecond
+   */
+  public final Double homingVelocityThresholdMetersPerSecond = 0.001;
+
+  /** The maximum amount of time the elevator can home for before saying it's at 0 and giving up */
+  public final Time homingMaxTime = Seconds.of(3.0);
+
+  /**
+   * The maximum amount of time the elevator can home without ever moving before it knows its at 0
+   */
+  public final Time homingMaxUnmovingTime = Seconds.of(1.0);
+
+  public final Integer homingVelocityFilterWindowSize = 5;
 
   /**
    * This is the maximum height the elevator can reach while the wrist is "in" without smashing it

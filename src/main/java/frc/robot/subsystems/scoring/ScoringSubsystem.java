@@ -1,27 +1,38 @@
 package frc.robot.subsystems.scoring;
 
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 
 import coppercore.controls.state_machine.StateMachine;
 import coppercore.controls.state_machine.StateMachineConfiguration;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.state.StateContainer;
+import coppercore.wpilib_interface.MonitorWithAlert;
+import coppercore.wpilib_interface.MonitoredSubsystem;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.TestModeManager;
+import frc.robot.TestModeManager.TestMode;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
+import frc.robot.subsystems.scoring.ElevatorIO.ElevatorOutputMode;
 import frc.robot.subsystems.scoring.states.IdleState;
+import frc.robot.subsystems.scoring.states.InitState;
 import frc.robot.subsystems.scoring.states.IntakeState;
 import frc.robot.subsystems.scoring.states.ScoreState;
+import frc.robot.subsystems.scoring.states.TuningState;
 import frc.robot.subsystems.scoring.states.WarmupState;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -88,7 +99,7 @@ import org.littletonrobotics.junction.Logger;
  * reset the clamps in an 'else,' allowing a full range of motion when no protection conditions are
  * met.
  */
-public class ScoringSubsystem extends SubsystemBase {
+public class ScoringSubsystem extends MonitoredSubsystem {
   private ElevatorMechanism elevatorMechanism;
   private WristMechanism wristMechanism;
   private ClawMechanism clawMechanism;
@@ -102,13 +113,7 @@ public class ScoringSubsystem extends SubsystemBase {
    */
   private boolean autoTransition = true;
 
-  /**
-   * This boolean exists to temporarily stop the state machine from running
-   *
-   * <p>It is intended to be used for test modes, e.g. ClawOvershootTuning needs to be able to
-   * manually eject an object without forcing the state machine to agree.
-   */
-  private boolean overrideStateMachine = false;
+  private boolean shouldWarmupAfterInit = false;
 
   private BooleanSupplier isDriveLinedUpSupplier;
 
@@ -138,10 +143,12 @@ public class ScoringSubsystem extends SubsystemBase {
   private GamePiece currentPiece = GamePiece.Coral;
 
   private enum ScoringState implements StateContainer {
+    Init(new InitState(instance)),
     Idle(new IdleState(instance)),
     Intake(new IntakeState(instance)),
     Warmup(new WarmupState(instance)),
-    Score(new ScoreState(instance));
+    Score(new ScoreState(instance)),
+    Tuning(new TuningState());
 
     private final PeriodicStateInterface state;
 
@@ -156,19 +163,32 @@ public class ScoringSubsystem extends SubsystemBase {
   }
 
   public enum ScoringTrigger {
+    Seeded,
     BeginIntake,
     DoneIntaking,
     CancelAction,
     ToggleWarmup, // warmup button toggles warmup <-> idle
     StartWarmup, // drive automatically enters warmup when lineup begins
     WarmupReady,
+    CancelWarmup, // Warmup button was released, go back to idle
     ScoredPiece,
     ReturnToIdle, // Return to idle when a warmup/score state no longer detects a gamepiece
+    EnterTestMode,
+    LeaveTestMode,
   }
 
   private StateMachineConfiguration<ScoringState, ScoringTrigger> stateMachineConfiguration;
 
   private StateMachine<ScoringState, ScoringTrigger> stateMachine;
+
+  private final BooleanSupplier isScoringTuningSupplier =
+      () ->
+          DriverStation.isTest()
+              && (TestModeManager.getTestMode() == TestMode.ElevatorTuning
+                  || TestModeManager.getTestMode() == TestMode.ElevatorCharacterization
+                  || TestModeManager.getTestMode() == TestMode.WristClosedLoopTuning
+                  || TestModeManager.getTestMode() == TestMode.WristVoltageTuning
+                  || TestModeManager.getTestMode() == TestMode.SetpointTuning);
 
   public ScoringSubsystem(
       ElevatorMechanism elevatorMechanism,
@@ -183,13 +203,30 @@ public class ScoringSubsystem extends SubsystemBase {
     stateMachineConfiguration = new StateMachineConfiguration<>();
 
     stateMachineConfiguration
+        .configure(ScoringState.Init)
+        .permitIf(ScoringTrigger.Seeded, ScoringState.Tuning, isScoringTuningSupplier)
+        .permitIf(
+            ScoringTrigger.Seeded,
+            ScoringState.Warmup,
+            () -> !isScoringTuningSupplier.getAsBoolean() && shouldWarmupAfterInit)
+        .permitIf(
+            ScoringTrigger.Seeded,
+            ScoringState.Idle,
+            () -> !isScoringTuningSupplier.getAsBoolean() && !shouldWarmupAfterInit);
+
+    stateMachineConfiguration
         .configure(ScoringState.Idle)
         .permitIf(
             ScoringTrigger.BeginIntake,
             ScoringState.Intake,
             () -> !(isCoralDetected() || isAlgaeDetected()))
         .permit(ScoringTrigger.ToggleWarmup, ScoringState.Warmup)
-        .permitIf(ScoringTrigger.StartWarmup, ScoringState.Warmup, () -> autoTransition);
+        .permit(ScoringTrigger.StartWarmup, ScoringState.Warmup)
+        .permitIf(ScoringTrigger.EnterTestMode, ScoringState.Tuning, isScoringTuningSupplier);
+
+    stateMachineConfiguration
+        .configure(ScoringState.Tuning)
+        .permit(ScoringTrigger.LeaveTestMode, ScoringState.Idle);
 
     stateMachineConfiguration
         .configure(ScoringState.Intake)
@@ -206,7 +243,8 @@ public class ScoringSubsystem extends SubsystemBase {
             ScoringTrigger.WarmupReady,
             ScoringState.Score,
             () -> autoTransition && isDriveLinedUpSupplier.getAsBoolean())
-        .permit(ScoringTrigger.ReturnToIdle, ScoringState.Idle);
+        .permit(ScoringTrigger.ReturnToIdle, ScoringState.Idle)
+        .permit(ScoringTrigger.CancelWarmup, ScoringState.Idle);
 
     stateMachineConfiguration
         .configure(ScoringState.Score)
@@ -217,7 +255,44 @@ public class ScoringSubsystem extends SubsystemBase {
             ScoringState.Intake,
             () -> !(clawMechanism.isCoralDetected() || clawMechanism.isAlgaeDetected()));
 
-    stateMachine = new StateMachine<>(stateMachineConfiguration, ScoringState.Idle);
+    stateMachine = new StateMachine<>(stateMachineConfiguration, ScoringState.Init);
+
+    // Manually call the onEntry for init, since we didn't transition into it
+    stateMachine.getCurrentState().state.onEntry(null);
+
+    if (wristMechanism != null) {
+      // Use two monitors: one to alert us if it's temporarily disconnected, one to disable motors
+      // if it's disconnected for a long time
+      addMonitor(
+          new MonitorWithAlert.MonitorWithAlertBuilder()
+              .withName("wristEncoderDisconnected")
+              .withStickyness(false)
+              .withIsStateValidSupplier(() -> wristMechanism.isWristEncoderConnected())
+              .withTimeToFault(0.2)
+              .withFaultCallback(() -> {})
+              .withLoggingEnabled(true)
+              .withAlertText("Wrist encoder not connected!")
+              .withAlertType(AlertType.kWarning)
+              .build());
+
+      // TODO: after https://github.com/team401/coppercore/issues/129, re-enable motors if the
+      // encoder comes back.
+      addMonitor(
+          new MonitorWithAlert.MonitorWithAlertBuilder()
+              .withName("wristEncoderDisconnectedExtended")
+              .withStickyness(true)
+              .withIsStateValidSupplier(
+                  () -> (!DriverStation.isEnabled() || wristMechanism.isWristEncoderConnected()))
+              .withTimeToFault(2.0)
+              .withFaultCallback(
+                  () -> {
+                    wristMechanism.setMotorsDisabled(true);
+                  })
+              .withLoggingEnabled(true)
+              .withAlertText("Wrist encoder disconnected, motor disabled.")
+              .withAlertType(AlertType.kError)
+              .build());
+    }
   }
 
   /**
@@ -242,6 +317,48 @@ public class ScoringSubsystem extends SubsystemBase {
    */
   public void fireTrigger(ScoringTrigger trigger) {
     stateMachine.fire(trigger);
+
+    if (trigger == ScoringTrigger.StartWarmup
+        && stateMachine.getCurrentState() == ScoringState.Init) {
+      shouldWarmupAfterInit = true;
+    }
+  }
+
+  public void updateScoringLevelFromNetworkTables(String level) {
+    if (level.equalsIgnoreCase("-1")) {
+      return;
+    }
+
+    if (level.equalsIgnoreCase("level1")) {
+      this.setTarget(FieldTarget.L1);
+    }
+    if (level.equalsIgnoreCase("level2")) {
+      this.setTarget(FieldTarget.L2);
+    }
+    if (level.equalsIgnoreCase("level3")) {
+      this.setTarget(FieldTarget.L3);
+    }
+    if (level.equalsIgnoreCase("level4")) {
+      this.setTarget(FieldTarget.L4);
+    }
+  }
+
+  /**
+   * Set whether or not the elevator should override and manually apply a voltage/current, or if it
+   * should used closed-loop
+   *
+   * @param outputMode ClosedLoop, Voltage, or Current
+   */
+  public void setElevatorOverrideMode(ElevatorOutputMode outputMode) {
+    elevatorMechanism.setOutputMode(outputMode);
+  }
+
+  public void setElevatorOverrideCurrent(Current current) {
+    elevatorMechanism.setOverrideCurrent(current);
+  }
+
+  public void setElevatorOverrideVoltage(Voltage volts) {
+    elevatorMechanism.setOverrideVoltage(volts);
   }
 
   /**
@@ -282,13 +399,28 @@ public class ScoringSubsystem extends SubsystemBase {
    *
    * <p>This height is determined by the {@link ElevatorMechanism}.
    *
-   * @return
+   * @return Current elevator height
    */
   public Distance getElevatorHeight() {
     if (JsonConstants.scoringFeatureFlags.runElevator) {
       return elevatorMechanism.getElevatorHeight();
     } else {
       return Meters.zero();
+    }
+  }
+
+  /**
+   * Get the current velocity of the elevator.
+   *
+   * <p>This velocity is determined by the {@link ElevatorMechanism}.
+   *
+   * @return Current elevator velocity
+   */
+  public LinearVelocity getElevatorVelocity() {
+    if (JsonConstants.scoringFeatureFlags.runElevator) {
+      return elevatorMechanism.getElevatorVelocity();
+    } else {
+      return MetersPerSecond.of(0.0);
     }
   }
 
@@ -384,6 +516,7 @@ public class ScoringSubsystem extends SubsystemBase {
    */
   public void setGamePiece(GamePiece piece) {
     currentPiece = piece;
+    Logger.recordOutput("scoring/gamepiece", piece);
   }
 
   /**
@@ -393,18 +526,6 @@ public class ScoringSubsystem extends SubsystemBase {
    */
   public GamePiece getGamePiece() {
     return currentPiece;
-  }
-
-  /**
-   * Set whether or not to temporarily override/disable the state machine. This should only be used
-   * by test modes!
-   *
-   * @param doOverrideStateMachine True if the state machine is disabled, and false if the state
-   *     machine should run. This value is false on initialization and will only change when this
-   *     method is called.
-   */
-  public void setOverrideStateMachine(boolean doOverrideStateMachine) {
-    overrideStateMachine = doOverrideStateMachine;
   }
 
   /**
@@ -439,10 +560,12 @@ public class ScoringSubsystem extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
-    if (!overrideStateMachine) {
-      stateMachine.periodic();
+  public void monitoredPeriodic() {
+    if (stateMachine.getCurrentState() == ScoringState.Tuning
+        && !isScoringTuningSupplier.getAsBoolean()) {
+      fireTrigger(ScoringTrigger.LeaveTestMode);
     }
+    stateMachine.periodic();
 
     if (JsonConstants.scoringFeatureFlags.runElevator) {
       elevatorMechanism.periodic();
@@ -462,16 +585,19 @@ public class ScoringSubsystem extends SubsystemBase {
     }
 
     Logger.recordOutput("scoring/state", stateMachine.getCurrentState());
+    Logger.recordOutput("scoring/isDriveLinedUp", isDriveLinedUpSupplier.getAsBoolean());
   }
 
   /** This method must be called by RobotContainer, as it does not run automatically! */
   public void testPeriodic() {
     switch (TestModeManager.getTestMode()) {
+      case SetpointTuning:
       case ElevatorTuning:
       case WristClosedLoopTuning:
       case WristVoltageTuning:
-      case SetpointTuning:
-        setOverrideStateMachine(true);
+        if (stateMachine.getCurrentState() != ScoringState.Tuning) {
+          fireTrigger(ScoringTrigger.EnterTestMode);
+        }
         break;
       default:
         break;
@@ -487,6 +613,32 @@ public class ScoringSubsystem extends SubsystemBase {
 
     if (JsonConstants.scoringFeatureFlags.runClaw) {
       clawMechanism.testPeriodic();
+    }
+  }
+
+  /**
+   * Get the Scoring subsystem's ElevatorMechanism instance.
+   *
+   * <p>This should ONLY be used to create Tunable commands from the elevator.
+   *
+   * @return the ElevatorMechanism that scoring uses
+   */
+  public ElevatorMechanism getElevatorMechanismForTuning() {
+    return elevatorMechanism;
+  }
+
+  /**
+   * Has the elevator position been seeded yet?
+   *
+   * @return True if it has been seeded, false if it hasn't been seeded.
+   */
+  public boolean hasBeenSeeded() {
+    return elevatorMechanism.hasBeenSeeded();
+  }
+
+  public void seedElevatorToZero() {
+    if (elevatorMechanism != null) {
+      elevatorMechanism.seedToZero();
     }
   }
 
@@ -521,7 +673,7 @@ public class ScoringSubsystem extends SubsystemBase {
     if (wristAngle.lt(JsonConstants.wristConstants.minElevatorDownSafeAngle)) {
       elevatorMinHeight.mut_replace(
           (Distance)
-              Measure.max(elevatorMaxHeight, JsonConstants.elevatorConstants.minWristDownHeight));
+              Measure.max(elevatorMinHeight, JsonConstants.elevatorConstants.minWristDownHeight));
     }
 
     // If the wrist is in an unsafe position for the elevator to move past the crossbar, clamp the
@@ -562,6 +714,16 @@ public class ScoringSubsystem extends SubsystemBase {
 
     elevatorMechanism.setAllowedRangeOfMotion(elevatorMinHeight, elevatorMaxHeight);
     wristMechanism.setAllowedRangeOfMotion(wristMinAngle, wristMaxAngle);
+  }
+
+  /**
+   * Set the supplier used to get the value of the joystick used to move the elevator setpoint in
+   * setpoint tuning mode
+   */
+  public void setTuningHeightSetpointAdjustmentSupplier(DoubleSupplier newSupplier) {
+    if (elevatorMechanism != null) {
+      elevatorMechanism.setTuningHeightSetpointAdjustmentSupplier(newSupplier);
+    }
   }
 
   /**
