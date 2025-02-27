@@ -71,15 +71,7 @@
     "unit": "Meter"
   },
   "minReefSafeHeight": {
-    "value": 0.2,
-    "unit": "Meter"
-  },
-  "L2MinHeightAbove": {
-    "value": 0.32,
-    "unit": "Meter"
-  },
-  "L3MinHeightAbove": {
-    "value": 0.65,
+    "value": 0.6,
     "unit": "Meter"
   },
   "L4MinHeightAbove": {
@@ -88,14 +80,6 @@
   },
   "L2MaxHeightBelow": {
     "value": 0.16,
-    "unit": "Meter"
-  },
-  "L3MaxHeightBelow": {
-    "value": 0.35,
-    "unit": "Meter"
-  },
-  "L4MaxHeightBelow": {
-    "value": 1.7,
     "unit": "Meter"
   },
   "elevatorSetpointEpsilon": {

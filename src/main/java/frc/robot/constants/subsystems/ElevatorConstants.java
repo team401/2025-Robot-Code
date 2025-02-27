@@ -184,15 +184,11 @@ public final class ElevatorConstants {
   public final Distance minWristDownHeight = Meters.of(0.2); // TODO: Real value
 
   /** Minimum height the elevator can be at with the wrist out without hitting the reef base */
-  public final Distance minReefSafeHeight = Meters.of(0.2);
+  public final Distance minReefSafeHeight = Meters.of(0.6);
 
-  public final Distance L2MinHeightAbove = Meters.of(0.32);
-  public final Distance L3MinHeightAbove = Meters.of(0.65);
   public final Distance L4MinHeightAbove = Meters.of(1.44);
 
   public final Distance L2MaxHeightBelow = Meters.of(0.16);
-  public final Distance L3MaxHeightBelow = Meters.of(0.35);
-  public final Distance L4MaxHeightBelow = Meters.of(0.7);
 
   /** When within this distance, the elevator is considered "at its setpoint" */
   public final Distance elevatorSetpointEpsilon = Meters.of(0.05);

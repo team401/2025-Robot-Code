@@ -49,11 +49,11 @@
     "unit": "Radian"
   },
   "minElevatorDownSafeAngle": {
-    "value": 0.0,
+    "value": -0.503,
     "unit": "Rotation"
   },
   "minReefSafeAngle": {
-    "value": 0.32,
+    "value": 0.3,
     "unit": "Rotation"
   },
   "closeToReefThreshold": {
