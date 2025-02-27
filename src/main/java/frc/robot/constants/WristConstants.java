@@ -91,7 +91,7 @@ public class WristConstants {
   /**
    * When less than this distance from the center of the reef, the claw can collide with it the reef
    */
-  public final Distance closeToReefThreshold = Meters.of(2.0); // TODO: Tune at shop 2/22
+  public final Distance closeToReefThreshold = Meters.of(2.5);
 
   /** The wrist can be this far away from the goal and considered "at the setpoint" */
   public final Angle wristSetpointEpsilon = Degrees.of(5.0);
