@@ -86,7 +86,7 @@ public class WristConstants {
   public final Angle minElevatorDownSafeAngle = Radians.of(-0.503); // TODO: Confirm
 
   /** The minimum angle the wrist can be at without hitting the reef when very close to the reef */
-  public final Angle minReefSafeAngle = Rotations.of(0.32);
+  public final Angle minReefSafeAngle = Rotations.of(0.3);
 
   /**
    * When less than this distance from the center of the reef, the claw can collide with it the reef

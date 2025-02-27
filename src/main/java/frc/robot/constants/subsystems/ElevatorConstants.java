@@ -165,7 +165,7 @@ public final class ElevatorConstants {
    * What reported velocity should be considered "moving" while homing, stored as a Double because
    * we can't serialize a MetersPerSecond
    */
-  public final Double homingVelocityThresholdMetersPerSecond = 0.001;
+  public final Double homingVelocityThresholdMetersPerSecond = 0.1;
 
   /** The maximum amount of time the elevator can home for before saying it's at 0 and giving up */
   public final Time homingMaxTime = Seconds.of(3.0);
