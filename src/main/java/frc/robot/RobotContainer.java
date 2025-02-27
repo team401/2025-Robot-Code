@@ -1,8 +1,6 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Radians;
-
-import coppercore.vision.VisionLocalizer;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import coppercore.vision.VisionLocalizer;
@@ -283,7 +281,6 @@ public class RobotContainer {
 
     ScoringSubsystemMapleSim.configDrive(drive);
     ScoringSubsystemMapleSim.configScoring(scoringSubsystem);
-    InitBindings.initScoringBindingsMaple();
   }
 
   public void updateMapleSim() {

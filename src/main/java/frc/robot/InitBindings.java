@@ -21,10 +21,10 @@ import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
-import frc.robot.subsystems.scoring.ScoringSubsystemMapleSim;
 import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
+import frc.robot.subsystems.scoring.ScoringSubsystemMapleSim;
 
 public final class InitBindings {
   // Controller
@@ -164,9 +164,6 @@ public final class InitBindings {
     driverController.b().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)));
   }
 
-  public static void initScoringBindingsMaple() {
-    driverController.x().onTrue(new InstantCommand(() -> ScoringSubsystemMapleSim.shootAlgae()));
-    driverController.y().onTrue(new InstantCommand(() -> ScoringSubsystemMapleSim.shootCoral()));
   public static void initScoringBindings(ScoringSubsystem scoring) {
     driverController
         .y()
@@ -176,6 +173,7 @@ public final class InitBindings {
                   scoring.setTarget(FieldTarget.L4);
                   scoring.setGamePiece(GamePiece.Coral);
                   scoring.fireTrigger(ScoringTrigger.StartWarmup);
+                  ScoringSubsystemMapleSim.shootCoral();
                 }));
     driverController
         .rightBumper()
@@ -183,6 +181,7 @@ public final class InitBindings {
             new InstantCommand(
                 () -> {
                   scoring.setClawRollerVoltage(JsonConstants.clawConstants.coralScoreVoltage);
+                  ScoringSubsystemMapleSim.shootAlgae();
                 }))
         .onFalse(
             new InstantCommand(
