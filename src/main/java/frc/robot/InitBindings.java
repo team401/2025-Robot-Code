@@ -21,13 +21,10 @@ import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
-<<<<<<< HEAD
 import frc.robot.subsystems.scoring.ScoringSubsystemMapleSim;
-=======
 import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
->>>>>>> main
 
 public final class InitBindings {
   // Controller
