@@ -66,20 +66,24 @@
     "unit": "Second"
   },
   "homingVelocityFilterWindowSize": 5,
-  "maxWristInBelowCrossBarHeight": {
-    "value": 1.0,
-    "unit": "Meter"
-  },
-  "minWristInAboveCrossBarHeight": {
-    "value": 1.1,
-    "unit": "Meter"
-  },
   "minWristDownHeight": {
     "value": 0.2,
     "unit": "Meter"
   },
+  "minReefSafeHeight": {
+    "value": 0.6,
+    "unit": "Meter"
+  },
+  "L4MinHeightAbove": {
+    "value": 1.74,
+    "unit": "Meter"
+  },
+  "L2MaxHeightBelow": {
+    "value": 0.16,
+    "unit": "Meter"
+  },
   "elevatorSetpointEpsilon": {
-    "value": 0.01,
+    "value": 0.05,
     "unit": "Meter"
   },
   "maxElevatorSetpointVelocityMetersPerSecond": 0.01
