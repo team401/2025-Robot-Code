@@ -21,8 +21,8 @@
   "wristKS": 0.2,
   "wristKV": 1.0,
   "wristKA": 0.0,
-  "wristKP": 20,
-  "wristKI": 0.0,
+  "wristKP": 25.0,
+  "wristKI": 1.0,
   "wristKD": 0.5,
   "wristMotionMagicCruiseVelocityRotationsPerSecond": 3.0,
   "wristMotionMagicExpo_kA": 0.4,
@@ -44,13 +44,17 @@
     "value": 2.0,
     "unit": "Radian"
   },
-  "maxCrossBarSafeAngle": {
-    "value": 2.0,
+  "minElevatorDownSafeAngle": {
+    "value": -0.503,
     "unit": "Radian"
   },
-  "minElevatorDownSafeAngle": {
-    "value": 0.0,
+  "minReefSafeAngle": {
+    "value": 0.3,
     "unit": "Rotation"
+  },
+  "closeToReefThreshold": {
+    "value": 2.5,
+    "unit": "Meter"
   },
   "wristSetpointEpsilon": {
     "value": 5.0,
