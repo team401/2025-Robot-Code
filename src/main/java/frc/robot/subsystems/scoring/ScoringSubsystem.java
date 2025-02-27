@@ -52,11 +52,11 @@ import org.littletonrobotics.junction.Logger;
  * distance of the reef.
  *
  * <ul>
- *   <li>If the elevator goal is above a certain reef level and we are below that reef level, clamp
- *       wrist to Idle position so it doesn't hit reef on the way up.
- *   <li>If the wrist is out beyond a certain angle, clamp elevator between the two reef levels
- *       around it until wrist comes in to Idle, so that it doesn't hit the reef on its way up or
- *       down.
+ *   <li>If the elevator goal is above L4 and the elevator is below L4, clamp wrist to Idle position
+ *       so it doesn't hit reef on the way up. (This may be unnecessary with new claw geometry)
+ *   <li>If the wrist is out beyond a certain angle, clamp elevator above L4 if it's above L4 or
+ *       below L4 if it's below L4 until wrist comes in to Idle, so that it doesn't hit the reef on
+ *       its way up or down.
  *   <li>If the elevator is below a certain height, clamp the wrist to be up so that it doesn't hit
  *       the base of the reef
  *   <li>If the wrist is at an angle where it would hit the reef base, clamp the elevator above a
