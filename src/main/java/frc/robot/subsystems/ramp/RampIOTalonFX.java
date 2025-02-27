@@ -1,10 +1,10 @@
 package frc.robot.subsystems.ramp;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.math.controller.PIDController;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
-
-import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.math.controller.PIDController;
 import frc.robot.constants.JsonConstants;
 
 // TODO make pid constants
@@ -20,7 +20,7 @@ public class RampIOTalonFX implements RampIO {
   public double angle_offset = 0.0;
 
   public RampIOTalonFX() {
-    talon = new TalonFX(JsonConstants.rampConstants.motorId);
+    talon = new TalonFX(JsonConstants.rampConstants.motorId, "canivore");
   }
 
   @Override
@@ -30,22 +30,22 @@ public class RampIOTalonFX implements RampIO {
     controller.setD(kD);
   }
 
-
-
   @Override
-  public void addOffset(double offset){
+  public void addOffset(double offset) {
     angle_offset += offset;
   }
 
   @Override
   public void updateInputs(RampInputs inputs) {
-    inputs.position = Rotations.of(talon.getPosition().getValueAsDouble()).in(Radians) + angle_offset;
+    inputs.position =
+        Rotations.of(talon.getPosition().getValueAsDouble()).in(Radians) + angle_offset;
   }
 
   @Override
   public void updateOutputs(RampInputs inputs, RampOutputs outputs) {
+    outputs.velocity = talon.getVelocity().getValueAsDouble();
     double volts = inputs.controlValue;
-    if (inputs.positionControl){
+    if (inputs.positionControl) {
       controller.setSetpoint(inputs.controlValue);
       volts = controller.calculate(inputs.position);
     }

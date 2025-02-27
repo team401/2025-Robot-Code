@@ -19,6 +19,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.ramp.RampSubsystem;
+import frc.robot.subsystems.ramp.states.RampState.RampTriggers;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 
 public final class InitBindings {
@@ -136,14 +137,14 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.prepareForClimb();
+                  rampSubsystem.fireTrigger(RampTriggers.START_CLIMB);
                 }));
     driverController
         .y()
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.prepareForIntake();
+                  rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
                 }));
   }
 

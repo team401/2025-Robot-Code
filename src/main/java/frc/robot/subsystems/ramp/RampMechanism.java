@@ -1,18 +1,14 @@
 package frc.robot.subsystems.ramp;
 
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+
 import coppercore.parameter_tools.LoggedTunableNumber;
+import edu.wpi.first.units.measure.AngularVelocity;
 import frc.robot.Robot;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
-
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-
 import java.util.function.BooleanSupplier;
-
 import org.littletonrobotics.junction.Logger;
-
-import edu.wpi.first.units.measure.AngularVelocity;
-
 
 public class RampMechanism {
   RampIO io;
@@ -29,15 +25,15 @@ public class RampMechanism {
   LoggedTunableNumber tunableKP;
   LoggedTunableNumber tunableKI;
   LoggedTunableNumber tunableKD;
-  
-  public void setInPositionSupplier(BooleanSupplier inPositionSupplier){
+
+  public void setInPositionSupplier(BooleanSupplier inPositionSupplier) {
     inPositionBooleanSupplier = inPositionSupplier;
   }
-  
+
   public RampMechanism(RampIO io) {
-     this.io = io;
-     tunablePosition = new LoggedTunableNumber("RampTunables/goalPos", controlValue);
-     tunableVoltage = new LoggedTunableNumber("RampTunables/voltage", controlValue);
+    this.io = io;
+    tunablePosition = new LoggedTunableNumber("RampTunables/goalPos", controlValue);
+    tunableVoltage = new LoggedTunableNumber("RampTunables/voltage", controlValue);
     final double defaultKP =
         Robot.isReal()
             ? JsonConstants.rampConstants.PID_TalonFX_P
@@ -59,7 +55,7 @@ public class RampMechanism {
 
     inputs.positionControl = positionControl;
     inputs.controlValue = controlValue;
-    
+
     io.updateInputs(inputs);
     io.updateOutputs(inputs, outputs);
 
@@ -107,7 +103,7 @@ public class RampMechanism {
     }
   }
 
-  public void setHome(){
+  public void setHome() {
     io.addOffset(-inputs.position);
   }
 

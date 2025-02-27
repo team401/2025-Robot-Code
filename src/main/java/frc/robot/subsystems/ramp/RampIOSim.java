@@ -1,10 +1,9 @@
 package frc.robot.subsystems.ramp;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.constants.JsonConstants;
 
@@ -26,7 +25,6 @@ public class RampIOSim implements RampIO {
   private final boolean simulateGravity = true;
 
   public double angle_offset = 0.0;
-  public Double lastPosition;
 
   private final SingleJointedArmSim sim =
       new SingleJointedArmSim(
@@ -47,24 +45,21 @@ public class RampIOSim implements RampIO {
   }
 
   @Override
-  public void addOffset(double offset){
+  public void addOffset(double offset) {
     angle_offset += offset;
   }
 
   @Override
   public void updateInputs(RampInputs inputs) {
     sim.update(0.02);
-    inputs.position = sim.getAngleRads()+angle_offset;
+    inputs.position = sim.getAngleRads() + angle_offset;
   }
 
   @Override
   public void updateOutputs(RampInputs inputs, RampOutputs outputs) {
-    if (lastPosition == null){
-      lastPosition = inputs.position;
-    }
-    outputs.velocity = inputs.position - lastPosition;
+    outputs.velocity = sim.getVelocityRadPerSec();
     double volts = inputs.controlValue;
-    if (inputs.positionControl){
+    if (inputs.positionControl) {
       controller.setSetpoint(inputs.controlValue);
       volts = controller.calculate(inputs.position);
     }
