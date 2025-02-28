@@ -24,7 +24,6 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
-import frc.robot.subsystems.scoring.ScoringSubsystemMapleSim;
 
 public final class InitBindings {
   // Controller
@@ -173,15 +172,15 @@ public final class InitBindings {
                   scoring.setTarget(FieldTarget.L4);
                   scoring.setGamePiece(GamePiece.Coral);
                   scoring.fireTrigger(ScoringTrigger.StartWarmup);
-                  ScoringSubsystemMapleSim.shootCoral();
                 }));
     driverController
         .rightBumper()
         .onTrue(
             new InstantCommand(
                 () -> {
+                  scoring.setTarget(FieldTarget.Net);
+                  scoring.setGamePiece(GamePiece.Algae);
                   scoring.setClawRollerVoltage(JsonConstants.clawConstants.coralScoreVoltage);
-                  ScoringSubsystemMapleSim.shootAlgae();
                 }))
         .onFalse(
             new InstantCommand(

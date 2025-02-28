@@ -1,5 +1,6 @@
 package frc.robot.subsystems.scoring;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
@@ -49,21 +50,18 @@ public class ScoringSubsystemMapleSim {
         .addGamePieceProjectile(
             new ReefscapeCoralOnFly(
                     drive.getPose().getTranslation(),
-                    new Translation2d(0.5, 0),
+                    new Translation2d(0.45, 0),
                     drive.getChassisSpeeds(),
                     drive.getPose().getRotation(),
                     Meters.of(
                         scoring.getElevatorHeight().in(Meters)
                             + 0.5), // initial height of the ball, in meters
                     MetersPerSecond.of(5), // initial velocity, in m/s
-                    scoring.getWristAngle()) // shooter angle
+                    Degrees.of((scoring.getWristAngle().in(Degrees)) * -1)) // shooter angle
                 .withProjectileTrajectoryDisplayCallBack(
+                    (poses) -> {},
                     (poses) ->
-                        Logger.recordOutput(
-                            "successfulShotsTrajectory", poses.toArray(Pose3d[]::new)),
-                    (poses) ->
-                        Logger.recordOutput(
-                            "missedShotsTrajectory", poses.toArray(Pose3d[]::new))));
+                        Logger.recordOutput("coralShotsTrajectory", poses.toArray(Pose3d[]::new))));
   }
 
   public static void configDrive(Drive driveSet) {
