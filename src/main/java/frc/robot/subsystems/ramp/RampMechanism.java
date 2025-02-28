@@ -88,7 +88,7 @@ public class RampMechanism {
             (volt) -> {
               setVoltage(volt[0]);
             },
-            tunablePosition);
+            tunableVoltage);
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (pid) -> {
