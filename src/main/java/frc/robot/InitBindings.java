@@ -165,6 +165,9 @@ public final class InitBindings {
   }
 
   public static void initScoringBindings(ScoringSubsystem scoring) {
+    driverController.x().onTrue(new InstantCommand(() -> {
+      scoring.fireTrigger(ScoringTrigger.BeginIntake);
+    }));
     driverController
         .y()
         .onTrue(
