@@ -234,7 +234,7 @@ public class StrategyManager {
     }
 
     // updates snakescreen with current locations to watch auto run
-    if(DriverStation.isAutonomousEnabled()) {
+    if (DriverStation.isAutonomousEnabled()) {
       this.publishDefaultSubsystemValues();
     }
 
