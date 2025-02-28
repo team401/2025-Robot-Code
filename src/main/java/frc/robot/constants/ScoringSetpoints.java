@@ -16,8 +16,6 @@ public class ScoringSetpoints {
   /** Keeps track of a setpoint for the scoring subsystem. */
   public static record ScoringSetpoint(String name, Distance elevatorHeight, Angle wristAngle) {}
 
-  // TODO: Add wrist angle to ScoringSetpoint
-
   @JSONExclude
   public static final JSONSync<ScoringSetpoints> synced =
       new JSONSync<ScoringSetpoints>(
@@ -40,12 +38,12 @@ public class ScoringSetpoints {
           Meters.of(0.2),
           Rotations.of(-0.75)); // Hold algae with the wrist out and the arm up
 
-  // TODO: Get actual values for all values from here down
   public final ScoringSetpoint L1 = new ScoringSetpoint("L1", Meters.of(1.0), Rotations.of(0.3214));
   public final ScoringSetpoint L2 = new ScoringSetpoint("L2", Meters.of(1.5), Rotations.of(0.3214));
   public final ScoringSetpoint L3 = new ScoringSetpoint("L3", Meters.of(2.0), Rotations.of(0.3214));
   public final ScoringSetpoint L4 = new ScoringSetpoint("L4", Meters.of(2.5), Rotations.of(0.3214));
 
+  // TODO: Algae setpoints
   public final ScoringSetpoint L2algae =
       new ScoringSetpoint("L2algae", Meters.of(1.8), Rotations.of(-0.75));
   public final ScoringSetpoint L3algae =
