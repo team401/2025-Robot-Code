@@ -130,8 +130,12 @@ public class StrategyManager {
           new Action(
               ActionType.Score, GamePiece.Coral, strategy.scoringLocations.get(i), scoringLevel));
 
-      // intake after each score
-      this.addAction(new Action(ActionType.Intake, GamePiece.Coral, strategy.intakeLocation, null));
+      if (!(i == strategy.scoringLocations.size() - 1 && !strategy.intakeAfterLastScore)) {
+        // intake after each score, only if it is not the last scoring location and the auto isn't
+        // configured to not intake after last score
+        this.addAction(
+            new Action(ActionType.Intake, GamePiece.Coral, strategy.intakeLocation, null));
+      }
     }
   }
 
@@ -203,6 +207,7 @@ public class StrategyManager {
       if (currentCommand != null) {
         CommandScheduler.getInstance().schedule(currentCommand);
       }
+      System.out.println("Scheduled new command");
     }
 
     this.logActions();
