@@ -85,6 +85,7 @@ public class IntakeState implements PeriodicStateInterface {
     switch (scoringSubsystem.getGamePiece()) {
       case Coral:
         if (scoringSubsystem.isCoralDetected()) {
+          scoringSubsystem.setClawRollerVoltage(Volts.zero());
           Angle currentPos = scoringSubsystem.getClawRollerPosition();
           if (isCounting) {
             // If we're already counting, check if we've rotated far enough
