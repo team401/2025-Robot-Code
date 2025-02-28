@@ -4,6 +4,7 @@ import coppercore.controls.state_machine.StateMachine;
 import coppercore.controls.state_machine.StateMachineConfiguration;
 import coppercore.controls.state_machine.state.StateContainer;
 import coppercore.controls.state_machine.state.StateInterface;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.ramp.RampSubsystem.RampStates;
@@ -53,7 +54,9 @@ public class RampSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    stateMachine.periodic();
+    if (!DriverStation.isTestEnabled()) {
+      stateMachine.periodic();
+    }
     mechanism.periodic();
     Logger.recordOutput("ramp/state", stateMachine.getCurrentState());
   }
@@ -86,6 +89,8 @@ public class RampSubsystem extends SubsystemBase {
     config.configure(RampStates.HOMING).permit(RampTriggers.HOMED, RampStates.IDLE);
 
     stateMachine = new StateMachine<>(config, RampStates.HOMING);
+
+    stateMachine.getCurrentState().getState().onEntry(null);
 
     RampState.setMechanism(mechanism);
     RampState.setFireTrigger(stateMachine::fire);
