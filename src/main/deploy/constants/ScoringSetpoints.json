@@ -90,11 +90,11 @@
   "coralStation": {
     "name": "coralStation",
     "elevatorHeight": {
-      "value": 0.1,
+      "value": 0.0,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": 0.1,
+      "value": 0.12,
       "unit": "Rotation"
     }
   },
