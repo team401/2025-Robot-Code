@@ -21,8 +21,8 @@
   "wristKS": 0.0,
   "wristKV": 0.0,
   "wristKA": 0.0,
-  "wristKP": 15.0,
-  "wristKI": 0.4,
+  "wristKP": 16.0,
+  "wristKI": 0.6,
   "wristKD": 2.0,
   "wristMotionMagicCruiseVelocityRotationsPerSecond": 0.3,
   "wristMotionMagicExpo_kA": 7.0,
@@ -41,7 +41,7 @@
     "unit": "Rotation"
   },
   "wristMaxMaxAngle": {
-    "value": 0.25,
+    "value": 0.34,
     "unit": "Rotation"
   },
   "maxCrossBarSafeAngle": {
@@ -53,7 +53,7 @@
     "unit": "Rotation"
   },
   "wristSetpointEpsilon": {
-    "value": 5.0,
+    "value": 360.0,
     "unit": "Degree"
   }
 }

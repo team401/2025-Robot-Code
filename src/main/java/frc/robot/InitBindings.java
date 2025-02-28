@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.StrategyManager.AutonomyMode;
 import frc.robot.commands.drive.DesiredLocationSelector;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
@@ -21,6 +22,9 @@ import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.ramp.states.RampState.RampTriggers;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
+import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
+import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 
 public final class InitBindings {
   // Controller
@@ -34,7 +38,7 @@ public final class InitBindings {
   private static final CommandXboxController driverController =
       new CommandXboxController(OperatorConstants.synced.getObject().kDriverControllerPort);
 
-  public static void initDriveBindings(Drive drive) {
+  public static void initDriveBindings(Drive drive, StrategyManager strategyManager) {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         new DriveWithJoysticks(
@@ -52,7 +56,10 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                  if (strategyManager.getAutonomyMode() != AutonomyMode.Manual) {
+                    drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                  }
+                  ;
                 },
                 drive));
     rightJoystick
@@ -60,7 +67,11 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+                  if (strategyManager.getAutonomyMode() != AutonomyMode.Manual) {
+                    drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+                    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.CancelWarmup);
+                  }
+                  ;
                 },
                 drive));
 
@@ -140,7 +151,7 @@ public final class InitBindings {
                   rampSubsystem.fireTrigger(RampTriggers.START_CLIMB);
                 }));
     driverController
-        .y()
+        .x()
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -151,6 +162,30 @@ public final class InitBindings {
   public static void initClimbBindings(ClimbSubsystem climb) {
     driverController.a().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)));
     driverController.b().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)));
+  }
+
+  public static void initScoringBindings(ScoringSubsystem scoring) {
+    driverController
+        .y()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  scoring.setTarget(FieldTarget.L4);
+                  scoring.setGamePiece(GamePiece.Coral);
+                  scoring.fireTrigger(ScoringTrigger.StartWarmup);
+                }));
+    driverController
+        .rightBumper()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  scoring.setClawRollerVoltage(JsonConstants.clawConstants.coralScoreVoltage);
+                }))
+        .onFalse(
+            new InstantCommand(
+                () -> {
+                  scoring.setClawRollerVoltage(Volts.zero());
+                }));
   }
 
   /**
@@ -206,6 +241,9 @@ public final class InitBindings {
                     () -> {
                       ScoringSubsystem.getInstance().setClawRollerVoltage(Volts.zero());
                     }));
+
+        ScoringSubsystem.getInstance()
+            .setTuningHeightSetpointAdjustmentSupplier(() -> driverController.getLeftY());
       default:
         break;
     }

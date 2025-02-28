@@ -12,7 +12,7 @@
     "unit": "Amp"
   },
   "coralProximityThreshold": {
-    "value": 5.0,
+    "value": 8.0,
     "unit": "Centimeter"
   },
   "coralProximityHysteresis": {
