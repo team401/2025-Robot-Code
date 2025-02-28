@@ -395,6 +395,9 @@ public class Drive implements DriveTemplate {
     // Update gyro alert
     gyroDisconnectedAlert.set(
         !gyroInputs.connected && ModeConstants.currentMode == ModeConstants.Mode.REAL);
+
+    Logger.recordOutput("Drive/goToIntake", goToIntake);
+    Logger.recordOutput("Drive/driveLinedUp", driveLinedUp);
   }
 
   /**

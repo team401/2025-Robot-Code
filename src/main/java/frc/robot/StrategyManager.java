@@ -202,12 +202,15 @@ public class StrategyManager {
 
   public void periodic() {
     if (currentCommand == null || currentCommand.isFinished()) {
+      if (currentCommand != null) {
+        System.out.println(currentCommand.getName() + " was finished.");
+      }
       currentAction = getNextAction();
       currentCommand = getCommandFromAction(currentAction);
       if (currentCommand != null) {
         CommandScheduler.getInstance().schedule(currentCommand);
+        System.out.println("Scheduled new command");
       }
-      System.out.println("Scheduled new command");
     }
 
     this.logActions();
