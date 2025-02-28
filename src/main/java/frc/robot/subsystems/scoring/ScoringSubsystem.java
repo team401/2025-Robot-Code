@@ -3,6 +3,7 @@ package frc.robot.subsystems.scoring;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import coppercore.controls.state_machine.StateMachine;
 import coppercore.controls.state_machine.StateMachineConfiguration;
@@ -12,6 +13,7 @@ import coppercore.wpilib_interface.MonitorWithAlert;
 import coppercore.wpilib_interface.MonitoredSubsystem;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -431,15 +433,30 @@ public class ScoringSubsystem extends MonitoredSubsystem {
   /**
    * Get the current angle of the wrist
    *
-   * <p>This height is determined by the {@link WristMechanism}.
+   * <p>This angle is determined by the {@link WristMechanism}.
    *
-   * @return
+   * @return A Measure, the current Angle of the wrist
    */
   public Angle getWristAngle() {
     if (JsonConstants.scoringFeatureFlags.runWrist) {
       return wristMechanism.getWristAngle();
     } else {
       return Rotations.zero();
+    }
+  }
+
+  /**
+   * Get the current angular velocity of the wrist
+   *
+   * <p>This velocity is determined by the {@link WristMechanism}
+   *
+   * @return A Measure, the angular velocity of the wrist
+   */
+  public AngularVelocity getWristVelocity() {
+    if (JsonConstants.scoringFeatureFlags.runWrist) {
+      return wristMechanism.getWristVelocity();
+    } else {
+      return RotationsPerSecond.zero();
     }
   }
 

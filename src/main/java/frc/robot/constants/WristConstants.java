@@ -96,6 +96,14 @@ public class WristConstants {
   /** The wrist can be this far away from the goal and considered "at the setpoint" */
   public final Angle wristSetpointEpsilon = Degrees.of(5.0);
 
+  /**
+   * How slow the wrist must be moving before it is considered to be stable at its goal position
+   *
+   * <p>This value is a Double because it can't be serialized with JSONSync
+   */
+  public final Double maxWristSetpointVelocityRotationsPerSecond =
+      0.008333; // 3 degrees per second = 1 / 120 rotations = 0.008333...
+
   public static final class Sim {
     @JSONExclude
     public static final JSONSync<WristConstants.Sim> synced =
