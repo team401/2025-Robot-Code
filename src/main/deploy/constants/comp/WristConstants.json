@@ -59,5 +59,6 @@
   "wristSetpointEpsilon": {
     "value": 5.0,
     "unit": "Degree"
-  }
+  },
+  "maxWristSetpointVelocityRotationsPerSecond": 0.008333
 }
