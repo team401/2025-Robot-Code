@@ -52,12 +52,23 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  if (strategyManager.getAutonomyMode() == AutonomyMode.Mixed) {
-                    drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
-                  } else {
-                    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+                  switch (strategyManager.getAutonomyMode()) {
+                    case Full:
+                      // If a binding is used in full autonomy, switch to mixed autonomy
+                      strategyManager.setAutonomyMode(AutonomyMode.Mixed);
+                      // And then fall through to the mixed autonomy behavior (no break here is
+                      // intentional)
+                    case Mixed:
+                      drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                      break;
+                    case Manual:
+                      // Only start scoring warmup if in manual autonomy; in mixed and full,
+                      // drivetrain triggers this when it enters lineup
+                      if (ScoringSubsystem.getInstance() != null) {
+                        ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+                      }
+                      break;
                   }
-                  ;
                 },
                 drive));
 
@@ -66,11 +77,22 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  if (strategyManager.getAutonomyMode() == AutonomyMode.Mixed) {
-                    drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+                  switch (strategyManager.getAutonomyMode()) {
+                    case Full:
+                      // If a binding is used in full autonomy, switch to mixed autonomy
+                      strategyManager.setAutonomyMode(AutonomyMode.Mixed);
+                      // And then fall through to the mixed autonomy behavior (no break here is
+                      // intentional)
+                    case Mixed:
+                      // Cancel auto align if in mixed autonomy
+                      drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+                      // Then always cancel warmup for scoring (no break here is intentional)
+                    case Manual:
+                      if (ScoringSubsystem.getInstance() != null) {
+                        ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.CancelWarmup);
+                      }
+                      break;
                   }
-                  ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.CancelWarmup);
-                  ;
                 },
                 drive));
 
@@ -128,13 +150,23 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  if (strategyManager.getAutonomyMode() == AutonomyMode.Mixed) {
-                    drive.setDesiredIntakeLocation(DesiredLocation.CoralStationRight);
-                    drive.setGoToIntake(true);
-                    drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
-                  }
-                  if (ScoringSubsystem.getInstance() != null) {
-                    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.BeginIntake);
+                  switch (strategyManager.getAutonomyMode()) {
+                    case Full:
+                      // If a binding is used in full autonomy, switch to mixed autonomy
+                      strategyManager.setAutonomyMode(AutonomyMode.Mixed);
+                      // And then fall through to the mixed autonomy behavior (no break here is
+                      // intentional)
+                    case Mixed:
+                      // Start auto align if in mixed autonomy
+                      drive.setDesiredIntakeLocation(DesiredLocation.CoralStationRight);
+                      drive.setGoToIntake(true);
+                      drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                      // Then always start intake for scoring (no break here is intentional)
+                    case Manual:
+                      if (ScoringSubsystem.getInstance() != null) {
+                        ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.BeginIntake);
+                      }
+                      break;
                   }
                 },
                 drive));
@@ -143,10 +175,22 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  drive.setGoToIntake(false);
-                  drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
-                  if (ScoringSubsystem.getInstance() != null) {
-                    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.CancelIntake);
+                  switch (strategyManager.getAutonomyMode()) {
+                    case Full:
+                      // If a binding is used in full autonomy, switch to mixed autonomy
+                      strategyManager.setAutonomyMode(AutonomyMode.Mixed);
+                      // And then fall through to the mixed autonomy behavior (no break here is
+                      // intentional)
+                    case Mixed:
+                      // Cancel auto align if in mixed autonomy
+                      drive.setGoToIntake(false);
+                      drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+                      // Then always cancel intake for scoring (no break here is intentional)
+                    case Manual:
+                      if (ScoringSubsystem.getInstance() != null) {
+                        ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.CancelIntake);
+                      }
+                      break;
                   }
                 },
                 drive));
@@ -172,6 +216,11 @@ public final class InitBindings {
   public static void initClimbBindings(ClimbSubsystem climb) {
     driverController.a().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)));
     driverController.b().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)));
+
+    // TODO: Find actual numbers for these buttons using driverstation
+    leftJoystick.button(3).onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)));
+
+    leftJoystick.button(4).onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)));
   }
 
   public static void initScoringBindings(ScoringSubsystem scoring) {
