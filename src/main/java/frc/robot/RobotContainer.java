@@ -147,7 +147,14 @@ public class RobotContainer {
     if (FeatureFlags.synced.getObject().runScoring) {
       scoringSubsystem = InitSubsystems.initScoringSubsystem();
       if (FeatureFlags.synced.getObject().runDrive) {
-        scoringSubsystem.setIsDriveLinedUpSupplier(() -> drive.isDriveAlignmentFinished());
+        scoringSubsystem.setIsDriveLinedUpSupplier(
+            () -> {
+              if (strategyManager.getAutonomyMode() == AutonomyMode.Mixed) {
+                return drive.isDriveAlignmentFinished();
+              } else {
+                return InitBindings.isManualScorePressed();
+              }
+            });
         scoringSubsystem.setReefDistanceSupplier(
             () -> {
               Translation2d reefCenter =
@@ -195,16 +202,11 @@ public class RobotContainer {
   }
 
   public void autonomousInit() {
-    strategyManager.setAutonomyMode(AutonomyMode.Full);
-
-    // load chosen strategy
-    strategyManager.addActionsFromAutoStrategy(autoChooser.getSelected());
+    strategyManager.autonomousInit(autoChooser.getSelected());
   }
 
   public void teleopInit() {
-    strategyManager.setAutonomyMode(AutonomyMode.Teleop);
-    // clear leftover actions from auto
-    strategyManager.clearActions();
+    strategyManager.teleopInit();
   }
 
   /** This method must be called from robot, as it isn't called automatically */
