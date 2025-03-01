@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
@@ -7,6 +8,7 @@ import coppercore.vision.VisionLocalizer;
 import coppercore.wpilib_interface.tuning.TuneS;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -18,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.StrategyManager.AutonomyMode;
 import frc.robot.commands.drive.AkitDriveCommands;
 import frc.robot.constants.AutoStrategy;
 import frc.robot.constants.AutoStrategyContainer;
@@ -149,6 +150,14 @@ public class RobotContainer {
       scoringSubsystem = InitSubsystems.initScoringSubsystem();
       if (FeatureFlags.synced.getObject().runDrive) {
         scoringSubsystem.setIsDriveLinedUpSupplier(() -> drive.isDriveAlignmentFinished());
+        scoringSubsystem.setReefDistanceSupplier(
+            () -> {
+              Translation2d reefCenter =
+                  drive.isAllianceRed()
+                      ? JsonConstants.redFieldLocations.redReefCenterTranslation
+                      : JsonConstants.blueFieldLocations.blueReefCenterTranslation;
+              return Meters.of(drive.getPose().getTranslation().getDistance(reefCenter));
+            });
       } else {
         scoringSubsystem.setIsDriveLinedUpSupplier(() -> true);
       }
@@ -188,16 +197,11 @@ public class RobotContainer {
   }
 
   public void autonomousInit() {
-    strategyManager.setAutonomyMode(AutonomyMode.Full);
-
-    // load chosen strategy
-    strategyManager.addActionsFromAutoStrategy(autoChooser.getSelected());
+    strategyManager.autonomousInit(autoChooser.getSelected());
   }
 
   public void teleopInit() {
-    strategyManager.setAutonomyMode(AutonomyMode.Teleop);
-    // clear leftover actions from auto
-    strategyManager.clearActions();
+    strategyManager.teleopInit();
   }
 
   /** This method must be called from robot, as it isn't called automatically */
