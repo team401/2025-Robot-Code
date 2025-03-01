@@ -10,6 +10,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.StrategyManager;
+import frc.robot.StrategyManager.AutonomyMode;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
@@ -158,11 +160,18 @@ public class LineupState implements PeriodicStateInterface {
   public boolean lineupFinished() {
     return latestObservation != null
         && hadObservationYet
-        && (latestObservation.alongTrackDistance() < 0.05
-            && Math.abs(latestObservation.crossTrackDistance()) < 0.01);
+        && (Math.abs(drive.getRotation().getRadians() - getRotationForReefSide().getRadians())
+                < 0.05
+            && latestObservation.alongTrackDistance() < 0.05
+            && Math.abs(latestObservation.crossTrackDistance()) < 0.015
+            && Math.abs(drive.getChassisSpeeds().vyMetersPerSecond) < 0.05);
   }
 
   public void periodic() {
+    if (StrategyManager.getInstance().getAutonomyMode() == AutonomyMode.Manual) {
+      drive.fireTrigger(DriveTrigger.CancelLineup);
+    }
+
     // run test through here if in test mode
     if (DriverStation.isTest()) {
       this.testPeriodic();
@@ -378,8 +387,8 @@ public class LineupState implements PeriodicStateInterface {
       double vx =
           JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
               * getAlongTrackVelocityReductionFactor(observation.crossTrackDistance())
-              * getAlongTrackVelocity(alongTrackDistanceFiltered);
-      double vy = driveCrossTrackLineupController.calculate(crossTrackDistanceFiltered);
+              * getAlongTrackVelocity(observation.alongTrackDistance()); // Maybe use filtered?
+      double vy = driveCrossTrackLineupController.calculate(observation.crossTrackDistance());
       double omega =
           rotationController.calculate(
               drive.getRotation().getRadians(), this.getRotationForReefSide().getRadians());

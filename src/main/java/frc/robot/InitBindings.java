@@ -211,6 +211,22 @@ public final class InitBindings {
                 () -> {
                   rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
                 }));
+
+    rightJoystick
+        .trigger()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
+                }));
+
+    rightJoystick
+        .trigger()
+        .onFalse(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.fireTrigger(RampTriggers.GOTO_IDLE);
+                }));
   }
 
   public static void initClimbBindings(ClimbSubsystem climb) {

@@ -51,6 +51,7 @@ import frc.robot.subsystems.drive.states.IdleState;
 import frc.robot.subsystems.drive.states.JoystickDrive;
 import frc.robot.subsystems.drive.states.LineupState;
 import frc.robot.subsystems.drive.states.OTFState;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -313,6 +314,12 @@ public class Drive implements DriveTemplate {
 
   @Override
   public void periodic() {
+    // Manually cancel go to intake if we have a gamepiece
+    if (goToIntake && ScoringSubsystem.getInstance().isCoralDetected()
+        || ScoringSubsystem.getInstance().isAlgaeDetected()) {
+      setGoToIntake(false);
+    }
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -811,7 +818,7 @@ public class Drive implements DriveTemplate {
 
   /** Returns the measured chassis speeds of the robot. */
   @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
-  private ChassisSpeeds getChassisSpeeds() {
+  public ChassisSpeeds getChassisSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
 

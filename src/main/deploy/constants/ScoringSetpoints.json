@@ -35,33 +35,33 @@
   "L2": {
     "name": "L2",
     "elevatorHeight": {
-      "value": 0.28,
+      "value": 0.25,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": 0.3,
+      "value": 0.29,
       "unit": "Rotation"
     }
   },
   "L3": {
     "name": "L3",
     "elevatorHeight": {
-      "value": 0.65,
+      "value": 0.7,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": 0.3,
+      "value": 0.29,
       "unit": "Rotation"
     }
   },
   "L4": {
     "name": "L4",
     "elevatorHeight": {
-      "value": 1.5,
+      "value": 1.6,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": 0.105,
+      "value": 0.09,
       "unit": "Rotation"
     }
   },
@@ -91,10 +91,10 @@
     "name": "coralStation",
     "elevatorHeight": {
       "value": 0.0,
-      "unit": "Meter"
+      "unit": "Inch"
     },
     "wristAngle": {
-      "value": 0.12,
+      "value": 0.3214,
       "unit": "Rotation"
     }
   },

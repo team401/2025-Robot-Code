@@ -31,6 +31,8 @@ public class StrategyManager {
     Manual,
   }
 
+  public static StrategyManager instance;
+
   private Queue<Action> actions = null;
   private Command currentCommand = null;
   private Drive drive;
@@ -60,6 +62,16 @@ public class StrategyManager {
     actions = new LinkedList<>();
     this.drive = drive;
     this.scoringSubsystem = scoringSubsystem;
+
+    if (instance == null) {
+      instance = this;
+    } else {
+      System.out.println("Instantiated strategy manager twice :(");
+    }
+  }
+
+  public static StrategyManager getInstance() {
+    return instance;
   }
 
   /**

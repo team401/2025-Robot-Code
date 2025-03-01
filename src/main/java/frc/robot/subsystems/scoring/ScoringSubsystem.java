@@ -226,8 +226,14 @@ public class ScoringSubsystem extends MonitoredSubsystem {
             ScoringTrigger.BeginIntake,
             ScoringState.Intake,
             () -> !(isCoralDetected() || isAlgaeDetected()))
-        .permit(ScoringTrigger.ToggleWarmup, ScoringState.Warmup)
-        .permit(ScoringTrigger.StartWarmup, ScoringState.Warmup)
+        .permitIf(
+            ScoringTrigger.ToggleWarmup,
+            ScoringState.Warmup,
+            () -> (isCoralDetected() || isAlgaeDetected()))
+        .permitIf(
+            ScoringTrigger.StartWarmup,
+            ScoringState.Warmup,
+            () -> (isCoralDetected() || isAlgaeDetected()))
         .permitIf(ScoringTrigger.EnterTestMode, ScoringState.Tuning, isScoringTuningSupplier);
 
     stateMachineConfiguration
