@@ -1,12 +1,8 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.wpilib_interface.DriveWithJoysticks;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -52,46 +48,50 @@ public final class InitBindings {
 
     // hold right joystick trigger down to have drive go to desired location
     rightJoystick
-        .button(1)
+        .trigger()
         .onTrue(
             new InstantCommand(
                 () -> {
-                  if (strategyManager.getAutonomyMode() != AutonomyMode.Manual) {
+                  if (strategyManager.getAutonomyMode() == AutonomyMode.Mixed) {
                     drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
-                  }
-                  ;
-                },
-                drive));
-    rightJoystick
-        .button(1)
-        .onFalse(
-            new InstantCommand(
-                () -> {
-                  if (strategyManager.getAutonomyMode() != AutonomyMode.Manual) {
-                    drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
-                    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.CancelWarmup);
+                  } else {
+                    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
                   }
                   ;
                 },
                 drive));
 
-    leftJoystick
-        .button(1)
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  drive.angleController.reset(drive.getRotation().getRadians());
-                  drive.alignToFieldElement();
-                },
-                drive));
-    leftJoystick
-        .button(1)
+    rightJoystick
+        .trigger()
         .onFalse(
             new InstantCommand(
                 () -> {
-                  drive.disableAlign();
+                  if (strategyManager.getAutonomyMode() == AutonomyMode.Mixed) {
+                    drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+                  }
+                  ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.CancelWarmup);
+                  ;
                 },
-                drive)); // pov right (reef 0-11 -> processor left -> processor right )
+                drive));
+
+    leftJoystick
+        .top()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  // Left joystick top button toggles reef align
+                  if (drive.isAligningToFieldElement()) {
+                    // If already aligning, stop
+                    drive.disableAlign();
+                  } else {
+                    // If not already aligning, start
+                    drive.angleController.reset(drive.getRotation().getRadians());
+                    drive.alignToFieldElement();
+                  }
+                },
+                drive));
+
+    // pov right (reef 0-11 -> processor left -> processor right )
     // pov left (goes backwards of right)
     driverController
         .povRight()
@@ -111,33 +111,43 @@ public final class InitBindings {
                 },
                 drive));
 
+    // TODO: Rebind localization if necessary
+    // leftJoystick
+    //     .top()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               drive.setPose(
+    //                   new Pose2d(
+    //                       Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
+    //             }));
+
+    // Hold left trigger to intake, release to cancel
     leftJoystick
-        .top()
+        .trigger()
         .onTrue(
             new InstantCommand(
                 () -> {
-                  drive.setPose(
-                      new Pose2d(
-                          Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
-                }));
-    rightJoystick
-        .top()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  drive.setDesiredIntakeLocation(DesiredLocation.CoralStationRight);
-                  drive.setGoToIntake(true);
-                  drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                  if (strategyManager.getAutonomyMode() == AutonomyMode.Mixed) {
+                    drive.setDesiredIntakeLocation(DesiredLocation.CoralStationRight);
+                    drive.setGoToIntake(true);
+                    drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                  }
+                  if (ScoringSubsystem.getInstance() != null) {
+                    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.BeginIntake);
+                  }
                 },
                 drive));
-
-    rightJoystick
-        .top()
+    leftJoystick
+        .trigger()
         .onFalse(
             new InstantCommand(
                 () -> {
                   drive.setGoToIntake(false);
                   drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+                  if (ScoringSubsystem.getInstance() != null) {
+                    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.CancelIntake);
+                  }
                 },
                 drive));
   }
@@ -254,5 +264,9 @@ public final class InitBindings {
       default:
         break;
     }
+  }
+
+  public static boolean isManualScorePressed() {
+    return rightJoystick.top().getAsBoolean();
   }
 }

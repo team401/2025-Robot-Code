@@ -165,8 +165,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
   public enum ScoringTrigger {
     Seeded,
     BeginIntake,
+    CancelIntake,
     DoneIntaking,
-    CancelAction,
     ToggleWarmup, // warmup button toggles warmup <-> idle
     StartWarmup, // drive automatically enters warmup when lineup begins
     WarmupReady,
@@ -239,7 +239,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
         // If autoTransition, go straight to warmup from intake once we're done
         // Otherwise, return to idle
         .permit(ScoringTrigger.DoneIntaking, ScoringState.Idle)
-        .permit(ScoringTrigger.CancelAction, ScoringState.Idle);
+        .permit(ScoringTrigger.CancelIntake, ScoringState.Idle);
 
     stateMachineConfiguration
         .configure(ScoringState.Warmup)
