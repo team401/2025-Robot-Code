@@ -287,14 +287,7 @@ public class Drive implements DriveTemplate {
 
     stateMachineConfiguration
         .configure(DriveState.Joystick)
-        .permitIf(
-            DriveTrigger.BeginAutoAlignment,
-            DriveState.OTF,
-            () -> !this.isDriveCloseToFinalLineupPose())
-        .permitIf(
-            DriveTrigger.BeginAutoAlignment,
-            DriveState.Lineup,
-            () -> this.isDriveCloseToFinalLineupPose() && !this.isGoingToIntake());
+        .permit(DriveTrigger.BeginAutoAlignment, DriveState.OTF);
 
     stateMachineConfiguration
         .configure(DriveState.OTF)
@@ -313,8 +306,6 @@ public class Drive implements DriveTemplate {
     stateMachineConfiguration
         .configure(DriveState.Lineup)
         .permit(DriveTrigger.CancelLineup, DriveState.Joystick)
-        .permitIf(DriveTrigger.FinishLineup, DriveState.Idle, () -> this.isWaitingOnScore())
-        .permitIf(DriveTrigger.FinishLineup, DriveState.Joystick, () -> !this.isWaitingOnScore())
         .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick)
         .permit(DriveTrigger.BeginOTF, DriveState.OTF);
 

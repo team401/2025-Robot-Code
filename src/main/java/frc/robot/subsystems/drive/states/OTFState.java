@@ -165,6 +165,8 @@ public class OTFState implements PeriodicStateInterface {
       Logger.recordOutput("Drive/OTF/commandScheduled", driveToPose.isScheduled());
 
       // this runs when we accidentally go into otf (too close to reef for final pose to be true)
+      // this is now the only way to transition into lineup
+      //  fixes the accidental entry into lineup that messes with scoring warmup
       if (driveToPose.isFinished() && drive.isDesiredLocationReef()) {
         drive.fireTrigger(DriveTrigger.BeginLineup);
       } else if (driveToPose.isFinished()) {
