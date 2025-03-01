@@ -160,7 +160,7 @@ public final class InitBindings {
                       // Start auto align if in mixed autonomy
                       drive.setDesiredIntakeLocation(DesiredLocation.CoralStationRight);
                       drive.setGoToIntake(true);
-                      drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                      drive.fireTrigger(DriveTrigger.BeginOTF);
                       // Then always start intake for scoring (no break here is intentional)
                     case Manual:
                       if (ScoringSubsystem.getInstance() != null) {
