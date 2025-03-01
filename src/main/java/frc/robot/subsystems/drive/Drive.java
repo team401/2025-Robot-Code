@@ -205,7 +205,6 @@ public class Drive implements DriveTemplate {
 
   public enum DriveTrigger {
     ManualJoysticks,
-    BeginAutoAlignment,
     CancelAutoAlignment,
     FinishOTF,
     CancelOTF,
@@ -287,7 +286,7 @@ public class Drive implements DriveTemplate {
 
     stateMachineConfiguration
         .configure(DriveState.Joystick)
-        .permit(DriveTrigger.BeginAutoAlignment, DriveState.OTF);
+        .permit(DriveTrigger.BeginOTF, DriveState.OTF);
 
     stateMachineConfiguration
         .configure(DriveState.OTF)
@@ -604,7 +603,7 @@ public class Drive implements DriveTemplate {
 
     if (isDriveOTF()) {
       stateMachine.fire(DriveTrigger.ManualJoysticks);
-      stateMachine.fire(DriveTrigger.BeginAutoAlignment);
+      stateMachine.fire(DriveTrigger.BeginOTF);
     }
   }
 

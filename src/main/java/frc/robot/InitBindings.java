@@ -57,7 +57,7 @@ public final class InitBindings {
             new InstantCommand(
                 () -> {
                   if (strategyManager.getAutonomyMode() != AutonomyMode.Manual) {
-                    drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                    drive.fireTrigger(DriveTrigger.BeginOTF);
                     ScoringSubsystem.getInstance().setTarget(FieldTarget.L4);
                   }
                   ;
@@ -130,7 +130,7 @@ public final class InitBindings {
                 () -> {
                   drive.setDesiredIntakeLocation(DesiredLocation.CoralStationRight);
                   drive.setGoToIntake(true);
-                  drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                  drive.fireTrigger(DriveTrigger.BeginOTF);
                 },
                 drive));
 

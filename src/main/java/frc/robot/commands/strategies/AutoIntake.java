@@ -30,7 +30,7 @@ public class AutoIntake extends Command {
     if (drive != null) {
       drive.setDesiredIntakeLocation(intakeLocation);
       drive.setGoToIntake(true);
-      drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+      drive.fireTrigger(DriveTrigger.BeginOTF);
     }
 
     if (scoringSubsystem != null) {
