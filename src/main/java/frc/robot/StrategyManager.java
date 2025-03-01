@@ -80,8 +80,14 @@ public class StrategyManager {
    * @param mode enum representing how autonomous to be
    */
   public void setAutonomyMode(AutonomyMode mode) {
+    if (this.autonomyMode == mode) {
+      this.autonomyMode = mode;
+      onAutonomyModeChange(mode);
+    }
     this.autonomyMode = mode;
   }
+
+  public void onAutonomyModeChange(AutonomyMode newMode) {}
 
   /**
    * gets the current level of autonomy running
