@@ -1,5 +1,6 @@
 package frc.robot.subsystems.ramp.states;
 
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -49,7 +50,7 @@ public class HomingState extends RampState {
     Logger.recordOutput("ramp/homing/homingTimer", homingTimer.get());
 
     if (filteredAbsVelocity
-        < JsonConstants.rampConstants.homingVelocityThresholdMetersPerSecond.in(RadiansPerSecond)) {
+        < JsonConstants.rampConstants.homingVelocityThresholdRadiansPerSecond.in(Radians)) {
       if (hasMoved) {
         mechanism.setHome();
         fireTrigger.accept(RampTriggers.HOMED);
