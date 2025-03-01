@@ -437,6 +437,10 @@ public class Drive implements DriveTemplate {
     isAligningToFieldElement = false;
   }
 
+  public boolean isAligningToFieldElement() {
+    return isAligningToFieldElement;
+  }
+
   /**
    * set supplier that interfaces with scoring used to make drive wait until setting next location
    * in auto
