@@ -98,7 +98,7 @@ public class LineupState implements PeriodicStateInterface {
     drive.disableAlign();
 
     // dont rely on previous estimates
-    latestObservation = new DistanceToTag(0.0, 0.0, false);
+    latestObservation = null;
     observationAge = 0;
 
     hadObservationYet = false;
@@ -263,8 +263,10 @@ public class LineupState implements PeriodicStateInterface {
 
     double multiplier = 1.0;
 
-    if (Math.abs(alongTrackDistance) < 0.3) {
-      multiplier = 0.2;
+    // slow down when near reef
+    if (Math.abs(alongTrackDistance)
+        < JsonConstants.drivetrainConstants.lineupAlongTrackSlowDownDistance) {
+      multiplier = JsonConstants.drivetrainConstants.lineupAlongTrackSlowDownMultiplier;
     }
 
     double sign = Math.signum(alongTrackDistance);
@@ -333,9 +335,14 @@ public class LineupState implements PeriodicStateInterface {
             JsonConstants.drivetrainConstants.driveAlongTrackOffset);
 
     if (!observation.isValid()) {
-      if (latestObservation != null && observationAge < 5) {
-        observation = latestObservation;
+      if (observationAge < 5) {
+        if (latestObservation != null && latestObservation.isValid()) {
+          observation = latestObservation;
+        }
         observationAge++;
+      } else if (observationAge > 5) {
+        // cancel lineup if we havent seen a observation after five times
+        drive.fireTrigger(DriveTrigger.CancelLineup);
       }
       // } else if (!otherCameraTried) {
       //   // check other camera (for when otf comes in from other side)
@@ -345,9 +352,6 @@ public class LineupState implements PeriodicStateInterface {
       //     observation = otherCameraObs;
       //   }
       // }
-      else {
-        drive.fireTrigger(DriveTrigger.BeginOTF);
-      }
     } else {
       latestObservation = observation;
       // begin warming up elevator/wrist when lineup starts
