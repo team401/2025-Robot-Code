@@ -1,6 +1,6 @@
 package frc.robot.subsystems.climb;
 
-import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.controls.state_machine.StateMachine;
@@ -66,7 +66,7 @@ public class ClimbSubsystem extends SubsystemBase {
   LoggedTunableNumber climbkA;
   LoggedTunableNumber climbkG;
 
-  LoggedTunableNumber climbTuningSetpointDegrees;
+  LoggedTunableNumber climbTuningSetpointRadians;
   LoggedTunableNumber climbTuningOverrideVolts;
 
   public StateMachineConfiguration<ClimbState, ClimbAction> climbMachineConfiguration;
@@ -120,8 +120,8 @@ public class ClimbSubsystem extends SubsystemBase {
     climbkG =
         new LoggedTunableNumber("ClimbTunables/climbkG", ClimbConstants.synced.getObject().climbkG);
 
-    climbTuningSetpointDegrees =
-        new LoggedTunableNumber("ClimbTunables/climbTuningSetpointDegrees", 0.0);
+    climbTuningSetpointRadians =
+        new LoggedTunableNumber("ClimbTunables/climbTuningSetpointRadians", 0.0);
     climbTuningOverrideVolts =
         new LoggedTunableNumber("ClimbTunables/climbTuningOverrideVolts", 0.0);
   }
@@ -199,9 +199,9 @@ public class ClimbSubsystem extends SubsystemBase {
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (setpoint) -> {
-              setGoalAngle(Degrees.of(setpoint[0]));
+              setGoalAngle(Radians.of(setpoint[0]));
             },
-            climbTuningSetpointDegrees);
+            climbTuningSetpointRadians);
         break;
       default:
         break;
