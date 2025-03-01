@@ -13,13 +13,13 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
-import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.ClimbConstants;
+import frc.robot.constants.JsonConstants;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -61,7 +61,7 @@ public class ClimbIOTalonFX implements ClimbIO {
             .withMotorOutput(
                 new MotorOutputConfigs()
                     .withNeutralMode(NeutralModeValue.Brake)
-                    .withInverted(InvertedValue.Clockwise_Positive))
+                    .withInverted(JsonConstants.climbConstants.climbInvertValue))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
@@ -129,17 +129,17 @@ public class ClimbIOTalonFX implements ClimbIO {
     if (brake) {
       leadMotor
           .getConfigurator()
-          .apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
+          .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Brake));
       followerMotor
           .getConfigurator()
-          .apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
+          .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Brake));
     } else {
       leadMotor
           .getConfigurator()
-          .apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
+          .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Coast));
       followerMotor
           .getConfigurator()
-          .apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
+          .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Coast));
     }
   }
 

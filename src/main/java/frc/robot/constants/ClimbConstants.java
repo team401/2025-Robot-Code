@@ -2,6 +2,7 @@ package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Radians;
 
+import com.ctre.phoenix6.signals.InvertedValue;
 import coppercore.parameter_tools.json.JSONExclude;
 import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
@@ -36,6 +37,7 @@ public class ClimbConstants {
 
   public final Double climbCurrentLimit = 60.0;
 
+  public final InvertedValue climbInvertValue = InvertedValue.Clockwise_Positive;
   public final Boolean invertFollowerClimbMotor = true;
 
   public static final class Sim {
