@@ -182,11 +182,11 @@ public final class InitBindings {
                       // And then fall through to the mixed autonomy behavior (no break here is
                       // intentional)
                     case Mixed:
+                    case Manual:
                       // Cancel auto align if in mixed autonomy
                       drive.setGoToIntake(false);
                       drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
                       // Then always cancel intake for scoring (no break here is intentional)
-                    case Manual:
                       if (ScoringSubsystem.getInstance() != null) {
                         ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.CancelIntake);
                       }

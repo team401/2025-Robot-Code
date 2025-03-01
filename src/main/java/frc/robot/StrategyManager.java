@@ -87,6 +87,27 @@ public class StrategyManager {
     this.autonomyMode = mode;
   }
 
+  /**
+   * sets the desired level of autonomy and publishes it to snakescreen
+   *
+   * @param mode enum representing how autonomous to be
+   */
+  public void setAutonomyModeAndPublish(AutonomyMode mode) {
+    setAutonomyMode(mode);
+
+    switch (mode) {
+      case Full:
+        autonomyPublisher.accept("high");
+        break;
+      case Mixed:
+        autonomyPublisher.accept("mid");
+        break;
+      case Manual:
+        autonomyPublisher.accept("low");
+        break;
+    }
+  }
+
   public void onAutonomyModeChange(AutonomyMode newMode) {}
 
   /**
