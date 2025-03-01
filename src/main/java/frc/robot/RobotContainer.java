@@ -151,6 +151,7 @@ public class RobotContainer {
       } else {
         scoringSubsystem.setIsDriveLinedUpSupplier(() -> true);
       }
+      scoringSubsystem.setIsDriveLinedUpSupplier(() -> true);
     }
     strategyManager = new StrategyManager(drive, scoringSubsystem);
   }
@@ -278,8 +279,7 @@ public class RobotContainer {
   public void resetMapleSim() {
     SimulatedArena.getInstance().resetFieldForAuto();
     ReefscapeAlgaeOnFly.setHitNetCallBack(() -> System.out.println("ALGAE hits NET!"));
-    ScoringSubsystemMapleSim.configDrive(drive);
-    ScoringSubsystemMapleSim.configScoring(scoringSubsystem);
+    ScoringSubsystemMapleSim.config(drive, driveSim, scoringSubsystem);
   }
 
   public void updateMapleSim() {
