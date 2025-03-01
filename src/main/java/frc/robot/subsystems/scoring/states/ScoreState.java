@@ -24,16 +24,16 @@ public class ScoreState implements PeriodicStateInterface {
     switch (scoringSubsystem.getGamePiece()) {
       case Coral:
         scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.coralScoreVoltage);
-        ScoringSubsystemMapleSim.shootCoral();
 
         if (!scoringSubsystem.isCoralDetected()) {
+          ScoringSubsystemMapleSim.shootCoral();
           scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
         }
         break;
       case Algae:
         scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
-        ScoringSubsystemMapleSim.shootAlgae();
         if (!scoringSubsystem.isAlgaeDetected()) {
+          ScoringSubsystemMapleSim.shootAlgae();
           scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
         }
         break;

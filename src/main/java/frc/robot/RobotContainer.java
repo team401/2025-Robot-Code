@@ -279,7 +279,8 @@ public class RobotContainer {
   public void resetMapleSim() {
     SimulatedArena.getInstance().resetFieldForAuto();
     ReefscapeAlgaeOnFly.setHitNetCallBack(() -> System.out.println("ALGAE hits NET!"));
-    ScoringSubsystemMapleSim.config(drive, driveSim, scoringSubsystem);
+    ScoringSubsystemMapleSim.configDrive(drive, driveSim);
+    ScoringSubsystemMapleSim.configScoring(scoringSubsystem);
   }
 
   public void updateMapleSim() {
