@@ -22,8 +22,8 @@
   "elevatorLargeCANCoderID": 32,
   "elevatorLargeCANCoderDirection": "CounterClockwise_Positive",
   "elevatorSmallCANCoderID": 33,
-  "elevatorSmallCANCoderDirection": "Clockwise_Positive",
-  "elevatorkP": 40.0,
+  "elevatorSmallCANCoderDirection": "CounterClockwise_Positive",
+  "elevatorkP": 60.0,
   "elevatorkI": 0.0,
   "elevatorkD": 0.0,
   "elevatorkS": 0.0,
@@ -42,14 +42,6 @@
   "CRTticksPerRotation": 4096,
   "elevatorTargetThresholdMeters": {
     "value": 0.03,
-    "unit": "Meter"
-  },
-  "maxWristInBelowCrossBarHeight": {
-    "value": 1.0,
-    "unit": "Meter"
-  },
-  "minWristInAboveCrossBarHeight": {
-    "value": 1.1,
     "unit": "Meter"
   },
   "minWristDownHeight": {

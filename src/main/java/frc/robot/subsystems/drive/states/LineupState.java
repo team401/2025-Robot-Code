@@ -159,7 +159,7 @@ public class LineupState implements PeriodicStateInterface {
    */
   public boolean lineupFinished() {
     return latestObservation != null
-        && (latestObservation.alongTrackDistance() < 0.01
+        && (latestObservation.alongTrackDistance() < 0.05
             && Math.abs(latestObservation.crossTrackDistance()) < 0.01);
   }
 
