@@ -25,6 +25,7 @@ public class LineupState implements PeriodicStateInterface {
   private Drive drive;
 
   private DistanceToTag latestObservation;
+  private boolean hadObservationYet = false;
   private int observationAge;
 
   // along track pid test mode
@@ -97,13 +98,10 @@ public class LineupState implements PeriodicStateInterface {
     drive.disableAlign();
 
     // dont rely on previous estimates
-    latestObservation = new DistanceToTag(0.0, 0.0, true);
+    latestObservation = new DistanceToTag(0.0, 0.0, false);
     observationAge = 0;
 
-    // begin warming up elevator/wrist when lineup starts
-    if (ScoringSubsystem.getInstance() != null) {
-      ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
-    }
+    hadObservationYet = false;
   }
 
   public void onExit(Transition transition) {
@@ -159,6 +157,7 @@ public class LineupState implements PeriodicStateInterface {
    */
   public boolean lineupFinished() {
     return latestObservation != null
+        && hadObservationYet
         && (latestObservation.alongTrackDistance() < 0.05
             && Math.abs(latestObservation.crossTrackDistance()) < 0.01);
   }
@@ -264,8 +263,8 @@ public class LineupState implements PeriodicStateInterface {
 
     double multiplier = 1.0;
 
-    if (Math.abs(alongTrackDistance) < 0.1) {
-      multiplier = 0.5;
+    if (Math.abs(alongTrackDistance) < 0.3) {
+      multiplier = 0.2;
     }
 
     double sign = Math.signum(alongTrackDistance);
@@ -351,6 +350,11 @@ public class LineupState implements PeriodicStateInterface {
       }
     } else {
       latestObservation = observation;
+      // begin warming up elevator/wrist when lineup starts
+      if (ScoringSubsystem.getInstance() != null) {
+        ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+      }
+      hadObservationYet = true;
       observationAge = 0;
     }
 

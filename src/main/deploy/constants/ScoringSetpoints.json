@@ -57,11 +57,11 @@
   "L4": {
     "name": "L4",
     "elevatorHeight": {
-      "value": 1.33,
+      "value": 1.5,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": 0.3,
+      "value": 0.105,
       "unit": "Rotation"
     }
   },
