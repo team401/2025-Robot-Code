@@ -1,10 +1,10 @@
 {
   "restingAngle": {
-    "value": 0.0,
+    "value": 0.1,
     "unit": "Radian"
   },
   "searchingAngle": {
-    "value": 1.0,
+    "value": 1.1,
     "unit": "Radian"
   },
   "finalHangingAngle": {
@@ -13,9 +13,9 @@
   },
   "leadClimbMotorId": 16,
   "followerClimbMotorId": 17,
-  "climbkP": 20,
-  "climbkI": 0,
-  "climbkD": 0,
+  "climbkP": 30.0,
+  "climbkI": 0.0,
+  "climbkD": 0.0,
   "climbCurrentLimit": 60,
   "invertFollowerClimbMotor": true
 }
