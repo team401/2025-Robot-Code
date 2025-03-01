@@ -262,6 +262,12 @@ public class LineupState implements PeriodicStateInterface {
     //       * driveAlongTrackLineupController.calculate(alongTrackDistance);
     // }
 
+    double multiplier = 1.0;
+
+    if (Math.abs(alongTrackDistance) < 0.1) {
+      multiplier = 0.5;
+    }
+
     double sign = Math.signum(alongTrackDistance);
 
     double rawVelocity =
@@ -269,7 +275,9 @@ public class LineupState implements PeriodicStateInterface {
             2
                 * JsonConstants.drivetrainConstants.lineupMaxAcceleration
                 * Math.abs(alongTrackDistance));
-    return sign * Math.min(rawVelocity, JsonConstants.drivetrainConstants.lineupMaxVelocity);
+    return sign
+        * multiplier
+        * Math.min(rawVelocity, JsonConstants.drivetrainConstants.lineupMaxVelocity);
   }
 
   public double getAlongTrackVelocityReductionFactor(double crossTrackDistance) {
