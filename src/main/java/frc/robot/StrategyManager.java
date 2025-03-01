@@ -27,7 +27,7 @@ import org.littletonrobotics.junction.Logger;
 public class StrategyManager {
   public enum AutonomyMode {
     Full,
-    Teleop,
+    Mixed,
     Manual,
   }
 
@@ -161,7 +161,7 @@ public class StrategyManager {
     if (action.type() == ActionType.Intake) {
       switch (this.autonomyMode) {
         case Full:
-        case Teleop:
+        case Mixed:
         case Manual:
         default:
           return new AutoIntake(drive, scoringSubsystem, action.location(), action.scoringTarget());
@@ -169,7 +169,7 @@ public class StrategyManager {
     } else if (action.type() == ActionType.Score) {
       switch (this.autonomyMode) {
         case Full:
-        case Teleop:
+        case Mixed:
         case Manual:
         default:
           return new AutoScore(drive, scoringSubsystem, action.location(), action.scoringTarget());
@@ -211,7 +211,7 @@ public class StrategyManager {
     if (autonomyLevel.equalsIgnoreCase("high")) {
       this.setAutonomyMode(AutonomyMode.Full);
     } else if (autonomyLevel.equalsIgnoreCase("mid")) {
-      this.setAutonomyMode(AutonomyMode.Teleop);
+      this.setAutonomyMode(AutonomyMode.Mixed);
     } else if (autonomyLevel.equalsIgnoreCase("low")) {
       this.setAutonomyMode(AutonomyMode.Manual);
     }
@@ -299,7 +299,7 @@ public class StrategyManager {
       case Full:
         autonomyPublisher.accept("high");
         break;
-      case Teleop:
+      case Mixed:
         autonomyPublisher.accept("mid");
         break;
       case Manual:
@@ -328,7 +328,7 @@ public class StrategyManager {
    * values
    */
   public void teleopInit() {
-    this.setAutonomyMode(AutonomyMode.Teleop);
+    this.setAutonomyMode(AutonomyMode.Mixed);
 
     this.clearActions();
 
