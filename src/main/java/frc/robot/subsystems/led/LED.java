@@ -59,48 +59,43 @@ public class LED extends SubsystemBase {
     if (!DriverStation.isDisabled()) {
 
       // Drive Subsystem Checks
+      // otf - bottom middle third of left strip
       if (driveSubsystem != null) {
         if (driveSubsystem.isDesiredLocationReef()) {
-          addPattern(LEDConstants.targetOnReefOTF, LEDConstants.clear);
+          addSplitPattern(LEDConstants.targetOnReefOTF, LEDConstants.clear);
         }
-        // if (driveSubsystem.isBrakeMode()) {
-        //  addPattern(LEDConstants.lasers);
-        // }
       }
       // Scoring Subsystem Checks
       if (scoringSubsystem != null) {
-        // Game Piece Checks
+        // Game Piece Checks - top thirds
         if (scoringSubsystem.getGamePiece() == GamePiece.Algae) {
           addPattern(LEDConstants.holdingAlgaePattern);
-        }
-
-        if (scoringSubsystem.getGamePiece() == GamePiece.Coral) {
+        } else if (scoringSubsystem.getGamePiece() == GamePiece.Coral) {
           addPattern(LEDConstants.holdingCoralPattern);
         } else if (scoringSubsystem.getGamePiece() == GamePiece.Coral
             && scoringSubsystem.getGamePiece() == GamePiece.Algae) {
           addPattern(LEDConstants.holdingBothPattern);
         } else {
-          addPattern(LEDConstants.clearTop, LEDConstants.clearTop);
+          addPattern(LEDConstants.clearTop);
         }
-        // Field Target Checks
+        // Field Target Checks - bottom and middle thirds
         if (scoringSubsystem.getTarget() == FieldTarget.L1) {
           addPattern(LEDConstants.targetOnReefL1Pattern);
-        }
-        if (scoringSubsystem.getTarget() == FieldTarget.L2) {
+        } else if (scoringSubsystem.getTarget() == FieldTarget.L2) {
           addPattern(LEDConstants.targetOnReefL2Pattern);
-        }
-        if (scoringSubsystem.getTarget() == FieldTarget.L3) {
+        } else if (scoringSubsystem.getTarget() == FieldTarget.L3) {
           addPattern(LEDConstants.targetOnReefL3Pattern);
-        }
-        if (scoringSubsystem.getTarget() == FieldTarget.L4) {
+        } else if (scoringSubsystem.getTarget() == FieldTarget.L4) {
           addPattern(LEDConstants.targetOnReefL4Pattern);
-        }
-        if (!visionWorkingSupplier.get()) {
-          addPattern(LEDConstants.isBeeLinkWorkingPattern);
         }
       }
 
-      // Hang Check
+      // check vision - bottom thirds
+      if (!visionWorkingSupplier.get()) {
+        addPattern(LEDConstants.isBeeLinkWorkingPattern);
+      }
+
+      // Hang Check - all thirds
       if (climbSubsystem != null) {
         if (climbSubsystem.getLockedToCage()) {
           addPattern(LEDConstants.lockedOnHangPattern);
@@ -109,7 +104,13 @@ public class LED extends SubsystemBase {
 
       applyPatterns();
 
-    } else {
+    }
+    // lasers(disabled) - all thirds
+    // else if (driveSubsystem.isBrakeMode()) {
+    //  addPattern(LEDConstants.lasers);
+    // }
+    else {
+      // rainbow - all thirds
       addPattern(LEDConstants.rainbowPattern);
       if (!visionWorkingSupplier.get()) {
         addPattern(LEDConstants.isBeeLinkWorkingPattern);
@@ -151,7 +152,7 @@ public class LED extends SubsystemBase {
    * @param left Pattern for the left LEDs
    * @param right Pattern for the right LEDs
    */
-  public void addPattern(LEDPattern left, LEDPattern right) {
+  public void addSplitPattern(LEDPattern left, LEDPattern right) {
     leftPatterns.add(left);
     rightPatterns.add(right);
   }

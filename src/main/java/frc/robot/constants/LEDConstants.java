@@ -16,49 +16,50 @@ public final class LEDConstants {
   public static final int leftLength = 180;
   public static final int rightLength = 180;
   public static final int totalLength = 360;
+  public static final double rainbowSpeed = 20;
 
   public static final Color off = Color.kBlack;
+  // LED Patterns
 
+  // all thirds
   public static LEDPattern rainbowPattern =
       LEDPattern.rainbow(255, 255)
           .scrollAtRelativeSpeed(Percent.per(Second).of(LEDConstants.rainbowSpeed));
+  public LEDPattern endGamePattern = LEDPattern.solid(Color.kRed);
 
+  public static LEDPattern lockedOnHangPattern = LEDPattern.solid(Color.kTeal);
+
+  public static LEDPattern clear = LEDPattern.solid(off);
+
+  public static LEDPattern lasers =
+      LEDPattern.gradient(GradientType.kContinuous, Color.kCrimson, Color.kBlack)
+          .scrollAtAbsoluteSpeed(InchesPerSecond.of(250), Meters.of(1.0 / 60));
+  // top third
   public static LEDPattern holdingAlgaePattern =
       LEDPattern.steps(Map.of(0, Color.kLimeGreen, 1 / 3.0, LEDConstants.off));
 
   public static LEDPattern holdingCoralPattern =
       LEDPattern.steps(Map.of(0, Color.kMagenta, 1 / 3.0, LEDConstants.off));
 
-  public static LEDPattern targetOnReefL1Pattern = LEDPattern.steps(Map.of(1 / 3.0, Color.kCyan));
-
   public static LEDPattern holdingBothPattern =
       LEDPattern.steps(Map.of(0, Color.kWhite, 1 / 3.0, LEDConstants.off));
+  public static LEDPattern clearTop = LEDPattern.steps(Map.of(1 / 3.0, Color.kBlack));
+  // middle third & bottom third
+  public static LEDPattern targetOnReefL1Pattern = LEDPattern.steps(Map.of(1 / 3.0, Color.kCyan));
 
   public static LEDPattern targetOnReefOTF = LEDPattern.steps(Map.of(1 / 3.0, Color.kBlue));
 
   public static LEDPattern targetOnReefL2Pattern =
       LEDPattern.steps(Map.of(1 / 3.0, Color.kOrangeRed));
 
-  public static LEDPattern clearTop = LEDPattern.steps(Map.of(1 / 3.0, Color.kBlack));
-
   public static LEDPattern targetOnReefL3Pattern = LEDPattern.steps(Map.of(1 / 3.0, Color.kPurple));
 
   public static LEDPattern targetOnReefL4Pattern =
       LEDPattern.steps(Map.of(1 / 3.0, Color.kGreenYellow));
 
-  public LEDPattern targetOnCoralStation =
-      LEDPattern.steps(Map.of(0, Color.kBlack, 1 / 3.0, Color.kYellow));
+  public LEDPattern targetOnCoralStation = LEDPattern.steps(Map.of(1 / 3.0, Color.kYellow));
 
-  public LEDPattern endGamePattern = LEDPattern.solid(Color.kRed);
-
-  public static LEDPattern lockedOnHangPattern = LEDPattern.solid(Color.kTeal);
-
-  public static LEDPattern clear = LEDPattern.solid(Color.kBlack);
-
-  public static LEDPattern lasers =
-      LEDPattern.gradient(GradientType.kContinuous, Color.kCrimson, Color.kBlack)
-          .scrollAtAbsoluteSpeed(InchesPerSecond.of(250), Meters.of(1.0 / 60));
+  // bottom third
   public static LEDPattern isBeeLinkWorkingPattern =
       LEDPattern.steps(Map.of(0, LEDConstants.off, 2 / 3.0, Color.kBlue));
-  public static final double rainbowSpeed = 20;
 }
