@@ -141,7 +141,7 @@ public class LED extends SubsystemBase {
 
   public void setVisionWorkingSupplier(Supplier<Boolean> visionWorkingSupplier) {
     this.visionWorkingSupplier = visionWorkingSupplier;
-}
+  }
 
   /**
    * Adds separate patterns for the left and right LED strips.

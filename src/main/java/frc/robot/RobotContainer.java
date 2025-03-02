@@ -133,7 +133,6 @@ public class RobotContainer {
       drive = InitSubsystems.initDriveSubsystem();
       if (FeatureFlags.synced.getObject().runVision) {
         vision = InitSubsystems.initVisionSubsystem(drive);
-        led.setVisionWorkingSupplier(() -> vision.isCoprocessorConnected()); //TODO: Change this to use logic 
         drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
       }
     }
@@ -155,6 +154,9 @@ public class RobotContainer {
 
     if (FeatureFlags.synced.getObject().runLEDs) {
       led = InitSubsystems.initLEDs(scoringSubsystem, climbSubsystem, drive);
+      if (FeatureFlags.synced.getObject().runVision) {
+        led.setVisionWorkingSupplier(() -> vision.coprocessorConnected());
+      }
     }
 
     strategyManager = new StrategyManager(drive, scoringSubsystem);
