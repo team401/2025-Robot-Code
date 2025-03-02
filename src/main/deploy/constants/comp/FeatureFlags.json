@@ -2,7 +2,6 @@
   "runDrive": true,
   "runVision": true,
   "runScoring": true,
-  "runClimb": false,
-  "runRamp": true,
-  "runLEDs": true
+  "runClimb": true,
+  "runRamp": true
 }
