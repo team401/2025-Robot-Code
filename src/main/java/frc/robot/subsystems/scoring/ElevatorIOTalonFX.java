@@ -130,8 +130,8 @@ public class ElevatorIOTalonFX implements ElevatorIO {
                     .withKD(ElevatorConstants.synced.getObject().elevatorkD))
             .withMotionMagic(
                 new MotionMagicConfigs()
-                    // .withMotionMagicCruiseVelocity(
-                    //     ElevatorConstants.synced.getObject().elevatorAngularCruiseVelocity)
+                    .withMotionMagicCruiseVelocity(
+                        ElevatorConstants.synced.getObject().elevatorAngularCruiseVelocity.div(5.0))
                     .withMotionMagicExpo_kA(
                         ElevatorConstants.synced.getObject().elevatorExpo_kA_raw)
                     .withMotionMagicExpo_kV(
@@ -286,10 +286,11 @@ public class ElevatorIOTalonFX implements ElevatorIO {
       Per<VoltageUnit, AngularAccelerationUnit> expo_kA,
       Per<VoltageUnit, AngularVelocityUnit> expo_kV) {
     // TODO: Figure out how to handle maximum velocity for the elevator
+
     MotionMagicConfigs configs =
         talonFXConfigs
             .MotionMagic
-            .withMotionMagicCruiseVelocity(maxVelocity)
+            // .withMotionMagicCruiseVelocity(maxVelocity)
             .withMotionMagicExpo_kA(expo_kA)
             .withMotionMagicExpo_kV(expo_kV);
 

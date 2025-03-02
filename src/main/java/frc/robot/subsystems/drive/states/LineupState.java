@@ -163,7 +163,7 @@ public class LineupState implements PeriodicStateInterface {
         && (Math.abs(drive.getRotation().getRadians() - getRotationForReefSide().getRadians())
                 < 0.05
             && latestObservation.alongTrackDistance() < 0.05
-            && Math.abs(latestObservation.crossTrackDistance()) < 0.015
+            && Math.abs(latestObservation.crossTrackDistance()) < 0.02
             && Math.abs(drive.getChassisSpeeds().vyMetersPerSecond) < 0.05);
   }
 
