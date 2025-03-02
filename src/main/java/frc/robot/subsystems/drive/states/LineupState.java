@@ -262,7 +262,7 @@ public class LineupState implements PeriodicStateInterface {
         alignmentSupplier.get(
             tagId,
             otherCameraIndex,
-            this.getCrossTrackOffset(otherCameraIndex),
+            ReefLineupUtil.getCrossTrackOffset(otherCameraIndex),
             JsonConstants.drivetrainConstants.driveAlongTrackOffset);
     if (observationOtherCamera.isValid()) {
       return observationOtherCamera;
