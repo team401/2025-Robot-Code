@@ -90,6 +90,10 @@ public class LineupState implements PeriodicStateInterface {
   }
 
   public void onEntry(Transition transition) {
+
+    // Drive isn't done lining up
+    drive.setDriveLinedUp(false);
+
     // cancel rotation lock on center
     drive.disableAlign();
 
@@ -102,7 +106,7 @@ public class LineupState implements PeriodicStateInterface {
   }
 
   public void onExit(Transition transition) {
-    drive.setDriveLinedUp(false);
+    drive.setDriveLinedUp(true);
   }
 
   /**
@@ -166,6 +170,7 @@ public class LineupState implements PeriodicStateInterface {
     this.LineupWithReefLocation();
 
     drive.setDriveLinedUp(lineupFinished());
+    Logger.recordOutput("lineup/finished", lineupFinished());
   }
 
   /**
