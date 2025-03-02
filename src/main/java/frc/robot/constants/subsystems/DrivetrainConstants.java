@@ -97,6 +97,18 @@ public class DrivetrainConstants {
   public final Double otfPoseDistanceLimit = 0.1;
   public final Double otfPoseEndingVelocity = 0.5;
 
+  /**
+   * if otf sees the correct tag with an along track and cross track under these thresholds, it will
+   * go to lineup
+   */
+  public final Double otfVisionAlongTrackThreshold = 0.5;
+
+  /**
+   * if otf sees the correct tag with an along track and cross track under these thresholds, it will
+   * go to lineup
+   */
+  public final Double otfVisionCrossTrackThreshold = 0.5;
+
   // The closed-loop output type to use for the steer motors;
   // This affects the PID/FF gains for the steer motors
   public final ClosedLoopOutputType kSteerClosedLoopOutput = ClosedLoopOutputType.Voltage;

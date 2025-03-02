@@ -5,11 +5,14 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.path.PathConstraints;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
+import coppercore.vision.VisionLocalizer.DistanceToTag;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
+import frc.robot.subsystems.drive.Drive.VisionAlignment;
+import frc.robot.subsystems.drive.ReefLineupUtil;
 import org.littletonrobotics.junction.Logger;
 
 public class OTFState implements PeriodicStateInterface {
@@ -171,6 +174,35 @@ public class OTFState implements PeriodicStateInterface {
         drive.fireTrigger(DriveTrigger.BeginLineup);
       } else if (driveToPose.isFinished()) {
         drive.fireTrigger(DriveTrigger.CancelOTF);
+      }
+
+      if (drive.isDesiredLocationReef()) {
+        // Check if we are close to a tag and can see the desired tag and go to OTF
+        int tagId = ReefLineupUtil.getTagIdForReef(drive);
+        int cameraIndex = ReefLineupUtil.getCameraIndexForLineup(drive);
+
+        if (tagId == -1 || cameraIndex == -1) {
+          // TODO: check if this might be false first time, but on another loop true
+          // drive.fireTrigger(DriveTrigger.CancelLineup);
+          return;
+        }
+
+        VisionAlignment alignmentSupplier = drive.getVisionAlignment();
+
+        DistanceToTag observation =
+            alignmentSupplier.get(
+                tagId,
+                cameraIndex,
+                ReefLineupUtil.getCrossTrackOffset(cameraIndex),
+                JsonConstants.drivetrainConstants.driveAlongTrackOffset);
+
+        if (observation.isValid()
+            && observation.alongTrackDistance()
+                < JsonConstants.drivetrainConstants.otfVisionAlongTrackThreshold
+            && Math.abs(observation.crossTrackDistance())
+                < JsonConstants.drivetrainConstants.otfVisionCrossTrackThreshold) {
+          drive.fireTrigger(DriveTrigger.BeginLineup);
+        }
       }
     }
   }

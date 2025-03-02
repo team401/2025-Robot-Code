@@ -1,0 +1,79 @@
+package frc.robot.subsystems.drive;
+
+import frc.robot.constants.JsonConstants;
+
+/** Provides utilities for finding the reef tag ID and camera ID to use for lineup */
+public class ReefLineupUtil {
+  /**
+   * gets tag to use for final alignment with vision
+   *
+   * @return int representing tag id to use
+   */
+  public static int getTagIdForReef(Drive drive) {
+    boolean allianceRed = drive.isAllianceRed();
+    switch (drive.getDesiredLocation()) {
+      case Reef0:
+      case Reef1:
+        return allianceRed ? 10 : 21;
+      case Reef2:
+      case Reef3:
+        return allianceRed ? 9 : 22;
+      case Reef4:
+      case Reef5:
+        return allianceRed ? 8 : 17;
+      case Reef6:
+      case Reef7:
+        return allianceRed ? 7 : 18;
+      case Reef8:
+      case Reef9:
+        return allianceRed ? 6 : 19;
+      case Reef10:
+      case Reef11:
+        return allianceRed ? 11 : 20;
+      default:
+        return -1;
+    }
+  }
+
+  /**
+   * gets camera index for vision single tag lineup
+   *
+   * @return 0 for Front Left camera; 1 for Front Right camera
+   */
+  public static int getCameraIndexForLineup(Drive drive) {
+    switch (drive.getDesiredLocation()) {
+        // Right Side of reef side (align to left camera)
+      case Reef0:
+      case Reef2:
+      case Reef4:
+      case Reef6:
+      case Reef8:
+      case Reef10:
+        return JsonConstants.visionConstants.FrontLeftCameraIndex;
+        // Left side of reef side (align to right camera)
+      case Reef1:
+      case Reef3:
+      case Reef5:
+      case Reef7:
+      case Reef9:
+      case Reef11:
+        return JsonConstants.visionConstants.FrontRightCameraIndex;
+      default:
+        return -1;
+    }
+  }
+
+  /**
+   * gets cross track offset for lineup
+   *
+   * @param cameraIndex camera to check offset
+   * @return offset for camera
+   */
+  public static Double getCrossTrackOffset(int cameraIndex) {
+    if (cameraIndex == JsonConstants.visionConstants.FrontRightCameraIndex) {
+      return JsonConstants.drivetrainConstants.driveCrossTrackFrontRightOffset;
+    } else {
+      return JsonConstants.drivetrainConstants.driveCrossTrackFrontLeftOffset;
+    }
+  }
+}

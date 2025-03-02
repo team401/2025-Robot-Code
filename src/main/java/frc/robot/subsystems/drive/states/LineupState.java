@@ -19,6 +19,7 @@ import frc.robot.constants.ModeConstants.Mode;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.drive.Drive.VisionAlignment;
+import frc.robot.subsystems.drive.ReefLineupUtil;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 import org.littletonrobotics.junction.Logger;
@@ -205,79 +206,6 @@ public class LineupState implements PeriodicStateInterface {
     Logger.recordOutput("lineup/finished", lineupFinished());
   }
 
-  /**
-   * gets tag to use for final alignment with vision
-   *
-   * @return int representing tag id to use
-   */
-  public int getTagIdForReef() {
-    boolean allianceRed = drive.isAllianceRed();
-    switch (drive.getDesiredLocation()) {
-      case Reef0:
-      case Reef1:
-        return allianceRed ? 10 : 21;
-      case Reef2:
-      case Reef3:
-        return allianceRed ? 9 : 22;
-      case Reef4:
-      case Reef5:
-        return allianceRed ? 8 : 17;
-      case Reef6:
-      case Reef7:
-        return allianceRed ? 7 : 18;
-      case Reef8:
-      case Reef9:
-        return allianceRed ? 6 : 19;
-      case Reef10:
-      case Reef11:
-        return allianceRed ? 11 : 20;
-      default:
-        return -1;
-    }
-  }
-
-  /**
-   * gets cross track offset for lineup
-   *
-   * @param cameraIndex camera to check offset
-   * @return offset for camera
-   */
-  public Double getCrossTrackOffset(int cameraIndex) {
-    if (cameraIndex == JsonConstants.visionConstants.FrontRightCameraIndex) {
-      return JsonConstants.drivetrainConstants.driveCrossTrackFrontRightOffset;
-    } else {
-      return JsonConstants.drivetrainConstants.driveCrossTrackFrontLeftOffset;
-    }
-  }
-
-  /**
-   * gets camera index for vision single tag lineup
-   *
-   * @return 0 for Front Left camera; 1 for Front Right camera
-   */
-  public int getCameraIndexForLineup() {
-    switch (drive.getDesiredLocation()) {
-        // Right Side of reef side (align to left camera)
-      case Reef0:
-      case Reef2:
-      case Reef4:
-      case Reef6:
-      case Reef8:
-      case Reef10:
-        return JsonConstants.visionConstants.FrontLeftCameraIndex;
-        // Left side of reef side (align to right camera)
-      case Reef1:
-      case Reef3:
-      case Reef5:
-      case Reef7:
-      case Reef9:
-      case Reef11:
-        return JsonConstants.visionConstants.FrontRightCameraIndex;
-      default:
-        return -1;
-    }
-  }
-
   public double getAlongTrackVelocity(double alongTrackDistance) {
     if (alongTrackDistance < 0
         && (ModeConstants.currentMode == Mode.MAPLESIM || ModeConstants.currentMode == Mode.SIM)) {
@@ -345,8 +273,8 @@ public class LineupState implements PeriodicStateInterface {
 
   /** take over goal speeds to align to reef exactly */
   public void LineupWithReefLocation() {
-    int tagId = this.getTagIdForReef();
-    int cameraIndex = this.getCameraIndexForLineup();
+    int tagId = ReefLineupUtil.getTagIdForReef(drive);
+    int cameraIndex = ReefLineupUtil.getCameraIndexForLineup(drive);
 
     if (tagId == -1 || cameraIndex == -1) {
       // TODO: check if this might be false first time, but on another loop true
@@ -364,7 +292,7 @@ public class LineupState implements PeriodicStateInterface {
         alignmentSupplier.get(
             tagId,
             cameraIndex,
-            this.getCrossTrackOffset(cameraIndex),
+            ReefLineupUtil.getCrossTrackOffset(cameraIndex),
             JsonConstants.drivetrainConstants.driveAlongTrackOffset);
 
     if (!observation.isValid()) {
