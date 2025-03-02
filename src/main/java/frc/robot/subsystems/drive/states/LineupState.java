@@ -160,23 +160,30 @@ public class LineupState implements PeriodicStateInterface {
   public boolean lineupFinished() {
     boolean latestObservationExists = latestObservation != null;
     boolean rotationCorrect =
-        Math.abs(drive.getRotation().getRadians() - getRotationForReefSide().getRadians()) < 0.05;
-    boolean alongTrackCorrect = latestObservation.alongTrackDistance() < 0.05;
-    boolean crossTrackCorrect = Math.abs(latestObservation.crossTrackDistance()) < 0.02;
-    boolean slowEnough = Math.abs(drive.getChassisSpeeds().vyMetersPerSecond) < 0.05;
+        Math.abs(drive.getRotation().getRadians() - getRotationForReefSide().getRadians())
+            < JsonConstants.drivetrainConstants.lineupRotationMarginRadians;
+    boolean alongTrackCorrect =
+        latestObservation.alongTrackDistance()
+            < JsonConstants.drivetrainConstants.lineupAlongTrackThresholdMeters;
+    boolean crossTrackCorrect =
+        Math.abs(latestObservation.crossTrackDistance())
+            < JsonConstants.drivetrainConstants.lineupCrossTrackThresholdMeters;
+    boolean vyLowEnough =
+        Math.abs(drive.getChassisSpeeds().vyMetersPerSecond)
+            < JsonConstants.drivetrainConstants.lineupVyThresholdMetersPerSecond;
 
     Logger.recordOutput("Drive/lineup/latestObservationExists", latestObservationExists);
     Logger.recordOutput("Drive/lineup/rotationCorrect", rotationCorrect);
     Logger.recordOutput("Drive/lineup/alongTrackCorrect", alongTrackCorrect);
     Logger.recordOutput("Drive/lineup/crossTrackCorrect", crossTrackCorrect);
-    Logger.recordOutput("Drive/lineup/slowEnough", slowEnough);
+    Logger.recordOutput("Drive/lineup/vyLowEnough", vyLowEnough);
 
     return latestObservationExists
         && hadObservationYet
         && rotationCorrect
         && alongTrackCorrect
         && crossTrackCorrect
-        && slowEnough;
+        && vyLowEnough;
   }
 
   public void periodic() {

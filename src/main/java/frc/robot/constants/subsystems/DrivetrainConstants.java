@@ -89,6 +89,11 @@ public class DrivetrainConstants {
   public final Double lineupAlongTrackSlowDownDistance = 0.3;
   public final Double lineupAlongTrackSlowDownMultiplier = 0.2;
 
+  public final Double lineupRotationMarginRadians = 0.05;
+  public final Double lineupAlongTrackThresholdMeters = 0.05;
+  public final Double lineupCrossTrackThresholdMeters = 0.02;
+  public final Double lineupVyThresholdMetersPerSecond = 0.05;
+
   public final Double otfPoseDistanceLimit = 0.1;
   public final Double otfPoseEndingVelocity = 0.5;
 
