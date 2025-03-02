@@ -131,7 +131,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
             .withMotionMagic(
                 new MotionMagicConfigs()
                     .withMotionMagicCruiseVelocity(
-                        ElevatorConstants.synced.getObject().elevatorAngularCruiseVelocity.div(5.0))
+                        ElevatorConstants.synced.getObject().elevatorAngularCruiseVelocity)
                     .withMotionMagicExpo_kA(
                         ElevatorConstants.synced.getObject().elevatorExpo_kA_raw)
                     .withMotionMagicExpo_kV(

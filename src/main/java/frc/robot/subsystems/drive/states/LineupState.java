@@ -164,6 +164,11 @@ public class LineupState implements PeriodicStateInterface {
    */
   public boolean lineupFinished() {
     boolean latestObservationExists = latestObservation != null;
+    Logger.recordOutput("Drive/lineup/latestObservationExists", latestObservationExists);
+    if (!latestObservationExists) {
+      return false;
+    }
+
     boolean rotationCorrect =
         Math.abs(drive.getRotation().getRadians() - getRotationForReefSide().getRadians())
             < JsonConstants.drivetrainConstants.lineupRotationMarginRadians;
@@ -177,7 +182,6 @@ public class LineupState implements PeriodicStateInterface {
         Math.abs(drive.getChassisSpeeds().vyMetersPerSecond)
             < JsonConstants.drivetrainConstants.lineupVyThresholdMetersPerSecond;
 
-    Logger.recordOutput("Drive/lineup/latestObservationExists", latestObservationExists);
     Logger.recordOutput("Drive/lineup/rotationCorrect", rotationCorrect);
     Logger.recordOutput("Drive/lineup/alongTrackCorrect", alongTrackCorrect);
     Logger.recordOutput("Drive/lineup/crossTrackCorrect", crossTrackCorrect);
