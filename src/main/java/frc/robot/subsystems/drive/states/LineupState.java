@@ -158,13 +158,25 @@ public class LineupState implements PeriodicStateInterface {
    * @return true if error is small enoguh
    */
   public boolean lineupFinished() {
-    return latestObservation != null
+    boolean latestObservationExists = latestObservation != null;
+    boolean rotationCorrect =
+        Math.abs(drive.getRotation().getRadians() - getRotationForReefSide().getRadians()) < 0.05;
+    boolean alongTrackCorrect = latestObservation.alongTrackDistance() < 0.05;
+    boolean crossTrackCorrect = Math.abs(latestObservation.crossTrackDistance()) < 0.02;
+    boolean slowEnough = Math.abs(drive.getChassisSpeeds().vyMetersPerSecond) < 0.05;
+
+    Logger.recordOutput("Drive/lineup/latestObservationExists", latestObservationExists);
+    Logger.recordOutput("Drive/lineup/rotationCorrect", rotationCorrect);
+    Logger.recordOutput("Drive/lineup/alongTrackCorrect", alongTrackCorrect);
+    Logger.recordOutput("Drive/lineup/crossTrackCorrect", crossTrackCorrect);
+    Logger.recordOutput("Drive/lineup/slowEnough", slowEnough);
+
+    return latestObservationExists
         && hadObservationYet
-        && (Math.abs(drive.getRotation().getRadians() - getRotationForReefSide().getRadians())
-                < 0.05
-            && latestObservation.alongTrackDistance() < 0.05
-            && Math.abs(latestObservation.crossTrackDistance()) < 0.02
-            && Math.abs(drive.getChassisSpeeds().vyMetersPerSecond) < 0.05);
+        && rotationCorrect
+        && alongTrackCorrect
+        && crossTrackCorrect
+        && slowEnough;
   }
 
   public void periodic() {
