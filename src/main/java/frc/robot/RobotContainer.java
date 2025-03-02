@@ -133,7 +133,7 @@ public class RobotContainer {
       drive = InitSubsystems.initDriveSubsystem();
       if (FeatureFlags.synced.getObject().runVision) {
         vision = InitSubsystems.initVisionSubsystem(drive);
-
+        led.setVisionWorkingSupplier(() -> vision.isCoprocessorConnected()); //TODO: Change this to use logic 
         drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
       }
     }
@@ -255,7 +255,7 @@ public class RobotContainer {
         break;
 
       case LEDTest:
-        CommandScheduler.getInstance().schedule(led.runCycle());
+        // CommandScheduler.getInstance().schedule(led.runCycle());
       default:
         break;
     }

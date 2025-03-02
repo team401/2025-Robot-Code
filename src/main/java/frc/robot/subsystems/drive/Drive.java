@@ -883,4 +883,10 @@ public class Drive implements DriveTemplate {
         double crossTrackOffsetMeters,
         double alongTrackOffsetMeters);
   }
+
+  // DELTEE THISSS PLEASEEEEE
+  public boolean isCoastMode() {
+
+    return true;
+  }
 }

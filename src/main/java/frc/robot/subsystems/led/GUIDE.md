@@ -10,7 +10,7 @@ List of Colors:
 ``holdingCoral  =  Color.kMagenta;``
 
  ``targetOnReef  =  Color.kBlue;``
- 
+
 ``targetOnReefL1  =  Color.kCyan;``
 
 ``targetOnReefL2  =  Color.kTeal;``
