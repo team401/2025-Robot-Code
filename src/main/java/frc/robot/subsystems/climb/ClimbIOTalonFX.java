@@ -3,30 +3,37 @@ package frc.robot.subsystems.climb;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.ClimbConstants;
+import frc.robot.constants.JsonConstants;
 import java.util.function.BooleanSupplier;
+import org.littletonrobotics.junction.Logger;
 
 public class ClimbIOTalonFX implements ClimbIO {
 
   TalonFX leadMotor;
   TalonFX followerMotor;
+  CANcoder climbAngleCoder;
 
   TalonFXConfiguration talonFXConfigs;
 
-  // TODO: replace when sensors become available
-  private BooleanSupplier lockedToCage = () -> true;
+  // TODO: replace when sensors become available - apparently this is not happening actually but
+  // leaving this in case a better solution happens later
+  private BooleanSupplier lockedToCage = () -> false;
 
   private MutAngle goalAngle = Radians.mutable(0);
   private MutVoltage overrideVoltage = Volts.mutable(0.0);
@@ -37,8 +44,9 @@ public class ClimbIOTalonFX implements ClimbIO {
       new MotionMagicVoltage(ClimbConstants.synced.getObject().restingAngle);
 
   public ClimbIOTalonFX() {
-    leadMotor = new TalonFX(ClimbConstants.synced.getObject().leadClimbMotorId);
-    followerMotor = new TalonFX(ClimbConstants.synced.getObject().followerClimbMotorId);
+    leadMotor = new TalonFX(16, "canivore");
+    followerMotor = new TalonFX(17, "canivore");
+    climbAngleCoder = new CANcoder(17, "canivore");
 
     followerMotor.setControl(
         new Follower(
@@ -46,7 +54,14 @@ public class ClimbIOTalonFX implements ClimbIO {
 
     talonFXConfigs =
         new TalonFXConfiguration()
-            .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
+            .withFeedback(
+                new FeedbackConfigs()
+                    .withFeedbackRemoteSensorID(climbAngleCoder.getDeviceID())
+                    .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder))
+            .withMotorOutput(
+                new MotorOutputConfigs()
+                    .withNeutralMode(NeutralModeValue.Brake)
+                    .withInverted(JsonConstants.climbConstants.climbInvertValue))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
@@ -57,9 +72,9 @@ public class ClimbIOTalonFX implements ClimbIO {
                     .withKV(ClimbConstants.synced.getObject().climbkV)
                     .withKA(ClimbConstants.synced.getObject().climbkA)
                     .withKG(ClimbConstants.synced.getObject().climbkG)
-                    .withKP(ClimbConstants.synced.getObject().climbP)
-                    .withKI(ClimbConstants.synced.getObject().climbI)
-                    .withKD(ClimbConstants.synced.getObject().climbD))
+                    .withKP(ClimbConstants.synced.getObject().climbkP)
+                    .withKI(ClimbConstants.synced.getObject().climbkI)
+                    .withKD(ClimbConstants.synced.getObject().climbkD))
             .withMotionMagic(
                 new MotionMagicConfigs()
                     .withMotionMagicAcceleration(5)
@@ -76,20 +91,24 @@ public class ClimbIOTalonFX implements ClimbIO {
 
     inputs.lockedToCage = this.lockedToCage.getAsBoolean();
     inputs.goalAngle.mut_replace(goalAngle);
-    inputs.motorAngle.mut_replace(leadMotor.getPosition().getValue());
+    inputs.motorAngle.mut_replace(climbAngleCoder.getAbsolutePosition().getValue());
   }
 
   @Override
   public void applyOutputs(ClimbOutputs outputs) {
 
-    calculator.withPosition(goalAngle);
+    calculator.withPosition(goalAngle.in(Rotations));
+
+    Logger.recordOutput("climb/calculatorAngle", leadMotor.getPosition().getValueAsDouble());
 
     if (override) {
-      leadMotor.setVoltage(0);
+      leadMotor.setVoltage(overrideVoltage.in(Volts));
     } else {
       leadMotor.setControl(calculator);
     }
-
+    // tried to replace the above if statement with leadMotor.setControl(new VoltageOut(5));,
+    // doesn't work
+    // the getMotorVoltage continuously returns 0 despite leadMotor's literal voltage being set to 5
     outputs.appliedVoltage.mut_replace(leadMotor.getMotorVoltage().getValue());
   }
 
@@ -106,12 +125,44 @@ public class ClimbIOTalonFX implements ClimbIO {
   }
 
   @Override
+  public void setBrakeMode(boolean brake) {
+    if (brake) {
+      leadMotor
+          .getConfigurator()
+          .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Brake));
+      followerMotor
+          .getConfigurator()
+          .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Brake));
+    } else {
+      leadMotor
+          .getConfigurator()
+          .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Coast));
+      followerMotor
+          .getConfigurator()
+          .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Coast));
+    }
+  }
+
+  @Override
   public void setPID(double p, double i, double d) {
     Slot0Configs configs = talonFXConfigs.Slot0;
 
     configs.kP = p;
     configs.kI = i;
     configs.kD = d;
+
+    leadMotor.getConfigurator().apply(configs);
+    followerMotor.getConfigurator().apply(configs);
+  }
+
+  @Override
+  public void setFF(double kS, double kV, double kA, double kG) {
+    Slot0Configs configs = talonFXConfigs.Slot0;
+
+    configs.kS = kS;
+    configs.kV = kV;
+    configs.kA = kA;
+    configs.kG = kG;
 
     leadMotor.getConfigurator().apply(configs);
     followerMotor.getConfigurator().apply(configs);
