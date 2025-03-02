@@ -10,4 +10,5 @@ public class AutoStrategy {
   public List<DesiredLocation> scoringLocations = null;
   public List<FieldTarget> scoringLevels = null;
   public final DesiredLocation intakeLocation = null;
+  public final Boolean intakeAfterLastScore = true;
 }
