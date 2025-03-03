@@ -337,8 +337,10 @@ public class LineupState implements PeriodicStateInterface {
     int signOfError = cameraIndex == JsonConstants.visionConstants.FrontLeftCameraIndex ? 1 : -1;
     // distance between cameras (add or subtract so we still lock on to correct side)
     double offsetErrorCorrection =
-        JsonConstants.visionConstants.FrontLeftTransform.getY()
-            - JsonConstants.visionConstants.FrontRightTransform.getY();
+        checkForSideSwitch()
+            ? 0
+            : JsonConstants.visionConstants.FrontLeftTransform.getY()
+                - JsonConstants.visionConstants.FrontRightTransform.getY();
     DistanceToTag observationOtherCamera =
         alignmentSupplier.get(
             tagId,
