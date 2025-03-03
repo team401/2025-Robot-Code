@@ -44,13 +44,13 @@ public class BlueFieldLocations {
   public Translation2d blueCoralStationLeftTranslation = new Translation2d(1.2, 7);
   public Rotation2d blueCoralStationLeftRotation = new Rotation2d(Units.degreesToRadians(-60));
 
-  // left stack
+  // left stack center (1.2, 5.85)
   public Translation2d coralAlgaeStackLeftTopCorner = new Translation2d(1.3, 6.0);
   public Translation2d coralAlgaeStackLeftBottomCorner = new Translation2d(1.1, 5.7);
-  // middle stack
+  // middle stack center (1.2, 4.05)
   public Translation2d coralAlgaeStackMiddleTopCorner = new Translation2d(1.3, 4.2);
   public Translation2d coralAlgaeStackMiddleBottomCorner = new Translation2d(1.1, 3.9);
-  // right stack
+  // right stack center (1.2, 2.2)
   public Translation2d coralAlgaeStackRightTopCorner = new Translation2d(1.3, 2.35);
   public Translation2d coralAlgaeStackRightBottomCorner = new Translation2d(1.1, 2.05);
 }
