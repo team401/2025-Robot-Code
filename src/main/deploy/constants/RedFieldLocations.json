@@ -64,26 +64,26 @@
   },
   "coralAlgaeStackLeftTopCorner": {
     "x": 16.1,
-    "y": 0.0
+    "y": 2.05
   },
   "coralAlgaeStackLeftBottomCorner": {
     "x": 16.3,
-    "y": 0.0
+    "y": 2.35
   },
   "coralAlgaeStackMiddleTopCorner": {
     "x": 16.1,
-    "y": 0.0
+    "y": 3.9
   },
   "coralAlgaeStackMiddleBottomCorner": {
     "x": 16.3,
-    "y": 0.0
+    "y": 4.2
   },
   "coralAlgaeStackRightTopCorner": {
     "x": 16.1,
-    "y": 0.0
+    "y": 5.7
   },
   "coralAlgaeStackRightBottomCorner": {
     "x": 16.3,
-    "y": 0.0
+    "y": 6.0
   }
 }
