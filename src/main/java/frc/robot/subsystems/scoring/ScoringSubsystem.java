@@ -737,7 +737,9 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     Distance reefDistance = reefDistanceSupplier.get();
     Logger.recordOutput("scoring/reefDistanceSupplier", reefDistance);
     if (reefDistance.lt(JsonConstants.wristConstants.closeToReefThreshold)) {
-      if (elevatorHeight.lte(JsonConstants.elevatorConstants.minReefSafeHeight)) {
+      if (elevatorHeight.lte(JsonConstants.elevatorConstants.minReefSafeHeight)
+          && !isAlgaeDetected()) { // Don't slam wrist up if we're holding an algae, trust other
+        // clamps
         wristInToAvoidReefBase = true;
         // If elevator is next to reef base, make sure wrist doesn't hit it
         wristMinAngle.mut_replace(
@@ -745,10 +747,13 @@ public class ScoringSubsystem extends MonitoredSubsystem {
       }
 
       if (ReefAvoidanceHelper.willPassReefLevel(elevatorHeight, elevatorGoalHeight)) {
-        wristInToPassReef = true;
-        // If we will pass a reef level, clamp the wrist to be in a safe position to pass the reef
-        wristMinAngle.mut_replace(
-            (Angle) Measure.max(wristMinAngle, JsonConstants.wristConstants.minReefSafeAngle));
+        if (!isAlgaeDetected()) { // Don't slam wrist up if we're holding an algae, trust other
+          // clamps
+          wristInToPassReef = true;
+          // If we will pass a reef level, clamp the wrist to be in a safe position to pass the reef
+          wristMinAngle.mut_replace(
+              (Angle) Measure.max(wristMinAngle, JsonConstants.wristConstants.minReefSafeAngle));
+        }
 
         // If we will pass a reef level and the wrist is in an unsafe position to pass the reef,
         // clamp
