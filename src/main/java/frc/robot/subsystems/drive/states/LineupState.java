@@ -17,6 +17,7 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.constants.ModeConstants.Mode;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.drive.Drive.VisionAlignment;
 import frc.robot.subsystems.drive.ReefLineupUtil;
@@ -32,6 +33,7 @@ public class LineupState implements PeriodicStateInterface {
   private DistanceToTag latestObservation;
   private boolean hadObservationYet = false;
   private int observationAge;
+  private DesiredLocation lastReefLocation = DesiredLocation.Reef0;
 
   // along track pid test mode
   private LoggedTunableNumber alongTrackKp =
@@ -99,10 +101,6 @@ public class LineupState implements PeriodicStateInterface {
   }
 
   public void onEntry(Transition transition) {
-
-    if(PathfindingCommand.warmupCommand().isScheduled()) {
-      PathfindingCommand.warmupCommand().cancel();
-    }
     // Drive isn't done lining up
     drive.setDriveLinedUp(false);
 
@@ -114,6 +112,8 @@ public class LineupState implements PeriodicStateInterface {
     observationAge = 0;
 
     hadObservationYet = false;
+
+    lastReefLocation = drive.getDesiredLocation();
   }
 
   public void onExit(Transition transition) {
@@ -162,12 +162,38 @@ public class LineupState implements PeriodicStateInterface {
     }
   }
 
+  public boolean checkForSideSwitch () {
+    switch(drive.getDesiredLocation()) {
+      case Reef0:
+        if (lastReefLocation == DesiredLocation.Reef1) {
+          return true;
+        }
+        return false;
+        case Reef1:
+        if (lastReefLocation == DesiredLocation.Reef0) {
+          return true;
+        }
+        return false;
+        case Reef2:
+        if (lastReefLocation == DesiredLocation.Reef3) {
+          return true;
+        }
+        return false;
+        case Reef3:
+        if (lastReefLocation == DesiredLocation.Reef2) {
+          return true;
+        }
+        return false;
+    }
+  }
+
   /**
    * checks if lineup is within 0.01 of tag + offsets
    *
    * @return true if error is small enoguh
    */
   public boolean lineupFinished() {
+    boolean switchedSides = checkForSideSwitch();
     boolean latestObservationExists = latestObservation != null;
     Logger.recordOutput("Drive/lineup/latestObservationExists", latestObservationExists);
     if (!latestObservationExists) {
@@ -187,6 +213,7 @@ public class LineupState implements PeriodicStateInterface {
         Math.abs(drive.getChassisSpeeds().vyMetersPerSecond)
             < JsonConstants.drivetrainConstants.lineupVyThresholdMetersPerSecond;
 
+    Logger.recordOutput("Drive/lineup/sideSwitched", switchedSides);
     Logger.recordOutput("Drive/lineup/rotationCorrect", rotationCorrect);
     Logger.recordOutput("Drive/lineup/alongTrackCorrect", alongTrackCorrect);
     Logger.recordOutput("Drive/lineup/crossTrackCorrect", crossTrackCorrect);
@@ -197,7 +224,8 @@ public class LineupState implements PeriodicStateInterface {
         && rotationCorrect
         && alongTrackCorrect
         && crossTrackCorrect
-        && vyLowEnough;
+        && vyLowEnough
+        && !switchedSides;
   }
 
   public void periodic() {
@@ -209,6 +237,8 @@ public class LineupState implements PeriodicStateInterface {
     if (DriverStation.isTest()) {
       this.testPeriodic();
     }
+
+    
     this.LineupWithReefLocation();
 
     drive.setDriveLinedUp(lineupFinished());
