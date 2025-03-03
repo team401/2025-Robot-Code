@@ -53,7 +53,6 @@ import frc.robot.subsystems.drive.states.JoystickDrive;
 import frc.robot.subsystems.drive.states.LineupState;
 import frc.robot.subsystems.drive.states.OTFState;
 import frc.robot.util.LocalADStarAK;
-
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -324,18 +323,16 @@ public class Drive implements DriveTemplate {
     stateMachine = new StateMachine<>(stateMachineConfiguration, DriveState.Joystick);
   }
 
-  /**
-   * add algae coral stack obstacles for on the fly
-   */
+  /** add algae coral stack obstacles for on the fly */
   public void autonomousInit() {
-    localADStar.setDynamicObstacles(List.of(new Pair<Translation2d, Translation2d>(null, null)), getPose().getTranslation());
+    localADStar.setDynamicObstacles(
+        List.of(new Pair<Translation2d, Translation2d>(null, null)), getPose().getTranslation());
   }
 
-   /**
-   * remove algae coral stack obstacles for on the fly
-   */
+  /** remove algae coral stack obstacles for on the fly */
   public void teleopInit() {
-    localADStar.setDynamicObstacles(List.of(new Pair<Translation2d, Translation2d>(null, null)), getPose().getTranslation());
+    localADStar.setDynamicObstacles(
+        List.of(new Pair<Translation2d, Translation2d>(null, null)), getPose().getTranslation());
   }
 
   @Override

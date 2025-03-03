@@ -61,5 +61,29 @@
   },
   "blueCoralStationLeftRotation": {
     "radians": -1.0471975511965976
+  },
+  "coralAlgaeStackLeftTopCorner": {
+    "x": 0.0,
+    "y": 0.0
+  },
+  "coralAlgaeStackLeftBottomCorner": {
+    "x": 0.0,
+    "y": 0.0
+  },
+  "coralAlgaeStackMiddleTopCorner": {
+    "x": 0.0,
+    "y": 0.0
+  },
+  "coralAlgaeStackMiddleBottomCorner": {
+    "x": 0.0,
+    "y": 0.0
+  },
+  "coralAlgaeStackRightTopCorner": {
+    "x": 0.0,
+    "y": 0.0
+  },
+  "coralAlgaeStackRightBottomCorner": {
+    "x": 0.0,
+    "y": 0.0
   }
 }

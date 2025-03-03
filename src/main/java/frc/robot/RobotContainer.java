@@ -213,7 +213,7 @@ public class RobotContainer {
 
   public void teleopInit() {
     drive.teleopInit();
-    
+
     strategyManager.teleopInit();
   }
 
