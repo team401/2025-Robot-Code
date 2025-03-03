@@ -325,8 +325,33 @@ public class Drive implements DriveTemplate {
 
   /** add algae coral stack obstacles for on the fly */
   public void autonomousInit() {
-    localADStar.setDynamicObstacles(
-        List.of(new Pair<Translation2d, Translation2d>(null, null)), getPose().getTranslation());
+    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+      localADStar.setDynamicObstacles(
+          List.of(
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackLeftTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackLeftBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackRightTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackRightBottomCorner)),
+          getPose().getTranslation());
+    } else {
+      localADStar.setDynamicObstacles(
+          List.of(
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackRightTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackRightBottomCorner)),
+          getPose().getTranslation());
+    }
   }
 
   /** remove algae coral stack obstacles for on the fly */
