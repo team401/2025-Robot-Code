@@ -330,7 +330,6 @@ public class StrategyManager {
       int reefLocation = drive.getDesiredLocationIndex();
 
       if (reefLocation != -1) {
-        System.out.println("publishing default reef" + reefLocation);
         reefLocationPublisher.accept(reefLocation);
       }
 
