@@ -31,6 +31,8 @@
   "driveAlongTrackOffset": 0.25,
   "driveCrossTrackFrontRightOffset": 0.0,
   "driveCrossTrackFrontLeftOffset": 0.0,
+  "driveCrossTrackFrontRightAlgaeOffset": 0.25,
+  "driveCrossTrackFrontLeftAlgaeOffset": 0.25,
   "lineupRotationMarginRadians": 0.05,
   "lineupAlongTrackThresholdMeters": 0.05,
   "lineupCrossTrackThresholdMeters": 0.02,

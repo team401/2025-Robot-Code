@@ -1,6 +1,8 @@
 package frc.robot.subsystems.drive;
 
 import frc.robot.constants.JsonConstants;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 
 /** Provides utilities for finding the reef tag ID and camera ID to use for lineup */
 public class ReefLineupUtil {
@@ -71,9 +73,17 @@ public class ReefLineupUtil {
    */
   public static Double getCrossTrackOffset(int cameraIndex) {
     if (cameraIndex == JsonConstants.visionConstants.FrontRightCameraIndex) {
-      return JsonConstants.drivetrainConstants.driveCrossTrackFrontRightOffset;
+      if (ScoringSubsystem.getInstance() != null
+          && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+        return JsonConstants.drivetrainConstants.driveCrossTrackFrontRightOffset; // coral
+      }
+      return JsonConstants.drivetrainConstants.driveCrossTrackFrontRightAlgaeOffset; // algae
     } else {
-      return JsonConstants.drivetrainConstants.driveCrossTrackFrontLeftOffset;
+      if (ScoringSubsystem.getInstance() != null
+          && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+        return JsonConstants.drivetrainConstants.driveCrossTrackFrontLeftOffset; // coral
+      }
+      return JsonConstants.drivetrainConstants.driveCrossTrackFrontLeftAlgaeOffset; // algae
     }
   }
 }

@@ -81,8 +81,10 @@ public class DrivetrainConstants {
   public final Double driveRotationKd = 0.0;
   public final Double driveAlongTrackMultiplier = -1.0;
   public final Double driveAlongTrackOffset = 0.25;
-  public final Double driveCrossTrackFrontRightOffset = 0.25;
-  public final Double driveCrossTrackFrontLeftOffset = 0.25;
+  public final Double driveCrossTrackFrontRightOffset = 0.0;
+  public final Double driveCrossTrackFrontLeftOffset = 0.0;
+  public final Double driveCrossTrackFrontRightAlgaeOffset = 0.25;
+  public final Double driveCrossTrackFrontLeftAlgaeOffset = 0.25;
 
   public final Double lineupMaxVelocity = 3.0;
   public final Double lineupMaxAcceleration = 1.5;
