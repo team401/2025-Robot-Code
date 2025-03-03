@@ -45,12 +45,12 @@ public class BlueFieldLocations {
   public Rotation2d blueCoralStationLeftRotation = new Rotation2d(Units.degreesToRadians(-60));
 
   // left stack
-  public Translation2d coralAlgaeStackLeftTopCorner = new Translation2d();
-  public Translation2d coralAlgaeStackLeftBottomCorner = new Translation2d();
+  public Translation2d coralAlgaeStackLeftTopCorner = new Translation2d(1.3,0);
+  public Translation2d coralAlgaeStackLeftBottomCorner = new Translation2d(1.1,0);
   // middle stack
-  public Translation2d coralAlgaeStackMiddleTopCorner = new Translation2d();
-  public Translation2d coralAlgaeStackMiddleBottomCorner = new Translation2d();
+  public Translation2d coralAlgaeStackMiddleTopCorner = new Translation2d(1.3,0);
+  public Translation2d coralAlgaeStackMiddleBottomCorner = new Translation2d(1.1,0);
   // right stack
-  public Translation2d coralAlgaeStackRightTopCorner = new Translation2d();
-  public Translation2d coralAlgaeStackRightBottomCorner = new Translation2d();
+  public Translation2d coralAlgaeStackRightTopCorner = new Translation2d(1.3,0);
+  public Translation2d coralAlgaeStackRightBottomCorner = new Translation2d(1.1,0);
 }
