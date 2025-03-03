@@ -236,8 +236,6 @@ public class StrategyManager {
 
     // scoring level selection
     if (scoringSubsystem != null) {
-      scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
-
       // update scoring gamepiece
       String gamePiece = gamePieceSelector.get();
 
@@ -246,6 +244,8 @@ public class StrategyManager {
       } else if (gamePiece.equalsIgnoreCase("algae")) {
         scoringSubsystem.setGamePiece(GamePiece.Algae);
       }
+
+      scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
     }
 
     // update autonomy level

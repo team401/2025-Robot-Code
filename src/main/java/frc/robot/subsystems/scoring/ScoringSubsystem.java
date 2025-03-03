@@ -342,7 +342,11 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     }
 
     if (level.equalsIgnoreCase("level1")) {
-      this.setTarget(FieldTarget.L1);
+      if (currentPiece == GamePiece.Algae) {
+        this.setTarget(FieldTarget.Processor);
+      } else {
+        this.setTarget(FieldTarget.L1);
+      }
     }
     if (level.equalsIgnoreCase("level2")) {
       this.setTarget(FieldTarget.L2);
@@ -351,7 +355,11 @@ public class ScoringSubsystem extends MonitoredSubsystem {
       this.setTarget(FieldTarget.L3);
     }
     if (level.equalsIgnoreCase("level4")) {
-      this.setTarget(FieldTarget.L4);
+      if (currentPiece == GamePiece.Algae) {
+        this.setTarget(FieldTarget.Net);
+      } else {
+        this.setTarget(FieldTarget.L4);
+      }
     }
   }
 
