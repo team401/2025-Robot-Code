@@ -24,6 +24,8 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 import org.littletonrobotics.junction.Logger;
 
+import com.pathplanner.lib.commands.PathfindingCommand;
+
 public class LineupState implements PeriodicStateInterface {
   private Drive drive;
 
@@ -98,6 +100,9 @@ public class LineupState implements PeriodicStateInterface {
 
   public void onEntry(Transition transition) {
 
+    if(PathfindingCommand.warmupCommand().isScheduled()) {
+      PathfindingCommand.warmupCommand().cancel();
+    }
     // Drive isn't done lining up
     drive.setDriveLinedUp(false);
 
