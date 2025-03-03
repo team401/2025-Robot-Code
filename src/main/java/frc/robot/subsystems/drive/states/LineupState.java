@@ -225,6 +225,20 @@ public class LineupState implements PeriodicStateInterface {
     }
   }
 
+  /** checks for reef location update and handles state accordingly */
+  public void checkForReefUpdate() {
+    // if we changed sides throw a invalid observation out so lineup doesnt think its finished and
+    // we can move on to other side
+    if (checkForSideSwitch()) {
+      latestObservation = new DistanceToTag(0, 0, false);
+    }
+    // if we changed locations and its not to the other side we need to go back to OTF to get
+    // within tag distance
+    else if (drive.getDesiredLocation() != lastReefLocation && !checkForSideSwitch()) {
+      drive.fireTrigger(DriveTrigger.BeginOTF);
+    }
+  }
+
   /**
    * checks if lineup is within 0.01 of tag + offsets
    *
@@ -232,9 +246,9 @@ public class LineupState implements PeriodicStateInterface {
    */
   public boolean lineupFinished() {
     boolean switchedSides = checkForSideSwitch();
-    boolean latestObservationExists = latestObservation != null;
-    Logger.recordOutput("Drive/lineup/latestObservationExists", latestObservationExists);
-    if (!latestObservationExists) {
+    boolean latestObservationIsValid = latestObservation != null && latestObservation.isValid();
+    Logger.recordOutput("Drive/lineup/latestObservationIsValid", latestObservationIsValid);
+    if (!latestObservationIsValid) {
       return false;
     }
 
@@ -257,7 +271,7 @@ public class LineupState implements PeriodicStateInterface {
     Logger.recordOutput("Drive/lineup/crossTrackCorrect", crossTrackCorrect);
     Logger.recordOutput("Drive/lineup/vyLowEnough", vyLowEnough);
 
-    return latestObservationExists
+    return latestObservationIsValid
         && hadObservationYet
         && rotationCorrect
         && alongTrackCorrect
@@ -275,6 +289,9 @@ public class LineupState implements PeriodicStateInterface {
     if (DriverStation.isTest()) {
       this.testPeriodic();
     }
+
+    // handles drive state due to reef location change
+    checkForReefUpdate();
 
     this.LineupWithReefLocation();
 
