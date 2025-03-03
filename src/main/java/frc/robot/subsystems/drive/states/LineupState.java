@@ -377,14 +377,17 @@ public class LineupState implements PeriodicStateInterface {
 
     if (!observation.isValid()) {
       DistanceToTag otherCameraObs = tryOtherCamera(alignmentSupplier, tagId, cameraIndex);
+      // use previous observation as long as its new enough
       if (observationAge < JsonConstants.drivetrainConstants.maxObservationAge) {
         if (latestObservation != null && latestObservation.isValid()) {
           observation = latestObservation;
         }
         observationAge++;
+      // check if the other camera has observation (maybe we switched to other pole or camera got unplugged)
       } else if (otherCameraObs != null && otherCameraObs.isValid()) {
         latestObservation = otherCameraObs;
         observationAge = 0;
+      // observation too old and other camera cant see -> time to cancel
       } else {
         // cancel lineup if we havent seen a observation after five times
         drive.fireTrigger(DriveTrigger.CancelLineup);
