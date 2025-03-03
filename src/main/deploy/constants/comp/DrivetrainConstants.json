@@ -40,6 +40,7 @@
   "otfVisionCrossTrackThreshold": 0.5,
   "lineupMaxVelocity": 4.0,
   "lineupMaxAcceleration": 2.5,
+  "maxObservationAge": 5,
   "lineupAlongTrackSlowDownDistance": 0.3,
   "lineupAlongTrackSlowDownMultiplier": 0.2,
   "otfPoseEndingVelocity": 0.5,

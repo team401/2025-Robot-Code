@@ -91,8 +91,6 @@ public class LineupState implements PeriodicStateInterface {
   LinearFilter alongTrackFilter = LinearFilter.singlePoleIIR(0.2, 0.02);
   LinearFilter crossTrackFilter = LinearFilter.singlePoleIIR(0.2, 0.02);
 
-  private boolean otherCameraTried = false;
-
   public LineupState(Drive drive) {
     this.drive = drive;
     rotationController.enableContinuousInput(-Math.PI / 2, Math.PI / 2);
@@ -335,18 +333,20 @@ public class LineupState implements PeriodicStateInterface {
   public DistanceToTag tryOtherCamera(
       VisionAlignment alignmentSupplier, int tagId, int cameraIndex) {
     int otherCameraIndex = cameraIndex == 0 ? 1 : 0;
-    otherCameraTried = true;
+    // check to add or subtract offset error
+    int signOfError = cameraIndex == JsonConstants.visionConstants.FrontLeftCameraIndex ? 1 : -1;
+    // distance between cameras (add or subtract so we still lock on to correct side)
+    double offsetErrorCorrection =
+        JsonConstants.visionConstants.FrontLeftTransform.getY()
+            - JsonConstants.visionConstants.FrontRightTransform.getY();
     DistanceToTag observationOtherCamera =
         alignmentSupplier.get(
             tagId,
             otherCameraIndex,
-            ReefLineupUtil.getCrossTrackOffset(otherCameraIndex),
+            ReefLineupUtil.getCrossTrackOffset(otherCameraIndex)
+                + (signOfError * offsetErrorCorrection),
             JsonConstants.drivetrainConstants.driveAlongTrackOffset);
-    if (observationOtherCamera.isValid()) {
-      return observationOtherCamera;
-    }
-
-    return null;
+    return observationOtherCamera;
   }
 
   /** take over goal speeds to align to reef exactly */
@@ -374,23 +374,19 @@ public class LineupState implements PeriodicStateInterface {
             JsonConstants.drivetrainConstants.driveAlongTrackOffset);
 
     if (!observation.isValid()) {
-      if (observationAge < 5) {
+      DistanceToTag otherCameraObs = tryOtherCamera(alignmentSupplier, tagId, cameraIndex);
+      if (observationAge < JsonConstants.drivetrainConstants.maxObservationAge) {
         if (latestObservation != null && latestObservation.isValid()) {
           observation = latestObservation;
         }
         observationAge++;
-      } else if (observationAge > 5) {
+      } else if (otherCameraObs != null && otherCameraObs.isValid()) {
+        latestObservation = otherCameraObs;
+        observationAge = 0;
+      } else {
         // cancel lineup if we havent seen a observation after five times
         drive.fireTrigger(DriveTrigger.CancelLineup);
       }
-      // } else if (!otherCameraTried) {
-      //   // check other camera (for when otf comes in from other side)
-      //   DistanceToTag otherCameraObs = tryOtherCamera(alignmentSupplier, tagId, cameraIndex);
-
-      //   if (otherCameraObs != null) {
-      //     observation = otherCameraObs;
-      //   }
-      // }
     } else {
       latestObservation = observation;
       // begin warming up elevator/wrist when lineup starts
