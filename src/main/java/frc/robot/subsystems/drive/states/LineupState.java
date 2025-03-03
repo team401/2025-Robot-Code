@@ -279,7 +279,7 @@ public class LineupState implements PeriodicStateInterface {
     this.LineupWithReefLocation();
 
     drive.setDriveLinedUp(lineupFinished());
-    Logger.recordOutput("lineup/finished", lineupFinished());
+    Logger.recordOutput("drive/lineup/finished", lineupFinished());
   }
 
   public double getAlongTrackVelocity(double alongTrackDistance) {
