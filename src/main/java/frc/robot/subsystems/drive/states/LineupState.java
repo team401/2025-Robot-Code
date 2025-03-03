@@ -25,8 +25,6 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 import org.littletonrobotics.junction.Logger;
 
-import com.pathplanner.lib.commands.PathfindingCommand;
-
 public class LineupState implements PeriodicStateInterface {
   private Drive drive;
 
@@ -162,27 +160,69 @@ public class LineupState implements PeriodicStateInterface {
     }
   }
 
-  public boolean checkForSideSwitch () {
-    switch(drive.getDesiredLocation()) {
+  public boolean checkForSideSwitch() {
+    switch (drive.getDesiredLocation()) {
       case Reef0:
         if (lastReefLocation == DesiredLocation.Reef1) {
           return true;
         }
         return false;
-        case Reef1:
+      case Reef1:
         if (lastReefLocation == DesiredLocation.Reef0) {
           return true;
         }
         return false;
-        case Reef2:
+      case Reef2:
         if (lastReefLocation == DesiredLocation.Reef3) {
           return true;
         }
         return false;
-        case Reef3:
+      case Reef3:
         if (lastReefLocation == DesiredLocation.Reef2) {
           return true;
         }
+        return false;
+      case Reef4:
+        if (lastReefLocation == DesiredLocation.Reef5) {
+          return true;
+        }
+        return false;
+      case Reef5:
+        if (lastReefLocation == DesiredLocation.Reef4) {
+          return true;
+        }
+        return false;
+      case Reef6:
+        if (lastReefLocation == DesiredLocation.Reef7) {
+          return true;
+        }
+        return false;
+      case Reef7:
+        if (lastReefLocation == DesiredLocation.Reef6) {
+          return true;
+        }
+        return false;
+      case Reef8:
+        if (lastReefLocation == DesiredLocation.Reef9) {
+          return true;
+        }
+        return false;
+      case Reef9:
+        if (lastReefLocation == DesiredLocation.Reef8) {
+          return true;
+        }
+        return false;
+      case Reef10:
+        if (lastReefLocation == DesiredLocation.Reef11) {
+          return true;
+        }
+        return false;
+      case Reef11:
+        if (lastReefLocation == DesiredLocation.Reef10) {
+          return true;
+        }
+        return false;
+      default:
         return false;
     }
   }
@@ -238,7 +278,6 @@ public class LineupState implements PeriodicStateInterface {
       this.testPeriodic();
     }
 
-    
     this.LineupWithReefLocation();
 
     drive.setDriveLinedUp(lineupFinished());
