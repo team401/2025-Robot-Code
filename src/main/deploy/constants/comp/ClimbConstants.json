@@ -1,21 +1,21 @@
 {
   "restingAngle": {
-    "value": 20.0,
-    "unit": "Degree"
+    "value": 0.1,
+    "unit": "Radian"
   },
   "searchingAngle": {
-    "value": 60.0,
-    "unit": "Degree"
+    "value": 1.1,
+    "unit": "Radian"
   },
   "finalHangingAngle": {
-    "value": 0.0,
-    "unit": "Degree"
+    "value": 0.1,
+    "unit": "Radian"
   },
-  "leadClimbMotorId": 0,
-  "followerClimbMotorId": 1,
-  "climbP": 5,
-  "climbI": 0,
-  "climbD": 0,
+  "leadClimbMotorId": 16,
+  "followerClimbMotorId": 17,
+  "climbkP": 30.0,
+  "climbkI": 0.0,
+  "climbkD": 0.0,
   "climbCurrentLimit": 60,
-  "invertFollowerClimbMotor": false
+  "invertFollowerClimbMotor": true
 }

@@ -1,12 +1,8 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.wpilib_interface.DriveWithJoysticks;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -20,6 +16,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.ramp.RampSubsystem;
+import frc.robot.subsystems.ramp.states.RampState.RampTriggers;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
@@ -51,46 +48,72 @@ public final class InitBindings {
 
     // hold right joystick trigger down to have drive go to desired location
     rightJoystick
-        .button(1)
+        .trigger()
         .onTrue(
             new InstantCommand(
                 () -> {
-                  if (strategyManager.getAutonomyMode() != AutonomyMode.Manual) {
-                    drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                  switch (strategyManager.getAutonomyMode()) {
+                    case Full:
+                      // If a binding is used in full autonomy, switch to mixed autonomy
+                      strategyManager.setAutonomyMode(AutonomyMode.Mixed);
+                      // And then fall through to the mixed autonomy behavior (no break here is
+                      // intentional)
+                    case Mixed:
+                      drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                      break;
+                    case Manual:
+                      // Only start scoring warmup if in manual autonomy; in mixed and full,
+                      // drivetrain triggers this when it enters lineup
+                      if (ScoringSubsystem.getInstance() != null) {
+                        ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+                      }
+                      break;
                   }
-                  ;
                 },
                 drive));
+
     rightJoystick
-        .button(1)
+        .trigger()
         .onFalse(
             new InstantCommand(
                 () -> {
-                  if (strategyManager.getAutonomyMode() != AutonomyMode.Manual) {
-                    drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
-                    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.CancelWarmup);
+                  switch (strategyManager.getAutonomyMode()) {
+                    case Full:
+                      // If a binding is used in full autonomy, switch to mixed autonomy
+                      strategyManager.setAutonomyMode(AutonomyMode.Mixed);
+                      // And then fall through to the mixed autonomy behavior (no break here is
+                      // intentional)
+                    case Mixed:
+                      // Cancel auto align if in mixed autonomy
+                      drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+                      // Then always cancel warmup for scoring (no break here is intentional)
+                    case Manual:
+                      if (ScoringSubsystem.getInstance() != null) {
+                        ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.CancelWarmup);
+                      }
+                      break;
                   }
-                  ;
                 },
                 drive));
 
     leftJoystick
-        .button(1)
+        .top()
         .onTrue(
             new InstantCommand(
                 () -> {
-                  drive.angleController.reset(drive.getRotation().getRadians());
-                  drive.alignToFieldElement();
+                  // Left joystick top button toggles reef align
+                  if (drive.isAligningToFieldElement()) {
+                    // If already aligning, stop
+                    drive.disableAlign();
+                  } else {
+                    // If not already aligning, start
+                    drive.angleController.reset(drive.getRotation().getRadians());
+                    drive.alignToFieldElement();
+                  }
                 },
                 drive));
-    leftJoystick
-        .button(1)
-        .onFalse(
-            new InstantCommand(
-                () -> {
-                  drive.disableAlign();
-                },
-                drive)); // pov right (reef 0-11 -> processor left -> processor right )
+
+    // pov right (reef 0-11 -> processor left -> processor right )
     // pov left (goes backwards of right)
     driverController
         .povRight()
@@ -110,33 +133,65 @@ public final class InitBindings {
                 },
                 drive));
 
+    // TODO: Rebind localization if necessary
+    // leftJoystick
+    //     .top()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               drive.setPose(
+    //                   new Pose2d(
+    //                       Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
+    //             }));
+
+    // Hold left trigger to intake, release to cancel
     leftJoystick
-        .top()
+        .trigger()
         .onTrue(
             new InstantCommand(
                 () -> {
-                  drive.setPose(
-                      new Pose2d(
-                          Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
-                }));
-    rightJoystick
-        .top()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  drive.setDesiredIntakeLocation(DesiredLocation.CoralStationRight);
-                  drive.setGoToIntake(true);
-                  drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                  switch (strategyManager.getAutonomyMode()) {
+                    case Full:
+                      // If a binding is used in full autonomy, switch to mixed autonomy
+                      strategyManager.setAutonomyMode(AutonomyMode.Mixed);
+                      // And then fall through to the mixed autonomy behavior (no break here is
+                      // intentional)
+                    case Mixed:
+                      // Start auto align if in mixed autonomy
+                      drive.setDesiredIntakeLocation(DesiredLocation.CoralStationRight);
+                      drive.setGoToIntake(true);
+                      drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                      // Then always start intake for scoring (no break here is intentional)
+                    case Manual:
+                      if (ScoringSubsystem.getInstance() != null) {
+                        ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.BeginIntake);
+                      }
+                      break;
+                  }
                 },
                 drive));
-
-    rightJoystick
-        .top()
+    leftJoystick
+        .trigger()
         .onFalse(
             new InstantCommand(
                 () -> {
-                  drive.setGoToIntake(false);
-                  drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+                  switch (strategyManager.getAutonomyMode()) {
+                    case Full:
+                      // If a binding is used in full autonomy, switch to mixed autonomy
+                      strategyManager.setAutonomyMode(AutonomyMode.Mixed);
+                      // And then fall through to the mixed autonomy behavior (no break here is
+                      // intentional)
+                    case Mixed:
+                      // Cancel auto align if in mixed autonomy
+                      drive.setGoToIntake(false);
+                      drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+                      // Then always cancel intake for scoring (no break here is intentional)
+                    case Manual:
+                      if (ScoringSubsystem.getInstance() != null) {
+                        ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.CancelIntake);
+                      }
+                      break;
+                  }
                 },
                 drive));
   }
@@ -147,23 +202,35 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.prepareForClimb();
+                  rampSubsystem.fireTrigger(RampTriggers.START_CLIMB);
                 }));
     driverController
         .x()
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.prepareForIntake();
+                  rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
                 }));
   }
 
   public static void initClimbBindings(ClimbSubsystem climb) {
     driverController.a().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)));
     driverController.b().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)));
+
+    // TODO: Find actual numbers for these buttons using driverstation
+    leftJoystick.button(3).onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)));
+
+    leftJoystick.button(4).onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)));
   }
 
   public static void initScoringBindings(ScoringSubsystem scoring) {
+    driverController
+        .x()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  scoring.fireTrigger(ScoringTrigger.BeginIntake);
+                }));
     driverController
         .y()
         .onTrue(
@@ -246,5 +313,9 @@ public final class InitBindings {
       default:
         break;
     }
+  }
+
+  public static boolean isManualScorePressed() {
+    return rightJoystick.top().getAsBoolean();
   }
 }

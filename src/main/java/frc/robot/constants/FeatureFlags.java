@@ -18,8 +18,5 @@ public final class FeatureFlags {
   public final Boolean runClimb = true;
   public final Boolean runDrive = true;
   public Boolean runVision = true;
-  public final Boolean runScoring = false;
-  // public final Boolean runElevator = true; // TODO: Figure out if we need Mechanism-level feature
-  // flags
-  // public final Boolean runClaw = true;
+  public final Boolean runScoring = true;
 }

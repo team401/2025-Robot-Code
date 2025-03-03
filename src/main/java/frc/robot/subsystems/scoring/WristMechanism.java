@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.VoltsPerRadianPerSecondSquared;
 import coppercore.parameter_tools.LoggedTunableNumber;
 import coppercore.wpilib_interface.UnitUtils;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
@@ -254,6 +255,15 @@ public class WristMechanism {
    */
   public Angle getWristAngle() {
     return inputs.wristPosition;
+  }
+
+  /**
+   * Get the current angular velocity of the wrist
+   *
+   * @return The current velocity of the wrist, according to the wrist encoder
+   */
+  public AngularVelocity getWristVelocity() {
+    return inputs.wristVelocity;
   }
 
   /**

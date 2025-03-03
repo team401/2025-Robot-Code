@@ -1,12 +1,15 @@
 package frc.robot.constants;
 
-import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Radians;
 
+import com.ctre.phoenix6.signals.InvertedValue;
+import coppercore.parameter_tools.json.JSONExclude;
 import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
 import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 import edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.Filesystem;
 
 public class ClimbConstants {
 
@@ -17,32 +20,36 @@ public class ClimbConstants {
           EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
-  public final Angle restingAngle = Degrees.of(20);
-  public final Angle searchingAngle = Degrees.of(60);
-  public final Angle finalHangingAngle = Degrees.of(0);
+  public final Angle restingAngle = Radians.of(0);
+  public final Angle searchingAngle = Radians.of(1);
+  public final Angle finalHangingAngle = Radians.of(0.1);
 
-  public final Integer leadClimbMotorId = 0;
-  public final Integer followerClimbMotorId = 1;
+  public final Integer leadClimbMotorId = 16;
+  public final Integer followerClimbMotorId = 17;
 
   public final Double climbkS = 0.0;
   public final Double climbkV = 0.0;
   public final Double climbkA = 0.0;
   public final Double climbkG = 0.0;
-  public final Double climbP = 50.0;
-  public final Double climbI = 0.0;
-  public final Double climbD = 0.0;
+  public final Double climbkP = 5.0;
+  public final Double climbkI = 0.0;
+  public final Double climbkD = 0.0;
 
   public final Double climbCurrentLimit = 60.0;
 
-  public final Boolean invertFollowerClimbMotor = false;
+  public final InvertedValue climbInvertValue = InvertedValue.Clockwise_Positive;
+  public final Boolean invertFollowerClimbMotor = true;
 
   public static final class Sim {
+    @JSONExclude
     public static final JSONSync<ClimbConstants.Sim> synced =
         new JSONSync<ClimbConstants.Sim>(
             new ClimbConstants.Sim(),
-            "ClimbConstants.Sim.json",
-            EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
-            new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
+            Filesystem.getDeployDirectory()
+                .toPath()
+                .resolve("constants/ClimbConstants.Sim.json")
+                .toString(),
+            new JSONSyncConfigBuilder().build());
 
     public final Double climbArmLengthMeters = 0.5;
     public final Double climbArmMassKg = 0.5;

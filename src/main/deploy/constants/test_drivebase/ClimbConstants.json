@@ -13,9 +13,9 @@
   },
   "leadClimbMotorId": 34,
   "followerClimbMotorId": 35,
-  "climbP": 5,
-  "climbI": 0,
-  "climbD": 0,
+  "climbkP": 5,
+  "climbkI": 0,
+  "climbkD": 0,
   "climbCurrentLimit": 60,
   "invertFollowerClimbMotor": false
 }

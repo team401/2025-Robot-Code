@@ -1,10 +1,13 @@
 package frc.robot;
 
 import edu.wpi.first.networktables.BooleanPublisher;
+import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StringSubscriber;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.strategies.AutoIntake;
@@ -13,6 +16,7 @@ import frc.robot.constants.AutoStrategy;
 import frc.robot.constants.AutoStrategyContainer.Action;
 import frc.robot.constants.AutoStrategyContainer.ActionType;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
@@ -23,7 +27,7 @@ import org.littletonrobotics.junction.Logger;
 public class StrategyManager {
   public enum AutonomyMode {
     Full,
-    Teleop,
+    Mixed,
     Manual,
   }
 
@@ -37,9 +41,18 @@ public class StrategyManager {
   private NetworkTableInstance inst = NetworkTableInstance.getDefault();
   private NetworkTable table = inst.getTable("");
   private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
+  private DoubleSubscriber intakeLocationSelector =
+      table.getDoubleTopic("stationTarget").subscribe(-1);
   private StringSubscriber reefLevelSelector = table.getStringTopic("scoreHeight").subscribe("-1");
   private StringSubscriber autonomySelector =
       table.getStringTopic("autonomyLevel").subscribe("mid");
+  private StringSubscriber gamePieceSelector = table.getStringTopic("gpMode").subscribe("-1");
+
+  private StringPublisher autonomyPublisher = table.getStringTopic("autonomyLevel").publish();
+  private DoublePublisher reefLocationPublisher = table.getDoubleTopic("reefTarget").publish();
+  private DoublePublisher intakeLocationPublisher = table.getDoubleTopic("stationTarget").publish();
+  private StringPublisher reefLevelPublisher = table.getStringTopic("scoreHeight").publish();
+  private StringPublisher gamePiecePublisher = table.getStringTopic("gpMode").publish();
   private BooleanPublisher hasCoralPublisher = table.getBooleanTopic("hasCoral").publish();
   private BooleanPublisher hasAlgaePublisher = table.getBooleanTopic("hasAlgae").publish();
 
@@ -130,8 +143,12 @@ public class StrategyManager {
           new Action(
               ActionType.Score, GamePiece.Coral, strategy.scoringLocations.get(i), scoringLevel));
 
-      // intake after each score
-      this.addAction(new Action(ActionType.Intake, GamePiece.Coral, strategy.intakeLocation, null));
+      if (!(i == strategy.scoringLocations.size() - 1 && !strategy.intakeAfterLastScore)) {
+        // intake after each score, only if it is not the last scoring location and the auto isn't
+        // configured to not intake after last score
+        this.addAction(
+            new Action(ActionType.Intake, GamePiece.Coral, strategy.intakeLocation, null));
+      }
     }
   }
 
@@ -148,7 +165,7 @@ public class StrategyManager {
     if (action.type() == ActionType.Intake) {
       switch (this.autonomyMode) {
         case Full:
-        case Teleop:
+        case Mixed:
         case Manual:
         default:
           return new AutoIntake(drive, scoringSubsystem, action.location(), action.scoringTarget());
@@ -156,7 +173,7 @@ public class StrategyManager {
     } else if (action.type() == ActionType.Score) {
       switch (this.autonomyMode) {
         case Full:
-        case Teleop:
+        case Mixed:
         case Manual:
         default:
           return new AutoScore(drive, scoringSubsystem, action.location(), action.scoringTarget());
@@ -170,21 +187,36 @@ public class StrategyManager {
     // drive reef location
     if (drive != null) {
       drive.updateDesiredLocationFromNetworkTables(reefLocationSelector.get());
+
+      // 20: left; 21: right
+      drive.setDesiredIntakeLocation(
+          intakeLocationSelector.get() == 20
+              ? DesiredLocation.CoralStationLeft
+              : DesiredLocation.CoralStationRight);
     }
 
     // scoring level selection
     if (scoringSubsystem != null) {
       scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
+
+      // update scoring gamepiece
+      String gamePiece = gamePieceSelector.get();
+
+      if (gamePiece.equalsIgnoreCase("coral")) {
+        scoringSubsystem.setGamePiece(GamePiece.Coral);
+      } else if (gamePiece.equalsIgnoreCase("algae")) {
+        scoringSubsystem.setGamePiece(GamePiece.Algae);
+      }
     }
 
     // update autonomy level
     String autonomyLevel = autonomySelector.get();
 
-    if (autonomyLevel == "high") {
+    if (autonomyLevel.equalsIgnoreCase("high")) {
       this.setAutonomyMode(AutonomyMode.Full);
-    } else if (autonomyLevel == "mid") {
-      this.setAutonomyMode(AutonomyMode.Teleop);
-    } else if (autonomyLevel == "low") {
+    } else if (autonomyLevel.equalsIgnoreCase("mid")) {
+      this.setAutonomyMode(AutonomyMode.Mixed);
+    } else if (autonomyLevel.equalsIgnoreCase("low")) {
       this.setAutonomyMode(AutonomyMode.Manual);
     }
   }
@@ -198,11 +230,20 @@ public class StrategyManager {
 
   public void periodic() {
     if (currentCommand == null || currentCommand.isFinished()) {
+      if (currentCommand != null) {
+        System.out.println(currentCommand.getName() + " was finished.");
+      }
       currentAction = getNextAction();
       currentCommand = getCommandFromAction(currentAction);
       if (currentCommand != null) {
         CommandScheduler.getInstance().schedule(currentCommand);
+        System.out.println("Scheduled new command");
       }
+    }
+
+    // updates snakescreen with current locations to watch auto run
+    if (DriverStation.isAutonomousEnabled()) {
+      this.publishDefaultSubsystemValues();
     }
 
     this.logActions();
@@ -210,5 +251,95 @@ public class StrategyManager {
     // send and receive from SnakeScreen
     this.updateScoringLocationsFromSnakeScreen();
     this.publishCoralAndAlgae();
+  }
+
+  public void publishDefaultSubsystemValues() {
+    if (scoringSubsystem != null) {
+      // publish default game piece
+      switch (scoringSubsystem.getGamePiece()) {
+        case Coral:
+          gamePiecePublisher.accept("coral");
+          break;
+        case Algae:
+          gamePiecePublisher.accept("algae");
+          break;
+        default:
+          break;
+      }
+
+      // publish default level
+      switch (scoringSubsystem.getTarget()) {
+        case L1:
+          reefLevelPublisher.accept("level1");
+          break;
+        case L2:
+          reefLevelPublisher.accept("level2");
+          break;
+        case L3:
+          reefLevelPublisher.accept("level3");
+          break;
+        case L4:
+          reefLevelPublisher.accept("level4");
+          break;
+        default:
+          break;
+      }
+    }
+
+    if (drive != null) {
+      // publish default reef location
+      int reefLocation = drive.getDesiredLocationIndex();
+
+      if (reefLocation != -1) {
+        System.out.println("publishing default reef" + reefLocation);
+        reefLocationPublisher.accept(reefLocation);
+      }
+
+      // publish default intake location
+      // 20: left; 21: right
+      double intakeLocation =
+          drive.getDesiredIntakeLocation() == DesiredLocation.CoralStationLeft ? 20 : 21;
+      intakeLocationPublisher.accept(intakeLocation);
+    }
+
+    // publish autonomy mode
+    switch (this.getAutonomyMode()) {
+      case Full:
+        autonomyPublisher.accept("high");
+        break;
+      case Mixed:
+        autonomyPublisher.accept("mid");
+        break;
+      case Manual:
+        autonomyPublisher.accept("low");
+        break;
+      default:
+        break;
+    }
+  }
+
+  /**
+   * call in robot container autonomous init to schedule actions and publish to snakescreen
+   *
+   * @param strategy the auto actions to run
+   */
+  public void autonomousInit(AutoStrategy strategy) {
+    this.setAutonomyMode(AutonomyMode.Full);
+
+    this.addActionsFromAutoStrategy(strategy);
+
+    this.publishDefaultSubsystemValues();
+  }
+
+  /**
+   * call in robot container teleop init to clear actions from auto and publish default snakescreen
+   * values
+   */
+  public void teleopInit() {
+    this.setAutonomyMode(AutonomyMode.Mixed);
+
+    this.clearActions();
+
+    this.publishDefaultSubsystemValues();
   }
 }
