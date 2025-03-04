@@ -63,7 +63,7 @@ public class ScoringSubsystemMapleSim {
                     Meters.of(
                         scoring.getElevatorHeight().in(Meters)
                             + 0.5), // initial height of the ball, in meters
-                    MetersPerSecond.of(5), // initial velocity, in m/s
+                    MetersPerSecond.of(4), // initial velocity, in m/s
                     Degrees.of((scoring.getWristAngle().in(Degrees)) * -1)) // shooter angle
                 .withProjectileTrajectoryDisplayCallBack(
                     (poses) -> {},
