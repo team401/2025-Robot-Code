@@ -13,9 +13,9 @@ import java.util.Map;
 public final class LEDConstants {
 
   public static final int ledPort = 9;
-  public static final int leftLength = 180;
-  public static final int rightLength = 180;
-  public static final int totalLength = 360;
+  public static final int halfLength = 50;
+
+  public static final int totalLength = 100;
   public static final double rainbowSpeed = 20;
 
   public static final Color off = Color.kBlack;

@@ -27,9 +27,9 @@ public class LED extends SubsystemBase {
   public final AddressableLEDBuffer ledStrip = new AddressableLEDBuffer(LEDConstants.totalLength);
 
   public final AddressableLEDBufferView leftData =
-      ledStrip.createView(0, LEDConstants.leftLength - 1);
+      ledStrip.createView(0, LEDConstants.halfLength - 1);
   private final AddressableLEDBufferView rightData =
-      ledStrip.createView(LEDConstants.leftLength, LEDConstants.totalLength - 1); // .reversed();
+      ledStrip.createView(LEDConstants.halfLength, LEDConstants.totalLength - 1); // .reversed();
 
   private Supplier<Boolean> visionWorkingSupplier = () -> true;
 
