@@ -161,65 +161,29 @@ public class LineupState implements PeriodicStateInterface {
   public boolean checkForSideSwitch() {
     switch (drive.getDesiredLocation()) {
       case Reef0:
-        if (lastReefLocation == DesiredLocation.Reef1) {
-          return true;
-        }
-        return false;
+        return lastReefLocation == DesiredLocation.Reef1;
       case Reef1:
-        if (lastReefLocation == DesiredLocation.Reef0) {
-          return true;
-        }
-        return false;
+        return lastReefLocation == DesiredLocation.Reef0;
       case Reef2:
-        if (lastReefLocation == DesiredLocation.Reef3) {
-          return true;
-        }
-        return false;
+        return lastReefLocation == DesiredLocation.Reef3;
       case Reef3:
-        if (lastReefLocation == DesiredLocation.Reef2) {
-          return true;
-        }
-        return false;
+        return lastReefLocation == DesiredLocation.Reef2;
       case Reef4:
-        if (lastReefLocation == DesiredLocation.Reef5) {
-          return true;
-        }
-        return false;
+        return lastReefLocation == DesiredLocation.Reef5;
       case Reef5:
-        if (lastReefLocation == DesiredLocation.Reef4) {
-          return true;
-        }
-        return false;
+        return lastReefLocation == DesiredLocation.Reef4;
       case Reef6:
-        if (lastReefLocation == DesiredLocation.Reef7) {
-          return true;
-        }
-        return false;
+        return lastReefLocation == DesiredLocation.Reef7;
       case Reef7:
-        if (lastReefLocation == DesiredLocation.Reef6) {
-          return true;
-        }
-        return false;
+        return lastReefLocation == DesiredLocation.Reef6;
       case Reef8:
-        if (lastReefLocation == DesiredLocation.Reef9) {
-          return true;
-        }
-        return false;
+        return lastReefLocation == DesiredLocation.Reef9;
       case Reef9:
-        if (lastReefLocation == DesiredLocation.Reef8) {
-          return true;
-        }
-        return false;
+        return lastReefLocation == DesiredLocation.Reef8;
       case Reef10:
-        if (lastReefLocation == DesiredLocation.Reef11) {
-          return true;
-        }
-        return false;
+        return lastReefLocation == DesiredLocation.Reef11;
       case Reef11:
-        if (lastReefLocation == DesiredLocation.Reef10) {
-          return true;
-        }
-        return false;
+        return lastReefLocation == DesiredLocation.Reef10;
       default:
         return false;
     }
