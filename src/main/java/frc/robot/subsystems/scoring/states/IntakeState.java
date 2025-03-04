@@ -47,9 +47,9 @@ public class IntakeState implements PeriodicStateInterface {
   // @Override
   public void periodic() {
     if (scoringSubsystem.getGamePiece() == GamePiece.Algae) {
-      scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.intakeVoltage.times(-1));
+      scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeIntakeVoltage);
     } else {
-      scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.intakeVoltage);
+      scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.coralIntakeVoltage);
     }
 
     ScoringSetpoint setpoint;
