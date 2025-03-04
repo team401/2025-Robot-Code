@@ -1,5 +1,7 @@
 package frc.robot.constants.field;
 
+import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
+
 import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -43,4 +45,7 @@ public class RedFieldLocations {
 
   public Translation2d redCoralStationLeftTranslation = new Translation2d(16.3, 1);
   public Rotation2d redCoralStationLeftRotation = new Rotation2d(Units.degreesToRadians(120));
+
+  public Translation2d redNetTranslation = new Translation2d(10.319, 2.768);
+  public Rotation2d redNetRotation = new Rotation2d(Math.PI / 2);
 }
