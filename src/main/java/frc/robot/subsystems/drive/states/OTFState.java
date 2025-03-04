@@ -107,8 +107,15 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReef1011Translation,
                 JsonConstants.blueFieldLocations.blueReef1011Rotation);
       case Processor:
-      case Net:
         return new Pose2d();
+      case Net:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redNetTranslation,
+                JsonConstants.redFieldLocations.redNetRotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueNetTranslation,
+                JsonConstants.blueFieldLocations.blueNetRotation);
       case CoralStationRight:
         return driveInput.isAllianceRed()
             ? new Pose2d(
