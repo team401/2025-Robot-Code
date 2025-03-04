@@ -90,6 +90,8 @@ public class DrivetrainConstants {
   public final Double otfPoseDistanceLimit = 0.1;
   public final Double otfPoseEndingVelocity = 0.5;
 
+  public final Double otfFarWarmupDistance = 1.0;
+
   // The closed-loop output type to use for the steer motors;
   // This affects the PID/FF gains for the steer motors
   public final ClosedLoopOutputType kSteerClosedLoopOutput = ClosedLoopOutputType.Voltage;
