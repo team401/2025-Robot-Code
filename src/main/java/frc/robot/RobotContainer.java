@@ -1,5 +1,6 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
@@ -7,6 +8,7 @@ import coppercore.vision.VisionLocalizer;
 import coppercore.wpilib_interface.tuning.TuneS;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -140,12 +142,30 @@ public class RobotContainer {
     }
     if (FeatureFlags.synced.getObject().runClimb) {
       climbSubsystem = InitSubsystems.initClimbSubsystem();
+      if (FeatureFlags.synced.getObject().runRamp) {
+        climbSubsystem.setRampClear(() -> rampSubsystem.isInPosition());
+      }
     }
 
     if (FeatureFlags.synced.getObject().runScoring) {
       scoringSubsystem = InitSubsystems.initScoringSubsystem();
       if (FeatureFlags.synced.getObject().runDrive) {
-        scoringSubsystem.setIsDriveLinedUpSupplier(() -> drive.isDriveAlignmentFinished());
+        scoringSubsystem.setIsDriveLinedUpSupplier(
+            () -> {
+              if (strategyManager.getAutonomyMode() == AutonomyMode.Mixed) {
+                return drive.isDriveAlignmentFinished();
+              } else {
+                return InitBindings.isManualScorePressed();
+              }
+            });
+        scoringSubsystem.setReefDistanceSupplier(
+            () -> {
+              Translation2d reefCenter =
+                  drive.isAllianceRed()
+                      ? JsonConstants.redFieldLocations.redReefCenterTranslation
+                      : JsonConstants.blueFieldLocations.blueReefCenterTranslation;
+              return Meters.of(drive.getPose().getTranslation().getDistance(reefCenter));
+            });
       } else {
         scoringSubsystem.setIsDriveLinedUpSupplier(() -> true);
       }
@@ -185,16 +205,16 @@ public class RobotContainer {
   }
 
   public void autonomousInit() {
-    strategyManager.setAutonomyMode(AutonomyMode.Full);
+    drive.autonomousInit();
 
     // load chosen strategy
-    strategyManager.addActionsFromAutoStrategy(autoChooser.getSelected());
+    strategyManager.autonomousInit(autoChooser.getSelected());
   }
 
   public void teleopInit() {
-    strategyManager.setAutonomyMode(AutonomyMode.Teleop);
-    // clear leftover actions from auto
-    strategyManager.clearActions();
+    drive.teleopInit();
+
+    strategyManager.teleopInit();
   }
 
   /** This method must be called from robot, as it isn't called automatically */
@@ -257,6 +277,10 @@ public class RobotContainer {
 
     if (FeatureFlags.synced.getObject().runRamp) {
       rampSubsystem.testPeriodic();
+    }
+
+    if (FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem.testPeriodic();
     }
 
     if (FeatureFlags.synced.getObject().runDrive) {

@@ -21,6 +21,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -49,6 +50,7 @@ import frc.robot.subsystems.drive.states.JoystickDrive;
 import frc.robot.subsystems.drive.states.LineupState;
 import frc.robot.subsystems.drive.states.OTFState;
 import frc.robot.util.LocalADStarAK;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BooleanSupplier;
@@ -217,6 +219,8 @@ public class Drive implements DriveTemplate {
   private boolean isAligningToFieldElement = false;
   private Translation2d lockedAlignPosition = new Translation2d();
 
+  private LocalADStarAK localADStar = new LocalADStarAK();
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -246,7 +250,7 @@ public class Drive implements DriveTemplate {
         PP_CONFIG,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);
-    Pathfinding.setPathfinder(new LocalADStarAK());
+    Pathfinding.setPathfinder(localADStar);
     PathPlannerLogging.setLogActivePathCallback(
         (activePath) -> {
           Logger.recordOutput(
@@ -312,6 +316,43 @@ public class Drive implements DriveTemplate {
         .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick);
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, DriveState.Joystick);
+  }
+
+  /** add algae coral stack obstacles for on the fly */
+  public void autonomousInit() {
+    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+      localADStar.setDynamicObstacles(
+          List.of(
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackLeftTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackLeftBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackRightTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackRightBottomCorner)),
+          getPose().getTranslation());
+    } else {
+      localADStar.setDynamicObstacles(
+          List.of(
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackRightTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackRightBottomCorner)),
+          getPose().getTranslation());
+    }
+  }
+
+  /** remove algae coral stack obstacles for on the fly */
+  public void teleopInit() {
+    localADStar.setDynamicObstacles(
+        List.of(new Pair<Translation2d, Translation2d>(null, null)), getPose().getTranslation());
   }
 
   @Override
@@ -390,6 +431,9 @@ public class Drive implements DriveTemplate {
     // Update gyro alert
     gyroDisconnectedAlert.set(
         !gyroInputs.connected && ModeConstants.currentMode == ModeConstants.Mode.REAL);
+
+    Logger.recordOutput("Drive/goToIntake", goToIntake);
+    Logger.recordOutput("Drive/driveLinedUp", driveLinedUp);
   }
 
   /**
@@ -430,6 +474,10 @@ public class Drive implements DriveTemplate {
 
   public void disableAlign() {
     isAligningToFieldElement = false;
+  }
+
+  public boolean isAligningToFieldElement() {
+    return isAligningToFieldElement;
   }
 
   /**
@@ -559,6 +607,29 @@ public class Drive implements DriveTemplate {
   @AutoLogOutput(key = "Drive//DesiredLocation")
   public DesiredLocation getDesiredLocation() {
     return goToIntake ? this.intakeLocation : this.desiredLocation;
+  }
+
+  /**
+   * get intake location currently set
+   *
+   * @return the intake location currently set
+   */
+  public DesiredLocation getDesiredIntakeLocation() {
+    return this.intakeLocation;
+  }
+
+  /**
+   * returns index of reef location for interfacing with snakescreen
+   *
+   * @return a double representing the index of reef location
+   */
+  public int getDesiredLocationIndex() {
+    for (int i = 0; i < locationArray.length; i++) {
+      if (locationArray[i] == desiredLocation) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   /**
