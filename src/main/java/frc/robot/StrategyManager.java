@@ -81,7 +81,6 @@ public class StrategyManager {
    */
   public void setAutonomyMode(AutonomyMode mode) {
     if (this.autonomyMode == mode) {
-      this.autonomyMode = mode;
       onAutonomyModeChange(mode);
     }
     this.autonomyMode = mode;
