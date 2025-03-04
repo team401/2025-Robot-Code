@@ -745,7 +745,10 @@ public class ScoringSubsystem extends MonitoredSubsystem {
 
     Distance reefDistance = reefDistanceSupplier.get();
     Logger.recordOutput("scoring/reefDistanceSupplier", reefDistance);
-    if (reefDistance.lt(JsonConstants.wristConstants.closeToReefThreshold)) {
+    if (reefDistance.lt(JsonConstants.wristConstants.closeToReefThreshold)
+        && !DriverStation.isTest()) {
+      closeToReef = true;
+
       if (elevatorHeight.lte(JsonConstants.elevatorConstants.minReefSafeHeight)
           && currentPiece != GamePiece.Algae) {
         wristInToAvoidReefBase = true;
