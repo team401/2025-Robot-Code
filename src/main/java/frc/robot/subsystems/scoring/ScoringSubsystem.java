@@ -28,6 +28,7 @@ import frc.robot.TestModeManager.TestMode;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.ElevatorIO.ElevatorOutputMode;
+import frc.robot.subsystems.scoring.states.FarWarmupState;
 import frc.robot.subsystems.scoring.states.IdleState;
 import frc.robot.subsystems.scoring.states.InitState;
 import frc.robot.subsystems.scoring.states.IntakeState;
@@ -109,12 +110,19 @@ public class ScoringSubsystem extends MonitoredSubsystem {
   private static ScoringSubsystem instance;
 
   /**
-   * Whether or not we should automatically transition through the workflow Idle -> Intake -> Warmup
-   * -> Score
+   * Keep track of what state to go into after init
+   *
+   * <p>If a trigger is fired to enter warmup while in init, it will go into warmup. If a trigger
+   * for far warmup is fired, it will go into far warmup. Multiple triggers are fired, the most
+   * recent trigger will apply.
    */
-  private boolean autoTransition = true;
+  private enum StateAfterInit {
+    Idle,
+    Warmup,
+    FarWarmup
+  }
 
-  private boolean shouldWarmupAfterInit = false;
+  private StateAfterInit warmupStateAfterInit = StateAfterInit.Idle;
 
   private BooleanSupplier isDriveLinedUpSupplier;
 
@@ -150,6 +158,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     Init(new InitState(instance)),
     Idle(new IdleState(instance)),
     Intake(new IntakeState(instance)),
+    FarWarmup(new FarWarmupState(instance)),
     Warmup(new WarmupState(instance)),
     Score(new ScoreState(instance)),
     Tuning(new TuningState());
@@ -171,8 +180,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     BeginIntake,
     CancelIntake,
     DoneIntaking,
-    ToggleWarmup, // warmup button toggles warmup <-> idle
     StartWarmup, // drive automatically enters warmup when lineup begins
+    StartFarWarmup, // Start a "far warmup" when drive is a certain distance from it's OTF target
     WarmupReady,
     CancelWarmup, // Warmup button was released, go back to idle
     ScoredPiece,
@@ -218,11 +227,22 @@ public class ScoringSubsystem extends MonitoredSubsystem {
         .permitIf(
             ScoringTrigger.Seeded,
             ScoringState.Warmup,
-            () -> !isScoringTuningSupplier.getAsBoolean() && shouldWarmupAfterInit)
+            () ->
+                !isScoringTuningSupplier.getAsBoolean()
+                    && warmupStateAfterInit == StateAfterInit.Warmup)
+        .permitIf(
+            ScoringTrigger.Seeded,
+            ScoringState.FarWarmup,
+            () ->
+                !isScoringTuningSupplier.getAsBoolean()
+                    && warmupStateAfterInit == StateAfterInit.FarWarmup
+                    && canFarWarmup())
         .permitIf(
             ScoringTrigger.Seeded,
             ScoringState.Idle,
-            () -> !isScoringTuningSupplier.getAsBoolean() && !shouldWarmupAfterInit);
+            () ->
+                !isScoringTuningSupplier.getAsBoolean()
+                    && warmupStateAfterInit == StateAfterInit.Idle);
 
     stateMachineConfiguration
         .configure(ScoringState.Idle)
@@ -230,14 +250,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
             ScoringTrigger.BeginIntake,
             ScoringState.Intake,
             () -> !(isCoralDetected() || isAlgaeDetected()))
-        .permitIf(
-            ScoringTrigger.ToggleWarmup,
-            ScoringState.Warmup,
-            () -> (isCoralDetected() || isAlgaeDetected()))
-        .permitIf(
-            ScoringTrigger.StartWarmup,
-            ScoringState.Warmup,
-            () -> (isCoralDetected() || isAlgaeDetected()))
+        .permitIf(ScoringTrigger.StartFarWarmup, ScoringState.FarWarmup, () -> canFarWarmup())
+        .permit(ScoringTrigger.StartWarmup, ScoringState.Warmup)
         .permitIf(ScoringTrigger.EnterTestMode, ScoringState.Tuning, isScoringTuningSupplier);
 
     stateMachineConfiguration
@@ -246,8 +260,6 @@ public class ScoringSubsystem extends MonitoredSubsystem {
 
     stateMachineConfiguration
         .configure(ScoringState.Intake)
-        // If autoTransition, go straight to warmup from intake once we're done
-        // Otherwise, return to idle
         .permitIf(
             ScoringTrigger.DoneIntaking,
             ScoringState.Idle,
@@ -256,13 +268,17 @@ public class ScoringSubsystem extends MonitoredSubsystem {
 
     stateMachineConfiguration
         .configure(ScoringState.Warmup)
-        .permit(ScoringTrigger.ToggleWarmup, ScoringState.Idle)
         // Allow warmup to transition to scoring if autoTransition is enabled and we are lined up
         .permitIf(
             ScoringTrigger.WarmupReady,
             ScoringState.Score,
-            () -> autoTransition && isDriveLinedUpSupplier.getAsBoolean())
+            () -> isDriveLinedUpSupplier.getAsBoolean())
         .permit(ScoringTrigger.ReturnToIdle, ScoringState.Idle)
+        .permit(ScoringTrigger.CancelWarmup, ScoringState.Idle);
+
+    stateMachineConfiguration
+        .configure(ScoringState.FarWarmup)
+        .permit(ScoringTrigger.StartWarmup, ScoringState.Warmup)
         .permit(ScoringTrigger.CancelWarmup, ScoringState.Idle);
 
     stateMachineConfiguration
@@ -315,14 +331,15 @@ public class ScoringSubsystem extends MonitoredSubsystem {
   }
 
   /**
-   * Set whether or not the scoring subsystem should automatically transition through its states
-   * (e.g. automatically enter warmup when drive starts lining up, automatically go to score when
-   * warmup is ready, etc.)
+   * Can the scoring subsystem warmup for far warmup at the moment?
    *
-   * @param shouldAutoTransition True if auto transition is enabled, false if not
+   * <p>This is true if the gamepiece is coral and the field target is L3 or L4
+   *
+   * @return
    */
-  public void setAutoTransition(boolean shouldAutoTransition) {
-    this.autoTransition = shouldAutoTransition;
+  public boolean canFarWarmup() {
+    return currentPiece == GamePiece.Coral
+        && (currentTarget == FieldTarget.L3 || currentTarget == FieldTarget.L4);
   }
 
   public void setIsDriveLinedUpSupplier(BooleanSupplier newSupplier) {
@@ -337,9 +354,17 @@ public class ScoringSubsystem extends MonitoredSubsystem {
   public void fireTrigger(ScoringTrigger trigger) {
     stateMachine.fire(trigger);
 
-    if (trigger == ScoringTrigger.StartWarmup
-        && stateMachine.getCurrentState() == ScoringState.Init) {
-      shouldWarmupAfterInit = true;
+    if (stateMachine.getCurrentState() == ScoringState.Init) {
+      switch (trigger) {
+        case StartWarmup:
+          warmupStateAfterInit = StateAfterInit.Warmup;
+          break;
+        case StartFarWarmup:
+          warmupStateAfterInit = StateAfterInit.FarWarmup;
+          break;
+        default:
+          break;
+      }
     }
   }
 

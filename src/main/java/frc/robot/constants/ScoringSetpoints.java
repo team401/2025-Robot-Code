@@ -43,6 +43,9 @@ public class ScoringSetpoints {
   public final ScoringSetpoint L3 = new ScoringSetpoint("L3", Meters.of(2.0), Rotations.of(0.3214));
   public final ScoringSetpoint L4 = new ScoringSetpoint("L4", Meters.of(2.5), Rotations.of(0.3214));
 
+  public final ScoringSetpoint farWarmup =
+      new ScoringSetpoint("farWarmup", Meters.of(0.6), Rotations.of(0.3214));
+
   // TODO: Algae setpoints
   public final ScoringSetpoint L2algae =
       new ScoringSetpoint("L2algae", Meters.of(1.8), Rotations.of(-0.75));

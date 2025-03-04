@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 import org.littletonrobotics.junction.Logger;
 
 public class OTFState implements PeriodicStateInterface {
@@ -159,6 +161,10 @@ public class OTFState implements PeriodicStateInterface {
     // finishes otf when we are 0.1 meters away
     if (drive.isDriveCloseToFinalLineupPose()) {
       drive.fireTrigger(DriveTrigger.FinishOTF);
+    }
+
+    if (drive.isDriveCloseForFarWarmup() && ScoringSubsystem.getInstance() != null) {
+      ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartFarWarmup);
     }
 
     if (driveToPose != null) {
