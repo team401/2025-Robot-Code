@@ -48,5 +48,21 @@
   "intakeAnglePastAlgaerange": {
     "value": 2.0,
     "unit": "Rotation"
+  },
+  "algaeDetectionCurrent": {
+    "value": 10.0,
+    "unit": "Amp"
+  },
+  "algaeIdleVoltage": {
+    "value": -2.0,
+    "unit": "Volt"
+  },
+  "algaeCurrentDetectionTimeRising": {
+    "value": 0.5,
+    "unit": "Second"
+  },
+  "algaeCurrentDetectionTimeFalling": {
+    "value": 2.0,
+    "unit": "Second"
   }
 }

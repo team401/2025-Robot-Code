@@ -21,7 +21,7 @@
   "driveAlongTrackKp": 0.5,
   "driveAlongTrackKi": 0.0,
   "driveAlongTrackKd": 0.0,
-  "driveCrossTrackKp": 6.0,
+  "driveCrossTrackKp": 4.0,
   "driveCrossTrackKi": 0.0,
   "driveCrossTrackKd": 0.0,
   "driveRotationKp": 3.0,

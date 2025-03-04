@@ -24,7 +24,9 @@ public class WarmupState implements PeriodicStateInterface {
   private LinearVelocity elevatorStableVelocityMeasure;
   private AngularVelocity wristStableVelocityMeasure;
 
-  Debouncer wristSetpointDebouncer = new Debouncer(1.0, DebounceType.kRising);
+  Debouncer wristSetpointDebouncer =
+      new Debouncer(
+          JsonConstants.wristConstants.wristStableDebounceTimeSeconds, DebounceType.kRising);
 
   public WarmupState(ScoringSubsystem scoringSubsystem) {
     this.scoringSubsystem = scoringSubsystem;
@@ -46,6 +48,10 @@ public class WarmupState implements PeriodicStateInterface {
 
     scoringSubsystem.setGoalSetpoint(setpoint);
     scoringSubsystem.setClawRollerVoltage(Volts.zero());
+
+    if (JsonConstants.scoringFeatureFlags.runClaw) {
+      scoringSubsystem.setAlgaeCurrentDetected(scoringSubsystem.isAlgaeCurrentDetected());
+    }
 
     if (!(scoringSubsystem.isAlgaeDetected() || scoringSubsystem.isCoralDetected())) {
       scoringSubsystem.fireTrigger(ScoringTrigger.ReturnToIdle);

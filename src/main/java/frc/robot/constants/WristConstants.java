@@ -104,6 +104,8 @@ public class WristConstants {
   public final Double maxWristSetpointVelocityRotationsPerSecond =
       0.008333; // 3 degrees per second = 1 / 120 rotations = 0.008333...
 
+  public final Double wristStableDebounceTimeSeconds = 0.5;
+
   public static final class Sim {
     @JSONExclude
     public static final JSONSync<WristConstants.Sim> synced =

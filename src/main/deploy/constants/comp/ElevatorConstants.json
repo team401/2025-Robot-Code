@@ -67,11 +67,11 @@
   },
   "homingVelocityFilterWindowSize": 5,
   "minWristDownHeight": {
-    "value": 0.2,
+    "value": 0.18,
     "unit": "Meter"
   },
   "minReefSafeHeight": {
-    "value": 0.6,
+    "value": 0.418,
     "unit": "Meter"
   },
   "L4MinHeightAbove": {

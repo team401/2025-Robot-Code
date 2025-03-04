@@ -29,6 +29,11 @@ public class ScoreState implements PeriodicStateInterface {
         break;
       case Algae:
         scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
+
+        if (JsonConstants.scoringFeatureFlags.runClaw) {
+          scoringSubsystem.setAlgaeCurrentDetected(scoringSubsystem.isAlgaeCurrentDetected());
+        }
+
         if (!scoringSubsystem.isAlgaeDetected()) {
           scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
         }

@@ -22,6 +22,7 @@ import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.InitBindings;
 import frc.robot.TestModeManager;
 import frc.robot.TestModeManager.TestMode;
 import frc.robot.constants.JsonConstants;
@@ -116,6 +117,9 @@ public class ScoringSubsystem extends MonitoredSubsystem {
   private boolean shouldWarmupAfterInit = false;
 
   private BooleanSupplier isDriveLinedUpSupplier;
+
+  /** Whether we detected an algae using current bc canrange dead */
+  private boolean algaeCurrentDetected = false;
 
   public enum FieldTarget {
     L1,
@@ -244,7 +248,10 @@ public class ScoringSubsystem extends MonitoredSubsystem {
         .configure(ScoringState.Intake)
         // If autoTransition, go straight to warmup from intake once we're done
         // Otherwise, return to idle
-        .permit(ScoringTrigger.DoneIntaking, ScoringState.Idle)
+        .permitIf(
+            ScoringTrigger.DoneIntaking,
+            ScoringState.Idle,
+            () -> currentPiece == GamePiece.Coral || !InitBindings.isIntakeHeld())
         .permit(ScoringTrigger.CancelIntake, ScoringState.Idle);
 
     stateMachineConfiguration
@@ -514,7 +521,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   public boolean isAlgaeDetected() {
     if (JsonConstants.scoringFeatureFlags.runClaw) {
-      return clawMechanism.isAlgaeDetected();
+      return clawMechanism.isAlgaeDetected() || algaeCurrentDetected;
     } else {
       return false;
     }
@@ -619,6 +626,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
       determineProtectionClamps();
     }
 
+    Logger.recordOutput("scoring/algaeCurrentDetected", algaeCurrentDetected);
     Logger.recordOutput("scoring/state", stateMachine.getCurrentState());
     Logger.recordOutput("scoring/isDriveLinedUp", isDriveLinedUpSupplier.getAsBoolean());
   }
@@ -708,7 +716,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     boolean wristAboveChassis = false;
     // If the elevator is below the minimum safe height for wrist to be down, clamp wrist above its
     // collision point
-    if (elevatorHeight.lt(JsonConstants.elevatorConstants.minWristDownHeight)) {
+    if (elevatorHeight.lt(JsonConstants.elevatorConstants.minWristDownHeight)
+        && !isAlgaeDetected()) {
       wristAboveChassis = true;
       wristMinAngle.mut_replace(
           (Angle)
@@ -738,8 +747,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     Logger.recordOutput("scoring/reefDistanceSupplier", reefDistance);
     if (reefDistance.lt(JsonConstants.wristConstants.closeToReefThreshold)) {
       if (elevatorHeight.lte(JsonConstants.elevatorConstants.minReefSafeHeight)
-          && !isAlgaeDetected()) { // Don't slam wrist up if we're holding an algae, trust other
-        // clamps
+          && currentPiece != GamePiece.Algae) {
         wristInToAvoidReefBase = true;
         // If elevator is next to reef base, make sure wrist doesn't hit it
         wristMinAngle.mut_replace(
@@ -747,13 +755,10 @@ public class ScoringSubsystem extends MonitoredSubsystem {
       }
 
       if (ReefAvoidanceHelper.willPassReefLevel(elevatorHeight, elevatorGoalHeight)) {
-        if (!isAlgaeDetected()) { // Don't slam wrist up if we're holding an algae, trust other
-          // clamps
-          wristInToPassReef = true;
-          // If we will pass a reef level, clamp the wrist to be in a safe position to pass the reef
-          wristMinAngle.mut_replace(
-              (Angle) Measure.max(wristMinAngle, JsonConstants.wristConstants.minReefSafeAngle));
-        }
+        wristInToPassReef = true;
+        // If we will pass a reef level, clamp the wrist to be in a safe position to pass the reef
+        wristMinAngle.mut_replace(
+            (Angle) Measure.max(wristMinAngle, JsonConstants.wristConstants.minReefSafeAngle));
 
         // If we will pass a reef level and the wrist is in an unsafe position to pass the reef,
         // clamp
@@ -817,5 +822,17 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   public static ScoringSubsystem getInstance() {
     return instance;
+  }
+
+  public boolean isAlgaeCurrentDetected() {
+    if (clawMechanism != null) {
+      return clawMechanism.isAlgaeCurrentDetected();
+    }
+
+    return false;
+  }
+
+  public void setAlgaeCurrentDetected(boolean detected) {
+    algaeCurrentDetected = detected;
   }
 }
