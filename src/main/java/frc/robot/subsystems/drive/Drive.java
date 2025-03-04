@@ -167,6 +167,15 @@ public class Drive implements DriveTemplate {
     DesiredLocation.CoralStationRight
   };
 
+  public DesiredLocation[] algaeArray = {
+    DesiredLocation.Reef0,
+    DesiredLocation.Reef2,
+    DesiredLocation.Reef4,
+    DesiredLocation.Reef6,
+    DesiredLocation.Reef8,
+    DesiredLocation.Reef10
+  };
+
   private DesiredLocation desiredLocation = DesiredLocation.Reef9;
   private DesiredLocation intakeLocation = DesiredLocation.CoralStationLeft;
   private boolean goToIntake = false;
@@ -605,8 +614,16 @@ public class Drive implements DriveTemplate {
   }
 
   /** checks for update from reef location network table (SnakeScreen) run periodically in drive */
-  public void updateDesiredLocationFromNetworkTables(double desiredIndex) {
+  public void updateDesiredLocationFromNetworkTables(double desiredIndex, boolean isAlgae) {
     if (desiredIndex == -1) {
+      return;
+    }
+    if (isAlgae) {
+      this.setDesiredLocation(algaeArray[(int) desiredIndex]);
+      if (isDriveOTF()) {
+        this.fireTrigger(DriveTrigger.ManualJoysticks);
+        this.fireTrigger(DriveTrigger.BeginOTF);
+      }
       return;
     }
     if (locationArray[(int) desiredIndex] != desiredLocation) {

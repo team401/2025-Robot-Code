@@ -225,7 +225,8 @@ public class StrategyManager {
   public void updateScoringLocationsFromSnakeScreen() {
     // drive reef location
     if (drive != null) {
-      drive.updateDesiredLocationFromNetworkTables(reefLocationSelector.get());
+      drive.updateDesiredLocationFromNetworkTables(
+          reefLocationSelector.get(), gamePieceSelector.get().equalsIgnoreCase("algae"));
 
       // 20: left; 21: right
       drive.setDesiredIntakeLocation(
