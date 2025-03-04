@@ -7,13 +7,14 @@ public interface RampIO {
   @AutoLog
   public static class RampInputs {
     public double position = 0.0;
-    public boolean inPosition;
+    public boolean positionControl = false;
+    public double controlValue = 0.0;
   }
 
   @AutoLog
   public static class RampOutputs {
-    public double targetPosition;
     public double appliedVolts;
+    public double velocity;
   }
 
   /**
@@ -26,6 +27,8 @@ public interface RampIO {
    * @param kD
    */
   public void setPID(double kP, double kI, double kD);
+
+  public void addOffset(double offset);
 
   public void updateInputs(RampInputs inputs);
 

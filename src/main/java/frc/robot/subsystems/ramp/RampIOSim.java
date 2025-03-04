@@ -25,6 +25,8 @@ public class RampIOSim implements RampIO {
   private final double startingRads = 0.5 * Math.PI;
   private final boolean simulateGravity = true;
 
+  public double angle_offset = 0.0;
+
   private final SingleJointedArmSim sim =
       new SingleJointedArmSim(
           DCMotor.getKrakenX60(1),
@@ -44,15 +46,24 @@ public class RampIOSim implements RampIO {
   }
 
   @Override
+  public void addOffset(double offset) {
+    angle_offset += offset;
+  }
+
+  @Override
   public void updateInputs(RampInputs inputs) {
     sim.update(0.02);
-    inputs.position = sim.getAngleRads();
+    inputs.position = sim.getAngleRads() + angle_offset;
   }
 
   @Override
   public void updateOutputs(RampInputs inputs, RampOutputs outputs) {
-    controller.setSetpoint(outputs.targetPosition);
-    double volts = controller.calculate(inputs.position);
+    outputs.velocity = sim.getVelocityRadPerSec();
+    double volts = inputs.controlValue;
+    if (inputs.positionControl) {
+      controller.setSetpoint(inputs.controlValue);
+      volts = controller.calculate(inputs.position);
+    }
     volts = Math.min(Math.max(volts, -12.0), 12.0);
     outputs.appliedVolts = volts;
     sim.setInputVoltage(volts);

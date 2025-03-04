@@ -437,6 +437,10 @@ public class Drive implements DriveTemplate {
     isAligningToFieldElement = false;
   }
 
+  public boolean isAligningToFieldElement() {
+    return isAligningToFieldElement;
+  }
+
   /**
    * set supplier that interfaces with scoring used to make drive wait until setting next location
    * in auto
@@ -563,6 +567,29 @@ public class Drive implements DriveTemplate {
   @AutoLogOutput(key = "Drive//DesiredLocation")
   public DesiredLocation getDesiredLocation() {
     return goToIntake ? this.intakeLocation : this.desiredLocation;
+  }
+
+  /**
+   * get intake location currently set
+   *
+   * @return the intake location currently set
+   */
+  public DesiredLocation getDesiredIntakeLocation() {
+    return this.intakeLocation;
+  }
+
+  /**
+   * returns index of reef location for interfacing with snakescreen
+   *
+   * @return a double representing the index of reef location
+   */
+  public int getDesiredLocationIndex() {
+    for (int i = 0; i < locationArray.length; i++) {
+      if (locationArray[i] == desiredLocation) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   /**
