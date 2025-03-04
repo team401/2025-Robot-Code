@@ -49,8 +49,8 @@
     "radians": 1.0471975511965976
   },
   "redCoralStationRightTranslation": {
-    "x": 16.1,
-    "y": 6.7
+    "x": 16.3,
+    "y": 7.0
   },
   "redCoralStationRightRotation": {
     "radians": -2.0943951023931953
@@ -61,5 +61,29 @@
   },
   "redCoralStationLeftRotation": {
     "radians": 2.0943951023931953
+  },
+  "coralAlgaeStackLeftTopCorner": {
+    "x": 15.95,
+    "y": 1.95
+  },
+  "coralAlgaeStackLeftBottomCorner": {
+    "x": 16.45,
+    "y": 2.45
+  },
+  "coralAlgaeStackMiddleTopCorner": {
+    "x": 15.95,
+    "y": 3.8
+  },
+  "coralAlgaeStackMiddleBottomCorner": {
+    "x": 16.45,
+    "y": 4.3
+  },
+  "coralAlgaeStackRightTopCorner": {
+    "x": 15.95,
+    "y": 5.6
+  },
+  "coralAlgaeStackRightBottomCorner": {
+    "x": 16.45,
+    "y": 6.1
   }
 }
