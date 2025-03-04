@@ -334,4 +334,8 @@ public final class InitBindings {
   public static boolean isManualScorePressed() {
     return rightJoystick.top().getAsBoolean();
   }
+
+  public static boolean isIntakeHeld() {
+    return leftJoystick.trigger().getAsBoolean();
+  }
 }
