@@ -30,6 +30,7 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.led.LED;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import java.io.File;
@@ -50,6 +51,7 @@ public class RobotContainer {
   private Drive drive = null;
   private ClimbSubsystem climbSubsystem = null;
   private VisionLocalizer vision = null;
+  private LED led = null;
   private StrategyManager strategyManager = null;
   private AutoStrategyContainer strategyContainer = null;
 
@@ -133,7 +135,6 @@ public class RobotContainer {
       drive = InitSubsystems.initDriveSubsystem();
       if (FeatureFlags.synced.getObject().runVision) {
         vision = InitSubsystems.initVisionSubsystem(drive);
-
         drive.setAlignmentSupplier(vision::getDistanceErrorToTag);
       }
     }
@@ -170,6 +171,16 @@ public class RobotContainer {
         scoringSubsystem.setIsDriveLinedUpSupplier(() -> true);
       }
     }
+
+    if (FeatureFlags.synced.getObject().runLEDs) {
+      led = InitSubsystems.initLEDs(scoringSubsystem, climbSubsystem, drive);
+      if (FeatureFlags.synced.getObject().runVision) {
+        // led.setVisionWorkingSupplier(() -> vision.coprocessorConnected());
+      } else {
+        // led.setVisionWorkingSupplier(() -> false);
+      }
+    }
+
     strategyManager = new StrategyManager(drive, scoringSubsystem);
   }
 
@@ -201,6 +212,7 @@ public class RobotContainer {
   }
 
   public void periodic() {
+
     strategyManager.periodic();
   }
 
@@ -264,6 +276,9 @@ public class RobotContainer {
         CommandScheduler.getInstance()
             .schedule(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         break;
+
+      case LEDTest:
+        // CommandScheduler.getInstance().schedule(led.runCycle());
       default:
         break;
     }
@@ -289,6 +304,7 @@ public class RobotContainer {
   }
 
   public void disabledPeriodic() {
+    led.periodic();
     // Logger.recordOutput("feature_flags/drive", FeatureFlags.synced.getObject().runDrive);
     strategyManager.logActions();
   }

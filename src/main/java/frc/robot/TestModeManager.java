@@ -23,6 +23,7 @@ public class TestModeManager {
     DriveSysIdDynamicForward,
     DriveSysIdDynamicBackward,
     DriveLineupTuning,
+    LEDTest,
     ClimbTuning,
     None, // Default test mode that does nothing until a new one is selected.
   }
@@ -63,6 +64,9 @@ public class TestModeManager {
     testModeChooser.addOption("Drive Lineup Tuning", TestMode.DriveLineupTuning);
     // Climb Test Modes
     testModeChooser.addOption("Climb Tuning", TestMode.ClimbTuning);
+
+    // LED
+    testModeChooser.addOption("LED Cycle Test", TestMode.LEDTest);
 
     SmartDashboard.putData("Test Mode Selector", testModeChooser);
   }
