@@ -1,7 +1,5 @@
 package frc.robot.constants.field;
 
-import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
-
 import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
