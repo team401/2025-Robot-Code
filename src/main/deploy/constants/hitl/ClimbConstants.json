@@ -11,11 +11,11 @@
     "value": 0.0,
     "unit": "Degree"
   },
-  "leadClimbMotorId": 0,
-  "followerClimbMotorId": 1,
-  "climbP": 5,
-  "climbI": 0,
-  "climbD": 0,
+  "leadClimbMotorId": 16,
+  "followerClimbMotorId": 17,
+  "climbkP": 5,
+  "climbkI": 0,
+  "climbkD": 0,
   "climbCurrentLimit": 60,
   "invertFollowerClimbMotor": false
 }

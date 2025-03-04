@@ -2,6 +2,7 @@ package frc.robot.subsystems.climb;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
@@ -13,6 +14,7 @@ public class ClimbIOSim extends ClimbIOTalonFX {
 
   TalonFXSimState leadMotorSimState = leadMotor.getSimState();
   TalonFXSimState followerMotorSimState = followerMotor.getSimState();
+  CANcoderSimState climbEncoderSimState = climbAngleCoder.getSimState();
 
   private SingleJointedArmSim climb =
       new SingleJointedArmSim(
@@ -35,11 +37,18 @@ public class ClimbIOSim extends ClimbIOTalonFX {
 
   @Override
   public void updateInputs(ClimbInputs inputs) {
-    leadMotorSimState.setRawRotorPosition(inputs.goalAngle);
+    leadMotorSimState.setRawRotorPosition(Radians.of(climb.getAngleRads()).times(25.0));
+    leadMotorSimState.setRotorVelocity(
+        RadiansPerSecond.of(climb.getVelocityRadPerSec()).times(25.0));
     leadMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
 
-    leadMotorSimState.setRawRotorPosition(inputs.goalAngle);
+    followerMotorSimState.setRawRotorPosition(Radians.of(climb.getAngleRads()).times(25.0));
+    followerMotorSimState.setRotorVelocity(
+        RadiansPerSecond.of(climb.getVelocityRadPerSec()).times(25.0));
     followerMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
+
+    climbEncoderSimState.setRawPosition(Radians.of(climb.getAngleRads()));
+    climbEncoderSimState.setVelocity(RadiansPerSecond.of(climb.getVelocityRadPerSec()));
 
     climb.setInputVoltage(leadMotorSimState.getMotorVoltage());
     climb.update(0.02);
