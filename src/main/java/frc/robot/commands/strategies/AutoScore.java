@@ -40,7 +40,6 @@ public class AutoScore extends Command {
     if (scoringSubsystem != null) {
       scoringSubsystem.setGamePiece(GamePiece.Coral);
       scoringSubsystem.setTarget(currentFieldTarget);
-      scoringSubsystem.setAutoTransition(true);
     }
   }
 

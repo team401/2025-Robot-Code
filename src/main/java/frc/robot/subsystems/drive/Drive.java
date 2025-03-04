@@ -561,6 +561,14 @@ public class Drive implements DriveTemplate {
         < JsonConstants.drivetrainConstants.otfPoseDistanceLimit;
   }
 
+  @AutoLogOutput(key = "Drive/OTF/isDriveCloseForFarWarmup")
+  public boolean isDriveCloseForFarWarmup() {
+    return this.getPose()
+            .getTranslation()
+            .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation())
+        < JsonConstants.drivetrainConstants.otfFarWarmupDistance;
+  }
+
   /**
    * checks if drive is currently lining up to a reef
    *
