@@ -32,9 +32,11 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystemMapleSim;
 import java.io.File;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
+import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnFly;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -169,6 +171,7 @@ public class RobotContainer {
       } else {
         scoringSubsystem.setIsDriveLinedUpSupplier(() -> true);
       }
+      scoringSubsystem.setIsDriveLinedUpSupplier(() -> true);
     }
     strategyManager = new StrategyManager(drive, scoringSubsystem);
   }
@@ -290,6 +293,13 @@ public class RobotContainer {
 
   public void disabledInit() {
     CommandScheduler.getInstance().cancelAll();
+  }
+
+  public void resetMapleSim() {
+    SimulatedArena.getInstance().resetFieldForAuto();
+    ReefscapeAlgaeOnFly.setHitNetCallBack(() -> System.out.println("ALGAE hits NET!"));
+    ScoringSubsystemMapleSim.configDrive(drive, driveSim);
+    ScoringSubsystemMapleSim.configScoring(scoringSubsystem);
   }
 
   public void updateMapleSim() {

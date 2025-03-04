@@ -245,12 +245,22 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
+                  scoring.setTarget(FieldTarget.Net);
+                  scoring.setGamePiece(GamePiece.Algae);
                   scoring.setClawRollerVoltage(JsonConstants.clawConstants.coralScoreVoltage);
                 }))
         .onFalse(
             new InstantCommand(
                 () -> {
                   scoring.setClawRollerVoltage(Volts.zero());
+                }));
+    driverController
+        .leftBumper()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  scoring.setTarget(FieldTarget.Ground);
+                  scoring.setGamePiece(GamePiece.Coral);
                 }));
   }
 

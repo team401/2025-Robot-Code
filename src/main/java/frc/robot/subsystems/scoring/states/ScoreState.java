@@ -6,6 +6,7 @@ import frc.robot.constants.ScoringSetpoints;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
+import frc.robot.subsystems.scoring.ScoringSubsystemMapleSim;
 
 public class ScoreState implements PeriodicStateInterface {
   private ScoringSubsystem scoringSubsystem;
@@ -23,13 +24,16 @@ public class ScoreState implements PeriodicStateInterface {
     switch (scoringSubsystem.getGamePiece()) {
       case Coral:
         scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.coralScoreVoltage);
+
         if (!scoringSubsystem.isCoralDetected()) {
+          ScoringSubsystemMapleSim.shootCoral();
           scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
         }
         break;
       case Algae:
         scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
         if (!scoringSubsystem.isAlgaeDetected()) {
+          ScoringSubsystemMapleSim.shootAlgae();
           scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
         }
         break;
