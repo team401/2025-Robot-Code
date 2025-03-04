@@ -62,6 +62,13 @@
   "blueCoralStationLeftRotation": {
     "radians": -1.0471975511965976
   },
+  "blueNetTranslation": {
+    "x": 10.319,
+    "y": 2.768
+  },
+  "blueNetRotation": {
+    "radians": 0
+  },
   "coralAlgaeStackLeftTopCorner": {
     "x": 1.45,
     "y": 6.1

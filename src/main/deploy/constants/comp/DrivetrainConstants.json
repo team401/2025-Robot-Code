@@ -337,6 +337,10 @@
   "OTFMaxLinearAccel": 2.0,
   "OTFMaxAngularVelocity": 3.141592653589793,
   "OTFMaxAngularAccel": 1.5707963267948966,
+  "OTFSlowLinearVelocity": 1.0,
+  "OTFSlowLinearAccel": 0.5,
+  "OTFSlowAngularVelocity": 1.57,
+  "OTFSlowAngularAccel": 0.8,
   "DrivetrainConstants": {
     "CANBusName": "canivore",
     "Pigeon2Id": 13
