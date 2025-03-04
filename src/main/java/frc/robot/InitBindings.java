@@ -285,7 +285,7 @@ public final class InitBindings {
                 new InstantCommand(
                     () -> {
                       ScoringSubsystem.getInstance()
-                          .setClawRollerVoltage(JsonConstants.clawConstants.intakeVoltage);
+                          .setClawRollerVoltage(JsonConstants.clawConstants.coralIntakeVoltage);
                     }))
             .onFalse(
                 new InstantCommand(
@@ -301,7 +301,7 @@ public final class InitBindings {
                     () -> {
                       ScoringSubsystem.getInstance()
                           .setClawRollerVoltage(
-                              JsonConstants.clawConstants.intakeVoltage.times(-0.5));
+                              JsonConstants.clawConstants.coralIntakeVoltage.times(-0.5));
                     }))
             .onFalse(
                 new InstantCommand(
