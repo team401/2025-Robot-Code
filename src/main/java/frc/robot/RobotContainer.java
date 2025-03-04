@@ -144,6 +144,9 @@ public class RobotContainer {
     }
     if (FeatureFlags.synced.getObject().runClimb) {
       climbSubsystem = InitSubsystems.initClimbSubsystem();
+      if (FeatureFlags.synced.getObject().runRamp) {
+        climbSubsystem.setRampClear(() -> rampSubsystem.isInPosition());
+      }
     }
 
     if (FeatureFlags.synced.getObject().runScoring) {
@@ -272,6 +275,10 @@ public class RobotContainer {
 
     if (FeatureFlags.synced.getObject().runRamp) {
       rampSubsystem.testPeriodic();
+    }
+
+    if (FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem.testPeriodic();
     }
 
     if (FeatureFlags.synced.getObject().runDrive) {

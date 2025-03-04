@@ -11,6 +11,7 @@ public final class BuildConstants {
   public static final String GIT_BRANCH = "maplesim-intake";
   public static final String BUILD_DATE = "2025-03-03 18:57:53 EST";
   public static final long BUILD_UNIX_TIME = 1741046273024L;
+
   public static final int DIRTY = 1;
 
   private BuildConstants() {}

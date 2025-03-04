@@ -8,6 +8,7 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class AutoScore extends Command {
   private Drive drive;
@@ -30,6 +31,7 @@ public class AutoScore extends Command {
 
   public void initialize() {
     if (drive != null) {
+      drive.setDriveLinedUp(false);
       drive.setGoToIntake(false);
       drive.setDesiredLocation(currentScoringLocation);
       drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
@@ -54,6 +56,8 @@ public class AutoScore extends Command {
    * @return true if we are ready for next path
    */
   public boolean isReadyForNextAction() {
+    Logger.recordOutput("AutoScore/driveFinished", drive.isDriveAlignmentFinished());
+    Logger.recordOutput("AutoScore/scoringFinished", !scoringSubsystem.shouldWaitOnScore());
     return (drive == null || drive.isDriveAlignmentFinished())
         && (scoringSubsystem == null || !scoringSubsystem.shouldWaitOnScore());
   }
