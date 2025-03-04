@@ -120,6 +120,17 @@
       "unit": "Rotation"
     }
   },
+  "netWarmup": {
+    "name": "netWarmup",
+    "elevatorHeight": {
+      "value": 0.25,
+      "unit": "Meter"
+    },
+    "wristAngle": {
+      "value": -0.105,
+      "unit": "Rotation"
+    }
+  },
   "net": {
     "name": "net",
     "elevatorHeight": {

@@ -1,10 +1,14 @@
 package frc.robot.subsystems.scoring.states;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
+import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 
 public class ScoreState implements PeriodicStateInterface {
@@ -16,7 +20,15 @@ public class ScoreState implements PeriodicStateInterface {
 
   @Override
   public void periodic() {
-    ScoringSetpoint setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getTarget());
+    ScoringSetpoint setpoint;
+    if (scoringSubsystem.getGamePiece() == GamePiece.Algae
+        && scoringSubsystem.getTarget() == FieldTarget.Net) {
+      // Force the net setpoint only in score since the "warmup" for the net stays low to use
+      // elevator to shoot algae upward
+      setpoint = JsonConstants.scoringSetpoints.net;
+    } else {
+      setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getTarget());
+    }
 
     scoringSubsystem.setGoalSetpoint(setpoint);
 
@@ -28,7 +40,18 @@ public class ScoreState implements PeriodicStateInterface {
         }
         break;
       case Algae:
-        scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
+        if (scoringSubsystem.getTarget() == FieldTarget.Net) {
+          // Only run claw rollers when elevator is at setpoint
+          if (scoringSubsystem
+              .getElevatorHeight()
+              .isNear(
+                  setpoint.elevatorHeight(),
+                  JsonConstants.elevatorConstants.elevatorSetpointEpsilon)) {
+            scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
+          } else {
+            scoringSubsystem.setClawRollerVoltage(Volts.zero());
+          }
+        }
 
         if (JsonConstants.scoringFeatureFlags.runClaw) {
           scoringSubsystem.setAlgaeCurrentDetected(scoringSubsystem.isAlgaeCurrentDetected());

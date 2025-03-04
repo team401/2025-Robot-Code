@@ -57,6 +57,9 @@ public class ScoringSetpoints {
 
   public final ScoringSetpoint processor =
       new ScoringSetpoint("processor", Meters.of(0.1), Rotations.of(-0.75));
+
+  public final ScoringSetpoint netWarmup =
+      new ScoringSetpoint("netWarmup", Meters.of(0.25), Rotations.of(-0.105));
   public final ScoringSetpoint net =
       new ScoringSetpoint("net", Meters.of(1.25), Rotations.of(-0.75));
 
@@ -79,7 +82,7 @@ public class ScoringSetpoints {
       case L4:
         return JsonConstants.scoringSetpoints.L4;
       case Net:
-        return JsonConstants.scoringSetpoints.net;
+        return JsonConstants.scoringSetpoints.netWarmup;
       case Processor:
         return JsonConstants.scoringSetpoints.processor;
       case Ground:
