@@ -205,10 +205,15 @@ public class RobotContainer {
   }
 
   public void autonomousInit() {
+    drive.autonomousInit();
+
+    // load chosen strategy
     strategyManager.autonomousInit(autoChooser.getSelected());
   }
 
   public void teleopInit() {
+    drive.teleopInit();
+
     strategyManager.teleopInit();
   }
 
