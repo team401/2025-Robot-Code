@@ -34,7 +34,7 @@ public class AutoScore extends Command {
       drive.setDriveLinedUp(false);
       drive.setGoToIntake(false);
       drive.setDesiredLocation(currentScoringLocation);
-      drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+      drive.fireTrigger(DriveTrigger.BeginOTF);
     }
 
     if (scoringSubsystem != null) {

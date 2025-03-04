@@ -31,6 +31,8 @@ public class StrategyManager {
     Manual,
   }
 
+  public static StrategyManager instance;
+
   private Queue<Action> actions = null;
   private Command currentCommand = null;
   private Drive drive;
@@ -60,6 +62,16 @@ public class StrategyManager {
     actions = new LinkedList<>();
     this.drive = drive;
     this.scoringSubsystem = scoringSubsystem;
+
+    if (instance == null) {
+      instance = this;
+    } else {
+      System.out.println("Instantiated strategy manager twice :(");
+    }
+  }
+
+  public static StrategyManager getInstance() {
+    return instance;
   }
 
   /**
@@ -68,8 +80,34 @@ public class StrategyManager {
    * @param mode enum representing how autonomous to be
    */
   public void setAutonomyMode(AutonomyMode mode) {
+    if (this.autonomyMode != mode) {
+      onAutonomyModeChange(mode);
+    }
     this.autonomyMode = mode;
   }
+
+  /**
+   * sets the desired level of autonomy and publishes it to snakescreen
+   *
+   * @param mode enum representing how autonomous to be
+   */
+  public void setAutonomyModeAndPublish(AutonomyMode mode) {
+    setAutonomyMode(mode);
+
+    switch (mode) {
+      case Full:
+        autonomyPublisher.accept("high");
+        break;
+      case Mixed:
+        autonomyPublisher.accept("mid");
+        break;
+      case Manual:
+        autonomyPublisher.accept("low");
+        break;
+    }
+  }
+
+  public void onAutonomyModeChange(AutonomyMode newMode) {}
 
   /**
    * gets the current level of autonomy running
@@ -186,7 +224,8 @@ public class StrategyManager {
   public void updateScoringLocationsFromSnakeScreen() {
     // drive reef location
     if (drive != null) {
-      drive.updateDesiredLocationFromNetworkTables(reefLocationSelector.get());
+      drive.updateDesiredLocationFromNetworkTables(
+          reefLocationSelector.get(), gamePieceSelector.get().equalsIgnoreCase("algae"));
 
       // 20: left; 21: right
       drive.setDesiredIntakeLocation(
@@ -197,8 +236,6 @@ public class StrategyManager {
 
     // scoring level selection
     if (scoringSubsystem != null) {
-      scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
-
       // update scoring gamepiece
       String gamePiece = gamePieceSelector.get();
 
@@ -207,6 +244,8 @@ public class StrategyManager {
       } else if (gamePiece.equalsIgnoreCase("algae")) {
         scoringSubsystem.setGamePiece(GamePiece.Algae);
       }
+
+      scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
     }
 
     // update autonomy level
@@ -291,7 +330,6 @@ public class StrategyManager {
       int reefLocation = drive.getDesiredLocationIndex();
 
       if (reefLocation != -1) {
-        System.out.println("publishing default reef" + reefLocation);
         reefLocationPublisher.accept(reefLocation);
       }
 

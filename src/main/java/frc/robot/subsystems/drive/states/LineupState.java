@@ -10,12 +10,17 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.StrategyManager;
+import frc.robot.StrategyManager.AutonomyMode;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.constants.ModeConstants.Mode;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DesiredLocation;
+import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.drive.Drive.VisionAlignment;
+import frc.robot.subsystems.drive.ReefLineupUtil;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 import org.littletonrobotics.junction.Logger;
@@ -24,7 +29,9 @@ public class LineupState implements PeriodicStateInterface {
   private Drive drive;
 
   private DistanceToTag latestObservation;
+  private boolean hadObservationYet = false;
   private int observationAge;
+  private DesiredLocation lastReefLocation = DesiredLocation.Reef0;
 
   // along track pid test mode
   private LoggedTunableNumber alongTrackKp =
@@ -90,7 +97,6 @@ public class LineupState implements PeriodicStateInterface {
   }
 
   public void onEntry(Transition transition) {
-
     // Drive isn't done lining up
     drive.setDriveLinedUp(false);
 
@@ -101,8 +107,9 @@ public class LineupState implements PeriodicStateInterface {
     latestObservation = null;
     observationAge = 0;
 
-    // begin warming up elevator/wrist when lineup starts
-    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+    hadObservationYet = false;
+
+    lastReefLocation = drive.getDesiredLocation();
   }
 
   public void onExit(Transition transition) {
@@ -151,99 +158,109 @@ public class LineupState implements PeriodicStateInterface {
     }
   }
 
+  public boolean checkForSideSwitch() {
+    switch (drive.getDesiredLocation()) {
+      case Reef0:
+        return lastReefLocation == DesiredLocation.Reef1;
+      case Reef1:
+        return lastReefLocation == DesiredLocation.Reef0;
+      case Reef2:
+        return lastReefLocation == DesiredLocation.Reef3;
+      case Reef3:
+        return lastReefLocation == DesiredLocation.Reef2;
+      case Reef4:
+        return lastReefLocation == DesiredLocation.Reef5;
+      case Reef5:
+        return lastReefLocation == DesiredLocation.Reef4;
+      case Reef6:
+        return lastReefLocation == DesiredLocation.Reef7;
+      case Reef7:
+        return lastReefLocation == DesiredLocation.Reef6;
+      case Reef8:
+        return lastReefLocation == DesiredLocation.Reef9;
+      case Reef9:
+        return lastReefLocation == DesiredLocation.Reef8;
+      case Reef10:
+        return lastReefLocation == DesiredLocation.Reef11;
+      case Reef11:
+        return lastReefLocation == DesiredLocation.Reef10;
+      default:
+        return false;
+    }
+  }
+
+  /** checks for reef location update and handles state accordingly */
+  public void checkForReefUpdate() {
+    // if we changed sides throw a invalid observation out so lineup doesnt think its finished and
+    // we can move on to other side
+    if (checkForSideSwitch()) {
+      latestObservation = new DistanceToTag(0, 0, false);
+    }
+    // if we changed locations and its not to the other side we need to go back to OTF to get
+    // within tag distance
+    else if (drive.getDesiredLocation() != lastReefLocation && !checkForSideSwitch()) {
+      drive.fireTrigger(DriveTrigger.BeginOTF);
+    }
+  }
+
   /**
    * checks if lineup is within 0.01 of tag + offsets
    *
    * @return true if error is small enoguh
    */
   public boolean lineupFinished() {
-    return latestObservation != null
-        && (latestObservation.alongTrackDistance() < 0.05
-            && Math.abs(latestObservation.crossTrackDistance()) < 0.01);
+    boolean switchedSides = checkForSideSwitch();
+    boolean latestObservationIsValid = latestObservation != null && latestObservation.isValid();
+    Logger.recordOutput("Drive/lineup/latestObservationIsValid", latestObservationIsValid);
+    if (!latestObservationIsValid) {
+      return false;
+    }
+
+    boolean rotationCorrect =
+        Math.abs(drive.getRotation().getRadians() - getRotationForReefSide().getRadians())
+            < JsonConstants.drivetrainConstants.lineupRotationMarginRadians;
+    boolean alongTrackCorrect =
+        latestObservation.alongTrackDistance()
+            < JsonConstants.drivetrainConstants.lineupAlongTrackThresholdMeters;
+    boolean crossTrackCorrect =
+        Math.abs(latestObservation.crossTrackDistance())
+            < JsonConstants.drivetrainConstants.lineupCrossTrackThresholdMeters;
+    boolean vyLowEnough =
+        Math.abs(drive.getChassisSpeeds().vyMetersPerSecond)
+            < JsonConstants.drivetrainConstants.lineupVyThresholdMetersPerSecond;
+
+    Logger.recordOutput("Drive/lineup/sideSwitched", switchedSides);
+    Logger.recordOutput("Drive/lineup/rotationCorrect", rotationCorrect);
+    Logger.recordOutput("Drive/lineup/alongTrackCorrect", alongTrackCorrect);
+    Logger.recordOutput("Drive/lineup/crossTrackCorrect", crossTrackCorrect);
+    Logger.recordOutput("Drive/lineup/vyLowEnough", vyLowEnough);
+
+    return latestObservationIsValid
+        && hadObservationYet
+        && rotationCorrect
+        && alongTrackCorrect
+        && crossTrackCorrect
+        && vyLowEnough
+        && !switchedSides;
   }
 
   public void periodic() {
+    if (StrategyManager.getInstance().getAutonomyMode() == AutonomyMode.Manual) {
+      drive.fireTrigger(DriveTrigger.CancelLineup);
+    }
+
     // run test through here if in test mode
     if (DriverStation.isTest()) {
       this.testPeriodic();
     }
+
+    // handles drive state due to reef location change
+    checkForReefUpdate();
+
     this.LineupWithReefLocation();
 
     drive.setDriveLinedUp(lineupFinished());
-    Logger.recordOutput("lineup/finished", lineupFinished());
-  }
-
-  /**
-   * gets tag to use for final alignment with vision
-   *
-   * @return int representing tag id to use
-   */
-  public int getTagIdForReef() {
-    boolean allianceRed = drive.isAllianceRed();
-    switch (drive.getDesiredLocation()) {
-      case Reef0:
-      case Reef1:
-        return allianceRed ? 10 : 21;
-      case Reef2:
-      case Reef3:
-        return allianceRed ? 9 : 22;
-      case Reef4:
-      case Reef5:
-        return allianceRed ? 8 : 17;
-      case Reef6:
-      case Reef7:
-        return allianceRed ? 7 : 18;
-      case Reef8:
-      case Reef9:
-        return allianceRed ? 6 : 19;
-      case Reef10:
-      case Reef11:
-        return allianceRed ? 11 : 20;
-      default:
-        return -1;
-    }
-  }
-
-  /**
-   * gets cross track offset for lineup
-   *
-   * @param cameraIndex camera to check offset
-   * @return offset for camera
-   */
-  public Double getCrossTrackOffset(int cameraIndex) {
-    if (cameraIndex == JsonConstants.visionConstants.FrontRightCameraIndex) {
-      return JsonConstants.drivetrainConstants.driveCrossTrackFrontRightOffset;
-    } else {
-      return JsonConstants.drivetrainConstants.driveCrossTrackFrontLeftOffset;
-    }
-  }
-
-  /**
-   * gets camera index for vision single tag lineup
-   *
-   * @return 0 for Front Left camera; 1 for Front Right camera
-   */
-  public int getCameraIndexForLineup() {
-    switch (drive.getDesiredLocation()) {
-        // Right Side of reef side (align to left camera)
-      case Reef0:
-      case Reef2:
-      case Reef4:
-      case Reef6:
-      case Reef8:
-      case Reef10:
-        return JsonConstants.visionConstants.FrontLeftCameraIndex;
-        // Left side of reef side (align to right camera)
-      case Reef1:
-      case Reef3:
-      case Reef5:
-      case Reef7:
-      case Reef9:
-      case Reef11:
-        return JsonConstants.visionConstants.FrontRightCameraIndex;
-      default:
-        return -1;
-    }
+    Logger.recordOutput("drive/lineup/finished", lineupFinished());
   }
 
   public double getAlongTrackVelocity(double alongTrackDistance) {
@@ -252,10 +269,22 @@ public class LineupState implements PeriodicStateInterface {
       return 0;
     }
 
-    if (alongTrackDistance < 0.2) {
-      return -1
-          * JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
-          * driveAlongTrackLineupController.calculate(alongTrackDistance);
+    if (Math.abs(alongTrackDistance) < 0.01) {
+      return 0;
+    }
+
+    // if (alongTrackDistance < 0.2) {
+    //   return -1
+    //       * JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
+    //       * driveAlongTrackLineupController.calculate(alongTrackDistance);
+    // }
+
+    double multiplier = 1.0;
+
+    // slow down when near reef
+    if (Math.abs(alongTrackDistance)
+        < JsonConstants.drivetrainConstants.lineupAlongTrackSlowDownDistance) {
+      multiplier = JsonConstants.drivetrainConstants.lineupAlongTrackSlowDownMultiplier;
     }
 
     double sign = Math.signum(alongTrackDistance);
@@ -265,17 +294,48 @@ public class LineupState implements PeriodicStateInterface {
             2
                 * JsonConstants.drivetrainConstants.lineupMaxAcceleration
                 * Math.abs(alongTrackDistance));
-    return sign * Math.min(rawVelocity, JsonConstants.drivetrainConstants.lineupMaxVelocity);
+    return sign
+        * multiplier
+        * Math.min(rawVelocity, JsonConstants.drivetrainConstants.lineupMaxVelocity);
   }
 
   public double getAlongTrackVelocityReductionFactor(double crossTrackDistance) {
-    return (0.5 - Math.abs(crossTrackDistance));
+    return 2 * (0.5 - Math.abs(crossTrackDistance));
+  }
+
+  /**
+   * check the other camera index for a valid observation
+   *
+   * @param alignmentSupplier vision supplier
+   * @param tagId tag to check for
+   * @param cameraIndex the camera index already tried
+   * @return
+   */
+  public DistanceToTag tryOtherCamera(
+      VisionAlignment alignmentSupplier, int tagId, int cameraIndex) {
+    int otherCameraIndex = cameraIndex == 0 ? 1 : 0;
+    // check to add or subtract offset error
+    int signOfError = cameraIndex == JsonConstants.visionConstants.FrontLeftCameraIndex ? 1 : -1;
+    // distance between cameras (add or subtract so we still lock on to correct side)
+    double offsetErrorCorrection =
+        checkForSideSwitch()
+            ? 0
+            : JsonConstants.visionConstants.FrontLeftTransform.getY()
+                - JsonConstants.visionConstants.FrontRightTransform.getY();
+    DistanceToTag observationOtherCamera =
+        alignmentSupplier.get(
+            tagId,
+            otherCameraIndex,
+            ReefLineupUtil.getCrossTrackOffset(otherCameraIndex)
+                + (signOfError * offsetErrorCorrection),
+            JsonConstants.drivetrainConstants.driveAlongTrackOffset);
+    return observationOtherCamera;
   }
 
   /** take over goal speeds to align to reef exactly */
   public void LineupWithReefLocation() {
-    int tagId = this.getTagIdForReef();
-    int cameraIndex = this.getCameraIndexForLineup();
+    int tagId = ReefLineupUtil.getTagIdForReef(drive);
+    int cameraIndex = ReefLineupUtil.getCameraIndexForLineup(drive);
 
     if (tagId == -1 || cameraIndex == -1) {
       // TODO: check if this might be false first time, but on another loop true
@@ -293,16 +353,33 @@ public class LineupState implements PeriodicStateInterface {
         alignmentSupplier.get(
             tagId,
             cameraIndex,
-            this.getCrossTrackOffset(cameraIndex),
+            ReefLineupUtil.getCrossTrackOffset(cameraIndex),
             JsonConstants.drivetrainConstants.driveAlongTrackOffset);
 
     if (!observation.isValid()) {
-      if (latestObservation != null && observationAge < 5) {
-        observation = latestObservation;
+      DistanceToTag otherCameraObs = tryOtherCamera(alignmentSupplier, tagId, cameraIndex);
+      // use previous observation as long as its not too old
+      if (observationAge < JsonConstants.drivetrainConstants.maxObservationAge) {
+        if (latestObservation != null && latestObservation.isValid()) {
+          observation = latestObservation;
+        }
         observationAge++;
+      } // check if the other camera has observation (maybe we switched to other pole or camera got
+      // unplugged)
+      else if (otherCameraObs != null && otherCameraObs.isValid()) {
+        latestObservation = otherCameraObs;
+        observationAge = 0;
+      } else {
+        // cancel lineup if we havent seen a observation after five times
+        drive.fireTrigger(DriveTrigger.CancelLineup);
       }
     } else {
       latestObservation = observation;
+      // begin warming up elevator/wrist when lineup starts
+      if (ScoringSubsystem.getInstance() != null) {
+        ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+      }
+      hadObservationYet = true;
       observationAge = 0;
     }
 
@@ -321,9 +398,9 @@ public class LineupState implements PeriodicStateInterface {
     if (!lineupFinished()) {
       double vx =
           JsonConstants.drivetrainConstants.driveAlongTrackMultiplier
-              // * getAlongTrackVelocityReductionFactor(observation.crossTrackDistance())
-              * getAlongTrackVelocity(alongTrackDistanceFiltered);
-      double vy = driveCrossTrackLineupController.calculate(crossTrackDistanceFiltered);
+              * getAlongTrackVelocityReductionFactor(observation.crossTrackDistance())
+              * getAlongTrackVelocity(observation.alongTrackDistance()); // Maybe use filtered?
+      double vy = driveCrossTrackLineupController.calculate(observation.crossTrackDistance());
       double omega =
           rotationController.calculate(
               drive.getRotation().getRadians(), this.getRotationForReefSide().getRadians());

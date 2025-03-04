@@ -49,8 +49,8 @@
     "unit": "Radian"
   },
   "minReefSafeAngle": {
-    "value": 0.3,
-    "unit": "Rotation"
+    "value": 1.56,
+    "unit": "Radian"
   },
   "closeToReefThreshold": {
     "value": 2.5,
@@ -60,5 +60,6 @@
     "value": 5.0,
     "unit": "Degree"
   },
-  "maxWristSetpointVelocityRotationsPerSecond": 0.008333
+  "maxWristSetpointVelocityRotationsPerSecond": 0.008333,
+  "wristStableDebounceTimeSeconds": 0.5
 }

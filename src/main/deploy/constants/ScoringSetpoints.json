@@ -13,11 +13,11 @@
   "idleWithAlgae": {
     "name": "IdleWithAlgae",
     "elevatorHeight": {
-      "value": 0.2,
+      "value": 0.3,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": -0.75,
+      "value": -0.105,
       "unit": "Rotation"
     }
   },
@@ -35,33 +35,33 @@
   "L2": {
     "name": "L2",
     "elevatorHeight": {
-      "value": 0.28,
+      "value": 0.25,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": 0.3,
+      "value": 0.29,
       "unit": "Rotation"
     }
   },
   "L3": {
     "name": "L3",
     "elevatorHeight": {
-      "value": 0.65,
+      "value": 0.7,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": 0.3,
+      "value": 0.29,
       "unit": "Rotation"
     }
   },
   "L4": {
     "name": "L4",
     "elevatorHeight": {
-      "value": 1.33,
+      "value": 1.6,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": 0.3,
+      "value": 0.09,
       "unit": "Rotation"
     }
   },
@@ -79,22 +79,22 @@
   "L2algae": {
     "name": "L2algae",
     "elevatorHeight": {
-      "value": 0.606,
+      "value": 0.419,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": -0.15,
+      "value": -0.105,
       "unit": "Rotation"
     }
   },
   "L3algae": {
     "name": "L3algae",
     "elevatorHeight": {
-      "value": 1.034,
+      "value": 0.88393,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": -0.15,
+      "value": -0.105,
       "unit": "Rotation"
     }
   },
@@ -102,10 +102,10 @@
     "name": "coralStation",
     "elevatorHeight": {
       "value": 0.0,
-      "unit": "Meter"
+      "unit": "Inch"
     },
     "wristAngle": {
-      "value": 0.12,
+      "value": 0.3214,
       "unit": "Rotation"
     }
   },

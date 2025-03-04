@@ -52,6 +52,7 @@ import frc.robot.subsystems.drive.states.IdleState;
 import frc.robot.subsystems.drive.states.JoystickDrive;
 import frc.robot.subsystems.drive.states.LineupState;
 import frc.robot.subsystems.drive.states.OTFState;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.util.LocalADStarAK;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -168,6 +169,15 @@ public class Drive implements DriveTemplate {
     DesiredLocation.CoralStationRight
   };
 
+  public DesiredLocation[] algaeArray = {
+    DesiredLocation.Reef0,
+    DesiredLocation.Reef2,
+    DesiredLocation.Reef4,
+    DesiredLocation.Reef6,
+    DesiredLocation.Reef8,
+    DesiredLocation.Reef10
+  };
+
   private DesiredLocation desiredLocation = DesiredLocation.Reef9;
   private DesiredLocation intakeLocation = DesiredLocation.CoralStationLeft;
   private boolean goToIntake = false;
@@ -207,10 +217,10 @@ public class Drive implements DriveTemplate {
 
   public enum DriveTrigger {
     ManualJoysticks,
-    BeginAutoAlignment,
     CancelAutoAlignment,
     FinishOTF,
     CancelOTF,
+    BeginOTF,
     BeginLineup,
     CancelLineup,
     FinishLineup,
@@ -290,14 +300,7 @@ public class Drive implements DriveTemplate {
 
     stateMachineConfiguration
         .configure(DriveState.Joystick)
-        .permitIf(
-            DriveTrigger.BeginAutoAlignment,
-            DriveState.OTF,
-            () -> !this.isDriveCloseToFinalLineupPose())
-        .permitIf(
-            DriveTrigger.BeginAutoAlignment,
-            DriveState.Lineup,
-            () -> this.isDriveCloseToFinalLineupPose() && !this.isGoingToIntake());
+        .permit(DriveTrigger.BeginOTF, DriveState.OTF);
 
     stateMachineConfiguration
         .configure(DriveState.OTF)
@@ -316,9 +319,8 @@ public class Drive implements DriveTemplate {
     stateMachineConfiguration
         .configure(DriveState.Lineup)
         .permit(DriveTrigger.CancelLineup, DriveState.Joystick)
-        .permitIf(DriveTrigger.FinishLineup, DriveState.Idle, () -> this.isWaitingOnScore())
-        .permitIf(DriveTrigger.FinishLineup, DriveState.Joystick, () -> !this.isWaitingOnScore())
-        .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick);
+        .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick)
+        .permit(DriveTrigger.BeginOTF, DriveState.OTF);
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, DriveState.Joystick);
   }
@@ -362,6 +364,12 @@ public class Drive implements DriveTemplate {
 
   @Override
   public void periodic() {
+    // Manually cancel go to intake if we have a gamepiece
+    if (goToIntake && ScoringSubsystem.getInstance().isCoralDetected()
+        || ScoringSubsystem.getInstance().isAlgaeDetected()) {
+      setGoToIntake(false);
+    }
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -655,8 +663,18 @@ public class Drive implements DriveTemplate {
   }
 
   /** checks for update from reef location network table (SnakeScreen) run periodically in drive */
-  public void updateDesiredLocationFromNetworkTables(double desiredIndex) {
+  public void updateDesiredLocationFromNetworkTables(double desiredIndex, boolean isAlgae) {
     if (desiredIndex == -1) {
+      return;
+    }
+
+    // only change locations if its different
+    if (isAlgae && algaeArray[(int) desiredIndex] != desiredLocation) {
+      this.setDesiredLocation(algaeArray[(int) desiredIndex]);
+      if (isDriveOTF()) {
+        this.fireTrigger(DriveTrigger.ManualJoysticks);
+        this.fireTrigger(DriveTrigger.BeginOTF);
+      }
       return;
     }
     if (locationArray[(int) desiredIndex] != desiredLocation) {
@@ -690,7 +708,7 @@ public class Drive implements DriveTemplate {
 
     if (isDriveOTF()) {
       stateMachine.fire(DriveTrigger.ManualJoysticks);
-      stateMachine.fire(DriveTrigger.BeginAutoAlignment);
+      stateMachine.fire(DriveTrigger.BeginOTF);
     }
   }
 
@@ -871,7 +889,7 @@ public class Drive implements DriveTemplate {
 
   /** Returns the measured chassis speeds of the robot. */
   @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
-  private ChassisSpeeds getChassisSpeeds() {
+  public ChassisSpeeds getChassisSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
 

@@ -59,7 +59,7 @@ public final class InitBindings {
                       // And then fall through to the mixed autonomy behavior (no break here is
                       // intentional)
                     case Mixed:
-                      drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                      drive.fireTrigger(DriveTrigger.BeginOTF);
                       break;
                     case Manual:
                       // Only start scoring warmup if in manual autonomy; in mixed and full,
@@ -160,7 +160,7 @@ public final class InitBindings {
                       // Start auto align if in mixed autonomy
                       drive.setDesiredIntakeLocation(DesiredLocation.CoralStationRight);
                       drive.setGoToIntake(true);
-                      drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                      drive.fireTrigger(DriveTrigger.BeginOTF);
                       // Then always start intake for scoring (no break here is intentional)
                     case Manual:
                       if (ScoringSubsystem.getInstance() != null) {
@@ -182,11 +182,11 @@ public final class InitBindings {
                       // And then fall through to the mixed autonomy behavior (no break here is
                       // intentional)
                     case Mixed:
+                    case Manual:
                       // Cancel auto align if in mixed autonomy
                       drive.setGoToIntake(false);
                       drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
                       // Then always cancel intake for scoring (no break here is intentional)
-                    case Manual:
                       if (ScoringSubsystem.getInstance() != null) {
                         ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.CancelIntake);
                       }
@@ -210,6 +210,22 @@ public final class InitBindings {
             new InstantCommand(
                 () -> {
                   rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
+                }));
+
+    rightJoystick
+        .trigger()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
+                }));
+
+    rightJoystick
+        .trigger()
+        .onFalse(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.fireTrigger(RampTriggers.GOTO_IDLE);
                 }));
   }
 
@@ -317,5 +333,9 @@ public final class InitBindings {
 
   public static boolean isManualScorePressed() {
     return rightJoystick.top().getAsBoolean();
+  }
+
+  public static boolean isIntakeHeld() {
+    return leftJoystick.trigger().getAsBoolean();
   }
 }

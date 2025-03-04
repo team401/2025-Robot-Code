@@ -152,7 +152,7 @@ public class RobotContainer {
       if (FeatureFlags.synced.getObject().runDrive) {
         scoringSubsystem.setIsDriveLinedUpSupplier(
             () -> {
-              if (strategyManager.getAutonomyMode() == AutonomyMode.Mixed) {
+              if (strategyManager.getAutonomyMode() != AutonomyMode.Manual) {
                 return drive.isDriveAlignmentFinished();
               } else {
                 return InitBindings.isManualScorePressed();
