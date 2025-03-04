@@ -659,7 +659,9 @@ public class Drive implements DriveTemplate {
     if (desiredIndex == -1) {
       return;
     }
-    if (isAlgae) {
+
+    // only change locations if its different
+    if (isAlgae && algaeArray[(int) desiredIndex] != desiredLocation) {
       this.setDesiredLocation(algaeArray[(int) desiredIndex]);
       if (isDriveOTF()) {
         this.fireTrigger(DriveTrigger.ManualJoysticks);
