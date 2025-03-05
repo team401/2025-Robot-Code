@@ -357,6 +357,8 @@ public class LineupState implements PeriodicStateInterface {
             ReefLineupUtil.getCrossTrackOffset(cameraIndex),
             JsonConstants.drivetrainConstants.driveAlongTrackOffset);
 
+    Logger.recordOutput("Drive/Lineup/newObservationValid", observation.isValid());
+
     if (!observation.isValid()) {
       DistanceToTag otherCameraObs = tryOtherCamera(alignmentSupplier, tagId, cameraIndex);
       // use previous observation as long as its not too old

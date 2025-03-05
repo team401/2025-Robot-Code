@@ -30,9 +30,12 @@ public class OTFState implements PeriodicStateInterface {
       PathfindingCommand.warmupCommand().cancel();
     }
     driveToPose = this.getDriveToPoseCommand();
+    System.out.println(driveToPose == null);
     if (driveToPose == null) {
       drive.fireTrigger(DriveTrigger.CancelOTF);
     }
+
+    System.out.println("running on entry correct");
     this.driveToPose.schedule();
   }
 
@@ -155,13 +158,14 @@ public class OTFState implements PeriodicStateInterface {
   public void periodic() {
     // checks if location has changed (so path can be rescheduled)
     if (otfPose == null || !otfPose.equals(findOTFPoseFromDesiredLocation(drive))) {
+      System.out.println("fail on entry");
       this.onEntry(null);
     }
 
     // finishes otf when we are 0.1 meters away
-    if (drive.isDriveCloseToFinalLineupPose()) {
-      drive.fireTrigger(DriveTrigger.FinishOTF);
-    }
+    // if (drive.isDriveCloseToFinalLineupPose()) {
+    //   drive.fireTrigger(DriveTrigger.FinishOTF);
+    // }
 
     if (drive.isDriveCloseForFarWarmup() && ScoringSubsystem.getInstance() != null) {
       ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartFarWarmup);
@@ -172,16 +176,17 @@ public class OTFState implements PeriodicStateInterface {
       Logger.recordOutput("Drive/OTF/commandFinished", driveToPose.isFinished());
 
       // reschedule command if its not actually close
-      if(driveToPose.isFinished() && !drive.isDriveCloseToFinalLineupPose()) {
-        driveToPose = this.getDriveToPoseCommand();
-        if (driveToPose == null) {
-          drive.fireTrigger(DriveTrigger.CancelOTF);
-        }
-        this.driveToPose.schedule();
-      // go to lineup if we want reef
-      } else if (driveToPose.isFinished() && drive.isDesiredLocationReef()) {
+      // if (driveToPose.isFinished() && !drive.isDriveCloseToFinalLineupPose()) {
+      //   driveToPose = this.getDriveToPoseCommand();
+      //   if (driveToPose == null) {
+      //     drive.fireTrigger(DriveTrigger.CancelOTF);
+      //   }
+      //   this.driveToPose.schedule();
+      //   // go to lineup if we want reef
+      // } else 
+      if (driveToPose.isFinished() && drive.isDesiredLocationReef()) {
         drive.fireTrigger(DriveTrigger.BeginLineup);
-      // go to joystick otherwise
+        // go to joystick otherwise
       } else if (driveToPose.isFinished()) {
         drive.fireTrigger(DriveTrigger.CancelOTF);
       }
