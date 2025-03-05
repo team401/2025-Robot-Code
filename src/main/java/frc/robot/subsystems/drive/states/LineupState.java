@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -101,7 +102,7 @@ public class LineupState implements PeriodicStateInterface {
 
     // Log adjustment on init so that it can be added to scope before lineup starts
     Logger.recordOutput("Drive/Lineup/Adjustment", new Translation2d());
-    Logger.recordOutput("Drive/Lineup/adjustedPose", new Pose2d());
+    Logger.recordOutput("Drive/Lineup/FinalPose", new Pose2d());
   }
 
   public void onEntry(Transition transition) {
@@ -120,6 +121,12 @@ public class LineupState implements PeriodicStateInterface {
     lastReefLocation = drive.getDesiredLocation();
 
     poseAtLastObservation = drive.getPose();
+
+    // begin warming up elevator/wrist when lineup starts
+    if (ScoringSubsystem.getInstance() != null) {
+      ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+      System.out.println("StartWarmup!");
+    }
   }
 
   public void onExit(Transition transition) {
@@ -362,13 +369,11 @@ public class LineupState implements PeriodicStateInterface {
             .rotateBy(getRotationForReefSide().times(-1.0));
 
     Logger.recordOutput("Drive/Lineup/Adjustment", adjustment);
-    Logger.recordOutput(
-        "Drive/Lineup/adjustedPose", drive.getPose().getTranslation().plus(adjustment));
 
     DistanceToTag adjustedObservation =
         new DistanceToTag(
-            latestObservation.crossTrackDistance() - adjustment.getX(),
-            latestObservation.alongTrackDistance() - adjustment.getY(),
+            latestObservation.crossTrackDistance() + adjustment.getX(),
+            latestObservation.alongTrackDistance() + adjustment.getY(),
             true);
     return adjustedObservation;
   }
@@ -406,10 +411,6 @@ public class LineupState implements PeriodicStateInterface {
 
       poseAtLastObservation = drive.getPose();
 
-      // begin warming up elevator/wrist when lineup starts
-      if (ScoringSubsystem.getInstance() != null) {
-        ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
-      }
       hadObservationYet = true;
       observationAge = 0;
     } else {
@@ -426,6 +427,17 @@ public class LineupState implements PeriodicStateInterface {
     //   observationAge = 0;
     //   Logger.recordOutput("Drive/Lineup/usingOtherCamera", true);
     // }
+
+    Logger.recordOutput(
+        "Drive/Lineup/FinalPose",
+        drive
+            .getPose()
+            .plus(
+                new Transform2d(
+                    new Translation2d(
+                            observation.alongTrackDistance(), observation.crossTrackDistance())
+                        .rotateBy(drive.getRotation()),
+                    Rotation2d.kZero)));
 
     double alongTrackDistanceFiltered =
         alongTrackFilter.calculate(observation.alongTrackDistance());

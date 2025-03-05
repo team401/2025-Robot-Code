@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.sim.CANcoderSimState;
+import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
@@ -37,6 +38,8 @@ public class WristIOSim extends WristIOTalonFX {
 
   public WristIOSim() {
     super();
+
+    wristCANcoderSimState.Orientation = ChassisReference.Clockwise_Positive;
 
     // Initialize sim state so that the first periodic runs with accurate data
     updateSimState();
