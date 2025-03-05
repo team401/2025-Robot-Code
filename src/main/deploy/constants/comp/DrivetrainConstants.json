@@ -37,6 +37,7 @@
   "lineupAlongTrackThresholdMeters": 0.05,
   "lineupCrossTrackThresholdMeters": 0.04,
   "lineupVyThresholdMetersPerSecond": 0.05,
+  "allowLineupFinishWithCachedObservation": true,
   "otfPoseDistanceLimit": 0.5,
   "otfVisionAlongTrackThreshold": 0.3,
   "otfVisionCrossTrackThreshold": 0.25,

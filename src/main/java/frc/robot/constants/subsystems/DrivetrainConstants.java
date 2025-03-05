@@ -92,6 +92,8 @@ public class DrivetrainConstants {
   public final Double lineupAlongTrackSlowDownMultiplier = 0.2;
   public final Integer maxObservationAge = 100;
 
+  public final Boolean allowLineupFinishWithCachedObservation = false;
+
   public final Double lineupRotationMarginRadians = 0.05;
   public final Double lineupAlongTrackThresholdMeters = 0.05;
   public final Double lineupCrossTrackThresholdMeters = 0.02;

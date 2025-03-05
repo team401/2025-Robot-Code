@@ -94,7 +94,7 @@ public class LineupState implements PeriodicStateInterface {
   LinearFilter alongTrackFilter = LinearFilter.singlePoleIIR(0.2, 0.02);
   LinearFilter crossTrackFilter = LinearFilter.singlePoleIIR(0.2, 0.02);
 
-  Pose2d poseAtLastObservation = new Pose2d();
+  Pose2d poseAtLastObservation = null; // Initialize to null so we don't somehow lineup off of 0, 0
 
   public LineupState(Drive drive) {
     this.drive = drive;
@@ -230,30 +230,36 @@ public class LineupState implements PeriodicStateInterface {
     boolean switchedSides = checkForSideSwitch();
     boolean latestObservationIsValid = latestObservation != null && latestObservation.isValid();
     Logger.recordOutput("Drive/lineup/latestObservationIsValid", latestObservationIsValid);
-    if (!latestObservationIsValid) {
-      return false;
+
+    DistanceToTag observation;
+    if (latestObservationIsValid) {
+      observation = latestObservation;
+    } else {
+      observation = updateDistanceFromCachedPose();
     }
 
     boolean rotationCorrect =
         Math.abs(drive.getRotation().getRadians() - getRotationForReefSide().getRadians())
             < JsonConstants.drivetrainConstants.lineupRotationMarginRadians;
     boolean alongTrackCorrect =
-        latestObservation.alongTrackDistance()
+        observation.alongTrackDistance()
             < JsonConstants.drivetrainConstants.lineupAlongTrackThresholdMeters;
     boolean crossTrackCorrect =
-        Math.abs(latestObservation.crossTrackDistance())
+        Math.abs(observation.crossTrackDistance())
             < JsonConstants.drivetrainConstants.lineupCrossTrackThresholdMeters;
     boolean vyLowEnough =
         Math.abs(drive.getChassisSpeeds().vyMetersPerSecond)
             < JsonConstants.drivetrainConstants.lineupVyThresholdMetersPerSecond;
 
+    Logger.recordOutput("Drive/lineup/hadObservationYet", hadObservationYet);
     Logger.recordOutput("Drive/lineup/sideSwitched", switchedSides);
     Logger.recordOutput("Drive/lineup/rotationCorrect", rotationCorrect);
     Logger.recordOutput("Drive/lineup/alongTrackCorrect", alongTrackCorrect);
     Logger.recordOutput("Drive/lineup/crossTrackCorrect", crossTrackCorrect);
     Logger.recordOutput("Drive/lineup/vyLowEnough", vyLowEnough);
 
-    return latestObservationIsValid
+    return (JsonConstants.drivetrainConstants.allowLineupFinishWithCachedObservation
+            || latestObservationIsValid)
         && hadObservationYet
         && rotationCorrect
         && alongTrackCorrect
