@@ -367,10 +367,10 @@ public class LineupState implements PeriodicStateInterface {
         observationAge++;
       } // check if the other camera has observation (maybe we switched to other pole or camera got
       // unplugged)
-      else if (otherCameraObs != null && otherCameraObs.isValid()) {
-        latestObservation = otherCameraObs;
-        observationAge = 0;
-      } else {
+      // else if (otherCameraObs != null && otherCameraObs.isValid()) {
+      //   latestObservation = otherCameraObs;
+      //   observationAge = 0;
+      else {
         // cancel lineup if we havent seen a observation after five times
         drive.fireTrigger(DriveTrigger.CancelLineup);
       }
