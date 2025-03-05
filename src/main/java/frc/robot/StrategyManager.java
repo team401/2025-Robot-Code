@@ -381,6 +381,9 @@ public class StrategyManager {
 
     this.clearActions();
 
+    this.currentCommand = null;
+    this.currentAction = null;
+
     this.publishDefaultSubsystemValues();
   }
 }
