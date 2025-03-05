@@ -344,12 +344,16 @@ public class LineupState implements PeriodicStateInterface {
   }
 
   /**
-   * calculates our expected distance errror based on global odometry
-   * fall back to this when there is no new observation or it isnt valid
-   * 
+   * calculates our expected distance errror based on global odometry fall back to this when there
+   * is no new observation or it isnt valid
+   *
    * @return a DistanceToTag of the new expected distances needed to reach setpoint
    */
   public DistanceToTag updateDistanceFromCachedPose() {
+
+    if (poseAtLastObservation == null || latestObservation == null) {
+      return new DistanceToTag(0, 0, false);
+    }
     Translation2d adjustment =
         drive
             .getPose()
@@ -397,28 +401,7 @@ public class LineupState implements PeriodicStateInterface {
 
     Logger.recordOutput("Drive/Lineup/usingOtherCamera", false);
 
-    if (!observation.isValid()) {
-      DistanceToTag otherCameraObs = tryOtherCamera(alignmentSupplier, tagId, cameraIndex);
-      // use previous observation as long as its not too old
-      if (observationAge < JsonConstants.drivetrainConstants.maxObservationAge) {
-        if (latestObservation != null && latestObservation.isValid()) {
-          observation = updateDistanceFromCachedPose();
-        }
-        observationAge++;
-      } // check if the other camera has observation (maybe we switched to other pole or camera got
-      // unplugged)
-      else if (otherCameraObs != null && otherCameraObs.isValid()) {
-        latestObservation = otherCameraObs;
-        observationAge = 0;
-        Logger.recordOutput("Drive/Lineup/usingOtherCamera", true);
-      } else {
-        // cancel lineup if we havent seen a observation after five times
-        drive.fireTrigger(DriveTrigger.CancelLineup);
-        System.out.println(
-            "no observation canceled lineup! age > "
-                + JsonConstants.drivetrainConstants.maxObservationAge.toString());
-      }
-    } else {
+    if (observation.isValid()) {
       latestObservation = observation;
 
       poseAtLastObservation = drive.getPose();
@@ -429,7 +412,20 @@ public class LineupState implements PeriodicStateInterface {
       }
       hadObservationYet = true;
       observationAge = 0;
+    } else {
+      observation = updateDistanceFromCachedPose();
+      if (!observation.isValid()) {
+        // go back to otf?
+      }
     }
+
+    // check if the other camera has observation (maybe we switched to other pole or camera got
+    // unplugged)
+    // if (otherCameraObs != null && otherCameraObs.isValid()) {
+    //   latestObservation = otherCameraObs;
+    //   observationAge = 0;
+    //   Logger.recordOutput("Drive/Lineup/usingOtherCamera", true);
+    // }
 
     double alongTrackDistanceFiltered =
         alongTrackFilter.calculate(observation.alongTrackDistance());
