@@ -6,7 +6,9 @@ import coppercore.parameter_tools.LoggedTunableNumber;
 import coppercore.vision.VisionLocalizer.DistanceToTag;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.LinearFilter;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -91,9 +93,15 @@ public class LineupState implements PeriodicStateInterface {
   LinearFilter alongTrackFilter = LinearFilter.singlePoleIIR(0.2, 0.02);
   LinearFilter crossTrackFilter = LinearFilter.singlePoleIIR(0.2, 0.02);
 
+  Pose2d poseAtLastObservation = new Pose2d();
+
   public LineupState(Drive drive) {
     this.drive = drive;
     rotationController.enableContinuousInput(-Math.PI / 2, Math.PI / 2);
+
+    // Log adjustment on init so that it can be added to scope before lineup starts
+    Logger.recordOutput("Drive/Lineup/Adjustment", new Translation2d());
+    Logger.recordOutput("Drive/Lineup/adjustedPose", new Pose2d());
   }
 
   public void onEntry(Transition transition) {
@@ -110,6 +118,8 @@ public class LineupState implements PeriodicStateInterface {
     hadObservationYet = false;
 
     lastReefLocation = drive.getDesiredLocation();
+
+    poseAtLastObservation = drive.getPose();
   }
 
   public void onExit(Transition transition) {
@@ -364,7 +374,23 @@ public class LineupState implements PeriodicStateInterface {
       // use previous observation as long as its not too old
       if (observationAge < JsonConstants.drivetrainConstants.maxObservationAge) {
         if (latestObservation != null && latestObservation.isValid()) {
-          observation = latestObservation;
+          Translation2d adjustment =
+              drive
+                  .getPose()
+                  .minus(poseAtLastObservation)
+                  .getTranslation()
+                  .rotateBy(getRotationForReefSide().times(-1.0));
+
+          Logger.recordOutput("Drive/Lineup/Adjustment", adjustment);
+          Logger.recordOutput("Drive/Lineup/adjustedPose", drive.getPose().getTranslation().plus(adjustment));
+
+          DistanceToTag adjustedObservation =
+              new DistanceToTag(
+                  latestObservation.crossTrackDistance() - adjustment.getX(),
+                  latestObservation.alongTrackDistance() - adjustment.getY(),
+                  true);
+
+          observation = adjustedObservation;
         }
         observationAge++;
       } // check if the other camera has observation (maybe we switched to other pole or camera got
@@ -381,6 +407,9 @@ public class LineupState implements PeriodicStateInterface {
       }
     } else {
       latestObservation = observation;
+
+      poseAtLastObservation = drive.getPose();
+
       // begin warming up elevator/wrist when lineup starts
       if (ScoringSubsystem.getInstance() != null) {
         ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
