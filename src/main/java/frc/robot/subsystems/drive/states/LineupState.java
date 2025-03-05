@@ -194,6 +194,7 @@ public class LineupState implements PeriodicStateInterface {
     // if we changed sides throw a invalid observation out so lineup doesnt think its finished and
     // we can move on to other side
     if (checkForSideSwitch()) {
+      lastReefLocation = drive.getDesiredLocation();
       latestObservation = new DistanceToTag(0, 0, false);
     }
     // if we changed locations and its not to the other side we need to go back to OTF to get

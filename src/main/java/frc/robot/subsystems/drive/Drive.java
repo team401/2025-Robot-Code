@@ -358,8 +358,7 @@ public class Drive implements DriveTemplate {
 
   /** remove algae coral stack obstacles for on the fly */
   public void teleopInit() {
-    localADStar.setDynamicObstacles(
-        List.of(new Pair<Translation2d, Translation2d>(null, null)), getPose().getTranslation());
+    localADStar.setDynamicObstacles(List.of(), getPose().getTranslation());
   }
 
   @Override
@@ -653,6 +652,20 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * returns index of reef location for interfacing with snakescreen
+   *
+   * @return a double representing the index of reef location
+   */
+  public int getDesiredAlgaeLocationIndex() {
+    for (int i = 0; i < algaeArray.length; i++) {
+      if (algaeArray[i] == desiredLocation) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /**
    * sets desired path location calling this and then setting OTF to true will cause robot to drive
    * path from current pose to the location
    *
@@ -676,8 +689,7 @@ public class Drive implements DriveTemplate {
         this.fireTrigger(DriveTrigger.BeginOTF);
       }
       return;
-    }
-    if (locationArray[(int) desiredIndex] != desiredLocation) {
+    } else if (!isAlgae && locationArray[(int) desiredIndex] != desiredLocation) {
       if (isDriveOTF()) {
         this.updateDesiredLocation((int) desiredIndex);
       } else {

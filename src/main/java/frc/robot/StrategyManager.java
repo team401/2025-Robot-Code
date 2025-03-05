@@ -328,6 +328,9 @@ public class StrategyManager {
     if (drive != null) {
       // publish default reef location
       int reefLocation = drive.getDesiredLocationIndex();
+      if (gamePieceSelector.get().equalsIgnoreCase("algae")) {
+        reefLocation = drive.getDesiredAlgaeLocationIndex();
+      }
 
       if (reefLocation != -1) {
         reefLocationPublisher.accept(reefLocation);
