@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.KilogramSquareMeters;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.sim.CANcoderSimState;
@@ -55,7 +54,10 @@ public class WristIOSim extends WristIOTalonFX {
     lastWristAngle.mut_replace(wristAngle);
 
     // 1:1 ratio of wrist to CANcoder makes this math very easy
-    wristCANcoderSimState.addPosition(diffAngle);
+    wristCANcoderSimState.setRawPosition(
+        wristAngle.minus(
+            JsonConstants.wristConstants
+                .wristCANcoderMagnetOffset)); // Subtract the magnet offset since it's 0 in sim
     wristCANcoderSimState.setVelocity(wristVelocity);
 
     Angle rotorDiffAngle = diffAngle.times(JsonConstants.wristConstants.wristReduction);
@@ -68,7 +70,7 @@ public class WristIOSim extends WristIOTalonFX {
 
     wristSim.setInputVoltage(wristMotorSimState.getMotorVoltage());
 
-    Logger.recordOutput("wristSim/position", wristAngle.in(Rotations));
+    Logger.recordOutput("wristSim/position", wristAngle.in(Radians));
   }
 
   @Override
