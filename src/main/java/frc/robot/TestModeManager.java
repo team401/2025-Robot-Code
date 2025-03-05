@@ -24,7 +24,14 @@ public class TestModeManager {
     DriveSysIdDynamicBackward,
     DriveLineupTuning,
     ClimbTuning,
+    PitTest,
     None, // Default test mode that does nothing until a new one is selected.
+  }
+
+  public enum PitTestModes {
+    Drive,
+    Elevator,
+    Ramp
   }
 
   private static SendableChooser<TestMode> testModeChooser;
@@ -64,7 +71,10 @@ public class TestModeManager {
     // Climb Test Modes
     testModeChooser.addOption("Climb Tuning", TestMode.ClimbTuning);
 
+    testModeChooser.addOption("Pit Test Mode -CHECK FOR PEOPLE", TestMode.PitTest);
+
     SmartDashboard.putData("Test Mode Selector", testModeChooser);
+    SmartDashboard.putBoolean("Advance", false);
   }
 
   public static TestMode getTestMode() {

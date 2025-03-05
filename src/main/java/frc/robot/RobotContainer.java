@@ -264,6 +264,11 @@ public class RobotContainer {
         CommandScheduler.getInstance()
             .schedule(drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
         break;
+
+      case PitTest:
+      
+        break;
+
       default:
         break;
     }
@@ -285,6 +290,16 @@ public class RobotContainer {
 
     if (FeatureFlags.synced.getObject().runDrive) {
       drive.periodic();
+    }
+    switch (TestModeManager.getTestMode()) {
+      case PitTest:
+        if (SmartDashboard.getBoolean("Advance", false)) {
+          System.out.println("iwork");
+        }
+        break;
+
+      default:
+        break;
     }
   }
 
