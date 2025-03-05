@@ -372,8 +372,7 @@ public class LineupState implements PeriodicStateInterface {
       else if (otherCameraObs != null && otherCameraObs.isValid()) {
         latestObservation = otherCameraObs;
         observationAge = 0;
-      }
-      else {
+      } else {
         // cancel lineup if we havent seen a observation after five times
         drive.fireTrigger(DriveTrigger.CancelLineup);
         System.out.println(

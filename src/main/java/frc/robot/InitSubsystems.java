@@ -1,6 +1,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pound;
 
@@ -140,9 +141,12 @@ public final class InitSubsystems {
                     .withGyro(COTS.ofPigeon2())
                     .withRobotMass(Pound.of(115.0 + 20.0 + 13.0))
                     .withTrackLengthTrackWidth(trackWidth, trackLength)
+                    .withBumperSize(
+                        trackWidth.plus(Inches.of(3.0 * 2.0)),
+                        trackLength.plus(Inches.of(3.0 * 2.0)))
                     .withSwerveModule(
                         COTS.ofMark4(DCMotor.getKrakenX60Foc(1), DCMotor.getKrakenX60(1), 1.5, 2)),
-                new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
+                new Pose2d(Meters.of(10.40), Meters.of(5.5), new Rotation2d(Degrees.of(0))));
         // DrivetrainConstants.SimConstants.driveSimConfig, new Pose2d());
         SimulatedArena.getInstance().addDriveTrainSimulation(RobotContainer.driveSim);
         return new Drive(
