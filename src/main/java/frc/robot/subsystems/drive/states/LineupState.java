@@ -343,6 +343,32 @@ public class LineupState implements PeriodicStateInterface {
     return observationOtherCamera;
   }
 
+  /**
+   * calculates our expected distance errror based on global odometry
+   * fall back to this when there is no new observation or it isnt valid
+   * 
+   * @return a DistanceToTag of the new expected distances needed to reach setpoint
+   */
+  public DistanceToTag updateDistanceFromCachedPose() {
+    Translation2d adjustment =
+        drive
+            .getPose()
+            .minus(poseAtLastObservation)
+            .getTranslation()
+            .rotateBy(getRotationForReefSide().times(-1.0));
+
+    Logger.recordOutput("Drive/Lineup/Adjustment", adjustment);
+    Logger.recordOutput(
+        "Drive/Lineup/adjustedPose", drive.getPose().getTranslation().plus(adjustment));
+
+    DistanceToTag adjustedObservation =
+        new DistanceToTag(
+            latestObservation.crossTrackDistance() - adjustment.getX(),
+            latestObservation.alongTrackDistance() - adjustment.getY(),
+            true);
+    return adjustedObservation;
+  }
+
   /** take over goal speeds to align to reef exactly */
   public void LineupWithReefLocation() {
     int tagId = ReefLineupUtil.getTagIdForReef(drive);
@@ -369,28 +395,14 @@ public class LineupState implements PeriodicStateInterface {
 
     Logger.recordOutput("Drive/Lineup/newObservationValid", observation.isValid());
 
+    Logger.recordOutput("Drive/Lineup/usingOtherCamera", false);
+
     if (!observation.isValid()) {
       DistanceToTag otherCameraObs = tryOtherCamera(alignmentSupplier, tagId, cameraIndex);
       // use previous observation as long as its not too old
       if (observationAge < JsonConstants.drivetrainConstants.maxObservationAge) {
         if (latestObservation != null && latestObservation.isValid()) {
-          Translation2d adjustment =
-              drive
-                  .getPose()
-                  .minus(poseAtLastObservation)
-                  .getTranslation()
-                  .rotateBy(getRotationForReefSide().times(-1.0));
-
-          Logger.recordOutput("Drive/Lineup/Adjustment", adjustment);
-          Logger.recordOutput("Drive/Lineup/adjustedPose", drive.getPose().getTranslation().plus(adjustment));
-
-          DistanceToTag adjustedObservation =
-              new DistanceToTag(
-                  latestObservation.crossTrackDistance() - adjustment.getX(),
-                  latestObservation.alongTrackDistance() - adjustment.getY(),
-                  true);
-
-          observation = adjustedObservation;
+          observation = updateDistanceFromCachedPose();
         }
         observationAge++;
       } // check if the other camera has observation (maybe we switched to other pole or camera got
@@ -398,6 +410,7 @@ public class LineupState implements PeriodicStateInterface {
       else if (otherCameraObs != null && otherCameraObs.isValid()) {
         latestObservation = otherCameraObs;
         observationAge = 0;
+        Logger.recordOutput("Drive/Lineup/usingOtherCamera", true);
       } else {
         // cancel lineup if we havent seen a observation after five times
         drive.fireTrigger(DriveTrigger.CancelLineup);
