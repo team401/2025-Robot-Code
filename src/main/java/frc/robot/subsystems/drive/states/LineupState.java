@@ -375,6 +375,9 @@ public class LineupState implements PeriodicStateInterface {
       else {
         // cancel lineup if we havent seen a observation after five times
         drive.fireTrigger(DriveTrigger.CancelLineup);
+        System.out.println(
+            "no observation canceled lineup! age > "
+                + JsonConstants.drivetrainConstants.maxObservationAge.toString());
       }
     } else {
       latestObservation = observation;

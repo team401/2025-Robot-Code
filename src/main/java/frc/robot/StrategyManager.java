@@ -367,7 +367,12 @@ public class StrategyManager {
   public void autonomousInit(AutoStrategy strategy) {
     this.setAutonomyMode(AutonomyMode.Full);
 
+    this.currentCommand = null;
+    this.currentAction = null;
+
+    actions.clear();
     this.addActionsFromAutoStrategy(strategy);
+    System.out.println("New actions loaded: " + String.valueOf(actions.size()));
 
     this.publishDefaultSubsystemValues();
   }

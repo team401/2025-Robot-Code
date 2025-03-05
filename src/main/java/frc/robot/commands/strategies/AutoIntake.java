@@ -53,6 +53,8 @@ public class AutoIntake extends Command {
     if (drive != null) {
       drive.setGoToIntake(false);
       drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+
+      System.out.println("AutoIntake canceled lineup!");
     }
   }
 

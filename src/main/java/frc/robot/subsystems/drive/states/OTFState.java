@@ -183,12 +183,13 @@ public class OTFState implements PeriodicStateInterface {
       //   }
       //   this.driveToPose.schedule();
       //   // go to lineup if we want reef
-      // } else 
+      // } else
       if (driveToPose.isFinished() && drive.isDesiredLocationReef()) {
         drive.fireTrigger(DriveTrigger.BeginLineup);
         // go to joystick otherwise
       } else if (driveToPose.isFinished()) {
         drive.fireTrigger(DriveTrigger.CancelOTF);
+        System.out.println("driveToPose isFinished canceled OTF!");
       }
 
       // if (drive.isDesiredLocationReef()) {
