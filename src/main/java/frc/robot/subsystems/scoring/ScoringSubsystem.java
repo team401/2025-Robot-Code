@@ -205,6 +205,12 @@ public class ScoringSubsystem extends MonitoredSubsystem {
 
   private Supplier<Distance> reefDistanceSupplier = () -> Meters.zero();
 
+  /**
+   * Supplies a boolean determining whether or not the elevator can safely move up without hitting
+   * the ramp
+   */
+  private BooleanSupplier rampSafeSupplier = () -> true;
+
   public ScoringSubsystem(
       ElevatorMechanism elevatorMechanism,
       WristMechanism wristMechanism,
@@ -718,6 +724,16 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   public void setReefDistanceSupplier(Supplier<Distance> newSupplier) {
     reefDistanceSupplier = newSupplier;
+  }
+
+  /**
+   * Update the ramp safety supplier used to keep the elevator below the ramp during climb
+   *
+   * @param newSupplier The new supplier, which should supply "true" when ramp is in Idle/Intake
+   *     position and "false" when ramp is over the top of the elevator for climb.
+   */
+  public void setRampSafeSupplier(BooleanSupplier newSupplier) {
+    rampSafeSupplier = newSupplier;
   }
 
   /**

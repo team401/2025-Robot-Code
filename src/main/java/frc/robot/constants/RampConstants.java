@@ -35,6 +35,8 @@ public class RampConstants {
   public final Double intakePosition = 1.0;
   public final Double climbPosition = 2.5;
 
+  public final Double maxElevatorSafePosition = 3.0; // TODO: real value
+
   // Voltages
   public final Double intakeVoltage = -1.0;
   public final Double homingVoltage = -2.0;

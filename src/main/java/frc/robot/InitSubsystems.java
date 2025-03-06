@@ -175,16 +175,29 @@ public final class InitSubsystems {
   }
 
   public static RampSubsystem initRampSubsystem() {
+    final RampSubsystem rampSubsystem;
     switch (ModeConstants.currentMode) {
       case REAL:
-        return new RampSubsystem(new RampMechanism(new RampIOTalonFX()));
+        rampSubsystem = new RampSubsystem(new RampMechanism(new RampIOTalonFX()));
+        break;
       case SIM:
       case MAPLESIM:
-        return new RampSubsystem(new RampMechanism(new RampIOSim()));
+        rampSubsystem = new RampSubsystem(new RampMechanism(new RampIOSim()));
+        break;
       default:
         throw new UnsupportedOperationException(
             "Non-exhaustive list of mode types supported in InitSubsystems");
     }
+
+    if (ScoringSubsystem.getInstance() != null) {
+      ScoringSubsystem.getInstance()
+          .setRampSafeSupplier(
+              () ->
+                  rampSubsystem.getPosition()
+                      <= JsonConstants.rampConstants.maxElevatorSafePosition);
+    }
+
+    return rampSubsystem;
   }
 
   public static VisionLocalizer initVisionSubsystem(Drive drive) {
