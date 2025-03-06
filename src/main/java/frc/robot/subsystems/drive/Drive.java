@@ -601,10 +601,11 @@ public class Drive implements DriveTemplate {
    * @return true if location is reef; false otherwise (processor / coral station)
    */
   public boolean isDesiredLocationReef() {
-    return !(desiredLocation == DesiredLocation.CoralStationLeft
-            || desiredLocation == DesiredLocation.CoralStationRight
-            || desiredLocation == DesiredLocation.Processor)
-        && !goToIntake; // only want reef if intake is false
+    return isLocationAlgaeIntake(desiredLocation) && goToIntake
+        || (!(desiredLocation == DesiredLocation.CoralStationLeft
+                || desiredLocation == DesiredLocation.CoralStationRight
+                || desiredLocation == DesiredLocation.Processor)
+            && !goToIntake);
   }
 
   /**
@@ -701,7 +702,7 @@ public class Drive implements DriveTemplate {
       return;
     }
 
-    if(isAlgae && algaeArray[(int) desiredIndex] != intakeLocation) {
+    if (isAlgae && algaeArray[(int) desiredIndex] != intakeLocation) {
       this.setDesiredIntakeLocation(algaeArray[(int) desiredIndex]);
       if (isDriveOTF()) {
         this.fireTrigger(DriveTrigger.ManualJoysticks);
