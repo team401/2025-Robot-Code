@@ -717,6 +717,15 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * sets brake mode for each module
+   */
+  public void setBrakeMode(boolean brake) {
+    for(int i = 0; i < modules.length; i++) {
+      modules[i].setBrakeMode(brake);
+    }
+  }
+
+  /**
    * updates desired path location (for when OTF is already running) this will cancel old command
    * and generate a new OTF path to run
    *

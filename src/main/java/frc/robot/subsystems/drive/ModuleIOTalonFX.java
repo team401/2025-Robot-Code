@@ -243,6 +243,11 @@ public class ModuleIOTalonFX implements ModuleIO {
         });
   }
 
+  public void setBrakeMode(boolean brake) {
+    driveTalon.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+    turnTalon.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
+  }
+
   @Override
   public void setDriveVelocity(double velocityRadPerSec) {
     double velocityRotPerSec = Units.radiansToRotations(velocityRadPerSec);

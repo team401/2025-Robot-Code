@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -52,10 +53,40 @@ public class RobotContainer {
   private VisionLocalizer vision = null;
   private StrategyManager strategyManager = null;
   private AutoStrategyContainer strategyContainer = null;
+  private DigitalInput ledSwitch = new DigitalInput(8);
+  private DigitalInput brakeSwitch = new DigitalInput(9);
 
   private SendableChooser<AutoStrategy> autoChooser = new SendableChooser<>();
 
   public static SwerveDriveSimulation driveSim = null;
+
+  public void checkSwitchForDisabled() {
+    boolean brake = brakeSwitch.get();
+    if(FeatureFlags.synced.getObject().runDrive) {
+      drive.setBrakeMode(brake);
+    }
+    if(FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem.setBrakeMode(brake);
+    }
+    if(FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem.setBrakeMode(brake);
+    }
+    if(FeatureFlags.synced.getObject().runRamp) {
+      rampSubsystem.setBrakeMode(brake);
+    }
+  }
+
+  public void setSubsystemsToBrake() {
+    if(FeatureFlags.synced.getObject().runDrive) {
+      drive.setBrakeMode(true);
+    }
+    if(FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem.setBrakeMode(true);
+    }
+    if(FeatureFlags.synced.getObject().runRamp) {
+      rampSubsystem.setBrakeMode(true);
+    }
+  }
 
   public void updateRobotModel() {
     double height = 0.0;
@@ -207,12 +238,16 @@ public class RobotContainer {
   public void autonomousInit() {
     drive.autonomousInit();
 
+    setSubsystemsToBrake();
+
     // load chosen strategy
     strategyManager.autonomousInit(autoChooser.getSelected());
   }
 
   public void teleopInit() {
     drive.teleopInit();
+
+    setSubsystemsToBrake();
 
     strategyManager.teleopInit();
   }
@@ -291,6 +326,7 @@ public class RobotContainer {
   public void disabledPeriodic() {
     // Logger.recordOutput("feature_flags/drive", FeatureFlags.synced.getObject().runDrive);
     strategyManager.logActions();
+    checkSwitchForDisabled();
   }
 
   public void disabledInit() {

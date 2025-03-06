@@ -135,6 +135,10 @@ public class ElevatorMechanism implements Tunable {
     return hasBeenSeeded;
   }
 
+  public void setBrakeMode(boolean brake) {
+    io.setBrakeMode(brake);
+  }
+
   public void periodic() {
     Logger.recordOutput("elevator/hasBeenSeeded", hasBeenSeeded);
     if (inputs.largeEncoderConnected && inputs.smallEncoderConnected && !hasBeenSeeded) {
