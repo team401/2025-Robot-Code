@@ -1,13 +1,13 @@
 package frc.robot.subsystems.ramp;
 
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
+
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
-
 import edu.wpi.first.math.controller.PIDController;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Rotations;
 import frc.robot.constants.JsonConstants;
 
 // TODO make pid constants
@@ -51,7 +51,8 @@ public class RampIOTalonFX implements RampIO {
   @Override
   public void updateInputs(RampInputs inputs) {
     inputs.position =
-        Rotations.of(talon.getPosition().getValueAsDouble() / (21.0/8.0)).in(Radians) + angle_offset;
+        Rotations.of(talon.getPosition().getValueAsDouble() / (21.0 / 8.0)).in(Radians)
+            + angle_offset;
   }
 
   @Override

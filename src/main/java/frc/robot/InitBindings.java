@@ -1,8 +1,7 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Volts;
-
 import coppercore.wpilib_interface.DriveWithJoysticks;
+import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -196,20 +195,20 @@ public final class InitBindings {
   }
 
   public static void initRampBindings(RampSubsystem rampSubsystem) {
-    driverController
-        .a()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.START_CLIMB);
-                }));
-    driverController
-        .x()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
-                }));
+    // driverController
+    //     .a()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               rampSubsystem.fireTrigger(RampTriggers.START_CLIMB);
+    //             }));
+    // driverController
+    //     .x()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
+    //             }));
 
     rightJoystick
         .trigger()

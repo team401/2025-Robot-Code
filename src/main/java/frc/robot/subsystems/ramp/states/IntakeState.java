@@ -6,12 +6,10 @@ public class IntakeState extends RampState {
 
   @Override
   public void periodic() {
-    setPosition(JsonConstants.rampConstants.intakePosition);
+    setVoltage(JsonConstants.rampConstants.intakeVoltage);
     if (inPosition()) {
       fireTrigger.accept(RampTriggers.HOLD_INTAKE);
     }
     super.periodic();
   }
-
-  
 }

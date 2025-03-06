@@ -1,14 +1,14 @@
 package frc.robot.subsystems.ramp.states;
 
-import org.littletonrobotics.junction.Logger;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
 
 import coppercore.controls.state_machine.transition.Transition;
 import edu.wpi.first.math.filter.MedianFilter;
-import static edu.wpi.first.units.Units.RadiansPerSecond;
-import static edu.wpi.first.units.Units.Seconds;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.JsonConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class HomingState extends RampState {
 

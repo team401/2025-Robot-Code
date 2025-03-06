@@ -7,7 +7,7 @@ public class IntakeHoldState extends RampState {
 
   @Override
   public void periodic() {
-    setVoltage(JsonConstants.rampConstants.intakeVoltage);
+    setVoltage(JsonConstants.rampConstants.intakeHoldVoltage);
     super.periodic();
   }
 

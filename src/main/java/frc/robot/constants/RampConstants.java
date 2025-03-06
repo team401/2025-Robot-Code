@@ -38,7 +38,8 @@ public class RampConstants {
   public final Double maxElevatorSafePosition = 3.0; // TODO: real value
 
   // Voltages
-  public final Double intakeVoltage = -1.0;
+  public final Double intakeVoltage = -3.0;
+  public final Double intakeHoldVoltage = -1.0;
   public final Double homingVoltage = -2.0;
   public final Boolean inverted = false;
 
@@ -48,7 +49,7 @@ public class RampConstants {
   public final AngularVelocity homingVelocityThresholdMetersPerSecond = RadiansPerSecond.of(0.1);
   public final Integer homingVelocityFilterWindowSize = 5;
 
-  public final double climbVoltage = 0.0;
-  public final double autoHomePosition = 2.0;
-
+  public final Double climbVoltage = 0.0;
+  public final Double autoHomePosition = 2.0;
+  public final Double climbHoldVoltage = 0.5;
 }

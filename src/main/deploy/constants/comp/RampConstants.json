@@ -1,6 +1,6 @@
 {
   "intakePosition": 0.0,
-  "climbPosition": 11.0,
+  "climbPosition": 2.0,
   "motorId": 18,
   "positionRange": 0.1,
   "PID_TalonFX_P": 0.2,
@@ -10,8 +10,10 @@
   "PID_SIM_I": 0.0,
   "PID_SIM_D": 0.0,
   "inverted": false,
-  "intakeVoltage": -1.0,
-  "homingVoltage": -2.0,
-  "climbVoltage": 0.0,
+  "intakeVoltage": -3.0,
+  "intakeHoldVoltage": -1.0,
+  "homingVoltage": -3.0,
+  "climbVoltage": 2.0,
+  "climbHoldVoltage": 0.5,
   "autoHomePosition": 2.0
 }
