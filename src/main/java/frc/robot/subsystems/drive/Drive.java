@@ -36,9 +36,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.networktables.DoubleSubscriber;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -146,6 +143,12 @@ public class Drive implements DriveTemplate {
     Reef9,
     Reef10,
     Reef11,
+    Algae0,
+    Algae1,
+    Algae2,
+    Algae3,
+    Algae4,
+    Algae5,
     Processor,
     CoralStationLeft,
     CoralStationRight,
@@ -170,21 +173,17 @@ public class Drive implements DriveTemplate {
   };
 
   public DesiredLocation[] algaeArray = {
-    DesiredLocation.Reef0,
-    DesiredLocation.Reef2,
-    DesiredLocation.Reef4,
-    DesiredLocation.Reef6,
-    DesiredLocation.Reef8,
-    DesiredLocation.Reef10
+    DesiredLocation.Algae0,
+    DesiredLocation.Algae1,
+    DesiredLocation.Algae2,
+    DesiredLocation.Algae3,
+    DesiredLocation.Algae4,
+    DesiredLocation.Algae5
   };
 
   private DesiredLocation desiredLocation = DesiredLocation.Reef9;
   private DesiredLocation intakeLocation = DesiredLocation.CoralStationLeft;
   private boolean goToIntake = false;
-
-  private NetworkTableInstance inst = NetworkTableInstance.getDefault();
-  private NetworkTable table = inst.getTable("");
-  private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
 
   @AutoLogOutput(key = "Drive/waitOnScore")
   private BooleanSupplier waitOnScore = () -> false;
@@ -615,7 +614,18 @@ public class Drive implements DriveTemplate {
    */
   public boolean isLocationScoring(DesiredLocation location) {
     return !(location == DesiredLocation.CoralStationLeft
-        || location == DesiredLocation.CoralStationRight);
+            || location == DesiredLocation.CoralStationRight)
+        || !isLocationAlgaeIntake(location);
+  }
+
+  /** checks if location is reef (center of poles) */
+  public boolean isLocationAlgaeIntake(DesiredLocation location) {
+    return !(location == DesiredLocation.Algae0
+        || location == DesiredLocation.Algae1
+        || location == DesiredLocation.Algae2
+        || location == DesiredLocation.Algae3
+        || location == DesiredLocation.Algae4
+        || location == DesiredLocation.Algae5);
   }
 
   /**
@@ -691,9 +701,8 @@ public class Drive implements DriveTemplate {
       return;
     }
 
-    // only change locations if its different
-    if (isAlgae && algaeArray[(int) desiredIndex] != desiredLocation) {
-      this.setDesiredLocation(algaeArray[(int) desiredIndex]);
+    if(isAlgae && algaeArray[(int) desiredIndex] != intakeLocation) {
+      this.setDesiredIntakeLocation(algaeArray[(int) desiredIndex]);
       if (isDriveOTF()) {
         this.fireTrigger(DriveTrigger.ManualJoysticks);
         this.fireTrigger(DriveTrigger.BeginOTF);
