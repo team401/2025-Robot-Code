@@ -328,6 +328,9 @@ public class StrategyManager {
     if (drive != null) {
       // publish default reef location
       int reefLocation = drive.getDesiredLocationIndex();
+      if (gamePieceSelector.get().equalsIgnoreCase("algae")) {
+        reefLocation = drive.getDesiredAlgaeLocationIndex();
+      }
 
       if (reefLocation != -1) {
         reefLocationPublisher.accept(reefLocation);
@@ -364,7 +367,12 @@ public class StrategyManager {
   public void autonomousInit(AutoStrategy strategy) {
     this.setAutonomyMode(AutonomyMode.Full);
 
+    this.currentCommand = null;
+    this.currentAction = null;
+
+    actions.clear();
     this.addActionsFromAutoStrategy(strategy);
+    System.out.println("New actions loaded: " + String.valueOf(actions.size()));
 
     this.publishDefaultSubsystemValues();
   }
@@ -377,6 +385,9 @@ public class StrategyManager {
     this.setAutonomyMode(AutonomyMode.Mixed);
 
     this.clearActions();
+
+    this.currentCommand = null;
+    this.currentAction = null;
 
     this.publishDefaultSubsystemValues();
   }

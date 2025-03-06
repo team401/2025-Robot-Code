@@ -5,12 +5,12 @@
     "unit": "Meter"
   },
   "wristMinAngle": {
-    "value": -0.8,
-    "unit": "Rotation"
+    "value": -1.68,
+    "unit": "Radian"
   },
   "wristMaxAngle": {
-    "value": 0.34,
-    "unit": "Rotation"
+    "value": 2.00,
+    "unit": "Radian"
   },
   "wristStartingAngle": {
     "value": 0.0,

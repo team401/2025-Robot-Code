@@ -90,7 +90,9 @@ public class DrivetrainConstants {
   public final Double lineupMaxAcceleration = 1.5;
   public final Double lineupAlongTrackSlowDownDistance = 0.3;
   public final Double lineupAlongTrackSlowDownMultiplier = 0.2;
-  public final Integer maxObservationAge = 5;
+  public final Integer maxObservationAge = 100;
+
+  public final Boolean allowLineupFinishWithCachedObservation = false;
 
   public final Double lineupRotationMarginRadians = 0.05;
   public final Double lineupAlongTrackThresholdMeters = 0.05;
@@ -112,7 +114,9 @@ public class DrivetrainConstants {
    */
   public final Double otfVisionCrossTrackThreshold = 0.5;
 
-  public final Double otfFarWarmupDistance = 1.0;
+  public final Double otfFarWarmupDistance = 2.5;
+
+  public final Double otfWarmupDistance = 1.5;
 
   // The closed-loop output type to use for the steer motors;
   // This affects the PID/FF gains for the steer motors

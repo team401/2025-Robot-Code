@@ -61,5 +61,5 @@
     "unit": "Degree"
   },
   "maxWristSetpointVelocityRotationsPerSecond": 0.008333,
-  "wristStableDebounceTimeSeconds": 0.5
+  "wristStableDebounceTimeSeconds": 0.1
 }

@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.StrategyManager.AutonomyMode;
-import frc.robot.commands.drive.DesiredLocationSelector;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -113,25 +112,25 @@ public final class InitBindings {
                 },
                 drive));
 
-    // pov right (reef 0-11 -> processor left -> processor right )
-    // pov left (goes backwards of right)
-    driverController
-        .povRight()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  DesiredLocationSelector.incrementIndex();
-                  DesiredLocationSelector.setLocationFromIndex(drive);
-                }));
-    driverController
-        .povLeft()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  DesiredLocationSelector.decrementIndex();
-                  DesiredLocationSelector.setLocationFromIndex(drive);
-                },
-                drive));
+    // // pov right (reef 0-11 -> processor left -> processor right )
+    // // pov left (goes backwards of right)
+    // driverController
+    //     .povRight()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               DesiredLocationSelector.incrementIndex();
+    //               DesiredLocationSelector.setLocationFromIndex(drive);
+    //             }));
+    // driverController
+    //     .povLeft()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               DesiredLocationSelector.decrementIndex();
+    //               DesiredLocationSelector.setLocationFromIndex(drive);
+    //             },
+    //             drive));s
 
     // TODO: Rebind localization if necessary
     // leftJoystick
@@ -223,6 +222,22 @@ public final class InitBindings {
     rightJoystick
         .trigger()
         .onFalse(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.fireTrigger(RampTriggers.GOTO_IDLE);
+                }));
+
+    leftJoystick
+        .button(3)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.fireTrigger(RampTriggers.START_CLIMB);
+                }));
+
+    leftJoystick
+        .button(4)
+        .onTrue(
             new InstantCommand(
                 () -> {
                   rampSubsystem.fireTrigger(RampTriggers.GOTO_IDLE);

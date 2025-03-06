@@ -30,9 +30,12 @@ public class OTFState implements PeriodicStateInterface {
       PathfindingCommand.warmupCommand().cancel();
     }
     driveToPose = this.getDriveToPoseCommand();
+    System.out.println(driveToPose == null);
     if (driveToPose == null) {
       drive.fireTrigger(DriveTrigger.CancelOTF);
     }
+
+    System.out.println("running on entry correct");
     this.driveToPose.schedule();
   }
 
@@ -148,35 +151,64 @@ public class OTFState implements PeriodicStateInterface {
             JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
             JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
 
+    if (drive.isGoingToIntake()) {
+      constraints =
+          new PathConstraints(
+              JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
+              JsonConstants.drivetrainConstants.OTFMaxLinearAccel - 1,
+              JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
+              JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
+    }
+
     return AutoBuilder.pathfindToPose(
-        otfPose, constraints, JsonConstants.drivetrainConstants.otfPoseEndingVelocity);
+        otfPose,
+        constraints,
+        drive.isGoingToIntake() ? 0 : JsonConstants.drivetrainConstants.otfPoseEndingVelocity);
   }
 
   public void periodic() {
     // checks if location has changed (so path can be rescheduled)
     if (otfPose == null || !otfPose.equals(findOTFPoseFromDesiredLocation(drive))) {
+      System.out.println("fail on entry");
       this.onEntry(null);
     }
 
     // finishes otf when we are 0.1 meters away
-    if (drive.isDriveCloseToFinalLineupPose()) {
-      drive.fireTrigger(DriveTrigger.FinishOTF);
-    }
+    // if (drive.isDriveCloseToFinalLineupPose()) {
+    //   drive.fireTrigger(DriveTrigger.FinishOTF);
+    // }
 
-    if (drive.isDriveCloseForFarWarmup() && ScoringSubsystem.getInstance() != null) {
+    if (drive.isDriveCloseForWarmup() && ScoringSubsystem.getInstance() != null) {
+      ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+    } else if (drive.isDriveCloseForFarWarmup() && ScoringSubsystem.getInstance() != null) {
       ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartFarWarmup);
     }
 
     if (driveToPose != null) {
       Logger.recordOutput("Drive/OTF/commandScheduled", driveToPose.isScheduled());
+      Logger.recordOutput("Drive/OTF/commandFinished", driveToPose.isFinished());
 
-      // this runs when we accidentally go into otf (too close to reef for final pose to be true)
-      // this is now the only way to transition into lineup
-      //  fixes the accidental entry into lineup that messes with scoring warmup
-      if (driveToPose.isFinished() && drive.isDesiredLocationReef()) {
+      // reschedule command if its not actually close
+      // if (driveToPose.isFinished() && !drive.isDriveCloseToFinalLineupPose()) {
+      //   driveToPose = this.getDriveToPoseCommand();
+      //   if (driveToPose == null) {
+      //     drive.fireTrigger(DriveTrigger.CancelOTF);
+      //   }
+      //   this.driveToPose.schedule();
+      //   // go to lineup if we want reef
+      // } else
+      if ((driveToPose == null || driveToPose.isFinished())
+          && !drive.isDriveCloseToFinalLineupPose()) {
+        this.driveToPose = getDriveToPoseCommand();
+        if (driveToPose != null) {
+          driveToPose.schedule();
+        }
+      } else if (driveToPose.isFinished() && drive.isDesiredLocationReef()) {
         drive.fireTrigger(DriveTrigger.BeginLineup);
+        // go to joystick otherwise
       } else if (driveToPose.isFinished()) {
         drive.fireTrigger(DriveTrigger.CancelOTF);
+        System.out.println("driveToPose isFinished canceled OTF!");
       }
 
       // if (drive.isDesiredLocationReef()) {
