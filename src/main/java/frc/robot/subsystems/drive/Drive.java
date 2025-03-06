@@ -716,11 +716,9 @@ public class Drive implements DriveTemplate {
     this.updateDesiredLocation(locationArray[locationIndex]);
   }
 
-  /**
-   * sets brake mode for each module
-   */
+  /** sets brake mode for each module */
   public void setBrakeMode(boolean brake) {
-    for(int i = 0; i < modules.length; i++) {
+    for (int i = 0; i < modules.length; i++) {
       modules[i].setBrakeMode(brake);
     }
   }

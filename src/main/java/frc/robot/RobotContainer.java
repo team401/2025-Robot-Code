@@ -62,28 +62,28 @@ public class RobotContainer {
 
   public void checkSwitchForDisabled() {
     boolean brake = brakeSwitch.get();
-    if(FeatureFlags.synced.getObject().runDrive) {
+    if (FeatureFlags.synced.getObject().runDrive) {
       drive.setBrakeMode(brake);
     }
-    if(FeatureFlags.synced.getObject().runClimb) {
+    if (FeatureFlags.synced.getObject().runClimb) {
       climbSubsystem.setBrakeMode(brake);
     }
-    if(FeatureFlags.synced.getObject().runScoring) {
+    if (FeatureFlags.synced.getObject().runScoring) {
       scoringSubsystem.setBrakeMode(brake);
     }
-    if(FeatureFlags.synced.getObject().runRamp) {
+    if (FeatureFlags.synced.getObject().runRamp) {
       rampSubsystem.setBrakeMode(brake);
     }
   }
 
   public void setSubsystemsToBrake() {
-    if(FeatureFlags.synced.getObject().runDrive) {
+    if (FeatureFlags.synced.getObject().runDrive) {
       drive.setBrakeMode(true);
     }
-    if(FeatureFlags.synced.getObject().runClimb) {
+    if (FeatureFlags.synced.getObject().runClimb) {
       climbSubsystem.setBrakeMode(true);
     }
-    if(FeatureFlags.synced.getObject().runRamp) {
+    if (FeatureFlags.synced.getObject().runRamp) {
       rampSubsystem.setBrakeMode(true);
     }
   }
