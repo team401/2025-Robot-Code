@@ -28,12 +28,6 @@ public class TestModeManager {
     None, // Default test mode that does nothing until a new one is selected.
   }
 
-  public enum PitTestModes {
-    Drive,
-    Elevator,
-    Ramp
-  }
-
   private static SendableChooser<TestMode> testModeChooser;
 
   /**

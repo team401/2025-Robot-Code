@@ -266,7 +266,6 @@ public class RobotContainer {
         break;
 
       case PitTest:
-      
         break;
 
       default:

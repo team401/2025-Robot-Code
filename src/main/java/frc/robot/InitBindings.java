@@ -1,8 +1,10 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Radian;
 import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.wpilib_interface.DriveWithJoysticks;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -326,6 +328,36 @@ public final class InitBindings {
 
         ScoringSubsystem.getInstance()
             .setTuningHeightSetpointAdjustmentSupplier(() -> driverController.getLeftY());
+
+      case PitTest:
+        driverController
+            .axisGreaterThan(1, 0.05)
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                      ScoringSubsystem.getInstance()
+                          .setWristGoalAngle(
+                              Angle.ofBaseUnits(driverController.getRawAxis(1), Radian));
+                    }));
+        // elevator & wrist
+        driverController
+            .y()
+            .onTrue(
+                new InstantCommand(
+                    () -> {
+                      ScoringSubsystem.getInstance()
+                          .setClawRollerVoltage(JsonConstants.clawConstants.coralScoreVoltage);
+                    }))
+            .onFalse(
+                new InstantCommand(
+                    () -> {
+                      ScoringSubsystem.getInstance().setClawRollerVoltage(Volts.zero());
+                    }));
+
+        // ramp
+
+        // climb
+        break;
       default:
         break;
     }
