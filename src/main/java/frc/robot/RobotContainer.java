@@ -83,6 +83,9 @@ public class RobotContainer {
     if (FeatureFlags.synced.getObject().runClimb) {
       climbSubsystem.setBrakeMode(true);
     }
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem.setBrakeMode(true);
+    }
     if (FeatureFlags.synced.getObject().runRamp) {
       rampSubsystem.setBrakeMode(true);
     }
