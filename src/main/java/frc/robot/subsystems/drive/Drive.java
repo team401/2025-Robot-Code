@@ -621,7 +621,7 @@ public class Drive implements DriveTemplate {
 
   /** checks if location is reef (center of poles) */
   public boolean isLocationAlgaeIntake(DesiredLocation location) {
-    return !(location == DesiredLocation.Algae0
+    return (location == DesiredLocation.Algae0
         || location == DesiredLocation.Algae1
         || location == DesiredLocation.Algae2
         || location == DesiredLocation.Algae3
