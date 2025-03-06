@@ -152,6 +152,8 @@ public class ElevatorMechanism implements Tunable {
     Logger.recordOutput("elevator/goalHeight", goalHeight);
     Logger.recordOutput("elevator/clampedGoalHeight", clampedGoalHeight);
 
+    Logger.recordOutput("elevator/velocity", getElevatorVelocity());
+
     Logger.processInputs("elevator/inputs", inputs);
     Logger.processInputs("elevator/outputs", outputs);
   }

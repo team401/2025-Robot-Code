@@ -10,6 +10,7 @@ import edu.wpi.first.units.measure.MutAngle;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 import org.littletonrobotics.junction.Logger;
 
@@ -45,7 +46,11 @@ public class IntakeState implements PeriodicStateInterface {
 
   // @Override
   public void periodic() {
-    scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.intakeVoltage);
+    if (scoringSubsystem.getGamePiece() == GamePiece.Algae) {
+      scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeIntakeVoltage);
+    } else {
+      scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.coralIntakeVoltage);
+    }
 
     ScoringSetpoint setpoint;
     switch (scoringSubsystem.getGamePiece()) {
@@ -90,29 +95,15 @@ public class IntakeState implements PeriodicStateInterface {
         }
         break;
       case Algae:
-        if (scoringSubsystem.isAlgaeDetected()) {
-          Angle currentPos = scoringSubsystem.getClawRollerPosition();
-          if (isCounting) {
-            // If we're already counting, check if we've rotated far enough
-            Angle diff = currentPos.minus(detectedAngle);
-            Logger.recordOutput("claw/intake/diff", diff.in(Rotations));
-            Logger.recordOutput(
-                "claw/intake/anglePastAlgaerange", intakeAnglePastAlgaeRange.in(Rotations));
-            if (diff.gt(intakeAnglePastAlgaeRange)) {
-              scoringSubsystem.setClawRollerVoltage(Volts.zero());
-              scoringSubsystem.fireTrigger(ScoringTrigger.DoneIntaking);
-            }
-          } else {
-            // If we're not already counting, start counting and record where we started
-            detectedAngle.mut_replace(currentPos);
-            isCounting = true;
-            Logger.recordOutput("claw/intake/diff", 0.0);
-            Logger.recordOutput(
-                "claw/intake/anglePastAlgaerange", intakeAnglePastAlgaeRange.in(Rotations));
+        boolean algaeCurrentDetected = scoringSubsystem.isAlgaeCurrentDetected();
+
+        if (scoringSubsystem.isAlgaeDetected() || algaeCurrentDetected) {
+          scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeIdleVoltage);
+          scoringSubsystem.fireTrigger(ScoringTrigger.DoneIntaking);
+
+          if (algaeCurrentDetected) {
+            scoringSubsystem.setAlgaeCurrentDetected(true);
           }
-        } else {
-          // If gamepiece not detected, we're no longer counting
-          isCounting = false;
         }
         break;
     }

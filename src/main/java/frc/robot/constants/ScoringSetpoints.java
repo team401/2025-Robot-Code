@@ -43,6 +43,9 @@ public class ScoringSetpoints {
   public final ScoringSetpoint L3 = new ScoringSetpoint("L3", Meters.of(2.0), Rotations.of(0.3214));
   public final ScoringSetpoint L4 = new ScoringSetpoint("L4", Meters.of(2.5), Rotations.of(0.3214));
 
+  public final ScoringSetpoint farWarmup =
+      new ScoringSetpoint("farWarmup", Meters.of(0.6), Rotations.of(0.3214));
+
   // TODO: Algae setpoints
   public final ScoringSetpoint L2algae =
       new ScoringSetpoint("L2algae", Meters.of(1.8), Rotations.of(-0.75));
@@ -54,6 +57,9 @@ public class ScoringSetpoints {
 
   public final ScoringSetpoint processor =
       new ScoringSetpoint("processor", Meters.of(0.1), Rotations.of(-0.75));
+
+  public final ScoringSetpoint netWarmup =
+      new ScoringSetpoint("netWarmup", Meters.of(0.25), Rotations.of(-0.105));
   public final ScoringSetpoint net =
       new ScoringSetpoint("net", Meters.of(1.25), Rotations.of(-0.75));
 
@@ -76,7 +82,7 @@ public class ScoringSetpoints {
       case L4:
         return JsonConstants.scoringSetpoints.L4;
       case Net:
-        return JsonConstants.scoringSetpoints.net;
+        return JsonConstants.scoringSetpoints.netWarmup;
       case Processor:
         return JsonConstants.scoringSetpoints.processor;
       case Ground:

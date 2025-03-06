@@ -81,14 +81,42 @@ public class DrivetrainConstants {
   public final Double driveRotationKd = 0.0;
   public final Double driveAlongTrackMultiplier = -1.0;
   public final Double driveAlongTrackOffset = 0.25;
-  public final Double driveCrossTrackFrontRightOffset = 0.25;
-  public final Double driveCrossTrackFrontLeftOffset = 0.25;
+  public final Double driveCrossTrackFrontRightOffset = 0.0;
+  public final Double driveCrossTrackFrontLeftOffset = 0.0;
+  public final Double driveCrossTrackFrontRightAlgaeOffset = 0.25;
+  public final Double driveCrossTrackFrontLeftAlgaeOffset = 0.25;
 
   public final Double lineupMaxVelocity = 3.0;
   public final Double lineupMaxAcceleration = 1.5;
+  public final Double lineupAlongTrackSlowDownDistance = 0.3;
+  public final Double lineupAlongTrackSlowDownMultiplier = 0.2;
+  public final Integer maxObservationAge = 100;
+
+  public final Boolean allowLineupFinishWithCachedObservation = false;
+
+  public final Double lineupRotationMarginRadians = 0.05;
+  public final Double lineupAlongTrackThresholdMeters = 0.05;
+  public final Double lineupCrossTrackThresholdMeters = 0.02;
+  public final Double lineupVyThresholdMetersPerSecond = 0.05;
 
   public final Double otfPoseDistanceLimit = 0.1;
   public final Double otfPoseEndingVelocity = 0.5;
+
+  /**
+   * if otf sees the correct tag with an along track and cross track under these thresholds, it will
+   * go to lineup
+   */
+  public final Double otfVisionAlongTrackThreshold = 0.5;
+
+  /**
+   * if otf sees the correct tag with an along track and cross track under these thresholds, it will
+   * go to lineup
+   */
+  public final Double otfVisionCrossTrackThreshold = 0.5;
+
+  public final Double otfFarWarmupDistance = 2.5;
+
+  public final Double otfWarmupDistance = 1.5;
 
   // The closed-loop output type to use for the steer motors;
   // This affects the PID/FF gains for the steer motors

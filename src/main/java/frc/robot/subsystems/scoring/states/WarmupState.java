@@ -6,6 +6,8 @@ import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.constants.JsonConstants;
@@ -21,6 +23,10 @@ public class WarmupState implements PeriodicStateInterface {
   // Cache measure versions of the Doubles from JSON constants
   private LinearVelocity elevatorStableVelocityMeasure;
   private AngularVelocity wristStableVelocityMeasure;
+
+  Debouncer wristSetpointDebouncer =
+      new Debouncer(
+          JsonConstants.wristConstants.wristStableDebounceTimeSeconds, DebounceType.kRising);
 
   public WarmupState(ScoringSubsystem scoringSubsystem) {
     this.scoringSubsystem = scoringSubsystem;
@@ -43,6 +49,10 @@ public class WarmupState implements PeriodicStateInterface {
     scoringSubsystem.setGoalSetpoint(setpoint);
     scoringSubsystem.setClawRollerVoltage(Volts.zero());
 
+    if (JsonConstants.scoringFeatureFlags.runClaw) {
+      scoringSubsystem.setAlgaeCurrentDetected(scoringSubsystem.isAlgaeCurrentDetected());
+    }
+
     if (!(scoringSubsystem.isAlgaeDetected() || scoringSubsystem.isCoralDetected())) {
       scoringSubsystem.fireTrigger(ScoringTrigger.ReturnToIdle);
     }
@@ -63,6 +73,8 @@ public class WarmupState implements PeriodicStateInterface {
             .getWristAngle()
             .isNear(setpoint.wristAngle(), JsonConstants.wristConstants.wristSetpointEpsilon);
 
+    boolean wristAtSetpointDebounced = wristSetpointDebouncer.calculate(wristAtSetpoint);
+
     boolean wristStable =
         scoringSubsystem
             .getWristVelocity()
@@ -71,9 +83,10 @@ public class WarmupState implements PeriodicStateInterface {
     Logger.recordOutput("scoring/warmup/elevatorAtSetpoint", elevatorAtSetpoint);
     Logger.recordOutput("scoring/warmup/elevatorStable", elevatorStable);
     Logger.recordOutput("scoring/warmup/wristAtSetpoint", wristAtSetpoint);
+    Logger.recordOutput("scoring/warmup/wristAtSetpointDebounced", wristAtSetpointDebounced);
     Logger.recordOutput("scoring/warmup/wristStable", wristStable);
 
-    if (elevatorAtSetpoint && elevatorStable && wristAtSetpoint && wristStable) {
+    if (elevatorAtSetpoint && elevatorStable && wristAtSetpointDebounced && wristStable) {
       scoringSubsystem.fireTrigger(ScoringTrigger.WarmupReady);
     }
   }

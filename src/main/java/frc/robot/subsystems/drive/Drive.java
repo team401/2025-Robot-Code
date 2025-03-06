@@ -49,6 +49,7 @@ import frc.robot.subsystems.drive.states.IdleState;
 import frc.robot.subsystems.drive.states.JoystickDrive;
 import frc.robot.subsystems.drive.states.LineupState;
 import frc.robot.subsystems.drive.states.OTFState;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.util.LocalADStarAK;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -142,6 +143,12 @@ public class Drive implements DriveTemplate {
     Reef9,
     Reef10,
     Reef11,
+    Algae0,
+    Algae1,
+    Algae2,
+    Algae3,
+    Algae4,
+    Algae5,
     Processor,
     Net,
     CoralStationLeft,
@@ -165,6 +172,15 @@ public class Drive implements DriveTemplate {
     DesiredLocation.Net,
     DesiredLocation.CoralStationLeft,
     DesiredLocation.CoralStationRight
+  };
+
+  public DesiredLocation[] algaeArray = {
+    DesiredLocation.Algae0,
+    DesiredLocation.Algae1,
+    DesiredLocation.Algae2,
+    DesiredLocation.Algae3,
+    DesiredLocation.Algae4,
+    DesiredLocation.Algae5
   };
 
   private DesiredLocation desiredLocation = DesiredLocation.Reef9;
@@ -202,10 +218,10 @@ public class Drive implements DriveTemplate {
 
   public enum DriveTrigger {
     ManualJoysticks,
-    BeginAutoAlignment,
     CancelAutoAlignment,
     FinishOTF,
     CancelOTF,
+    BeginOTF,
     BeginLineup,
     CancelLineup,
     FinishLineup,
@@ -285,14 +301,7 @@ public class Drive implements DriveTemplate {
 
     stateMachineConfiguration
         .configure(DriveState.Joystick)
-        .permitIf(
-            DriveTrigger.BeginAutoAlignment,
-            DriveState.OTF,
-            () -> !this.isDriveCloseToFinalLineupPose())
-        .permitIf(
-            DriveTrigger.BeginAutoAlignment,
-            DriveState.Lineup,
-            () -> this.isDriveCloseToFinalLineupPose() && !this.isGoingToIntake());
+        .permit(DriveTrigger.BeginOTF, DriveState.OTF);
 
     stateMachineConfiguration
         .configure(DriveState.OTF)
@@ -311,9 +320,8 @@ public class Drive implements DriveTemplate {
     stateMachineConfiguration
         .configure(DriveState.Lineup)
         .permit(DriveTrigger.CancelLineup, DriveState.Joystick)
-        .permitIf(DriveTrigger.FinishLineup, DriveState.Idle, () -> this.isWaitingOnScore())
-        .permitIf(DriveTrigger.FinishLineup, DriveState.Joystick, () -> !this.isWaitingOnScore())
-        .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick);
+        .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick)
+        .permit(DriveTrigger.BeginOTF, DriveState.OTF);
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, DriveState.Joystick);
   }
@@ -351,12 +359,18 @@ public class Drive implements DriveTemplate {
 
   /** remove algae coral stack obstacles for on the fly */
   public void teleopInit() {
-    localADStar.setDynamicObstacles(
-        List.of(new Pair<Translation2d, Translation2d>(null, null)), getPose().getTranslation());
+    localADStar.setDynamicObstacles(List.of(), getPose().getTranslation());
   }
 
   @Override
   public void periodic() {
+    // Manually cancel go to intake if we have a gamepiece
+    if (goToIntake && ScoringSubsystem.getInstance().isCoralDetected()) {
+      setGoToIntake(false);
+    } else if (goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
+      setGoToIntake(false);
+    }
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -556,6 +570,21 @@ public class Drive implements DriveTemplate {
         < JsonConstants.drivetrainConstants.otfPoseDistanceLimit;
   }
 
+  @AutoLogOutput(key = "Drive/OTF/isDriveCloseForFarWarmup")
+  public boolean isDriveCloseForFarWarmup() {
+    return this.getPose()
+            .getTranslation()
+            .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation())
+        < JsonConstants.drivetrainConstants.otfFarWarmupDistance;
+  }
+
+  public boolean isDriveCloseForWarmup() {
+    return this.getPose()
+            .getTranslation()
+            .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation())
+        < JsonConstants.drivetrainConstants.otfWarmupDistance;
+  }
+
   /**
    * checks if drive is currently lining up to a reef
    *
@@ -572,11 +601,13 @@ public class Drive implements DriveTemplate {
    * @return true if location is reef; false otherwise (processor / coral station)
    */
   public boolean isDesiredLocationReef() {
-    return !(desiredLocation == DesiredLocation.CoralStationLeft
-            || desiredLocation == DesiredLocation.CoralStationRight
-            || desiredLocation == DesiredLocation.Processor
-            || desiredLocation == DesiredLocation.Net)
-        && !goToIntake; // only want reef if intake is false
+    boolean isCoralReefTarget =
+        !(desiredLocation == DesiredLocation.CoralStationLeft
+                || desiredLocation == DesiredLocation.CoralStationRight
+                || desiredLocation == DesiredLocation.Processor)
+            && !goToIntake;
+    boolean isAlgaeReefTarget = isLocationAlgaeIntake(desiredLocation) && goToIntake;
+    return isCoralReefTarget || isAlgaeReefTarget;
   }
 
   /**
@@ -585,8 +616,22 @@ public class Drive implements DriveTemplate {
    * @return true if location is scoring (reef / processor)
    */
   public boolean isLocationScoring(DesiredLocation location) {
-    return !(location == DesiredLocation.CoralStationLeft
-        || location == DesiredLocation.CoralStationRight);
+    boolean isLocationCoralStation =
+        (location == DesiredLocation.CoralStationLeft
+            || location == DesiredLocation.CoralStationRight);
+    boolean isAlgaeIntake = isLocationAlgaeIntake(location);
+
+    return (!isLocationCoralStation && !isAlgaeIntake);
+  }
+
+  /** checks if location is reef (center of poles) */
+  public boolean isLocationAlgaeIntake(DesiredLocation location) {
+    return (location == DesiredLocation.Algae0
+        || location == DesiredLocation.Algae1
+        || location == DesiredLocation.Algae2
+        || location == DesiredLocation.Algae3
+        || location == DesiredLocation.Algae4
+        || location == DesiredLocation.Algae5);
   }
 
   /**
@@ -633,6 +678,20 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * returns index of reef location for interfacing with snakescreen
+   *
+   * @return a double representing the index of reef location
+   */
+  public int getDesiredAlgaeLocationIndex() {
+    for (int i = 0; i < algaeArray.length; i++) {
+      if (algaeArray[i] == desiredLocation) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /**
    * sets desired path location calling this and then setting OTF to true will cause robot to drive
    * path from current pose to the location
    *
@@ -643,11 +702,19 @@ public class Drive implements DriveTemplate {
   }
 
   /** checks for update from reef location network table (SnakeScreen) run periodically in drive */
-  public void updateDesiredLocationFromNetworkTables(double desiredIndex) {
+  public void updateDesiredLocationFromNetworkTables(double desiredIndex, boolean isAlgae) {
     if (desiredIndex == -1) {
       return;
     }
-    if (locationArray[(int) desiredIndex] != desiredLocation) {
+
+    if (isAlgae && algaeArray[(int) desiredIndex] != intakeLocation) {
+      this.setDesiredIntakeLocation(algaeArray[(int) desiredIndex]);
+      if (isDriveOTF()) {
+        this.fireTrigger(DriveTrigger.ManualJoysticks);
+        this.fireTrigger(DriveTrigger.BeginOTF);
+      }
+      return;
+    } else if (!isAlgae && locationArray[(int) desiredIndex] != desiredLocation) {
       if (isDriveOTF()) {
         this.updateDesiredLocation((int) desiredIndex);
       } else {
@@ -678,7 +745,7 @@ public class Drive implements DriveTemplate {
 
     if (isDriveOTF()) {
       stateMachine.fire(DriveTrigger.ManualJoysticks);
-      stateMachine.fire(DriveTrigger.BeginAutoAlignment);
+      stateMachine.fire(DriveTrigger.BeginOTF);
     }
   }
 
@@ -859,7 +926,7 @@ public class Drive implements DriveTemplate {
 
   /** Returns the measured chassis speeds of the robot. */
   @AutoLogOutput(key = "SwerveChassisSpeeds/Measured")
-  private ChassisSpeeds getChassisSpeeds() {
+  public ChassisSpeeds getChassisSpeeds() {
     return kinematics.toChassisSpeeds(getModuleStates());
   }
 
