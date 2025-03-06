@@ -123,12 +123,12 @@
   "netWarmup": {
     "name": "netWarmup",
     "elevatorHeight": {
-      "value": 0.25,
+      "value": 1.55,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": -0.105,
-      "unit": "Rotation"
+      "value": 1.3,
+      "unit": "Radian"
     }
   },
   "net": {
