@@ -339,7 +339,7 @@ public class LineupState implements PeriodicStateInterface {
       VisionAlignment alignmentSupplier, int tagId, int cameraIndex) {
     int otherCameraIndex = cameraIndex == 0 ? 1 : 0;
     // check to add or subtract offset error
-    int signOfError = cameraIndex == JsonConstants.visionConstants.FrontLeftCameraIndex ? 1 : -1;
+    int signOfError = cameraIndex == JsonConstants.visionConstants.FrontLeftCameraIndex ? -1 : 1;
     // distance between cameras (add or subtract so we still lock on to correct side)
     double offsetErrorCorrection =
         checkForSideSwitch()
@@ -372,14 +372,14 @@ public class LineupState implements PeriodicStateInterface {
             .getPose()
             .minus(poseAtLastObservation)
             .getTranslation()
-            .rotateBy(getRotationForReefSide().times(-1.0));
+            .rotateBy(getRotationForReefSide());
 
     Logger.recordOutput("Drive/Lineup/Adjustment", adjustment);
 
     DistanceToTag adjustedObservation =
         new DistanceToTag(
-            latestObservation.crossTrackDistance() + adjustment.getX(),
-            latestObservation.alongTrackDistance() + adjustment.getY(),
+            latestObservation.crossTrackDistance() + adjustment.getY(),
+            latestObservation.alongTrackDistance() + adjustment.getX(),
             true);
     return adjustedObservation;
   }
@@ -408,6 +408,8 @@ public class LineupState implements PeriodicStateInterface {
             ReefLineupUtil.getCrossTrackOffset(cameraIndex),
             JsonConstants.drivetrainConstants.driveAlongTrackOffset);
 
+    DistanceToTag otherCameraObs = tryOtherCamera(alignmentSupplier, tagId, cameraIndex);
+
     Logger.recordOutput("Drive/Lineup/newObservationValid", observation.isValid());
 
     Logger.recordOutput("Drive/Lineup/usingOtherCamera", false);
@@ -419,20 +421,19 @@ public class LineupState implements PeriodicStateInterface {
 
       hadObservationYet = true;
       observationAge = 0;
+    } else if (otherCameraObs != null && otherCameraObs.isValid()) {
+      // check if the other camera has observation (maybe we switched to other pole or camera got
+      // unplugged)
+      latestObservation = otherCameraObs;
+      observation = otherCameraObs;
+      observationAge = 0;
+      Logger.recordOutput("Drive/Lineup/usingOtherCamera", true);
     } else {
       observation = updateDistanceFromCachedPose();
       if (!observation.isValid()) {
         // go back to otf?
       }
     }
-
-    // check if the other camera has observation (maybe we switched to other pole or camera got
-    // unplugged)
-    // if (otherCameraObs != null && otherCameraObs.isValid()) {
-    //   latestObservation = otherCameraObs;
-    //   observationAge = 0;
-    //   Logger.recordOutput("Drive/Lineup/usingOtherCamera", true);
-    // }
 
     Logger.recordOutput(
         "Drive/Lineup/FinalPose",

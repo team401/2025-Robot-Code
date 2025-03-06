@@ -114,7 +114,9 @@ public class DrivetrainConstants {
    */
   public final Double otfVisionCrossTrackThreshold = 0.5;
 
-  public final Double otfFarWarmupDistance = 1.0;
+  public final Double otfFarWarmupDistance = 2.5;
+
+  public final Double otfWarmupDistance = 1.5;
 
   // The closed-loop output type to use for the steer motors;
   // This affects the PID/FF gains for the steer motors

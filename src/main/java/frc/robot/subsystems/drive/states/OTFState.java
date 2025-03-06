@@ -151,8 +151,19 @@ public class OTFState implements PeriodicStateInterface {
             JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
             JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
 
+    if (drive.isGoingToIntake()) {
+      constraints =
+          new PathConstraints(
+              JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
+              JsonConstants.drivetrainConstants.OTFMaxLinearAccel - 1,
+              JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
+              JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
+    }
+
     return AutoBuilder.pathfindToPose(
-        otfPose, constraints, JsonConstants.drivetrainConstants.otfPoseEndingVelocity);
+        otfPose,
+        constraints,
+        drive.isGoingToIntake() ? 0 : JsonConstants.drivetrainConstants.otfPoseEndingVelocity);
   }
 
   public void periodic() {
@@ -167,7 +178,9 @@ public class OTFState implements PeriodicStateInterface {
     //   drive.fireTrigger(DriveTrigger.FinishOTF);
     // }
 
-    if (drive.isDriveCloseForFarWarmup() && ScoringSubsystem.getInstance() != null) {
+    if (drive.isDriveCloseForWarmup() && ScoringSubsystem.getInstance() != null) {
+      ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+    } else if (drive.isDriveCloseForFarWarmup() && ScoringSubsystem.getInstance() != null) {
       ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartFarWarmup);
     }
 
@@ -184,7 +197,13 @@ public class OTFState implements PeriodicStateInterface {
       //   this.driveToPose.schedule();
       //   // go to lineup if we want reef
       // } else
-      if (driveToPose.isFinished() && drive.isDesiredLocationReef()) {
+      if ((driveToPose == null || driveToPose.isFinished())
+          && !drive.isDriveCloseToFinalLineupPose()) {
+        this.driveToPose = getDriveToPoseCommand();
+        if (driveToPose != null) {
+          driveToPose.schedule();
+        }
+      } else if (driveToPose.isFinished() && drive.isDesiredLocationReef()) {
         drive.fireTrigger(DriveTrigger.BeginLineup);
         // go to joystick otherwise
       } else if (driveToPose.isFinished()) {
