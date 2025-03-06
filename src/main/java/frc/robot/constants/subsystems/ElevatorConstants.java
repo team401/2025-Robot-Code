@@ -197,7 +197,7 @@ public final class ElevatorConstants {
    * How high elevator must go before we can swing the algae up into the robot without getting stuck
    * on crossbar or elevator
    */
-  public final Distance minAlgaeInHeight = Meters.of(1.5);
+  public final Distance minAlgaeInHeight = Meters.of(1.7);
 
   /**
    * How slow must the elevator move before it is considered to be stable at its goal position

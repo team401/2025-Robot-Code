@@ -8,6 +8,7 @@ import frc.robot.constants.ScoringSetpoints;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
+import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 
 public class ScoreState implements PeriodicStateInterface {
@@ -20,8 +21,16 @@ public class ScoreState implements PeriodicStateInterface {
   @Override
   public void periodic() {
     ScoringSetpoint setpoint;
+
     // Only warmup like normal when we aren't doing algae in the net
-    setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getTarget());
+    if (scoringSubsystem.getGamePiece() == GamePiece.Algae
+        && scoringSubsystem.getTarget() == FieldTarget.Net) {
+      // Force the net setpoint only in score since the "warmup" for the net stays low to use
+      // elevator to shoot algae upward
+      setpoint = JsonConstants.scoringSetpoints.net;
+    } else {
+      setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getTarget());
+    }
 
     scoringSubsystem.setGoalSetpoint(setpoint);
 
