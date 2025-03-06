@@ -38,10 +38,10 @@ public class BlueFieldLocations {
   public Translation2d blueReef1011Translation = new Translation2d(5.5, 5.6);
   public Rotation2d blueReef1011Rotation = new Rotation2d(Math.toRadians(-120));
 
-  public Translation2d blueCoralStationRightTranslation = new Translation2d(1.3, 1);
+  public Translation2d blueCoralStationRightTranslation = new Translation2d(1.5536, 0.6048);
   public Rotation2d blueCoralStationRightRotation = new Rotation2d(Units.degreesToRadians(60));
 
-  public Translation2d blueCoralStationLeftTranslation = new Translation2d(1.2, 7);
+  public Translation2d blueCoralStationLeftTranslation = new Translation2d(1.5536, 7.32);
   public Rotation2d blueCoralStationLeftRotation = new Rotation2d(Units.degreesToRadians(-60));
 
   public Translation2d blueNetTranslation = new Translation2d(10.319, 2.768);

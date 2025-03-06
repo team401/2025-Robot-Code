@@ -4,7 +4,6 @@ import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 
 public class RedFieldLocations {
@@ -38,10 +37,10 @@ public class RedFieldLocations {
   public Translation2d redReef1011Translation = new Translation2d(12.2, 2.6);
   public Rotation2d redReef1011Rotation = new Rotation2d(Math.toRadians(60));
 
-  public Translation2d redCoralStationRightTranslation = new Translation2d(15.82,7.32);
+  public Translation2d redCoralStationRightTranslation = new Translation2d(15.82, 7.32);
   public Rotation2d redCoralStationRightRotation = new Rotation2d(-2.2689);
 
-  public Translation2d redCoralStationLeftTranslation = new Translation2d(16.3, 1);
+  public Translation2d redCoralStationLeftTranslation = new Translation2d(15.82, 0.6048);
   public Rotation2d redCoralStationLeftRotation = new Rotation2d(2.2689);
 
   public Translation2d redNetTranslation = new Translation2d(10.319, 2.768);
