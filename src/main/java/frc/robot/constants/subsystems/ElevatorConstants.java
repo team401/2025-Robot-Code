@@ -193,7 +193,10 @@ public final class ElevatorConstants {
   /** When within this distance, the elevator is considered "at its setpoint" */
   public final Distance elevatorSetpointEpsilon = Meters.of(0.05);
 
-  /** How high elevator must go before we can swing the algae up into the robot without getting stuck on crossbar or elevator */
+  /**
+   * How high elevator must go before we can swing the algae up into the robot without getting stuck
+   * on crossbar or elevator
+   */
   public final Distance minAlgaeInHeight = Meters.of(1.5);
 
   /**
