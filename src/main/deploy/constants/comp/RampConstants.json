@@ -11,5 +11,7 @@
   "PID_SIM_D": 0.0,
   "inverted": false,
   "intakeVoltage": -1.0,
-  "homingVoltage": -2.0
+  "homingVoltage": -2.0,
+  "climbVoltage": 0.0,
+  "autoHomePosition": 2.0
 }
