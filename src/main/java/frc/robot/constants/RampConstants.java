@@ -18,7 +18,7 @@ public class RampConstants {
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
   public final Integer motorId = 1;
-  public final Double positionRange = 0.02;
+  public final Double positionRange = 0.05;
 
   public final Double PID_TalonFX_P = 5.0;
   public final Double PID_TalonFX_I = 0.0;
@@ -47,4 +47,8 @@ public class RampConstants {
   public final Time homingMaxUnmovingTime = Seconds.of(3);
   public final AngularVelocity homingVelocityThresholdMetersPerSecond = RadiansPerSecond.of(0.1);
   public final Integer homingVelocityFilterWindowSize = 50;
+
+  public final double climbVoltage = 0.0;
+  public final double autoHomePosition = 2.0;
+
 }
