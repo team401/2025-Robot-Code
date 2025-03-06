@@ -13,10 +13,9 @@ import java.util.Map;
 public final class LEDConstants {
 
   public static final int ledPort = 9;
-  public static final int halfLength = 50;
-
-  public static final int totalLength = 100;
-  public static final double rainbowSpeed = 20;
+  public static final int halfLength = 14;
+  public static final int totalLength = 28;
+  public static final double rainbowSpeed = 50;
 
   public static final Color off = Color.kBlack;
   // LED Patterns
