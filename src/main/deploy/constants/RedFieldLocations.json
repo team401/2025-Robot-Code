@@ -56,11 +56,18 @@
     "radians": -2.2689
   },
   "redCoralStationLeftTranslation": {
-    "x": 16.3,
-    "y": 1.0
+    "x": 15.82,
+    "y": 0.6048
   },
   "redCoralStationLeftRotation": {
-    "radians": 2.0943951023931953
+    "radians": 2.2689
+  },
+  "redNetTranslation": {
+    "x": 10.319,
+    "y": 2.768
+  },
+  "redNetRotation": {
+    "radians": 3.14159
   },
   "coralAlgaeStackLeftTopCorner": {
     "x": 15.95,

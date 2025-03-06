@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
@@ -58,6 +59,7 @@ public class OTFState implements PeriodicStateInterface {
         // meter away from center of tag)
       case Reef0:
       case Reef1:
+      case Algae0:
         return driveInput.isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReef01Translation,
@@ -67,6 +69,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReef01Rotation);
       case Reef2:
       case Reef3:
+      case Algae1:
         return driveInput.isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReef23Translation,
@@ -76,6 +79,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReef23Rotation);
       case Reef4:
       case Reef5:
+      case Algae2:
         return driveInput.isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReef45Translation,
@@ -85,6 +89,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReef45Rotation);
       case Reef6:
       case Reef7:
+      case Algae3:
         return driveInput.isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReef67Translation,
@@ -94,6 +99,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReef67Rotation);
       case Reef8:
       case Reef9:
+      case Algae4:
         return driveInput.isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReef89Translation,
@@ -103,6 +109,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReef89Rotation);
       case Reef10:
       case Reef11:
+      case Algae5:
         return driveInput.isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReef1011Translation,
@@ -110,6 +117,16 @@ public class OTFState implements PeriodicStateInterface {
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueReef1011Translation,
                 JsonConstants.blueFieldLocations.blueReef1011Rotation);
+      case Processor:
+        return new Pose2d();
+      case Net:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redNetTranslation,
+                JsonConstants.redFieldLocations.redNetRotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueNetTranslation,
+                JsonConstants.blueFieldLocations.blueNetRotation);
       case CoralStationRight:
         return driveInput.isAllianceRed()
             ? new Pose2d(
@@ -143,13 +160,24 @@ public class OTFState implements PeriodicStateInterface {
       return null;
     }
 
-    // Create the constraints to use while pathfinding
-    PathConstraints constraints =
-        new PathConstraints(
-            JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
-            JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
-            JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
-            JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
+    PathConstraints constraints;
+    if (drive.getDesiredLocation() == DesiredLocation.Net) {
+      // Create the constraints to use while pathfinding
+      constraints =
+          new PathConstraints(
+              JsonConstants.drivetrainConstants.OTFSlowLinearVelocity,
+              JsonConstants.drivetrainConstants.OTFSlowLinearAccel,
+              JsonConstants.drivetrainConstants.OTFSlowAngularVelocity,
+              JsonConstants.drivetrainConstants.OTFSlowAngularAccel);
+    } else {
+      // Create the constraints to use while pathfinding
+      constraints =
+          new PathConstraints(
+              JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
+              JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
+              JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
+              JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
+    }
 
     if (drive.isGoingToIntake()) {
       constraints =
