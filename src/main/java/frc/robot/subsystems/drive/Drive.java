@@ -365,9 +365,7 @@ public class Drive implements DriveTemplate {
     // Manually cancel go to intake if we have a gamepiece
     if (goToIntake && ScoringSubsystem.getInstance().isCoralDetected()) {
       setGoToIntake(false);
-    }
-
-    if (goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
+    } else if (goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
       setGoToIntake(false);
     }
 
@@ -601,11 +599,13 @@ public class Drive implements DriveTemplate {
    * @return true if location is reef; false otherwise (processor / coral station)
    */
   public boolean isDesiredLocationReef() {
-    return isLocationAlgaeIntake(desiredLocation) && goToIntake
-        || (!(desiredLocation == DesiredLocation.CoralStationLeft
+    boolean isCoralReefTarget =
+        !(desiredLocation == DesiredLocation.CoralStationLeft
                 || desiredLocation == DesiredLocation.CoralStationRight
                 || desiredLocation == DesiredLocation.Processor)
-            && !goToIntake);
+            && !goToIntake;
+    boolean isAlgaeReefTarget = isLocationAlgaeIntake(desiredLocation) && goToIntake;
+    return isCoralReefTarget || isAlgaeReefTarget;
   }
 
   /**
@@ -614,9 +614,12 @@ public class Drive implements DriveTemplate {
    * @return true if location is scoring (reef / processor)
    */
   public boolean isLocationScoring(DesiredLocation location) {
-    return !(location == DesiredLocation.CoralStationLeft
-            || location == DesiredLocation.CoralStationRight)
-        || !isLocationAlgaeIntake(location);
+    boolean isLocationCoralStation =
+        (location == DesiredLocation.CoralStationLeft
+            || location == DesiredLocation.CoralStationRight);
+    boolean isAlgaeIntake = isLocationAlgaeIntake(location);
+
+    return (!isLocationCoralStation && !isAlgaeIntake);
   }
 
   /** checks if location is reef (center of poles) */
