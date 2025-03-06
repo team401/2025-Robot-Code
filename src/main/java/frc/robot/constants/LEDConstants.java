@@ -13,8 +13,8 @@ import java.util.Map;
 public final class LEDConstants {
 
   public static final int ledPort = 9;
-  public static final int halfLength = 14;
-  public static final int totalLength = 28;
+  public static final int halfLength = 14; // alternate number to test = 504
+  public static final int totalLength = 28; // alternate number to test = 1008
   public static final double rainbowSpeed = 50;
 
   public static final Color off = Color.kBlack;
