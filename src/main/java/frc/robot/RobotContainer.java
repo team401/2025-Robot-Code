@@ -236,6 +236,9 @@ public class RobotContainer {
 
   public void periodic() {
     strategyManager.periodic();
+
+    Logger.recordOutput("Switches/brake", brakeSwitch.get());
+    Logger.recordOutput("Switches/led", ledSwitch.get());
   }
 
   public void autonomousInit() {
