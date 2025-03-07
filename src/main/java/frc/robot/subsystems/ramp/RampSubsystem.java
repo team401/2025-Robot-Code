@@ -1,7 +1,5 @@
 package frc.robot.subsystems.ramp;
 
-import org.littletonrobotics.junction.Logger;
-
 import coppercore.controls.state_machine.StateMachine;
 import coppercore.controls.state_machine.StateMachineConfiguration;
 import coppercore.controls.state_machine.state.StateContainer;
@@ -17,6 +15,7 @@ import frc.robot.subsystems.ramp.states.IntakeHoldState;
 import frc.robot.subsystems.ramp.states.IntakeState;
 import frc.robot.subsystems.ramp.states.RampState;
 import frc.robot.subsystems.ramp.states.RampState.RampTriggers;
+import org.littletonrobotics.junction.Logger;
 
 // TODO apply current to hold in position
 public class RampSubsystem extends SubsystemBase {
@@ -89,7 +88,9 @@ public class RampSubsystem extends SubsystemBase {
         .permit(RampTriggers.START_INTAKE, RampStates.CLIMB_TO_INTAKE_HOMING);
 
     config.configure(RampStates.HOMING).permit(RampTriggers.HOMED, RampStates.IDLE);
-    config.configure(RampStates.CLIMB_TO_INTAKE_HOMING).permit(RampTriggers.HOMED, RampStates.INTAKE);
+    config
+        .configure(RampStates.CLIMB_TO_INTAKE_HOMING)
+        .permit(RampTriggers.HOMED, RampStates.INTAKE);
 
     stateMachine = new StateMachine<>(config, RampStates.HOMING);
 
