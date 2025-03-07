@@ -59,6 +59,7 @@ public class RobotContainer {
   private SendableChooser<AutoStrategy> autoChooser = new SendableChooser<>();
 
   private boolean lastBrakeSwitchValue = brakeSwitch.get();
+  private boolean lastLedSwitchValue = ledSwitch.get();
 
   public static SwerveDriveSimulation driveSim = null;
 
@@ -81,6 +82,14 @@ public class RobotContainer {
     }
     if (FeatureFlags.synced.getObject().runRamp) {
       rampSubsystem.setBrakeMode(brake);
+    }
+  }
+
+  public void checkLedSwitch() {
+    boolean ledSwitchValue = ledSwitch.get();
+    if(ledSwitchValue != lastLedSwitchValue) {
+      lastLedSwitchValue = ledSwitchValue;
+      
     }
   }
 
