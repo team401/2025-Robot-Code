@@ -29,6 +29,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOMapleSim;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.led.LED;
 import frc.robot.subsystems.ramp.RampIOSim;
 import frc.robot.subsystems.ramp.RampIOTalonFX;
 import frc.robot.subsystems.ramp.RampMechanism;
@@ -49,6 +50,7 @@ import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
 public final class InitSubsystems {
+
   public static ScoringSubsystem initScoringSubsystem() {
     ElevatorMechanism elevatorMechanism = null;
     WristMechanism wristMechanism = null;
@@ -235,6 +237,26 @@ public final class InitSubsystems {
             new double[0],
             new VisionIO() {},
             new VisionIO() {});
+    }
+  }
+
+  public static LED initLEDs(
+      ScoringSubsystem scoringSubsystem, ClimbSubsystem climbSubsystem, Drive drive) {
+
+    switch (ModeConstants.currentMode) {
+      case REAL:
+        return new LED(scoringSubsystem, climbSubsystem, drive);
+      case SIM:
+      case MAPLESIM:
+        return new LED(scoringSubsystem, climbSubsystem, drive);
+
+      case REPLAY:
+        throw new UnsupportedOperationException("LED replay is not yet implemented.");
+      default:
+        throw new UnsupportedOperationException(
+            "Non-exhaustive list of mode types supported in InitSubsystems (got "
+                + ModeConstants.currentMode
+                + ")");
     }
   }
 }
