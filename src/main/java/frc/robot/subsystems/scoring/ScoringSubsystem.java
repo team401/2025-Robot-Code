@@ -820,12 +820,23 @@ public class ScoringSubsystem extends MonitoredSubsystem {
       }
     }
 
+    boolean wristDownForAlgae = false;
+    if (isAlgaeDetected()
+        && elevatorMechanism
+            .getElevatorHeight()
+            .lt(JsonConstants.elevatorConstants.minAlgaeInHeight)) {
+      wristDownForAlgae = true;
+      wristMaxAngle.mut_replace(
+          (Angle) Measure.min(wristMaxAngle, JsonConstants.wristConstants.algaeUnderCrossbarAngle));
+    }
+
     Logger.recordOutput("scoring/clamps/closeToReef", closeToReef);
     Logger.recordOutput("scoring/clamps/wristInToAvoidReefBase", wristInToAvoidReefBase);
     Logger.recordOutput("scoring/clamps/elevatorUpToAvoidReefBase", elevatorUpToAvoidReefBase);
     Logger.recordOutput("scoring/clamps/wristInToPassReef", wristInToPassReef);
     Logger.recordOutput("scoring/clamps/elevatorBelowReefLevel", elevatorBelowReefLevel);
     Logger.recordOutput("scoring/clamps/elevatorAboveReefLevel", elevatorAboveReefLevel);
+    Logger.recordOutput("scoring/clamps/wristDownForAlgae", wristDownForAlgae);
 
     elevatorMechanism.setAllowedRangeOfMotion(elevatorMinHeight, elevatorMaxHeight);
     wristMechanism.setAllowedRangeOfMotion(wristMinAngle, wristMaxAngle);
