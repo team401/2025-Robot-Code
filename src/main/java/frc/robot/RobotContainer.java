@@ -92,7 +92,9 @@ public class RobotContainer {
 
     if(ledSwitchValue != lastLedSwitchValue) {
       lastLedSwitchValue = ledSwitchValue;
-      led.setLedOn(ledSwitchValue);
+      if(FeatureFlags.synced.getObject().runLEDs) {
+        led.setLedOn(ledSwitchValue);
+      }
     }
   }
 
@@ -275,7 +277,9 @@ public class RobotContainer {
     drive.autonomousInit();
 
     setSubsystemsToBrake();
-    led.setLedOn(true);
+    if(FeatureFlags.synced.getObject().runLEDs) {
+      led.setLedOn(true);
+    }
 
     // load chosen strategy
     strategyManager.autonomousInit(autoChooser.getSelected());
@@ -285,7 +289,9 @@ public class RobotContainer {
     drive.teleopInit();
 
     setSubsystemsToBrake();
-    led.setLedOn(true);
+    if(FeatureFlags.synced.getObject().runLEDs) {
+      led.setLedOn(true);
+    }
 
     strategyManager.teleopInit();
   }
