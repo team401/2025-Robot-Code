@@ -44,12 +44,13 @@ public class RampConstants {
   public final Boolean inverted = false;
 
   // Homing Settings
-  public final Time homingMaxTime = Seconds.of(3);
-  public final Time homingMaxUnmovingTime = Seconds.of(1);
+  public final Time homingMaxTime = Seconds.of(2);
+  public final Time homingMaxUnmovingTime = Seconds.of(0.2);
   public final AngularVelocity homingVelocityThresholdMetersPerSecond = RadiansPerSecond.of(0.1);
   public final Integer homingVelocityFilterWindowSize = 5;
 
   public final Double climbVoltage = 0.0;
-  public final Double autoHomePosition = 2.0;
+  public final Double autoHomePositionHigh = 2.0;
+  public final Double autoHomePositionLow = -0.1;
   public final Double climbHoldVoltage = 0.5;
 }
