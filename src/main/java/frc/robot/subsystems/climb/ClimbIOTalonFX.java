@@ -127,44 +127,12 @@ public class ClimbIOTalonFX implements ClimbIO {
   }
 
   @Override
-  public void setBrakeMode(boolean brake) {
-    if (brake) {
-      leadMotor
-          .getConfigurator()
-          .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Brake));
-      followerMotor
-          .getConfigurator()
-          .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Brake));
-    } else {
-      leadMotor
-          .getConfigurator()
-          .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Coast));
-      followerMotor
-          .getConfigurator()
-          .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Coast));
-    }
-  }
-
-  @Override
   public void setPID(double p, double i, double d) {
     Slot0Configs configs = talonFXConfigs.Slot0;
 
     configs.kP = p;
     configs.kI = i;
     configs.kD = d;
-
-    leadMotor.getConfigurator().apply(configs);
-    followerMotor.getConfigurator().apply(configs);
-  }
-
-  @Override
-  public void setFF(double kS, double kV, double kA, double kG) {
-    Slot0Configs configs = talonFXConfigs.Slot0;
-
-    configs.kS = kS;
-    configs.kV = kV;
-    configs.kA = kA;
-    configs.kG = kG;
 
     leadMotor.getConfigurator().apply(configs);
     followerMotor.getConfigurator().apply(configs);

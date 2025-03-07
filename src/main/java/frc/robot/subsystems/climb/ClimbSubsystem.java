@@ -185,16 +185,6 @@ public class ClimbSubsystem extends SubsystemBase {
 
         LoggedTunableNumber.ifChanged(
             hashCode(),
-            (ff) -> {
-              io.setFF(ff[0], ff[1], ff[2], ff[3]);
-            },
-            climbkS,
-            climbkV,
-            climbkA,
-            climbkG);
-
-        LoggedTunableNumber.ifChanged(
-            hashCode(),
             (setpoint) -> {
               io.setOverrideVoltage(Volts.of(setpoint[0]));
             },

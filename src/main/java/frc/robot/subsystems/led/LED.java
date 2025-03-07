@@ -194,7 +194,6 @@ public class LED extends SubsystemBase {
     rightPatterns.clear();
   }
 
-
   public void enabled(boolean enabled) {
     this.enabled = enabled;
     if (enabled) {
