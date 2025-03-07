@@ -368,7 +368,7 @@ public class Drive implements DriveTemplate {
       setGoToIntake(false);
     }
 
-    if(goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
+    if (goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
       setGoToIntake(false);
     }
 

@@ -58,10 +58,18 @@ public class RobotContainer {
 
   private SendableChooser<AutoStrategy> autoChooser = new SendableChooser<>();
 
+  private boolean lastBrakeSwitchValue = brakeSwitch.get();
+
   public static SwerveDriveSimulation driveSim = null;
 
   public void checkSwitchForDisabled() {
     boolean brake = brakeSwitch.get();
+
+    if(brake == lastBrakeSwitchValue) {
+      return;
+    }
+
+    lastBrakeSwitchValue = brake;
     if (FeatureFlags.synced.getObject().runDrive) {
       drive.setBrakeMode(brake);
     }
