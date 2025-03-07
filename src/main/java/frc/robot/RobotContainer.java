@@ -273,7 +273,7 @@ public class RobotContainer {
         break;
 
       case LEDTest:
-        // CommandScheduler.getInstance().schedule(led.runCycle());
+        CommandScheduler.getInstance().schedule(led.LEDTest());
       default:
         break;
     }

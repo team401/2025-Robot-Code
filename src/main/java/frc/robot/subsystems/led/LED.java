@@ -6,13 +6,16 @@ import edu.wpi.first.wpilibj.AddressableLEDBufferView;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.constants.LEDConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
-import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -26,13 +29,13 @@ public class LED extends SubsystemBase {
   private final AddressableLED led = new AddressableLED(LEDConstants.ledPort);
   public final AddressableLEDBuffer ledStrip = new AddressableLEDBuffer(LEDConstants.totalLength);
 
-  public final AddressableLEDBufferView leftData =
-      ledStrip.createView(0, LEDConstants.halfLength - 1);
-  private final AddressableLEDBufferView rightData =
+  public AddressableLEDBufferView leftData =
+      ledStrip.createView(0, LEDConstants.halfLength - 1).reversed();
+  private AddressableLEDBufferView rightData =
       ledStrip.createView(LEDConstants.halfLength, LEDConstants.totalLength - 1).reversed();
 
   private Supplier<Boolean> visionWorkingSupplier = () -> true;
-
+  private static final double commandWaitTime = 2;
   private ScoringSubsystem scoringSubsystem;
   private ClimbSubsystem climbSubsystem;
   private Drive driveSubsystem;
@@ -56,7 +59,7 @@ public class LED extends SubsystemBase {
   @Override
   public void periodic() {
 
-    if (!DriverStation.isDisabled()) {
+    if (!DriverStation.isDisabled() && !DriverStation.isTest()) {
 
       // Drive Subsystem Checks
       // otf - bottom middle third of left strip
@@ -68,12 +71,11 @@ public class LED extends SubsystemBase {
       // Scoring Subsystem Checks
       if (scoringSubsystem != null) {
         // Game Piece Checks - top thirds
-        if (scoringSubsystem.getGamePiece() == GamePiece.Algae) {
+        if (scoringSubsystem.isAlgaeDetected()) {
           addPattern(LEDConstants.holdingAlgaePattern);
-        } else if (scoringSubsystem.getGamePiece() == GamePiece.Coral) {
+        } else if (scoringSubsystem.isCoralDetected()) {
           addPattern(LEDConstants.holdingCoralPattern);
-        } else if (scoringSubsystem.getGamePiece() == GamePiece.Coral
-            && scoringSubsystem.getGamePiece() == GamePiece.Algae) {
+        } else if (scoringSubsystem.isAlgaeDetected() && scoringSubsystem.isCoralDetected()) {
           addPattern(LEDConstants.holdingBothPattern);
         } else {
           addPattern(LEDConstants.clearTop);
@@ -109,7 +111,8 @@ public class LED extends SubsystemBase {
     // else if (driveSubsystem.isBrakeMode()) {
     //  addPattern(LEDConstants.lasers);
     // }
-    else {
+    else if (!DriverStation.isTest()) {
+
       // rainbow - all thirds
       addPattern(LEDConstants.rainbowPattern);
       if (!visionWorkingSupplier.get()) {
@@ -187,5 +190,63 @@ public class LED extends SubsystemBase {
 
     leftPatterns.clear();
     rightPatterns.clear();
+  }
+
+  public Command LEDTest() {
+    return new SequentialCommandGroup(
+        new InstantCommand(
+            () -> {
+              runPattern(LEDConstants.clear);
+              led.setData(ledStrip);
+            }),
+        new WaitCommand(commandWaitTime),
+        new InstantCommand(
+            () -> {
+              runPattern(LEDConstants.holdingAlgaePattern);
+              led.setData(ledStrip);
+            }),
+        new WaitCommand(commandWaitTime),
+        new InstantCommand(
+            () -> {
+              runPattern(LEDConstants.holdingCoralPattern);
+              led.setData(ledStrip);
+            }),
+        new WaitCommand(commandWaitTime),
+        new InstantCommand(
+            () -> {
+              runPattern(LEDConstants.holdingBothPattern);
+              led.setData(ledStrip);
+            }),
+        new WaitCommand(commandWaitTime),
+        new InstantCommand(
+            () -> {
+              runPattern(LEDConstants.targetOnReefL1Pattern);
+              led.setData(ledStrip);
+            }),
+        new WaitCommand(commandWaitTime),
+        new InstantCommand(
+            () -> {
+              runPattern(LEDConstants.targetOnReefL2Pattern);
+              led.setData(ledStrip);
+            }),
+        new WaitCommand(commandWaitTime),
+        new InstantCommand(
+            () -> {
+              runPattern(LEDConstants.targetOnReefL3Pattern);
+              led.setData(ledStrip);
+            }),
+        new WaitCommand(commandWaitTime),
+        new InstantCommand(
+            () -> {
+              runPattern(LEDConstants.targetOnReefL4Pattern);
+              led.setData(ledStrip);
+            }),
+        new WaitCommand(commandWaitTime),
+        new InstantCommand(
+            () -> {
+              runPattern(LEDConstants.isBeeLinkWorkingPattern);
+              led.setData(ledStrip);
+            }),
+        new WaitCommand(commandWaitTime));
   }
 }
