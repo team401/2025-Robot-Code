@@ -21,6 +21,8 @@ public class ScoreState implements PeriodicStateInterface {
   @Override
   public void periodic() {
     ScoringSetpoint setpoint;
+
+    // Only warmup like normal when we aren't doing algae in the net
     if (scoringSubsystem.getGamePiece() == GamePiece.Algae
         && scoringSubsystem.getTarget() == FieldTarget.Net) {
       // Force the net setpoint only in score since the "warmup" for the net stays low to use
@@ -45,12 +47,15 @@ public class ScoreState implements PeriodicStateInterface {
           if (scoringSubsystem
               .getElevatorHeight()
               .isNear(
-                  setpoint.elevatorHeight(),
+                  JsonConstants.scoringSetpoints.net.elevatorHeight(),
                   JsonConstants.elevatorConstants.elevatorSetpointEpsilon)) {
             scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
           } else {
             scoringSubsystem.setClawRollerVoltage(Volts.zero());
           }
+        } else {
+          // If scoring algae but not in the net, run the rollers (score processor as normal)
+          scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
         }
 
         if (JsonConstants.scoringFeatureFlags.runClaw) {

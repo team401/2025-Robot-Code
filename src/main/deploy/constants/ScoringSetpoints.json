@@ -79,22 +79,22 @@
   "L2algae": {
     "name": "L2algae",
     "elevatorHeight": {
-      "value": 0.46,
+      "value": 0.5,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": -0.105,
+      "value": -0.095,
       "unit": "Rotation"
     }
   },
   "L3algae": {
     "name": "L3algae",
     "elevatorHeight": {
-      "value": 0.88393,
+      "value": 0.92393,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": -0.105,
+      "value": -0.095,
       "unit": "Rotation"
     }
   },
@@ -123,12 +123,12 @@
   "netWarmup": {
     "name": "netWarmup",
     "elevatorHeight": {
-      "value": 0.25,
+      "value": 1.8,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": -0.105,
-      "unit": "Rotation"
+      "value": 1.3,
+      "unit": "Radian"
     }
   },
   "net": {

@@ -61,5 +61,9 @@
     "unit": "Degree"
   },
   "maxWristSetpointVelocityRotationsPerSecond": 0.008333,
-  "wristStableDebounceTimeSeconds": 0.1
+  "wristStableDebounceTimeSeconds": 0.1,
+  "algaeUnderCrossbarAngle": {
+    "value": -0.105,
+    "unit": "Radian"
+  }
 }

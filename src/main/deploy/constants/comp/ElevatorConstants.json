@@ -86,5 +86,9 @@
     "value": 0.05,
     "unit": "Meter"
   },
-  "maxElevatorSetpointVelocityMetersPerSecond": 0.01
+  "maxElevatorSetpointVelocityMetersPerSecond": 0.01,
+  "minAlgaeInHeight": {
+    "value": 1.7,
+    "unit": "Meter"
+  }
 }
