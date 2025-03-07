@@ -17,7 +17,6 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
-import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.climb.ClimbIOSim;
 import frc.robot.subsystems.climb.ClimbIOTalonFX;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -241,7 +240,23 @@ public final class InitSubsystems {
     }
   }
 
-  public static LEDSubsystem initLEDSubsystem() {
-    return new LEDSubsystem();
+  public static LED initLEDs(
+    ScoringSubsystem scoringSubsystem, ClimbSubsystem climbSubsystem, Drive drive) {
+
+  switch (ModeConstants.currentMode) {
+    case REAL:
+      return new LED(scoringSubsystem, climbSubsystem, drive);
+    case SIM:
+    case MAPLESIM:
+      return new LED(scoringSubsystem, climbSubsystem, drive);
+
+    case REPLAY:
+      throw new UnsupportedOperationException("LED replay is not yet implemented.");
+    default:
+      throw new UnsupportedOperationException(
+          "Non-exhaustive list of mode types supported in InitSubsystems (got "
+              + ModeConstants.currentMode
+              + ")");
+  }
   }
 }
