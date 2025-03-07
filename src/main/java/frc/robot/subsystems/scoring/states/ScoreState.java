@@ -51,6 +51,9 @@ public class ScoreState implements PeriodicStateInterface {
           } else {
             scoringSubsystem.setClawRollerVoltage(Volts.zero());
           }
+        } else {
+          // If scoring algae but not in the net, run the rollers (score processor as normal)
+          scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
         }
 
         if (JsonConstants.scoringFeatureFlags.runClaw) {
