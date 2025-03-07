@@ -68,7 +68,7 @@ public class RobotContainer {
   public void checkSwitchForDisabled() {
     boolean brake = brakeSwitch.get();
 
-    if(brake == lastBrakeSwitchValue) {
+    if (brake == lastBrakeSwitchValue) {
       return;
     }
 
@@ -90,9 +90,9 @@ public class RobotContainer {
   public void checkLedSwitch() {
     boolean ledSwitchValue = ledSwitch.get();
 
-    if(ledSwitchValue != lastLedSwitchValue) {
+    if (ledSwitchValue != lastLedSwitchValue) {
       lastLedSwitchValue = ledSwitchValue;
-      if(FeatureFlags.synced.getObject().runLEDs) {
+      if (FeatureFlags.synced.getObject().runLEDs) {
         led.setLedOn(ledSwitchValue);
       }
     }
@@ -277,7 +277,7 @@ public class RobotContainer {
     drive.autonomousInit();
 
     setSubsystemsToBrake();
-    if(FeatureFlags.synced.getObject().runLEDs) {
+    if (FeatureFlags.synced.getObject().runLEDs) {
       led.setLedOn(true);
     }
 
@@ -289,7 +289,7 @@ public class RobotContainer {
     drive.teleopInit();
 
     setSubsystemsToBrake();
-    if(FeatureFlags.synced.getObject().runLEDs) {
+    if (FeatureFlags.synced.getObject().runLEDs) {
       led.setLedOn(true);
     }
 

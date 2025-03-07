@@ -190,7 +190,7 @@ public class LED extends SubsystemBase {
   }
 
   public void setLedOn(boolean on) {
-    if(on) {
+    if (on) {
       led.start();
     } else {
       led.stop();
