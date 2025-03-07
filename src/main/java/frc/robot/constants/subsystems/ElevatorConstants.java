@@ -122,7 +122,7 @@ public final class ElevatorConstants {
               / elevatorToSpool.in(PerUnit.combine(Meters, Radians)));
 
   /* The Motion Magic Expo kV, measured in Volts per Radian per Second, but represented as a double so it can be synced by JSONSync */
-  public final Double elevatorExpo_kV_raw = 0.005;
+  public final Double elevatorExpo_kV_raw = 0.5;
 
   /**
    * The kV used by Motion Magic Expo to generate a motion profile. Dividing the supply voltage by

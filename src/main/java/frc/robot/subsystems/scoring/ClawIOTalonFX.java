@@ -30,7 +30,8 @@ public class ClawIOTalonFX implements ClawIO {
         new TalonFXConfiguration()
             .withMotorOutput(
                 new MotorOutputConfigs()
-                    .withInverted(JsonConstants.clawConstants.kClawMotorInverted))
+                    .withInverted(JsonConstants.clawConstants.kClawMotorInverted)
+                    .withNeutralMode(NeutralModeValue.Brake))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withSupplyCurrentLimit(JsonConstants.clawConstants.clawSupplyCurrentLimit)

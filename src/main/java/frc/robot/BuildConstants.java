@@ -3,8 +3,9 @@ package frc.robot;
 /** Automatically generated file containing build version information. */
 public final class BuildConstants {
   public static final String MAVEN_GROUP = "";
-  public static final String MAVEN_NAME = "2025-Robot-Code";
+  public static final String MAVEN_NAME = "2025-Robot-Code-3";
   public static final String VERSION = "unspecified";
+
   public static final int GIT_REVISION = 102;
   public static final String GIT_SHA = "67baeb5eb38a5abe6eb2a83700d56d62e3c1cb60";
   public static final String GIT_DATE = "2025-03-05 20:28:34 EST";

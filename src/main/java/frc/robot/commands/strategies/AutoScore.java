@@ -34,19 +34,19 @@ public class AutoScore extends Command {
       drive.setDriveLinedUp(false);
       drive.setGoToIntake(false);
       drive.setDesiredLocation(currentScoringLocation);
-      drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+      drive.fireTrigger(DriveTrigger.BeginOTF);
     }
 
     if (scoringSubsystem != null) {
       scoringSubsystem.setGamePiece(GamePiece.Coral);
       scoringSubsystem.setTarget(currentFieldTarget);
-      scoringSubsystem.setAutoTransition(true);
     }
   }
 
   public void end(boolean interrupted) {
     if (drive != null) {
       drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+      System.out.println("AutoScore canceled lineup!");
     }
   }
 

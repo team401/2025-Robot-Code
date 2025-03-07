@@ -30,7 +30,7 @@ public class AutoIntake extends Command {
     if (drive != null) {
       drive.setDesiredIntakeLocation(intakeLocation);
       drive.setGoToIntake(true);
-      drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+      drive.fireTrigger(DriveTrigger.BeginOTF);
     }
 
     if (scoringSubsystem != null) {
@@ -53,6 +53,8 @@ public class AutoIntake extends Command {
     if (drive != null) {
       drive.setGoToIntake(false);
       drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+
+      System.out.println("AutoIntake canceled lineup!");
     }
   }
 

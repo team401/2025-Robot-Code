@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.StrategyManager.AutonomyMode;
-import frc.robot.commands.drive.DesiredLocationSelector;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -59,7 +58,7 @@ public final class InitBindings {
                       // And then fall through to the mixed autonomy behavior (no break here is
                       // intentional)
                     case Mixed:
-                      drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                      drive.fireTrigger(DriveTrigger.BeginOTF);
                       break;
                     case Manual:
                       // Only start scoring warmup if in manual autonomy; in mixed and full,
@@ -113,25 +112,25 @@ public final class InitBindings {
                 },
                 drive));
 
-    // pov right (reef 0-11 -> processor left -> processor right )
-    // pov left (goes backwards of right)
-    driverController
-        .povRight()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  DesiredLocationSelector.incrementIndex();
-                  DesiredLocationSelector.setLocationFromIndex(drive);
-                }));
-    driverController
-        .povLeft()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  DesiredLocationSelector.decrementIndex();
-                  DesiredLocationSelector.setLocationFromIndex(drive);
-                },
-                drive));
+    // // pov right (reef 0-11 -> processor left -> processor right )
+    // // pov left (goes backwards of right)
+    // driverController
+    //     .povRight()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               DesiredLocationSelector.incrementIndex();
+    //               DesiredLocationSelector.setLocationFromIndex(drive);
+    //             }));
+    // driverController
+    //     .povLeft()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               DesiredLocationSelector.decrementIndex();
+    //               DesiredLocationSelector.setLocationFromIndex(drive);
+    //             },
+    //             drive));s
 
     // TODO: Rebind localization if necessary
     // leftJoystick
@@ -160,7 +159,7 @@ public final class InitBindings {
                       // Start auto align if in mixed autonomy
                       drive.setDesiredIntakeLocation(DesiredLocation.CoralStationRight);
                       drive.setGoToIntake(true);
-                      drive.fireTrigger(DriveTrigger.BeginAutoAlignment);
+                      drive.fireTrigger(DriveTrigger.BeginOTF);
                       // Then always start intake for scoring (no break here is intentional)
                     case Manual:
                       if (ScoringSubsystem.getInstance() != null) {
@@ -182,11 +181,11 @@ public final class InitBindings {
                       // And then fall through to the mixed autonomy behavior (no break here is
                       // intentional)
                     case Mixed:
+                    case Manual:
                       // Cancel auto align if in mixed autonomy
                       drive.setGoToIntake(false);
                       drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
                       // Then always cancel intake for scoring (no break here is intentional)
-                    case Manual:
                       if (ScoringSubsystem.getInstance() != null) {
                         ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.CancelIntake);
                       }
@@ -210,6 +209,38 @@ public final class InitBindings {
             new InstantCommand(
                 () -> {
                   rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
+                }));
+
+    rightJoystick
+        .trigger()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
+                }));
+
+    rightJoystick
+        .trigger()
+        .onFalse(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.fireTrigger(RampTriggers.GOTO_IDLE);
+                }));
+
+    leftJoystick
+        .button(3)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.fireTrigger(RampTriggers.START_CLIMB);
+                }));
+
+    leftJoystick
+        .button(4)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.fireTrigger(RampTriggers.GOTO_IDLE);
                 }));
   }
 
@@ -269,7 +300,7 @@ public final class InitBindings {
                 new InstantCommand(
                     () -> {
                       ScoringSubsystem.getInstance()
-                          .setClawRollerVoltage(JsonConstants.clawConstants.intakeVoltage);
+                          .setClawRollerVoltage(JsonConstants.clawConstants.coralIntakeVoltage);
                     }))
             .onFalse(
                 new InstantCommand(
@@ -285,7 +316,7 @@ public final class InitBindings {
                     () -> {
                       ScoringSubsystem.getInstance()
                           .setClawRollerVoltage(
-                              JsonConstants.clawConstants.intakeVoltage.times(-0.5));
+                              JsonConstants.clawConstants.coralIntakeVoltage.times(-0.5));
                     }))
             .onFalse(
                 new InstantCommand(
@@ -317,5 +348,9 @@ public final class InitBindings {
 
   public static boolean isManualScorePressed() {
     return rightJoystick.top().getAsBoolean();
+  }
+
+  public static boolean isIntakeHeld() {
+    return leftJoystick.trigger().getAsBoolean();
   }
 }
