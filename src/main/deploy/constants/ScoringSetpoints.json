@@ -79,7 +79,7 @@
   "L2algae": {
     "name": "L2algae",
     "elevatorHeight": {
-      "value": 0.46,
+      "value": 0.5,
       "unit": "Meter"
     },
     "wristAngle": {
@@ -90,7 +90,7 @@
   "L3algae": {
     "name": "L3algae",
     "elevatorHeight": {
-      "value": 0.88393,
+      "value": 0.92393,
       "unit": "Meter"
     },
     "wristAngle": {
