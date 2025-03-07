@@ -1,6 +1,6 @@
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2025.2.1"
+    id "edu.wpi.first.GradleRIO" version "2025.3.1"
     id "com.peterabeles.gversion" version "1.10"
     id "com.diffplug.spotless" version "6.24.0"
 }
@@ -29,16 +29,16 @@ deploy {
                 // getTargetTypeClass is a shortcut to get the class type using a string
 
                 frcJava(getArtifactTypeClass('FRCJavaArtifact')) {
-                    // // https://www.chiefdelphi.com/t/2024-wpilib-feedback/464322/141
-                    // final MAX_JAVA_HEAP_SIZE_MB = 100;
+                    // https://www.chiefdelphi.com/t/2024-wpilib-feedback/464322/141
+                    final MAX_JAVA_HEAP_SIZE_MB = 100;
                     // jvmArgs.add("-XX:+UnlockExperimentalVMOptions")
 
-                    // // Set the minimum heap size to the maximum heap size to avoid resizing
-                    // jvmArgs.add("-Xmx" + MAX_JAVA_HEAP_SIZE_MB + "M")
-                    // jvmArgs.add("-Xms" + MAX_JAVA_HEAP_SIZE_MB + "M")
-                    // jvmArgs.add("-XX:GCTimeRatio=5")
-                    // jvmArgs.add("-XX:+UseSerialGC")
-                    // jvmArgs.add("-XX:MaxGCPauseMillis=50")
+                    // Set the minimum heap size to the maximum heap size to avoid resizing
+                    //  jvmArgs.add("-Xmx" + MAX_JAVA_HEAP_SIZE_MB + "M")
+                    //jvmArgs.add("-Xms" + MAX_JAVA_HEAP_SIZE_MB + "M")
+                    //jvmArgs.add("-XX:GCTimeRatio=5")
+                    //jvmArgs.add("-XX:+UseSerialGC")
+                    //jvmArgs.add("-XX:MaxGCPauseMillis=50")
                 }
 
                 // Static files artifact
@@ -101,7 +101,7 @@ dependencies {
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
 
-    def coppercoreVersion = "2025.1.11"
+    def coppercoreVersion = "2025.1.11.visionleds"
 
     implementation "io.github.team401.coppercore:controls:$coppercoreVersion"
     implementation "io.github.team401.coppercore:geometry:$coppercoreVersion"

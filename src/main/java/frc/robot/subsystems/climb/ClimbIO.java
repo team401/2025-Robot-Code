@@ -12,7 +12,7 @@ public interface ClimbIO {
 
   @AutoLog
   public static class ClimbInputs {
-    boolean lockedToCage = true;
+    boolean lockedToCage = false;
 
     MutAngle motorAngle = Radians.mutable(0);
     MutAngle goalAngle = Radians.mutable(0);
@@ -31,6 +31,8 @@ public interface ClimbIO {
   public default void setGoalAngle(Angle angle) {}
 
   public default void setOverrideVoltage(Voltage voltage) {}
+
+  public default void setBrakeMode(boolean brake) {}
 
   public default void setPID(double p, double i, double d) {}
 

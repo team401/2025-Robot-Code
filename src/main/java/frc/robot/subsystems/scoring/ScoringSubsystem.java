@@ -3,6 +3,7 @@ package frc.robot.subsystems.scoring;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import coppercore.controls.state_machine.StateMachine;
 import coppercore.controls.state_machine.StateMachineConfiguration;
@@ -12,6 +13,7 @@ import coppercore.wpilib_interface.MonitorWithAlert;
 import coppercore.wpilib_interface.MonitoredSubsystem;
 import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -34,6 +36,7 @@ import frc.robot.subsystems.scoring.states.TuningState;
 import frc.robot.subsystems.scoring.states.WarmupState;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -48,22 +51,19 @@ import org.littletonrobotics.junction.Logger;
  *
  * <p>The general strategy for collision avoidance is as follows:
  *
- * <p>Avoiding collisions with the crossbar:
+ * <p>Avoiding collisions with the reef: This logic only applies if the robot is within a certain
+ * distance of the reef.
  *
  * <ul>
- *   <li>If the elevator is below the crossbar and the wrist is in a position where it would
- *       collide, the elevator is clamped to be below the crossbar.
- *   <li>If the elevator is above the crossbar and the wrist is in a position where it would
- *       collide, the elevator is clamped to be above the crossbar.
- *   <li>If the elevator is at the crossbar, the wrist is clamped to be in a position where it
- *       cannot collide.
- *   <li>If the elevator is below the crossbar and its goal position is above the crossbar (or vice
- *       versa), the wrist is clamped to be in a position where it cannot collide.
- *   <li>While these rules do next explicitly force the claw to go to a non-colliding position when
- *       elevator is going up, there will be no setpoint above the crossbar where the wrist is in a
- *       colliding position. Therefore, the wrist will always be moving to a non-colliding position
- *       while the elevator is going up, and the elevator will wait for it to be safe before going
- *       up.
+ *   <li>If the elevator goal is above L4 and the elevator is below L4, clamp wrist to Idle position
+ *       so it doesn't hit reef on the way up. (This may be unnecessary with new claw geometry)
+ *   <li>If the wrist is out beyond a certain angle, clamp elevator above L4 if it's above L4 or
+ *       below L4 if it's below L4 until wrist comes in to Idle, so that it doesn't hit the reef on
+ *       its way up or down.
+ *   <li>If the elevator is below a certain height, clamp the wrist to be up so that it doesn't hit
+ *       the base of the reef
+ *   <li>If the wrist is at an angle where it would hit the reef base, clamp the elevator above a
+ *       certain height
  * </ul>
  *
  * <p>Avoiding collisions with the ground: (this part may or may not be necessary, depending on
@@ -166,8 +166,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
   public enum ScoringTrigger {
     Seeded,
     BeginIntake,
+    CancelIntake,
     DoneIntaking,
-    CancelAction,
     ToggleWarmup, // warmup button toggles warmup <-> idle
     StartWarmup, // drive automatically enters warmup when lineup begins
     WarmupReady,
@@ -191,6 +191,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
                   || TestModeManager.getTestMode() == TestMode.WristVoltageTuning
                   || TestModeManager.getTestMode() == TestMode.SetpointTuning);
 
+  private Supplier<Distance> reefDistanceSupplier = () -> Meters.zero();
+
   public ScoringSubsystem(
       ElevatorMechanism elevatorMechanism,
       WristMechanism wristMechanism,
@@ -198,6 +200,10 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     this.elevatorMechanism = elevatorMechanism;
     this.wristMechanism = wristMechanism;
     this.clawMechanism = clawMechanism;
+
+    if (instance != null) {
+      System.out.println("Warning: Instantiated scoring twice!!!!!");
+    }
 
     instance = this;
 
@@ -234,7 +240,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
         // If autoTransition, go straight to warmup from intake once we're done
         // Otherwise, return to idle
         .permit(ScoringTrigger.DoneIntaking, ScoringState.Idle)
-        .permit(ScoringTrigger.CancelAction, ScoringState.Idle);
+        .permit(ScoringTrigger.CancelIntake, ScoringState.Idle);
 
     stateMachineConfiguration
         .configure(ScoringState.Warmup)
@@ -428,15 +434,30 @@ public class ScoringSubsystem extends MonitoredSubsystem {
   /**
    * Get the current angle of the wrist
    *
-   * <p>This height is determined by the {@link WristMechanism}.
+   * <p>This angle is determined by the {@link WristMechanism}.
    *
-   * @return
+   * @return A Measure, the current Angle of the wrist
    */
   public Angle getWristAngle() {
     if (JsonConstants.scoringFeatureFlags.runWrist) {
       return wristMechanism.getWristAngle();
     } else {
       return Rotations.zero();
+    }
+  }
+
+  /**
+   * Get the current angular velocity of the wrist
+   *
+   * <p>This velocity is determined by the {@link WristMechanism}
+   *
+   * @return A Measure, the angular velocity of the wrist
+   */
+  public AngularVelocity getWristVelocity() {
+    if (JsonConstants.scoringFeatureFlags.runWrist) {
+      return wristMechanism.getWristVelocity();
+    } else {
+      return RotationsPerSecond.zero();
     }
   }
 
@@ -644,6 +665,16 @@ public class ScoringSubsystem extends MonitoredSubsystem {
   }
 
   /**
+   * Update the reef distance supplier used for reef collision avoidance
+   *
+   * @param newSupplier The new Distance supplier, which should supply the robot's distance from
+   *     reef center
+   */
+  public void setReefDistanceSupplier(Supplier<Distance> newSupplier) {
+    reefDistanceSupplier = newSupplier;
+  }
+
+  /**
    * Based on the state of the wrist and elevator, clamp their positions to avoid collisions
    *
    * <p>This method does not verify that the mechanisms exist, so featureflags should be checked
@@ -661,57 +692,89 @@ public class ScoringSubsystem extends MonitoredSubsystem {
 
     Angle wristAngle = wristMechanism.getWristAngle();
 
+    boolean wristAboveChassis = false;
     // If the elevator is below the minimum safe height for wrist to be down, clamp wrist above its
     // collision point
     if (elevatorHeight.lt(JsonConstants.elevatorConstants.minWristDownHeight)) {
+      wristAboveChassis = true;
       wristMinAngle.mut_replace(
           (Angle)
               Measure.max(wristMinAngle, JsonConstants.wristConstants.minElevatorDownSafeAngle));
     }
+    Logger.recordOutput("scoring/clamps/wristAboveChassis", wristAboveChassis);
 
+    boolean elevatorAboveClaw = false;
     // If the wrist is below the minimum safe angle for the elevator to be down, clamp the elevator
     // above its collision point
     if (wristAngle.lt(JsonConstants.wristConstants.minElevatorDownSafeAngle)) {
+      elevatorAboveClaw = true;
       elevatorMinHeight.mut_replace(
           (Distance)
               Measure.max(elevatorMinHeight, JsonConstants.elevatorConstants.minWristDownHeight));
     }
+    Logger.recordOutput("scoring/clamps/elevatorAboveClaw", elevatorAboveClaw);
 
-    // If the wrist is in an unsafe position for the elevator to move past the crossbar, clamp the
-    // elevator above/below its collision point
-    if (wristAngle.gt(JsonConstants.wristConstants.maxCrossBarSafeAngle)) {
-      if (elevatorHeight.gt(JsonConstants.elevatorConstants.minWristInAboveCrossBarHeight)) {
-        elevatorMinHeight.mut_replace(
-            (Distance)
-                Measure.max(
-                    elevatorMinHeight,
-                    JsonConstants.elevatorConstants.minWristInAboveCrossBarHeight));
-      } else {
-        elevatorMaxHeight.mut_replace(
-            (Distance)
-                Measure.min(
-                    elevatorMaxHeight,
-                    JsonConstants.elevatorConstants.maxWristInBelowCrossBarHeight));
+    boolean closeToReef = false;
+    boolean wristInToAvoidReefBase = false;
+    boolean elevatorUpToAvoidReefBase = false;
+    boolean wristInToPassReef = false;
+    boolean elevatorBelowReefLevel = false;
+    boolean elevatorAboveReefLevel = false;
+
+    Distance reefDistance = reefDistanceSupplier.get();
+    Logger.recordOutput("scoring/reefDistanceSupplier", reefDistance);
+    if (reefDistance.lt(JsonConstants.wristConstants.closeToReefThreshold)) {
+      if (elevatorHeight.lte(JsonConstants.elevatorConstants.minReefSafeHeight)) {
+        wristInToAvoidReefBase = true;
+        // If elevator is next to reef base, make sure wrist doesn't hit it
+        wristMinAngle.mut_replace(
+            (Angle) Measure.max(wristMinAngle, JsonConstants.wristConstants.minReefSafeAngle));
+      }
+
+      if (ReefAvoidanceHelper.willPassReefLevel(elevatorHeight, elevatorGoalHeight)) {
+        wristInToPassReef = true;
+        // If we will pass a reef level, clamp the wrist to be in a safe position to pass the reef
+        wristMinAngle.mut_replace(
+            (Angle) Measure.max(wristMinAngle, JsonConstants.wristConstants.minReefSafeAngle));
+
+        // If we will pass a reef level and the wrist is in an unsafe position to pass the reef,
+        // clamp
+        // the elevator above or below the point of collision
+        if (wristAngle.lt(JsonConstants.wristConstants.minReefSafeAngle)) {
+          elevatorUpToAvoidReefBase = true;
+          // If the wrist would hit the reef base, clamp the elevator above the reef base height
+          elevatorMinHeight.mut_replace(
+              (Distance)
+                  Measure.max(
+                      elevatorMinHeight, JsonConstants.elevatorConstants.minReefSafeHeight));
+
+          if (elevatorHeight.lt(elevatorGoalHeight)) {
+            elevatorBelowReefLevel = true;
+            elevatorMaxHeight.mut_replace(
+                (Distance)
+                    Measure.min(
+                        elevatorMaxHeight,
+                        ReefAvoidanceHelper.getCollisionHeight(
+                            elevatorHeight, elevatorGoalHeight)));
+          } else {
+            elevatorAboveReefLevel = true;
+            elevatorMinHeight.mut_replace(
+                (Distance)
+                    Measure.max(
+                        elevatorMinHeight,
+                        ReefAvoidanceHelper.getCollisionHeight(
+                            elevatorHeight, elevatorGoalHeight)));
+          }
+        }
       }
     }
 
-    // If the elevator is at the height of the crossbar, clamp wrist to be outside collision point
-    if (elevatorHeight.gte(JsonConstants.elevatorConstants.maxWristInBelowCrossBarHeight)
-        && elevatorHeight.lte(JsonConstants.elevatorConstants.minWristInAboveCrossBarHeight)) {
-      wristMaxAngle.mut_replace(
-          (Angle) Measure.min(wristMaxAngle, JsonConstants.wristConstants.maxCrossBarSafeAngle));
-    }
-    // If the elevator is below crossbar and trying to go up or above crossbar and trying to go
-    // down, clamp wrist be below its collision point
-    if ((elevatorHeight.lte(JsonConstants.elevatorConstants.minWristInAboveCrossBarHeight)
-            && elevatorGoalHeight.gte(
-                JsonConstants.elevatorConstants.maxWristInBelowCrossBarHeight))
-        || (elevatorHeight.gte(JsonConstants.elevatorConstants.maxWristInBelowCrossBarHeight)
-            && elevatorGoalHeight.lte(
-                JsonConstants.elevatorConstants.maxWristInBelowCrossBarHeight))) {
-      wristMaxAngle.mut_replace(
-          (Angle) Measure.min(wristMaxAngle, JsonConstants.wristConstants.maxCrossBarSafeAngle));
-    }
+    Logger.recordOutput("scoring/clamps/closeToReef", closeToReef);
+    Logger.recordOutput("scoring/clamps/wristInToAvoidReefBase", wristInToAvoidReefBase);
+    Logger.recordOutput("scoring/clamps/elevatorUpToAvoidReefBase", elevatorUpToAvoidReefBase);
+    Logger.recordOutput("scoring/clamps/wristInToPassReef", wristInToPassReef);
+    Logger.recordOutput("scoring/clamps/elevatorBelowReefLevel", elevatorBelowReefLevel);
+    Logger.recordOutput("scoring/clamps/elevatorAboveReefLevel", elevatorAboveReefLevel);
 
     elevatorMechanism.setAllowedRangeOfMotion(elevatorMinHeight, elevatorMaxHeight);
     wristMechanism.setAllowedRangeOfMotion(wristMinAngle, wristMaxAngle);

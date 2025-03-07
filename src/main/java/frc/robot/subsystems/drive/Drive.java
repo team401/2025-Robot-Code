@@ -395,6 +395,9 @@ public class Drive implements DriveTemplate {
     // Update gyro alert
     gyroDisconnectedAlert.set(
         !gyroInputs.connected && ModeConstants.currentMode == ModeConstants.Mode.REAL);
+
+    Logger.recordOutput("Drive/goToIntake", goToIntake);
+    Logger.recordOutput("Drive/driveLinedUp", driveLinedUp);
   }
 
   /**
@@ -435,6 +438,10 @@ public class Drive implements DriveTemplate {
 
   public void disableAlign() {
     isAligningToFieldElement = false;
+  }
+
+  public boolean isAligningToFieldElement() {
+    return isAligningToFieldElement;
   }
 
   /**
@@ -563,6 +570,29 @@ public class Drive implements DriveTemplate {
   @AutoLogOutput(key = "Drive//DesiredLocation")
   public DesiredLocation getDesiredLocation() {
     return goToIntake ? this.intakeLocation : this.desiredLocation;
+  }
+
+  /**
+   * get intake location currently set
+   *
+   * @return the intake location currently set
+   */
+  public DesiredLocation getDesiredIntakeLocation() {
+    return this.intakeLocation;
+  }
+
+  /**
+   * returns index of reef location for interfacing with snakescreen
+   *
+   * @return a double representing the index of reef location
+   */
+  public int getDesiredLocationIndex() {
+    for (int i = 0; i < locationArray.length; i++) {
+      if (locationArray[i] == desiredLocation) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   /**
