@@ -106,6 +106,8 @@ public class WristConstants {
 
   public final Double wristStableDebounceTimeSeconds = 0.5;
 
+  public final Angle algaeUnderCrossbarAngle = Radians.of(-0.105);
+
   public static final class Sim {
     @JSONExclude
     public static final JSONSync<WristConstants.Sim> synced =
