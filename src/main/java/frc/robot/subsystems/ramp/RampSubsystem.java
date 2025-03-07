@@ -101,6 +101,10 @@ public class RampSubsystem extends SubsystemBase {
     mechanism.testPeriodic();
   }
 
+  public void setBrakeMode(boolean brake) {
+    mechanism.setBrakeMode(brake);
+  }
+
   public void prepareForClimb() {
     mechanism.setPosition(JsonConstants.rampConstants.climbPosition);
   }

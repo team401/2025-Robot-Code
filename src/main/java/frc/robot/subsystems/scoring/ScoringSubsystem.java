@@ -368,6 +368,12 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     }
   }
 
+  /** sets brake mode of relevant motors */
+  public void setBrakeMode(boolean brake) {
+    wristMechanism.setBrakeMode(brake);
+    elevatorMechanism.setBrakeMode(brake);
+  }
+
   public void updateScoringLevelFromNetworkTables(String level) {
     if (level.equalsIgnoreCase("-1")) {
       return;

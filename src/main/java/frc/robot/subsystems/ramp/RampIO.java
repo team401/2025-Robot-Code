@@ -33,4 +33,6 @@ public interface RampIO {
   public void updateInputs(RampInputs inputs);
 
   public void updateOutputs(RampInputs inputs, RampOutputs outputs);
+
+  public void setBrakeMode(boolean brake);
 }

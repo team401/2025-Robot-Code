@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -54,10 +55,63 @@ public class RobotContainer {
   private LED led = null;
   private StrategyManager strategyManager = null;
   private AutoStrategyContainer strategyContainer = null;
+  private DigitalInput ledSwitch = new DigitalInput(8);
+  private DigitalInput brakeSwitch = new DigitalInput(9);
 
   private SendableChooser<AutoStrategy> autoChooser = new SendableChooser<>();
 
+  private boolean lastBrakeSwitchValue = brakeSwitch.get();
+  private boolean lastLedSwitchValue = ledSwitch.get();
+
   public static SwerveDriveSimulation driveSim = null;
+
+  public void checkSwitchForDisabled() {
+    boolean brake = brakeSwitch.get();
+
+    if (brake == lastBrakeSwitchValue) {
+      return;
+    }
+
+    lastBrakeSwitchValue = brake;
+    if (FeatureFlags.synced.getObject().runDrive) {
+      drive.setBrakeMode(brake);
+    }
+    if (FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem.setBrakeMode(brake);
+    }
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem.setBrakeMode(brake);
+    }
+    if (FeatureFlags.synced.getObject().runRamp) {
+      rampSubsystem.setBrakeMode(brake);
+    }
+  }
+
+  public void checkLedSwitch() {
+    boolean ledSwitchValue = ledSwitch.get();
+
+    if (ledSwitchValue != lastLedSwitchValue) {
+      lastLedSwitchValue = ledSwitchValue;
+      if (FeatureFlags.synced.getObject().runLEDs) {
+        led.setLedOn(ledSwitchValue);
+      }
+    }
+  }
+
+  public void setSubsystemsToBrake() {
+    if (FeatureFlags.synced.getObject().runDrive) {
+      drive.setBrakeMode(true);
+    }
+    if (FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem.setBrakeMode(true);
+    }
+    if (FeatureFlags.synced.getObject().runScoring) {
+      scoringSubsystem.setBrakeMode(true);
+    }
+    if (FeatureFlags.synced.getObject().runRamp) {
+      rampSubsystem.setBrakeMode(true);
+    }
+  }
 
   public void updateRobotModel() {
     double height = 0.0;
@@ -214,10 +268,18 @@ public class RobotContainer {
   public void periodic() {
 
     strategyManager.periodic();
+
+    Logger.recordOutput("Switches/brake", brakeSwitch.get());
+    Logger.recordOutput("Switches/led", ledSwitch.get());
   }
 
   public void autonomousInit() {
     drive.autonomousInit();
+
+    setSubsystemsToBrake();
+    if (FeatureFlags.synced.getObject().runLEDs) {
+      led.setLedOn(true);
+    }
 
     // load chosen strategy
     strategyManager.autonomousInit(autoChooser.getSelected());
@@ -225,6 +287,11 @@ public class RobotContainer {
 
   public void teleopInit() {
     drive.teleopInit();
+
+    setSubsystemsToBrake();
+    if (FeatureFlags.synced.getObject().runLEDs) {
+      led.setLedOn(true);
+    }
 
     strategyManager.teleopInit();
   }
@@ -307,6 +374,8 @@ public class RobotContainer {
     led.periodic();
     // Logger.recordOutput("feature_flags/drive", FeatureFlags.synced.getObject().runDrive);
     strategyManager.logActions();
+    checkSwitchForDisabled();
+    checkLedSwitch();
   }
 
   public void disabledInit() {
