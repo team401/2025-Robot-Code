@@ -1,7 +1,9 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Pound;
 
 import coppercore.vision.VisionIO;
 import coppercore.vision.VisionIOPhotonReal;
@@ -11,6 +13,8 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Distance;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.subsystems.climb.ClimbIOSim;
@@ -127,10 +131,24 @@ public final class InitSubsystems {
       case MAPLESIM:
 
         // Sim robot, instantiate physics sim IO implementations
+        Distance trackWidth =
+            JsonConstants.drivetrainConstants.kBackLeftYPos.minus(
+                JsonConstants.drivetrainConstants.kBackRightYPos);
+        Distance trackLength =
+            JsonConstants.drivetrainConstants.kFrontLeftXPos.minus(
+                JsonConstants.drivetrainConstants.kBackLeftXPos);
         RobotContainer.driveSim =
             new SwerveDriveSimulation(
-                DriveTrainSimulationConfig.Default().withGyro(COTS.ofPigeon2()),
-                new Pose2d(Meters.of(14.350), Meters.of(4.0), new Rotation2d(Degrees.of(180))));
+                DriveTrainSimulationConfig.Default()
+                    .withGyro(COTS.ofPigeon2())
+                    .withRobotMass(Pound.of(115.0 + 20.0 + 13.0))
+                    .withTrackLengthTrackWidth(trackWidth, trackLength)
+                    .withBumperSize(
+                        trackWidth.plus(Inches.of(3.0 * 2.0)),
+                        trackLength.plus(Inches.of(3.0 * 2.0)))
+                    .withSwerveModule(
+                        COTS.ofMark4(DCMotor.getKrakenX60Foc(1), DCMotor.getKrakenX60(1), 1.5, 2)),
+                new Pose2d(Meters.of(10.40), Meters.of(5.5), new Rotation2d(Degrees.of(0))));
         // DrivetrainConstants.SimConstants.driveSimConfig, new Pose2d());
         SimulatedArena.getInstance().addDriveTrainSimulation(RobotContainer.driveSim);
         return new Drive(

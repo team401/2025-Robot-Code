@@ -29,16 +29,20 @@
     "unit": "Centimeter"
   },
   "algaeMinSignalStrengthForValidMeasurement": 2500.0,
-  "intakeVoltage": {
-    "value": 5.0,
+  "coralIntakeVoltage": {
+    "value": 2.5,
+    "unit": "Volt"
+  },
+  "algaeIntakeVoltage": {
+    "value": -2.0,
     "unit": "Volt"
   },
   "coralScoreVoltage": {
-    "value": 3.0,
+    "value": 12.0,
     "unit": "Volt"
   },
   "algaeScoreVoltage": {
-    "value": -3.0,
+    "value": 12.0,
     "unit": "Volt"
   },
   "intakeAnglePastCoralrange": {
@@ -48,5 +52,21 @@
   "intakeAnglePastAlgaerange": {
     "value": 2.0,
     "unit": "Rotation"
+  },
+  "algaeDetectionCurrent": {
+    "value": 10.0,
+    "unit": "Amp"
+  },
+  "algaeIdleVoltage": {
+    "value": -4.0,
+    "unit": "Volt"
+  },
+  "algaeCurrentDetectionTimeRising": {
+    "value": 0.5,
+    "unit": "Second"
+  },
+  "algaeCurrentDetectionTimeFalling": {
+    "value": 2.0,
+    "unit": "Second"
   }
 }

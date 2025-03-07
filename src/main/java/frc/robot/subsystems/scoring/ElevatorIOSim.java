@@ -62,15 +62,16 @@ public class ElevatorIOSim extends ElevatorIOTalonFX {
 
     Angle spoolRotations = Rotations.of(elevatorHeight.div(Inches.of(4.724)).magnitude());
     Angle largeEncoderRotations =
-        spoolRotations.times(
-            (double) ElevatorConstants.synced.getObject().spoolTeeth
-                / (double) ElevatorConstants.synced.getObject().largeCANCoderTeeth);
-    Angle smallEncoderRotations =
         spoolRotations
             .times(
                 (double) ElevatorConstants.synced.getObject().spoolTeeth
-                    / (double) ElevatorConstants.synced.getObject().smallCANCoderTeeth)
-            .times(-1);
+                    / (double) ElevatorConstants.synced.getObject().largeCANCoderTeeth)
+            .times(-1.0);
+
+    Angle smallEncoderRotations =
+        spoolRotations.times(
+            (double) ElevatorConstants.synced.getObject().spoolTeeth
+                / (double) ElevatorConstants.synced.getObject().smallCANCoderTeeth);
 
     Angle motorRotations =
         spoolRotations.times(ElevatorConstants.synced.getObject().elevatorReduction);

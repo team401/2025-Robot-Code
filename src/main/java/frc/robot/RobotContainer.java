@@ -158,7 +158,7 @@ public class RobotContainer {
       if (FeatureFlags.synced.getObject().runDrive) {
         scoringSubsystem.setIsDriveLinedUpSupplier(
             () -> {
-              if (strategyManager.getAutonomyMode() == AutonomyMode.Mixed) {
+              if (strategyManager.getAutonomyMode() != AutonomyMode.Manual) {
                 return drive.isDriveAlignmentFinished();
               } else {
                 return InitBindings.isManualScorePressed();
@@ -228,6 +228,9 @@ public class RobotContainer {
   }
 
   public void autonomousInit() {
+    drive.autonomousInit();
+
+    // load chosen strategy
     strategyManager.autonomousInit(autoChooser.getSelected());
 
     if (FeatureFlags.synced.getObject().runLEDs) {
@@ -244,6 +247,8 @@ public class RobotContainer {
   }
 
   public void teleopInit() {
+    drive.teleopInit();
+
     strategyManager.teleopInit();
 
     if (FeatureFlags.synced.getObject().runLEDs) {

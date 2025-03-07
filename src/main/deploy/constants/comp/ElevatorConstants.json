@@ -31,7 +31,7 @@
   "elevatorkA": 0.08,
   "elevatorkG": 11.5,
   "elevatorCruiseVelocityMetersPerSecond": 3.0,
-  "elevatorExpo_kV_raw": 0.005,
+  "elevatorExpo_kV_raw": 0.5,
   "elevatorExpo_kA_raw": 0.03,
   "minElevatorHeight": {
     "value": 0.0,
@@ -67,15 +67,15 @@
   },
   "homingVelocityFilterWindowSize": 5,
   "minWristDownHeight": {
-    "value": 0.2,
+    "value": 0.18,
     "unit": "Meter"
   },
   "minReefSafeHeight": {
-    "value": 0.6,
+    "value": 0.418,
     "unit": "Meter"
   },
   "L4MinHeightAbove": {
-    "value": 1.74,
+    "value": 1.55,
     "unit": "Meter"
   },
   "L2MaxHeightBelow": {
