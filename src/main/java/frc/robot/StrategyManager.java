@@ -228,10 +228,12 @@ public class StrategyManager {
           reefLocationSelector.get(), gamePieceSelector.get().equalsIgnoreCase("algae"));
 
       // 20: left; 21: right
-      drive.setDesiredIntakeLocation(
-          intakeLocationSelector.get() == 20
-              ? DesiredLocation.CoralStationLeft
-              : DesiredLocation.CoralStationRight);
+      if (gamePieceSelector.get().equalsIgnoreCase("coral")) {
+        drive.setDesiredIntakeLocation(
+            intakeLocationSelector.get() == 20
+                ? DesiredLocation.CoralStationLeft
+                : DesiredLocation.CoralStationRight);
+      }
     }
 
     // scoring level selection

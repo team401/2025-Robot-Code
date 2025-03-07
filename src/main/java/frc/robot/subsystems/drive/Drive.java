@@ -49,7 +49,6 @@ import frc.robot.subsystems.drive.states.IdleState;
 import frc.robot.subsystems.drive.states.JoystickDrive;
 import frc.robot.subsystems.drive.states.LineupState;
 import frc.robot.subsystems.drive.states.OTFState;
-import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.util.LocalADStarAK;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -363,11 +362,11 @@ public class Drive implements DriveTemplate {
   @Override
   public void periodic() {
     // Manually cancel go to intake if we have a gamepiece
-    if (goToIntake && ScoringSubsystem.getInstance().isCoralDetected()) {
-      setGoToIntake(false);
-    } else if (goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
-      setGoToIntake(false);
-    }
+    // if (goToIntake && ScoringSubsystem.getInstance().isCoralDetected()) {
+    //   setGoToIntake(false);
+    // } else if (goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
+    //   setGoToIntake(false);
+    // }
 
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
@@ -604,7 +603,7 @@ public class Drive implements DriveTemplate {
                 || desiredLocation == DesiredLocation.CoralStationRight
                 || desiredLocation == DesiredLocation.Processor)
             && !goToIntake;
-    boolean isAlgaeReefTarget = isLocationAlgaeIntake(desiredLocation) && goToIntake;
+    boolean isAlgaeReefTarget = isLocationAlgaeIntake(intakeLocation) && goToIntake;
     return isCoralReefTarget || isAlgaeReefTarget;
   }
 
@@ -613,6 +612,7 @@ public class Drive implements DriveTemplate {
    *
    * @return true if location is scoring (reef / processor)
    */
+  @AutoLogOutput(key = "Drive/isLocationScoring")
   public boolean isLocationScoring(DesiredLocation location) {
     boolean isLocationCoralStation =
         (location == DesiredLocation.CoralStationLeft
