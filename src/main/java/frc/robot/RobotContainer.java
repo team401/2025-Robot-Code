@@ -89,9 +89,10 @@ public class RobotContainer {
 
   public void checkLedSwitch() {
     boolean ledSwitchValue = ledSwitch.get();
+
     if(ledSwitchValue != lastLedSwitchValue) {
       lastLedSwitchValue = ledSwitchValue;
-      
+      led.setLedOn(ledSwitchValue);
     }
   }
 
@@ -274,6 +275,7 @@ public class RobotContainer {
     drive.autonomousInit();
 
     setSubsystemsToBrake();
+    led.setLedOn(true);
 
     // load chosen strategy
     strategyManager.autonomousInit(autoChooser.getSelected());
@@ -283,6 +285,7 @@ public class RobotContainer {
     drive.teleopInit();
 
     setSubsystemsToBrake();
+    led.setLedOn(true);
 
     strategyManager.teleopInit();
   }
@@ -366,6 +369,7 @@ public class RobotContainer {
     // Logger.recordOutput("feature_flags/drive", FeatureFlags.synced.getObject().runDrive);
     strategyManager.logActions();
     checkSwitchForDisabled();
+    checkLedSwitch();
   }
 
   public void disabledInit() {

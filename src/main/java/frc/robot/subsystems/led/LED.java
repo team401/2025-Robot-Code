@@ -188,4 +188,12 @@ public class LED extends SubsystemBase {
     leftPatterns.clear();
     rightPatterns.clear();
   }
+
+  public void setLedOn(boolean on) {
+    if(on) {
+      led.start();
+    } else {
+      led.stop();
+    }
+  }
 }
