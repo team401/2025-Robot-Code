@@ -83,7 +83,7 @@
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": -0.105,
+      "value": -0.095,
       "unit": "Rotation"
     }
   },
@@ -94,7 +94,7 @@
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": -0.105,
+      "value": -0.095,
       "unit": "Rotation"
     }
   },
