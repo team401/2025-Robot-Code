@@ -15,7 +15,7 @@ public final class LEDConstants {
   public static final int ledPort = 9;
   public static final int halfLength = 14;
   public static final int totalLength = 28;
-  public static final int totalLengthRainbow = 150;
+  public static final int totalLengthRainbow = 50;
   public static final double rainbowSpeed = 20;
 
   public static final Color off = Color.kBlack;
