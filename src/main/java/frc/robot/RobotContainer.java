@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.StrategyManager.AutonomyMode;
 import frc.robot.commands.drive.AkitDriveCommands;
 import frc.robot.constants.AutoStrategy;
 import frc.robot.constants.AutoStrategyContainer;
@@ -207,10 +206,14 @@ public class RobotContainer {
       if (FeatureFlags.synced.getObject().runDrive) {
         scoringSubsystem.setIsDriveLinedUpSupplier(
             () -> {
-              if (strategyManager.getAutonomyMode() != AutonomyMode.Manual) {
-                return drive.isDriveAlignmentFinished();
-              } else {
-                return InitBindings.isManualScorePressed();
+              switch (strategyManager.getAutonomyMode()) {
+                case Manual:
+                  return InitBindings.isManualScorePressed();
+                case Mixed:
+                  return drive.isDriveAlignmentFinished() || InitBindings.isManualScorePressed();
+                case Full:
+                default:
+                  return drive.isDriveAlignmentFinished();
               }
             });
         scoringSubsystem.setReefDistanceSupplier(

@@ -21,8 +21,8 @@
   },
   "coralMinSignalStrengthForValidMeasurement": 2500.0,
   "algaeProximityThreshold": {
-    "value": 5.0,
-    "unit": "Centimeter"
+    "value": 2.0,
+    "unit": "Inch"
   },
   "algaeProximityHysteresis": {
     "value": 0.5,
@@ -39,6 +39,10 @@
   },
   "coralScoreVoltage": {
     "value": 10.0,
+    "unit": "Volt"
+  },
+  "coralL23ScoreVoltage": {
+    "value": 4.0,
     "unit": "Volt"
   },
   "algaeScoreVoltage": {
