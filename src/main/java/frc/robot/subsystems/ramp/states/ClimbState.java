@@ -15,6 +15,6 @@ public class ClimbState extends RampState {
   }
 
   public boolean inPosition() {
-    return JsonConstants.rampConstants.climbPosition - mechanism.inputs.position < 0.0;
+    return mechanism.inputs.position < JsonConstants.rampConstants.climbPosition;
   }
 }
