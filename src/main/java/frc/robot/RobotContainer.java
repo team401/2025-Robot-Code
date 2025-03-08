@@ -378,10 +378,17 @@ public class RobotContainer {
     strategyManager.logActions();
     checkSwitchForDisabled();
     checkLedSwitch();
+
+    Logger.recordOutput("Switches/brake", brakeSwitch.get());
+    Logger.recordOutput("Switches/led", ledSwitch.get());
   }
 
   public void disabledInit() {
     CommandScheduler.getInstance().cancelAll();
+
+    if (FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem.setBrakeMode(true);
+    }
   }
 
   public void updateMapleSim() {

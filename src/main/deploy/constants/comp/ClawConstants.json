@@ -38,7 +38,7 @@
     "unit": "Volt"
   },
   "coralScoreVoltage": {
-    "value": 12.0,
+    "value": 10.0,
     "unit": "Volt"
   },
   "algaeScoreVoltage": {

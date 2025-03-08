@@ -298,6 +298,17 @@ public final class InitBindings {
                 () -> {
                   scoring.setClawRollerVoltage(Volts.zero());
                 }));
+
+    rightJoystick
+        .top()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  if (ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Algae
+                      && ScoringSubsystem.getInstance().getTarget() == FieldTarget.Processor) {
+                    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.WarmupReady);
+                  }
+                }));
   }
 
   /**
