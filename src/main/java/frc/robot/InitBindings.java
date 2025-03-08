@@ -12,7 +12,6 @@ import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem.ClimbAction;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.ramp.states.RampState.RampTriggers;
@@ -58,6 +57,7 @@ public final class InitBindings {
                       // And then fall through to the mixed autonomy behavior (no break here is
                       // intentional)
                     case Mixed:
+                      drive.setGoToIntake(false);
                       drive.fireTrigger(DriveTrigger.BeginOTF);
                       break;
                     case Manual:
@@ -157,7 +157,6 @@ public final class InitBindings {
                       // intentional)
                     case Mixed:
                       // Start auto align if in mixed autonomy
-                      drive.setDesiredIntakeLocation(DesiredLocation.CoralStationRight);
                       drive.setGoToIntake(true);
                       drive.fireTrigger(DriveTrigger.BeginOTF);
                       // Then always start intake for scoring (no break here is intentional)

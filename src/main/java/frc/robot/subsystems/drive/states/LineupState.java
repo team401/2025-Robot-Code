@@ -142,31 +142,37 @@ public class LineupState implements PeriodicStateInterface {
     switch (drive.getDesiredLocation()) {
       case Reef0:
       case Reef1:
+      case Algae0:
         return drive.isAllianceRed()
             ? JsonConstants.redFieldLocations.redReef01Rotation
             : JsonConstants.blueFieldLocations.blueReef01Rotation;
       case Reef2:
       case Reef3:
+      case Algae1:
         return drive.isAllianceRed()
             ? JsonConstants.redFieldLocations.redReef23Rotation
             : JsonConstants.blueFieldLocations.blueReef23Rotation;
       case Reef4:
       case Reef5:
+      case Algae2:
         return drive.isAllianceRed()
             ? JsonConstants.redFieldLocations.redReef45Rotation
             : JsonConstants.blueFieldLocations.blueReef45Rotation;
       case Reef6:
       case Reef7:
+      case Algae3:
         return drive.isAllianceRed()
             ? JsonConstants.redFieldLocations.redReef67Rotation
             : JsonConstants.blueFieldLocations.blueReef67Rotation;
       case Reef8:
       case Reef9:
+      case Algae4:
         return drive.isAllianceRed()
             ? JsonConstants.redFieldLocations.redReef89Rotation
             : JsonConstants.blueFieldLocations.blueReef89Rotation;
       case Reef10:
       case Reef11:
+      case Algae5:
         return drive.isAllianceRed()
             ? JsonConstants.redFieldLocations.redReef1011Rotation
             : JsonConstants.blueFieldLocations.blueReef1011Rotation;

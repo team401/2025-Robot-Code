@@ -143,6 +143,10 @@ public class ClimbSubsystem extends SubsystemBase {
     rampClear = rClear;
   }
 
+  public void setBrakeMode(boolean brake) {
+    io.setBrakeMode(brake);
+  }
+
   public boolean getLockedToCage() {
     return inputs.lockedToCage;
   }

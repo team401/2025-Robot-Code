@@ -68,4 +68,8 @@ public class RampIOSim implements RampIO {
     outputs.appliedVolts = volts;
     sim.setInputVoltage(volts);
   }
+
+  public void setBrakeMode(boolean brake) {
+    return;
+  }
 }
