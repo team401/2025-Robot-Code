@@ -18,5 +18,5 @@
   "climbkD": 0.0,
   "climbCurrentLimit": 60,
   "invertFollowerClimbMotor": true,
-  "climbFFVolts": -10.0
+  "climbFFVolts": -2.0
 }

@@ -104,8 +104,11 @@ public class ClimbIOTalonFX implements ClimbIO {
 
   @Override
   public void applyOutputs(ClimbOutputs outputs) {
-
-    calculator.withPosition(goalAngle.in(Rotations)).withFeedForward(feedforward);
+    if (goalAngle.lt(climbAngleCoder.getAbsolutePosition().getValue())) {
+      calculator.withPosition(goalAngle.in(Rotations)).withFeedForward(feedforward);
+    } else {
+      calculator.withPosition(goalAngle.in(Rotations)).withFeedForward(0.0);
+    }
 
     Logger.recordOutput("climb/calculatorAngle", leadMotor.getPosition().getValueAsDouble());
 
