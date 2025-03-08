@@ -286,7 +286,9 @@ public class RobotContainer {
   }
 
   public void teleopInit() {
-    drive.teleopInit();
+    if (FeatureFlags.synced.getObject().runDrive) {
+      drive.teleopInit();
+    }
 
     setSubsystemsToBrake();
     if (FeatureFlags.synced.getObject().runLEDs) {
