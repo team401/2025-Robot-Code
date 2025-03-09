@@ -633,7 +633,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
         hasGamePiece = clawMechanism.isAlgaeDetected();
         break;
     }
-    return ((stateMachine.getCurrentState() == ScoringState.Init) && (stateMachine.getCurrentState() == ScoringState.Warmup)
+    return ((stateMachine.getCurrentState() == ScoringState.Init)
+            || (stateMachine.getCurrentState() == ScoringState.Warmup)
             || (stateMachine.getCurrentState() == ScoringState.Score))
         && hasGamePiece;
   }
