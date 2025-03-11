@@ -9,7 +9,6 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import coppercore.controls.state_machine.StateMachine;
@@ -237,6 +236,7 @@ public class Drive implements DriveTemplate {
   private LocalADStarAK localADStar = new LocalADStarAK();
 
   private Command pathfindWarmupSpoofCommand;
+  private Command warmupCommand = PathfindingCommand.warmupCommand();
 
   public Drive(
       GyroIO gyroIO,
@@ -307,35 +307,35 @@ public class Drive implements DriveTemplate {
           getPose().getTranslation());
     }
 
-    PathfindingCommand.warmupCommand().schedule();
+    warmupCommand.schedule();
 
-    // DriveState.OTF.getState().getDriveToPoseCommand().
-    // Manually create an OTF command on robot init to avoid massive lagspike when auto begins:
-    Pose2d goalPose =
-        isAllianceRed()
-            ? new Pose2d(
-                JsonConstants.redFieldLocations.redReef23Translation,
-                JsonConstants.redFieldLocations.redReef23Rotation)
-            : new Pose2d(
-                JsonConstants.blueFieldLocations.blueReef23Translation,
-                JsonConstants.blueFieldLocations.blueReef23Rotation);
+    // // DriveState.OTF.getState().getDriveToPoseCommand().
+    // // Manually create an OTF command on robot init to avoid massive lagspike when auto begins:
+    // Pose2d goalPose =
+    //     isAllianceRed()
+    //         ? new Pose2d(
+    //             JsonConstants.redFieldLocations.redReef23Translation,
+    //             JsonConstants.redFieldLocations.redReef23Rotation)
+    //         : new Pose2d(
+    //             JsonConstants.blueFieldLocations.blueReef23Translation,
+    //             JsonConstants.blueFieldLocations.blueReef23Rotation);
 
-    // Create the constraints to use while pathfinding
-    PathConstraints constraints =
-        new PathConstraints(
-            JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
-            JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
-            JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
-            JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
+    // // Create the constraints to use while pathfinding
+    // PathConstraints constraints =
+    //     new PathConstraints(
+    //         JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
+    //         JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
+    //         JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
+    //         JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
 
-    pathfindWarmupSpoofCommand =
-        AutoBuilder.pathfindToPose(
-            goalPose, constraints, JsonConstants.drivetrainConstants.otfPoseEndingVelocity);
+    // pathfindWarmupSpoofCommand =
+    //     AutoBuilder.pathfindToPose(
+    //         goalPose, constraints, JsonConstants.drivetrainConstants.otfPoseEndingVelocity);
 
-    pathfindWarmupSpoofCommand.schedule();
+    // pathfindWarmupSpoofCommand.schedule();
 
-    // Manually call execute because the 1st execute seems to take 0.9 seconds in auto
-    pathfindWarmupSpoofCommand.execute();
+    // // Manually call execute because the 1st execute seems to take 0.9 seconds in auto
+    // pathfindWarmupSpoofCommand.execute();
 
     angleController.enableContinuousInput(-Math.PI, Math.PI);
     // Configure SysId
@@ -385,8 +385,12 @@ public class Drive implements DriveTemplate {
   }
 
   public void autonomousInit() {
-    if (pathfindWarmupSpoofCommand != null && pathfindWarmupSpoofCommand.isScheduled()) {
-      pathfindWarmupSpoofCommand.cancel();
+    // if (pathfindWarmupSpoofCommand != null && pathfindWarmupSpoofCommand.isScheduled()) {
+    //   pathfindWarmupSpoofCommand.cancel();
+    // }
+
+    if (warmupCommand != null && warmupCommand.isScheduled()) {
+      warmupCommand.cancel();
     }
   }
 
@@ -481,6 +485,12 @@ public class Drive implements DriveTemplate {
 
     Logger.recordOutput("Drive/goToIntake", goToIntake);
     Logger.recordOutput("Drive/driveLinedUp", driveLinedUp);
+  }
+
+  public void disabledPeriodic() {
+    if (warmupCommand != null) {
+      Logger.recordOutput("Drive/warmupScheduled", warmupCommand.isScheduled());
+    }
   }
 
   /**

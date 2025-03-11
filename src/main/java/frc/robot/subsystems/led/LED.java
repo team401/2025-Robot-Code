@@ -24,7 +24,7 @@ public class LED extends SubsystemBase {
   private List<LEDPattern> rightPatterns = new ArrayList<>();
 
   private final AddressableLED led = new AddressableLED(LEDConstants.ledPort);
-  public AddressableLEDBuffer ledStrip = new AddressableLEDBuffer(LEDConstants.totalLengthRainbow);
+  public AddressableLEDBuffer ledStrip = new AddressableLEDBuffer(LEDConstants.totalLength);
 
   public AddressableLEDBufferView leftData =
       ledStrip
@@ -52,7 +52,7 @@ public class LED extends SubsystemBase {
     this.scoringSubsystem = scoringSubsystem;
     this.climbSubsystem = climbSubsystem;
     this.driveSubsystem = drive;
-    led.setLength(LEDConstants.totalLengthRainbow);
+    led.setLength(LEDConstants.totalLength);
     led.start();
   }
 
@@ -75,7 +75,6 @@ public class LED extends SubsystemBase {
   /** Periodic method called every loop cycle. Updates LED patterns based on robot state. */
   @Override
   public void periodic() {
-    setEnabled(DriverStation.isEnabled());
     if (!DriverStation.isDisabled()) {
 
       // Drive Subsystem Checks

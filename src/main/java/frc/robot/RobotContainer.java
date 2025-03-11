@@ -279,10 +279,10 @@ public class RobotContainer {
   public void autonomousInit() {
     drive.autonomousInit();
 
-    setSubsystemsToBrake();
-    if (FeatureFlags.synced.getObject().runLEDs) {
-      led.setLedOn(true);
-    }
+    // setSubsystemsToBrake();
+    // if (FeatureFlags.synced.getObject().runLEDs) {
+    //   led.setLedOn(true);
+    // }
 
     // load chosen strategy
     strategyManager.autonomousInit(autoChooser.getSelected());
