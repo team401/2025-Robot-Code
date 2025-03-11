@@ -122,7 +122,7 @@ public final class ElevatorConstants {
               / elevatorToSpool.in(PerUnit.combine(Meters, Radians)));
 
   /* The Motion Magic Expo kV, measured in Volts per Radian per Second, but represented as a double so it can be synced by JSONSync */
-  public final Double elevatorExpo_kV_raw = 0.005;
+  public final Double elevatorExpo_kV_raw = 0.5;
 
   /**
    * The kV used by Motion Magic Expo to generate a motion profile. Dividing the supply voltage by
@@ -192,6 +192,12 @@ public final class ElevatorConstants {
 
   /** When within this distance, the elevator is considered "at its setpoint" */
   public final Distance elevatorSetpointEpsilon = Meters.of(0.05);
+
+  /**
+   * How high elevator must go before we can swing the algae up into the robot without getting stuck
+   * on crossbar or elevator
+   */
+  public final Distance minAlgaeInHeight = Meters.of(1.7);
 
   /**
    * How slow must the elevator move before it is considered to be stable at its goal position

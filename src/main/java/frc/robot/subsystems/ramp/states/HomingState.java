@@ -69,4 +69,8 @@ public class HomingState extends RampState {
 
     super.periodic();
   }
+
+  public boolean inPosition() {
+    return false;
+  }
 }

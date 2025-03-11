@@ -9,6 +9,7 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import coppercore.controls.state_machine.StateMachine;
@@ -21,6 +22,7 @@ import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -35,9 +37,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.networktables.DoubleSubscriber;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -51,7 +50,9 @@ import frc.robot.subsystems.drive.states.IdleState;
 import frc.robot.subsystems.drive.states.JoystickDrive;
 import frc.robot.subsystems.drive.states.LineupState;
 import frc.robot.subsystems.drive.states.OTFState;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.util.LocalADStarAK;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BooleanSupplier;
@@ -143,6 +144,12 @@ public class Drive implements DriveTemplate {
     Reef9,
     Reef10,
     Reef11,
+    Algae0,
+    Algae1,
+    Algae2,
+    Algae3,
+    Algae4,
+    Algae5,
     Processor,
     CoralStationLeft,
     CoralStationRight,
@@ -166,13 +173,18 @@ public class Drive implements DriveTemplate {
     DesiredLocation.CoralStationRight
   };
 
+  public DesiredLocation[] algaeArray = {
+    DesiredLocation.Algae0,
+    DesiredLocation.Algae1,
+    DesiredLocation.Algae2,
+    DesiredLocation.Algae3,
+    DesiredLocation.Algae4,
+    DesiredLocation.Algae5
+  };
+
   private DesiredLocation desiredLocation = DesiredLocation.Reef9;
   private DesiredLocation intakeLocation = DesiredLocation.CoralStationLeft;
   private boolean goToIntake = false;
-
-  private NetworkTableInstance inst = NetworkTableInstance.getDefault();
-  private NetworkTable table = inst.getTable("");
-  private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
 
   @AutoLogOutput(key = "Drive/waitOnScore")
   private BooleanSupplier waitOnScore = () -> false;
@@ -205,10 +217,10 @@ public class Drive implements DriveTemplate {
 
   public enum DriveTrigger {
     ManualJoysticks,
-    BeginAutoAlignment,
     CancelAutoAlignment,
     FinishOTF,
     CancelOTF,
+    BeginOTF,
     BeginLineup,
     CancelLineup,
     FinishLineup,
@@ -221,6 +233,10 @@ public class Drive implements DriveTemplate {
 
   private boolean isAligningToFieldElement = false;
   private Translation2d lockedAlignPosition = new Translation2d();
+
+  private LocalADStarAK localADStar = new LocalADStarAK();
+
+  private Command pathfindWarmupSpoofCommand;
 
   public Drive(
       GyroIO gyroIO,
@@ -251,7 +267,7 @@ public class Drive implements DriveTemplate {
         PP_CONFIG,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);
-    Pathfinding.setPathfinder(new LocalADStarAK());
+    Pathfinding.setPathfinder(localADStar);
     PathPlannerLogging.setLogActivePathCallback(
         (activePath) -> {
           Logger.recordOutput(
@@ -263,7 +279,64 @@ public class Drive implements DriveTemplate {
         });
 
     // warm up java processing for faster pathfind later
+    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+      localADStar.setDynamicObstacles(
+          List.of(
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackLeftTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackLeftBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackRightTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackRightBottomCorner)),
+          getPose().getTranslation());
+    } else {
+      localADStar.setDynamicObstacles(
+          List.of(
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackRightTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackRightBottomCorner)),
+          getPose().getTranslation());
+    }
+
     PathfindingCommand.warmupCommand().schedule();
+
+    // DriveState.OTF.getState().getDriveToPoseCommand().
+    // Manually create an OTF command on robot init to avoid massive lagspike when auto begins:
+    Pose2d goalPose =
+        isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReef23Translation,
+                JsonConstants.redFieldLocations.redReef23Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReef23Translation,
+                JsonConstants.blueFieldLocations.blueReef23Rotation);
+
+    // Create the constraints to use while pathfinding
+    PathConstraints constraints =
+        new PathConstraints(
+            JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
+            JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
+            JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
+            JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
+
+    pathfindWarmupSpoofCommand =
+        AutoBuilder.pathfindToPose(
+            goalPose, constraints, JsonConstants.drivetrainConstants.otfPoseEndingVelocity);
+
+    pathfindWarmupSpoofCommand.schedule();
+
+    // Manually call execute because the 1st execute seems to take 0.9 seconds in auto
+    pathfindWarmupSpoofCommand.execute();
+
     angleController.enableContinuousInput(-Math.PI, Math.PI);
     // Configure SysId
     sysId =
@@ -286,14 +359,7 @@ public class Drive implements DriveTemplate {
 
     stateMachineConfiguration
         .configure(DriveState.Joystick)
-        .permitIf(
-            DriveTrigger.BeginAutoAlignment,
-            DriveState.OTF,
-            () -> !this.isDriveCloseToFinalLineupPose())
-        .permitIf(
-            DriveTrigger.BeginAutoAlignment,
-            DriveState.Lineup,
-            () -> this.isDriveCloseToFinalLineupPose() && !this.isGoingToIntake());
+        .permit(DriveTrigger.BeginOTF, DriveState.OTF);
 
     stateMachineConfiguration
         .configure(DriveState.OTF)
@@ -312,15 +378,32 @@ public class Drive implements DriveTemplate {
     stateMachineConfiguration
         .configure(DriveState.Lineup)
         .permit(DriveTrigger.CancelLineup, DriveState.Joystick)
-        .permitIf(DriveTrigger.FinishLineup, DriveState.Idle, () -> this.isWaitingOnScore())
-        .permitIf(DriveTrigger.FinishLineup, DriveState.Joystick, () -> !this.isWaitingOnScore())
-        .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick);
+        .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick)
+        .permit(DriveTrigger.BeginOTF, DriveState.OTF);
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, DriveState.Joystick);
   }
 
+  public void autonomousInit() {
+    if (pathfindWarmupSpoofCommand != null && pathfindWarmupSpoofCommand.isScheduled()) {
+      pathfindWarmupSpoofCommand.cancel();
+    }
+  }
+
+  /** remove algae coral stack obstacles for on the fly */
+  public void teleopInit() {
+    localADStar.setDynamicObstacles(List.of(), getPose().getTranslation());
+  }
+
   @Override
   public void periodic() {
+    // Manually cancel go to intake if we have a gamepiece
+    if (goToIntake && ScoringSubsystem.getInstance().isCoralDetected()) {
+      setGoToIntake(false);
+    } else if (goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
+      setGoToIntake(false);
+    }
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -520,6 +603,21 @@ public class Drive implements DriveTemplate {
         < JsonConstants.drivetrainConstants.otfPoseDistanceLimit;
   }
 
+  @AutoLogOutput(key = "Drive/OTF/isDriveCloseForFarWarmup")
+  public boolean isDriveCloseForFarWarmup() {
+    return this.getPose()
+            .getTranslation()
+            .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation())
+        < JsonConstants.drivetrainConstants.otfFarWarmupDistance;
+  }
+
+  public boolean isDriveCloseForWarmup() {
+    return this.getPose()
+            .getTranslation()
+            .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation())
+        < JsonConstants.drivetrainConstants.otfWarmupDistance;
+  }
+
   /**
    * checks if drive is currently lining up to a reef
    *
@@ -536,10 +634,13 @@ public class Drive implements DriveTemplate {
    * @return true if location is reef; false otherwise (processor / coral station)
    */
   public boolean isDesiredLocationReef() {
-    return !(desiredLocation == DesiredLocation.CoralStationLeft
-            || desiredLocation == DesiredLocation.CoralStationRight
-            || desiredLocation == DesiredLocation.Processor)
-        && !goToIntake; // only want reef if intake is false
+    boolean isCoralReefTarget =
+        !(desiredLocation == DesiredLocation.CoralStationLeft
+                || desiredLocation == DesiredLocation.CoralStationRight
+                || desiredLocation == DesiredLocation.Processor)
+            && !goToIntake;
+    boolean isAlgaeReefTarget = isLocationAlgaeIntake(intakeLocation) && goToIntake;
+    return isCoralReefTarget || isAlgaeReefTarget;
   }
 
   /**
@@ -547,9 +648,24 @@ public class Drive implements DriveTemplate {
    *
    * @return true if location is scoring (reef / processor)
    */
+  @AutoLogOutput(key = "Drive/isLocationScoring")
   public boolean isLocationScoring(DesiredLocation location) {
-    return !(location == DesiredLocation.CoralStationLeft
-        || location == DesiredLocation.CoralStationRight);
+    boolean isLocationCoralStation =
+        (location == DesiredLocation.CoralStationLeft
+            || location == DesiredLocation.CoralStationRight);
+    boolean isAlgaeIntake = isLocationAlgaeIntake(location);
+
+    return (!isLocationCoralStation && !isAlgaeIntake);
+  }
+
+  /** checks if location is reef (center of poles) */
+  public boolean isLocationAlgaeIntake(DesiredLocation location) {
+    return (location == DesiredLocation.Algae0
+        || location == DesiredLocation.Algae1
+        || location == DesiredLocation.Algae2
+        || location == DesiredLocation.Algae3
+        || location == DesiredLocation.Algae4
+        || location == DesiredLocation.Algae5);
   }
 
   /**
@@ -596,6 +712,20 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * returns index of reef location for interfacing with snakescreen
+   *
+   * @return a double representing the index of reef location
+   */
+  public int getDesiredAlgaeLocationIndex() {
+    for (int i = 0; i < algaeArray.length; i++) {
+      if (algaeArray[i] == desiredLocation) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /**
    * sets desired path location calling this and then setting OTF to true will cause robot to drive
    * path from current pose to the location
    *
@@ -606,11 +736,19 @@ public class Drive implements DriveTemplate {
   }
 
   /** checks for update from reef location network table (SnakeScreen) run periodically in drive */
-  public void updateDesiredLocationFromNetworkTables(double desiredIndex) {
+  public void updateDesiredLocationFromNetworkTables(double desiredIndex, boolean isAlgae) {
     if (desiredIndex == -1) {
       return;
     }
-    if (locationArray[(int) desiredIndex] != desiredLocation) {
+
+    if (isAlgae && algaeArray[(int) desiredIndex] != intakeLocation) {
+      this.setDesiredIntakeLocation(algaeArray[(int) desiredIndex]);
+      if (isDriveOTF()) {
+        this.fireTrigger(DriveTrigger.ManualJoysticks);
+        this.fireTrigger(DriveTrigger.BeginOTF);
+      }
+      return;
+    } else if (!isAlgae && locationArray[(int) desiredIndex] != desiredLocation) {
       if (isDriveOTF()) {
         this.updateDesiredLocation((int) desiredIndex);
       } else {
@@ -630,6 +768,13 @@ public class Drive implements DriveTemplate {
     this.updateDesiredLocation(locationArray[locationIndex]);
   }
 
+  /** sets brake mode for each module */
+  public void setBrakeMode(boolean brake) {
+    for (int i = 0; i < modules.length; i++) {
+      modules[i].setBrakeMode(brake);
+    }
+  }
+
   /**
    * updates desired path location (for when OTF is already running) this will cancel old command
    * and generate a new OTF path to run
@@ -641,7 +786,7 @@ public class Drive implements DriveTemplate {
 
     if (isDriveOTF()) {
       stateMachine.fire(DriveTrigger.ManualJoysticks);
-      stateMachine.fire(DriveTrigger.BeginAutoAlignment);
+      stateMachine.fire(DriveTrigger.BeginOTF);
     }
   }
 

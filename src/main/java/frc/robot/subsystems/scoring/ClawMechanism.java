@@ -1,12 +1,16 @@
 package frc.robot.subsystems.scoring;
 
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.parameter_tools.LoggedTunableNumber;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.scoring.states.IntakeState;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class ClawMechanism {
@@ -17,6 +21,16 @@ public class ClawMechanism {
   private LoggedTunableNumber manualTuningVolts;
   private LoggedTunableNumber coralOvershootRotations;
   private LoggedTunableNumber algaeOvershootRotations;
+
+  private Debouncer algaeRiseDebouncer =
+      new Debouncer(
+          JsonConstants.clawConstants.algaeCurrentDetectionTimeRising.in(Seconds),
+          DebounceType.kBoth);
+
+  private Debouncer algaeFallDebouncer =
+      new Debouncer(
+          JsonConstants.clawConstants.algaeCurrentDetectionTimeFalling.in(Seconds),
+          DebounceType.kBoth);
 
   public ClawMechanism(ClawIO io) {
     manualTuningVolts = new LoggedTunableNumber("ClawTunables/clawManualVolts", 0.0);
@@ -101,5 +115,19 @@ public class ClawMechanism {
    */
   public boolean isAlgaeDetected() {
     return inputs.algaeDetected;
+  }
+
+  @AutoLogOutput(key = "scoring/claw/isAlgaeCurrentDetected")
+  public boolean isAlgaeCurrentDetected() {
+    boolean currentState =
+        inputs.clawStatorCurrent.gte(JsonConstants.clawConstants.algaeDetectionCurrent);
+    boolean riseDebounced = algaeRiseDebouncer.calculate(currentState);
+    boolean fallDebounced = algaeFallDebouncer.calculate(currentState);
+
+    Logger.recordOutput("scoring/claw/notDebounced", currentState);
+    Logger.recordOutput("scoring/claw/riseDebouncer", riseDebounced);
+    Logger.recordOutput("scoring/claw/fallDebounced", fallDebounced);
+
+    return riseDebounced || fallDebounced;
   }
 }

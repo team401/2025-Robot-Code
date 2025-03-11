@@ -1,6 +1,8 @@
 package frc.robot.subsystems.climb;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
@@ -94,10 +96,19 @@ public class ClimbIOTalonFX implements ClimbIO {
     inputs.motorAngle.mut_replace(climbAngleCoder.getAbsolutePosition().getValue());
   }
 
+  private double feedforward = 0.0;
+
+  public void setFF(double newFF) {
+    this.feedforward = newFF;
+  }
+
   @Override
   public void applyOutputs(ClimbOutputs outputs) {
-
-    calculator.withPosition(goalAngle.in(Rotations));
+    if (goalAngle.lt(climbAngleCoder.getAbsolutePosition().getValue())) {
+      calculator.withPosition(goalAngle.in(Rotations)).withFeedForward(feedforward);
+    } else {
+      calculator.withPosition(goalAngle.in(Rotations)).withFeedForward(0.0);
+    }
 
     Logger.recordOutput("climb/calculatorAngle", leadMotor.getPosition().getValueAsDouble());
 
@@ -106,6 +117,7 @@ public class ClimbIOTalonFX implements ClimbIO {
     } else {
       leadMotor.setControl(calculator);
     }
+
     // tried to replace the above if statement with leadMotor.setControl(new VoltageOut(5));,
     // doesn't work
     // the getMotorVoltage continuously returns 0 despite leadMotor's literal voltage being set to 5

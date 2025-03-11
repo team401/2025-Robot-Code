@@ -28,6 +28,7 @@ public class RampSubsystem extends SubsystemBase {
     CLIMB(new ClimbState()),
     INTAKE(new IntakeState()),
     INTAKE_HOLD(new IntakeHoldState()),
+    CLIMB_TO_INTAKE_HOMING(new HomingState()),
     HOMING(new HomingState());
 
     private RampState state;
@@ -84,9 +85,12 @@ public class RampSubsystem extends SubsystemBase {
     config
         .configure(RampStates.CLIMB)
         .permit(RampTriggers.GOTO_IDLE, RampStates.IDLE)
-        .permit(RampTriggers.START_INTAKE, RampStates.INTAKE);
+        .permit(RampTriggers.START_INTAKE, RampStates.CLIMB_TO_INTAKE_HOMING);
 
     config.configure(RampStates.HOMING).permit(RampTriggers.HOMED, RampStates.IDLE);
+    config
+        .configure(RampStates.CLIMB_TO_INTAKE_HOMING)
+        .permit(RampTriggers.HOMED, RampStates.INTAKE);
 
     stateMachine = new StateMachine<>(config, RampStates.HOMING);
 
@@ -99,6 +103,10 @@ public class RampSubsystem extends SubsystemBase {
   /** Must be called manually, does NOT run automatically */
   public void testPeriodic() {
     mechanism.testPeriodic();
+  }
+
+  public void setBrakeMode(boolean brake) {
+    mechanism.setBrakeMode(brake);
   }
 
   public void prepareForClimb() {

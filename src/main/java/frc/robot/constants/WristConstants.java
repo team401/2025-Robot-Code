@@ -104,6 +104,10 @@ public class WristConstants {
   public final Double maxWristSetpointVelocityRotationsPerSecond =
       0.008333; // 3 degrees per second = 1 / 120 rotations = 0.008333...
 
+  public final Double wristStableDebounceTimeSeconds = 0.5;
+
+  public final Angle algaeUnderCrossbarAngle = Radians.of(-0.105);
+
   public static final class Sim {
     @JSONExclude
     public static final JSONSync<WristConstants.Sim> synced =
@@ -124,8 +128,8 @@ public class WristConstants {
 
     public final Distance wristArmLength = Meters.of(0.5);
 
-    public final Angle wristMinAngle = Rotations.of(-0.80);
-    public final Angle wristMaxAngle = Rotations.of(0.30);
+    public final Angle wristMinAngle = Radians.of(-1.68);
+    public final Angle wristMaxAngle = Radians.of(2.0);
 
     public final Angle wristStartingAngle = Rotations.of(0.0);
   }

@@ -3,6 +3,7 @@ package frc.robot.constants;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -13,6 +14,7 @@ import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Filesystem;
 
@@ -43,8 +45,10 @@ public class ClawConstants {
   public final Distance algaeProximityHysteresis = Centimeters.of(0.5);
   public final double algaeMinSignalStrengthForValidMeasurement = 2500.0;
 
-  public final Voltage intakeVoltage = Volts.of(3.0);
+  public final Voltage coralIntakeVoltage = Volts.of(3.0);
+  public final Voltage algaeIntakeVoltage = Volts.of(-3.0);
   public final Voltage coralScoreVoltage = Volts.of(3.0);
+  public final Voltage coralL23ScoreVoltage = Volts.of(6.0);
   public final Voltage algaeScoreVoltage = Volts.of(-3.0);
 
   /** Voltage the claw should use to hold the algae in place while idling */
@@ -55,6 +59,12 @@ public class ClawConstants {
 
   /** How far should the motor rotate after the sensor detects an algae to intake? */
   public final Angle intakeAnglePastAlgaerange = Rotations.of(2.0);
+
+  public final Current algaeDetectionCurrent = Amps.of(10.0);
+
+  public final Time algaeCurrentDetectionTimeRising = Seconds.of(0.5);
+
+  public final Time algaeCurrentDetectionTimeFalling = Seconds.of(2.0);
 
   public static final class Sim {
     @JSONExclude
