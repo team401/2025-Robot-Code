@@ -235,6 +235,9 @@ public class Drive implements DriveTemplate {
 
   private LocalADStarAK localADStar = new LocalADStarAK();
 
+  private Command pathfindWarmupSpoofCommand;
+  private Command warmupCommand = PathfindingCommand.warmupCommand();
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -276,7 +279,64 @@ public class Drive implements DriveTemplate {
         });
 
     // warm up java processing for faster pathfind later
-    PathfindingCommand.warmupCommand().schedule();
+    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+      localADStar.setDynamicObstacles(
+          List.of(
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackLeftTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackLeftBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackRightTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackRightBottomCorner)),
+          getPose().getTranslation());
+    } else {
+      localADStar.setDynamicObstacles(
+          List.of(
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackRightTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackRightBottomCorner)),
+          getPose().getTranslation());
+    }
+
+    warmupCommand.schedule();
+
+    // // DriveState.OTF.getState().getDriveToPoseCommand().
+    // // Manually create an OTF command on robot init to avoid massive lagspike when auto begins:
+    // Pose2d goalPose =
+    //     isAllianceRed()
+    //         ? new Pose2d(
+    //             JsonConstants.redFieldLocations.redReef23Translation,
+    //             JsonConstants.redFieldLocations.redReef23Rotation)
+    //         : new Pose2d(
+    //             JsonConstants.blueFieldLocations.blueReef23Translation,
+    //             JsonConstants.blueFieldLocations.blueReef23Rotation);
+
+    // // Create the constraints to use while pathfinding
+    // PathConstraints constraints =
+    //     new PathConstraints(
+    //         JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
+    //         JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
+    //         JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
+    //         JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
+
+    // pathfindWarmupSpoofCommand =
+    //     AutoBuilder.pathfindToPose(
+    //         goalPose, constraints, JsonConstants.drivetrainConstants.otfPoseEndingVelocity);
+
+    // pathfindWarmupSpoofCommand.schedule();
+
+    // // Manually call execute because the 1st execute seems to take 0.9 seconds in auto
+    // pathfindWarmupSpoofCommand.execute();
+
     angleController.enableContinuousInput(-Math.PI, Math.PI);
     // Configure SysId
     sysId =
@@ -324,34 +384,13 @@ public class Drive implements DriveTemplate {
     stateMachine = new StateMachine<>(stateMachineConfiguration, DriveState.Joystick);
   }
 
-  /** add algae coral stack obstacles for on the fly */
   public void autonomousInit() {
-    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-      localADStar.setDynamicObstacles(
-          List.of(
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.redFieldLocations.coralAlgaeStackLeftTopCorner,
-                  JsonConstants.redFieldLocations.coralAlgaeStackLeftBottomCorner),
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleTopCorner,
-                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleBottomCorner),
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.redFieldLocations.coralAlgaeStackRightTopCorner,
-                  JsonConstants.redFieldLocations.coralAlgaeStackRightBottomCorner)),
-          getPose().getTranslation());
-    } else {
-      localADStar.setDynamicObstacles(
-          List.of(
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftTopCorner,
-                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftBottomCorner),
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleTopCorner,
-                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleBottomCorner),
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.blueFieldLocations.coralAlgaeStackRightTopCorner,
-                  JsonConstants.blueFieldLocations.coralAlgaeStackRightBottomCorner)),
-          getPose().getTranslation());
+    // if (pathfindWarmupSpoofCommand != null && pathfindWarmupSpoofCommand.isScheduled()) {
+    //   pathfindWarmupSpoofCommand.cancel();
+    // }
+
+    if (warmupCommand != null && warmupCommand.isScheduled()) {
+      warmupCommand.cancel();
     }
   }
 
@@ -446,6 +485,12 @@ public class Drive implements DriveTemplate {
 
     Logger.recordOutput("Drive/goToIntake", goToIntake);
     Logger.recordOutput("Drive/driveLinedUp", driveLinedUp);
+  }
+
+  public void disabledPeriodic() {
+    if (warmupCommand != null) {
+      Logger.recordOutput("Drive/warmupScheduled", warmupCommand.isScheduled());
+    }
   }
 
   /**
