@@ -63,7 +63,7 @@ public class ClimbIOTalonFX implements ClimbIO {
 
     // HITL CODE: leadMotor = new TalonFX(6, "rio");
 
-    leadMotor = new TalonFX(ClimbConstants.synced.getObject().leadClimbMotorId, "rio");
+    leadMotor = new TalonFX(ClimbConstants.synced.getObject().leadClimbMotorId, "canivore");
     followerMotor = new TalonFX(ClimbConstants.synced.getObject().followerClimbMotorId, "canivore");
 
     followerMotor.setControl(
