@@ -120,7 +120,7 @@ public class ClimbIOTalonFX implements ClimbIO {
 
   @Override
   public void applyOutputs(ClimbOutputs outputs) {
-    if (goalAngle.lt(climbAngleCoder.getAbsolutePosition().getValue())) {
+    if (goalAngle.lt(climbAngleCandi.getPWM1Position().getValue())) {
       calculator.withPosition(goalAngle.in(Rotations)).withFeedForward(feedforward);
     } else {
       calculator.withPosition(goalAngle.in(Rotations)).withFeedForward(0.0);
