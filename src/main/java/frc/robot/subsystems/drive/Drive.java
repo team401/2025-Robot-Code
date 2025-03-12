@@ -456,7 +456,16 @@ public class Drive implements DriveTemplate {
    *     control), false for auto (robot centric)
    */
   public void setGoalSpeeds(ChassisSpeeds speeds, boolean fieldCentric) {
-    if (fieldCentric && stateMachine.inState(DriveState.Joystick)) {
+    // if we are in lineup, but field centric speeds are passed in that means joysticks are moving
+    // and we should cancel lineup
+    if (fieldCentric
+        && (stateMachine.inState(DriveState.Joystick) || stateMachine.inState(DriveState.Lineup))) {
+      if (stateMachine.inState(DriveState.Lineup)
+          && (speeds.vxMetersPerSecond > 0
+              || speeds.vyMetersPerSecond > 0
+              || speeds.omegaRadiansPerSecond > 0)) {
+        this.fireTrigger(DriveTrigger.CancelLineup);
+      }
       // Adjust for field-centric control
       boolean isFlipped =
           DriverStation.getAlliance().isPresent()
