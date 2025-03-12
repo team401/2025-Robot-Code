@@ -2,7 +2,7 @@ package frc.robot.subsystems.climb;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.sim.CANcoderSimState;
+import com.ctre.phoenix6.sim.CANdiSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.RobotController;
@@ -13,8 +13,9 @@ import org.littletonrobotics.junction.Logger;
 public class ClimbIOSim extends ClimbIOTalonFX {
 
   TalonFXSimState leadMotorSimState = leadMotor.getSimState();
-  TalonFXSimState followerMotorSimState = followerMotor.getSimState();
-  CANcoderSimState climbEncoderSimState = climbAngleCoder.getSimState();
+  // TalonFXSimState followerMotorSimState = followerMotor.getSimState();
+  // CANcoderSimState climbEncoderSimState = climbAngleCoder.getSimState();
+  CANdiSimState climbEncoderSimState = climbAngleCandi.getSimState();
 
   private SingleJointedArmSim climb =
       new SingleJointedArmSim(
@@ -42,13 +43,13 @@ public class ClimbIOSim extends ClimbIOTalonFX {
         RadiansPerSecond.of(climb.getVelocityRadPerSec()).times(25.0));
     leadMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
 
-    followerMotorSimState.setRawRotorPosition(Radians.of(climb.getAngleRads()).times(25.0));
+    /*followerMotorSimState.setRawRotorPosition(Radians.of(climb.getAngleRads()).times(25.0));
     followerMotorSimState.setRotorVelocity(
         RadiansPerSecond.of(climb.getVelocityRadPerSec()).times(25.0));
-    followerMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
+    followerMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());*/
 
-    climbEncoderSimState.setRawPosition(Radians.of(climb.getAngleRads()));
-    climbEncoderSimState.setVelocity(RadiansPerSecond.of(climb.getVelocityRadPerSec()));
+    climbEncoderSimState.setPwm1Position(Radians.of(climb.getAngleRads()));
+    climbEncoderSimState.setPwm1Velocity(RadiansPerSecond.of(climb.getVelocityRadPerSec()));
 
     climb.setInputVoltage(leadMotorSimState.getMotorVoltage());
     climb.update(0.02);

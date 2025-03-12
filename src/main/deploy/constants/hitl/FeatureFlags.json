@@ -2,7 +2,7 @@
   "runDrive": false,
   "runVision": false,
   "runScoring": false,
-  "runClimb": false,
+  "runClimb": true,
   "runRamp": false,
-  "runLEDs": true
+  "runLEDs": false
 }

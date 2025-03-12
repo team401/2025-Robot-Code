@@ -4,15 +4,16 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.configs.CANdiConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.PWM1Configs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -22,16 +23,19 @@ import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.ClimbConstants;
 import frc.robot.constants.JsonConstants;
+import frc.robot.util.PhoenixUtil;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class ClimbIOTalonFX implements ClimbIO {
 
-  TalonFX leadMotor;
-  TalonFX followerMotor;
-  CANcoder climbAngleCoder;
+  protected final TalonFX leadMotor;
+  // protected final TalonFX followerMotor;
+  // protected final CANcoder climbAngleCoder;
+  protected final CANdi climbAngleCandi;
 
   TalonFXConfiguration talonFXConfigs;
+  CANdiConfiguration candiConfig;
 
   // TODO: replace when sensors become available - apparently this is not happening actually but
   // leaving this in case a better solution happens later
@@ -46,20 +50,31 @@ public class ClimbIOTalonFX implements ClimbIO {
       new MotionMagicVoltage(ClimbConstants.synced.getObject().restingAngle);
 
   public ClimbIOTalonFX() {
-    leadMotor = new TalonFX(16, "canivore");
-    followerMotor = new TalonFX(17, "canivore");
-    climbAngleCoder = new CANcoder(17, "canivore");
 
-    followerMotor.setControl(
-        new Follower(
-            leadMotor.getDeviceID(), ClimbConstants.synced.getObject().invertFollowerClimbMotor));
+    candiConfig =
+        new CANdiConfiguration()
+            .withPWM1(
+                new PWM1Configs()
+                    .withAbsoluteSensorOffset(Radians.of(0))
+                    .withAbsoluteSensorDiscontinuityPoint(0.5)
+                    .withSensorDirection(true));
+    climbAngleCandi = new CANdi(0);
+    PhoenixUtil.tryUntilOk(1000, () -> climbAngleCandi.getConfigurator().apply(candiConfig));
+
+    leadMotor = new TalonFX(6, "rio");
+    // followerMotor = new TalonFX(17, "canivore");
+    // climbAngleCoder = new CANcoder(17, "canivore");
+
+    /*followerMotor.setControl(
+    new Follower(
+        leadMotor.getDeviceID(), ClimbConstants.synced.getObject().invertFollowerClimbMotor));*/
 
     talonFXConfigs =
         new TalonFXConfiguration()
             .withFeedback(
                 new FeedbackConfigs()
-                    .withFeedbackRemoteSensorID(climbAngleCoder.getDeviceID())
-                    .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder))
+                    .withFeedbackRemoteSensorID(climbAngleCandi.getDeviceID())
+                    .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANdiPWM1))
             .withMotorOutput(
                 new MotorOutputConfigs()
                     .withNeutralMode(NeutralModeValue.Brake)
@@ -83,7 +98,7 @@ public class ClimbIOTalonFX implements ClimbIO {
                     .withMotionMagicCruiseVelocity(5));
 
     leadMotor.getConfigurator().apply(talonFXConfigs);
-    followerMotor.getConfigurator().apply(talonFXConfigs);
+    // followerMotor.getConfigurator().apply(talonFXConfigs);
 
     // TODO: set lockedToCage when ramp becomes available
   }
@@ -93,7 +108,7 @@ public class ClimbIOTalonFX implements ClimbIO {
 
     inputs.lockedToCage = this.lockedToCage.getAsBoolean();
     inputs.goalAngle.mut_replace(goalAngle);
-    inputs.motorAngle.mut_replace(climbAngleCoder.getAbsolutePosition().getValue());
+    inputs.motorAngle.mut_replace(climbAngleCandi.getPWM1Position().getValue());
   }
 
   @Override
@@ -132,16 +147,16 @@ public class ClimbIOTalonFX implements ClimbIO {
       leadMotor
           .getConfigurator()
           .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Brake));
-      followerMotor
-          .getConfigurator()
-          .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Brake));
+      /*followerMotor
+      .getConfigurator()
+      .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Brake));*/
     } else {
       leadMotor
           .getConfigurator()
           .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Coast));
-      followerMotor
-          .getConfigurator()
-          .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Coast));
+      /*followerMotor
+      .getConfigurator()
+      .apply(talonFXConfigs.MotorOutput.withNeutralMode(NeutralModeValue.Coast));*/
     }
   }
 
@@ -154,7 +169,7 @@ public class ClimbIOTalonFX implements ClimbIO {
     configs.kD = d;
 
     leadMotor.getConfigurator().apply(configs);
-    followerMotor.getConfigurator().apply(configs);
+    // followerMotor.getConfigurator().apply(configs);
   }
 
   @Override
@@ -167,6 +182,6 @@ public class ClimbIOTalonFX implements ClimbIO {
     configs.kG = kG;
 
     leadMotor.getConfigurator().apply(configs);
-    followerMotor.getConfigurator().apply(configs);
+    // followerMotor.getConfigurator().apply(configs);
   }
 }
