@@ -39,7 +39,6 @@ public class RampConstants {
   public final Double autoHomePositionHigh = 2.0;
   public final Double autoHomePositionLow = -0.1;
 
-
   // Voltages
   public final Double intakeVoltage = -3.0;
   public final Double intakeHoldVoltage = -1.0;
@@ -58,5 +57,4 @@ public class RampConstants {
   public final Boolean inverted = false;
   public final Integer motorId = 1;
   public final Double positionRange = 0.05;
-
 }

@@ -1,10 +1,9 @@
 package frc.robot.subsystems.ramp;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.constants.JsonConstants;
 
@@ -21,8 +20,8 @@ public class RampIOSim implements RampIO {
   private final double jKgMetersSquared = 0.01906254;
   private final double armLengthMeters = Inches.of(24.938).in(Meters);
   private final double minAngleRads = 0;
-  private final double maxAngleRads = Math.PI;
-  private final double startingRads = 0.5 * Math.PI;
+  private final double maxAngleRads = 4.8;
+  private final double startingRads = 0.0;
   private final boolean simulateGravity = true;
 
   public double angle_offset = 0.0;

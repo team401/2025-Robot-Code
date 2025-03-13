@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.ramp.RampSubsystem.RampStates;
 import frc.robot.subsystems.ramp.states.ClimbState;
+import frc.robot.subsystems.ramp.states.ExtendingState;
 import frc.robot.subsystems.ramp.states.HomingState;
 import frc.robot.subsystems.ramp.states.IdleState;
 import frc.robot.subsystems.ramp.states.IntakeState;
@@ -26,7 +27,7 @@ public class RampSubsystem extends SubsystemBase {
     IDLE(new IdleState()),
     CLIMB_POSITION(new ClimbState()),
     INTAKE_POSITION(new IntakeState()),
-    EXTENDING(null),
+    EXTENDING(new ExtendingState()),
     CLIMB_TO_INTAKE_HOMING(new HomingState()),
     STARTUP_HOMING(new HomingState()),
     HOMING(new HomingState());
@@ -81,6 +82,8 @@ public class RampSubsystem extends SubsystemBase {
         .permit(RampTriggers.RETURN_TO_IDLE, RampStates.IDLE)
         .permit(RampTriggers.INTAKE, RampStates.CLIMB_TO_INTAKE_HOMING);
 
+    config.configure(RampStates.HOMING).permit(RampTriggers.HOMING_FINISHED, RampStates.IDLE);
+
     config
         .configure(RampStates.STARTUP_HOMING)
         .permit(RampTriggers.HOMING_FINISHED, RampStates.EXTENDING);
@@ -93,7 +96,7 @@ public class RampSubsystem extends SubsystemBase {
         .permit(RampTriggers.RETURN_TO_IDLE, RampStates.IDLE)
         .permit(RampTriggers.HOME, RampStates.HOMING);
 
-    stateMachine = new StateMachine<>(config, RampStates.HOMING);
+    stateMachine = new StateMachine<>(config, RampStates.STARTUP_HOMING);
 
     stateMachine.getCurrentState().getState().onEntry(null);
 
