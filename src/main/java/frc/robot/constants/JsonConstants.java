@@ -43,6 +43,15 @@ public class JsonConstants {
     blueFieldLocations = BlueFieldLocations.synced.getObject();
     drivetrainConstants = DrivetrainConstants.synced.getObject();
     visionConstants = VisionConstants.synced.getObject();
+
+    try {
+      scoringSetpoints.fillVariableL4WristMap();
+    } catch (Exception e) {
+      e.printStackTrace();
+      System.out.println(
+          "WARNING: L4 variable wrist map constants were incorrectly defined (different numbers of distances vs. angles), using L4 setpoint as placeholder map");
+      scoringSetpoints.fillPlaceholderL4WristMap();
+    }
   }
 
   public static ElevatorConstants elevatorConstants;

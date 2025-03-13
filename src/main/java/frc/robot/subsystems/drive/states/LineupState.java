@@ -463,6 +463,8 @@ public class LineupState implements PeriodicStateInterface {
     Logger.recordOutput("Drive/Lineup/CrossTrackDistanceFiltered", crossTrackDistanceFiltered);
     Logger.recordOutput("Drive/Lineup/IsObservationValid", observation.isValid());
 
+    drive.setLatestAlongTrackDistance(observation.alongTrackDistance());
+
     // give to PID Controllers and setGoalSpeeds (robotCentric)
     if (!lineupFinished()) {
       double vx =

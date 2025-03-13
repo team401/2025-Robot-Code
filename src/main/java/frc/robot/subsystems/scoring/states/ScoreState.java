@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import frc.robot.constants.JsonConstants;
-import frc.robot.constants.ScoringSetpoints;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
@@ -29,7 +28,7 @@ public class ScoreState implements PeriodicStateInterface {
       // elevator to shoot algae upward
       setpoint = JsonConstants.scoringSetpoints.net;
     } else {
-      setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getTarget());
+      setpoint = JsonConstants.scoringSetpoints.getWarmupSetpoint(scoringSubsystem.getTarget());
     }
 
     scoringSubsystem.setGoalSetpoint(setpoint);

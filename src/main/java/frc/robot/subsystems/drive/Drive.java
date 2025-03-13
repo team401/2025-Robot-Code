@@ -197,6 +197,9 @@ public class Drive implements DriveTemplate {
 
   private boolean driveLinedUp = false;
 
+  /** The last along track distance set by Lineup state (0.0 when not in lineup) */
+  private double latestAlongTrackDistance = 0.0;
+
   private enum DriveState implements StateContainer {
     Idle(new IdleState(instance)),
     OTF(new OTFState(instance)),
@@ -1013,6 +1016,14 @@ public class Drive implements DriveTemplate {
           DriveConfiguration.getInstance().BackRight.LocationX,
           DriveConfiguration.getInstance().BackRight.LocationY)
     };
+  }
+
+  public void setLatestAlongTrackDistance(double alongTrackDistance) {
+    this.latestAlongTrackDistance = alongTrackDistance;
+  }
+
+  public double getLatestAlongTrackDistance() {
+    return latestAlongTrackDistance;
   }
 
   @FunctionalInterface

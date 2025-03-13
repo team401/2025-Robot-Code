@@ -11,7 +11,6 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.constants.JsonConstants;
-import frc.robot.constants.ScoringSetpoints;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
@@ -44,7 +43,8 @@ public class WarmupState implements PeriodicStateInterface {
 
   @Override
   public void periodic() {
-    ScoringSetpoint setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getTarget());
+    ScoringSetpoint setpoint =
+        JsonConstants.scoringSetpoints.getWarmupSetpoint(scoringSubsystem.getTarget());
 
     scoringSubsystem.setGoalSetpoint(setpoint);
     scoringSubsystem.setClawRollerVoltage(Volts.zero());

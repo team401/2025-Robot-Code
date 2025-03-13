@@ -17,4 +17,6 @@ public class ScoringFeatureFlags {
   public final Boolean runElevator = true;
   public final Boolean runClaw = true;
   public final Boolean runWrist = true;
+
+  public final Boolean useVariableL4Setpoint = true;
 }
