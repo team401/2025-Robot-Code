@@ -73,13 +73,13 @@ public class ScoringSetpoints {
    * Combined with variableL4WristAngles, these form the interpolate double used for variable
    * distance L4 scoring
    */
-  public final Distance[] variableL4AlongTrackDistances = {Meters.of(0.0)};
+  public final Distance[] variableL4AlongTrackDistances = {Meters.of(0.1), Meters.of(0.0)};
 
   /**
    * Combined with variableL4AlongTrackDistances, these form the interpolate double used for
    * variable distance L4 scoring
    */
-  public final Angle[] variableL4WristAngles = {Rotations.of(0.09)};
+  public final Angle[] variableL4WristAngles = {Rotations.of(0.32), Rotations.of(0.09)};
 
   /** Maps along track distances (in meters) to wrist angles (in rotations) */
   public static InterpolateDouble variableL4WristMap;
