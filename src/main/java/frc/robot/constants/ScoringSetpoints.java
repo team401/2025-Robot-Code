@@ -85,7 +85,7 @@ public class ScoringSetpoints {
   public static InterpolateDouble variableL4WristMap;
 
   /** Keep track of a reference to the drive subsystem to access along track distance */
-  private Drive driveReference = null;
+  @JSONExclude private Drive driveReference = null;
 
   /**
    * Give the ScoringSetpoints instance a reference to the drivetrain, used to obtain along track

@@ -48,7 +48,8 @@ public class JsonConstants {
       scoringSetpoints.fillVariableL4WristMap();
     } catch (Exception e) {
       e.printStackTrace();
-      System.out.println("WARNING: L4 variable wrist map constants were incorrectly defined (different numbers of distances vs. angles), using L4 setpoint as placeholder map");
+      System.out.println(
+          "WARNING: L4 variable wrist map constants were incorrectly defined (different numbers of distances vs. angles), using L4 setpoint as placeholder map");
       scoringSetpoints.fillPlaceholderL4WristMap();
     }
   }
