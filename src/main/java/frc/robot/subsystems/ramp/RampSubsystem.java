@@ -11,7 +11,6 @@ import frc.robot.subsystems.ramp.RampSubsystem.RampStates;
 import frc.robot.subsystems.ramp.states.ClimbState;
 import frc.robot.subsystems.ramp.states.HomingState;
 import frc.robot.subsystems.ramp.states.IdleState;
-import frc.robot.subsystems.ramp.states.IntakeHoldState;
 import frc.robot.subsystems.ramp.states.IntakeState;
 import frc.robot.subsystems.ramp.states.RampState;
 import frc.robot.subsystems.ramp.states.RampState.RampTriggers;
@@ -25,10 +24,11 @@ public class RampSubsystem extends SubsystemBase {
 
   public enum RampStates implements StateContainer {
     IDLE(new IdleState()),
-    CLIMB(new ClimbState()),
-    INTAKE(new IntakeState()),
-    INTAKE_HOLD(new IntakeHoldState()),
+    CLIMB_POSITION(new ClimbState()),
+    INTAKE_POSITION(new IntakeState()),
+    EXTENDING(null),
     CLIMB_TO_INTAKE_HOMING(new HomingState()),
+    STARTUP_HOMING(new HomingState()),
     HOMING(new HomingState());
 
     private RampState state;
@@ -67,30 +67,31 @@ public class RampSubsystem extends SubsystemBase {
 
     config
         .configure(RampStates.IDLE)
-        .permit(RampTriggers.START_INTAKE, RampStates.INTAKE)
-        .permit(RampTriggers.START_CLIMB, RampStates.CLIMB)
-        .permit(RampTriggers.START_HOMING, RampStates.HOMING);
+        .permit(RampTriggers.INTAKE, RampStates.INTAKE_POSITION)
+        .permit(RampTriggers.CLIMB, RampStates.CLIMB_POSITION)
+        .permit(RampTriggers.HOME, RampStates.HOMING);
 
     config
-        .configure(RampStates.INTAKE)
-        .permit(RampTriggers.GOTO_IDLE, RampStates.IDLE)
-        .permit(RampTriggers.START_CLIMB, RampStates.CLIMB)
-        .permit(RampTriggers.HOLD_INTAKE, RampStates.INTAKE_HOLD);
+        .configure(RampStates.INTAKE_POSITION)
+        .permit(RampTriggers.RETURN_TO_IDLE, RampStates.IDLE)
+        .permit(RampTriggers.CLIMB, RampStates.CLIMB_POSITION);
 
     config
-        .configure(RampStates.INTAKE_HOLD)
-        .permit(RampTriggers.GOTO_IDLE, RampStates.IDLE)
-        .permit(RampTriggers.START_CLIMB, RampStates.CLIMB);
+        .configure(RampStates.CLIMB_POSITION)
+        .permit(RampTriggers.RETURN_TO_IDLE, RampStates.IDLE)
+        .permit(RampTriggers.INTAKE, RampStates.CLIMB_TO_INTAKE_HOMING);
 
     config
-        .configure(RampStates.CLIMB)
-        .permit(RampTriggers.GOTO_IDLE, RampStates.IDLE)
-        .permit(RampTriggers.START_INTAKE, RampStates.CLIMB_TO_INTAKE_HOMING);
+        .configure(RampStates.STARTUP_HOMING)
+        .permit(RampTriggers.HOMING_FINISHED, RampStates.EXTENDING);
 
-    config.configure(RampStates.HOMING).permit(RampTriggers.HOMED, RampStates.IDLE);
+    config.configure(RampStates.EXTENDING).permit(RampTriggers.HOME, RampStates.HOMING);
+
     config
         .configure(RampStates.CLIMB_TO_INTAKE_HOMING)
-        .permit(RampTriggers.HOMED, RampStates.INTAKE);
+        .permit(RampTriggers.HOMING_FINISHED, RampStates.INTAKE_POSITION)
+        .permit(RampTriggers.RETURN_TO_IDLE, RampStates.IDLE)
+        .permit(RampTriggers.HOME, RampStates.HOMING);
 
     stateMachine = new StateMachine<>(config, RampStates.HOMING);
 

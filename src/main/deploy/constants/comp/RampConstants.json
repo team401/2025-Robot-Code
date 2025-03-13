@@ -1,20 +1,26 @@
 {
-  "intakePosition": 0.0,
-  "climbPosition": 4.0,
   "motorId": 18,
+  "inverted": false,
+
   "positionRange": 0.2,
+
   "PID_TalonFX_P": 0.2,
   "PID_TalonFX_I": 0.0,
   "PID_TalonFX_D": 0.0,
   "PID_SIM_P": 5,
   "PID_SIM_I": 0.0,
   "PID_SIM_D": 0.0,
-  "inverted": false,
+
+  "intakePosition": 0.0,
+  "climbPosition": 4.0,
+  "extendPosition": 0.5,
+  "autoHomePositionHigh": 0.7,
+  "autoHomePositionLow": -0.05,
+  
   "intakeVoltage": -2.0,
   "intakeHoldVoltage": -1.0,
   "homingVoltage": -2.0,
   "climbVoltage": 1.5,
   "climbHoldVoltage": 0.5,
-  "autoHomePositionHigh": 0.7,
-  "autoHomePositionLow": -0.05
+  "extendingVoltage": 1.0
 }
