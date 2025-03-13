@@ -372,6 +372,12 @@ public class Drive implements DriveTemplate {
       setGoToIntake(false);
     }
 
+    // Reset alongtrack distance to zero if not in lineup to prevent scoring from getting stuck on a
+    // setpoint that's far away
+    if (stateMachine.getCurrentState() != DriveState.Lineup) {
+      setLatestAlongTrackDistance(0.0);
+    }
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
