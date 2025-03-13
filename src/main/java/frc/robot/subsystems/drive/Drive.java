@@ -238,6 +238,8 @@ public class Drive implements DriveTemplate {
 
   private LocalADStarAK localADStar = new LocalADStarAK();
 
+  private Command warmupCommand = PathfindingCommand.warmupCommand();
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -279,7 +281,36 @@ public class Drive implements DriveTemplate {
         });
 
     // warm up java processing for faster pathfind later
-    PathfindingCommand.warmupCommand().schedule();
+    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+      localADStar.setDynamicObstacles(
+          List.of(
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackLeftTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackLeftBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackRightTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackRightBottomCorner)),
+          getPose().getTranslation());
+    } else {
+      localADStar.setDynamicObstacles(
+          List.of(
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackRightTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackRightBottomCorner)),
+          getPose().getTranslation());
+    }
+
+    warmupCommand.schedule();
+
     angleController.enableContinuousInput(-Math.PI, Math.PI);
     // Configure SysId
     sysId =
@@ -327,34 +358,10 @@ public class Drive implements DriveTemplate {
     stateMachine = new StateMachine<>(stateMachineConfiguration, DriveState.Joystick);
   }
 
-  /** add algae coral stack obstacles for on the fly */
   public void autonomousInit() {
-    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-      localADStar.setDynamicObstacles(
-          List.of(
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.redFieldLocations.coralAlgaeStackLeftTopCorner,
-                  JsonConstants.redFieldLocations.coralAlgaeStackLeftBottomCorner),
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleTopCorner,
-                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleBottomCorner),
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.redFieldLocations.coralAlgaeStackRightTopCorner,
-                  JsonConstants.redFieldLocations.coralAlgaeStackRightBottomCorner)),
-          getPose().getTranslation());
-    } else {
-      localADStar.setDynamicObstacles(
-          List.of(
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftTopCorner,
-                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftBottomCorner),
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleTopCorner,
-                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleBottomCorner),
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.blueFieldLocations.coralAlgaeStackRightTopCorner,
-                  JsonConstants.blueFieldLocations.coralAlgaeStackRightBottomCorner)),
-          getPose().getTranslation());
+
+    if (warmupCommand != null && warmupCommand.isScheduled()) {
+      warmupCommand.cancel();
     }
   }
 
@@ -455,6 +462,12 @@ public class Drive implements DriveTemplate {
 
     Logger.recordOutput("Drive/goToIntake", goToIntake);
     Logger.recordOutput("Drive/driveLinedUp", driveLinedUp);
+  }
+
+  public void disabledPeriodic() {
+    if (warmupCommand != null) {
+      Logger.recordOutput("Drive/warmupScheduled", warmupCommand.isScheduled());
+    }
   }
 
   /**

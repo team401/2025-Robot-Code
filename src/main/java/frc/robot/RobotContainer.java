@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.StrategyManager.AutonomyMode;
 import frc.robot.commands.drive.AkitDriveCommands;
 import frc.robot.constants.AutoStrategy;
 import frc.robot.constants.AutoStrategyContainer;
@@ -207,10 +206,14 @@ public class RobotContainer {
       if (FeatureFlags.synced.getObject().runDrive) {
         scoringSubsystem.setIsDriveLinedUpSupplier(
             () -> {
-              if (strategyManager.getAutonomyMode() != AutonomyMode.Manual) {
-                return drive.isDriveAlignmentFinished();
-              } else {
-                return InitBindings.isManualScorePressed();
+              switch (strategyManager.getAutonomyMode()) {
+                case Manual:
+                  return InitBindings.isManualScorePressed();
+                case Mixed:
+                  return drive.isDriveAlignmentFinished() || InitBindings.isManualScorePressed();
+                case Full:
+                default:
+                  return drive.isDriveAlignmentFinished();
               }
             });
         scoringSubsystem.setReefDistanceSupplier(
@@ -280,10 +283,10 @@ public class RobotContainer {
   public void autonomousInit() {
     drive.autonomousInit();
 
-    setSubsystemsToBrake();
-    if (FeatureFlags.synced.getObject().runLEDs) {
-      led.setLedOn(true);
-    }
+    // setSubsystemsToBrake();
+    // if (FeatureFlags.synced.getObject().runLEDs) {
+    //   led.setLedOn(true);
+    // }
 
     // load chosen strategy
     strategyManager.autonomousInit(autoChooser.getSelected());
@@ -382,10 +385,17 @@ public class RobotContainer {
     strategyManager.logActions();
     checkSwitchForDisabled();
     checkLedSwitch();
+
+    Logger.recordOutput("Switches/brake", brakeSwitch.get());
+    Logger.recordOutput("Switches/led", ledSwitch.get());
   }
 
   public void disabledInit() {
     CommandScheduler.getInstance().cancelAll();
+
+    if (FeatureFlags.synced.getObject().runClimb) {
+      climbSubsystem.setBrakeMode(true);
+    }
   }
 
   public void updateMapleSim() {

@@ -211,4 +211,8 @@ public class ClimbSubsystem extends SubsystemBase {
         break;
     }
   }
+
+  public void setFeedforward(double newFF) {
+    io.setFF(newFF);
+  }
 }

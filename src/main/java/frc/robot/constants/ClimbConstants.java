@@ -40,6 +40,8 @@ public class ClimbConstants {
   public final InvertedValue climbInvertValue = InvertedValue.Clockwise_Positive;
   public final Boolean invertFollowerClimbMotor = true;
 
+  public final Double climbFFVolts = -10.0;
+
   public static final class Sim {
     @JSONExclude
     public static final JSONSync<ClimbConstants.Sim> synced =
