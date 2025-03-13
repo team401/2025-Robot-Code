@@ -79,12 +79,12 @@
       "axisCount": 2,
       "buttonCount": 6,
       "buttonKeys": [
-        260,
-        268,
-        266,
-        261,
-        269,
-        267
+        49,
+        50,
+        51,
+        52,
+        53,
+        54
       ],
       "povCount": 0
     },
@@ -100,6 +100,9 @@
     },
     {
       "guid": "Keyboard1"
+    },
+    {
+      "guid": "Keyboard2"
     }
   ]
 }
