@@ -1041,6 +1041,7 @@ public class Drive implements DriveTemplate {
     this.latestAlongTrackDistance = alongTrackDistance;
   }
 
+  @AutoLogOutput(key = "Drive/latestAlongTrackDistance")
   public double getLatestAlongTrackDistance() {
     return latestAlongTrackDistance;
   }
