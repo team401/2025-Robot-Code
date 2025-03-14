@@ -53,9 +53,9 @@ public final class InitBindings {
                 () -> {
                   switch (strategyManager.getAutonomyMode()) {
                     case Full:
-                      // If a binding is used in full autonomy, switch to mixed autonomy
-                      strategyManager.setAutonomyMode(AutonomyMode.Mixed);
-                      // And then fall through to the mixed autonomy behavior (no break here is
+                      // If a binding is used in full autonomy, switch to smart autonomy
+                      strategyManager.setAutonomyMode(AutonomyMode.Smart);
+                      // And then fall through to the smart autonomy behavior (no break here is
                       // intentional)
                     case Smart:
                       // When the scoring trigger is pulled in smart autonomy, select the closest
@@ -87,8 +87,9 @@ public final class InitBindings {
                   switch (strategyManager.getAutonomyMode()) {
                     case Full:
                       // If a binding is used in full autonomy, switch to mixed autonomy
-                      strategyManager.setAutonomyMode(AutonomyMode.Mixed);
-                      // And then fall through to the mixed autonomy behavior (no break here is
+                      strategyManager.setAutonomyMode(AutonomyMode.Smart);
+                      // And then fall through to the smart/mixed autonomy behavior (no break here
+                      // is
                       // intentional)
                     case Smart:
                     case Mixed:
@@ -164,6 +165,9 @@ public final class InitBindings {
                       strategyManager.setAutonomyMode(AutonomyMode.Mixed);
                       // And then fall through to the mixed autonomy behavior (no break here is
                       // intentional)
+                    case Smart:
+                      // Smart does the same as mixed
+                      // TODO: Design what Smart autonomy will do for intaking
                     case Mixed:
                       // Start auto align if in mixed autonomy
                       drive.setGoToIntake(true);
@@ -188,6 +192,7 @@ public final class InitBindings {
                       strategyManager.setAutonomyMode(AutonomyMode.Mixed);
                       // And then fall through to the mixed autonomy behavior (no break here is
                       // intentional)
+                    case Smart:
                     case Mixed:
                     case Manual:
                       // Cancel auto align if in mixed autonomy

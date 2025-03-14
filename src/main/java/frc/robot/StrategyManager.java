@@ -359,6 +359,9 @@ public class StrategyManager {
       case Full:
         autonomyPublisher.accept("high");
         break;
+      case Smart:
+        autonomyPublisher.accept("smart");
+        break;
       case Mixed:
         autonomyPublisher.accept("mid");
         break;
@@ -393,7 +396,7 @@ public class StrategyManager {
    * values
    */
   public void teleopInit() {
-    this.setAutonomyMode(AutonomyMode.Mixed);
+    this.setAutonomyMode(AutonomyMode.Smart);
 
     this.clearActions();
 
