@@ -10,13 +10,11 @@
   "PID_SIM_D": 0.0,
   "intakePosition": 0.0,
   "climbPosition": 4.0,
-  "extendPosition": 1.0,
   "autoHomePositionHigh": 0.7,
   "autoHomePositionLow": -0.05,
   "intakeVoltage": -2.0,
   "intakeHoldVoltage": -1.0,
   "homingVoltage": -2.0,
   "climbVoltage": 1.5,
-  "climbHoldVoltage": 0.5,
-  "extendingVoltage": 1.0
+  "climbHoldVoltage": 0.5
 }
