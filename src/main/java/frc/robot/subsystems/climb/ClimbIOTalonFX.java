@@ -123,7 +123,7 @@ public class ClimbIOTalonFX implements ClimbIO {
       configs.kP = ClimbConstants.synced.getObject().climbkP;
     }*/
 
-    calculator.withPosition(goalAngle.in(Rotations));//.withSlot(configs);
+    calculator.withPosition(goalAngle.in(Rotations)); // .withSlot(configs);
 
     Logger.recordOutput("climb/calculatorAngle", leadMotor.getPosition().getValueAsDouble());
 
