@@ -9,7 +9,7 @@ public class IdleState extends RampState {
   public void periodic() {
     if (mechanism.inputs.position >= JsonConstants.rampConstants.autoHomePositionHigh
         || mechanism.inputs.position <= JsonConstants.rampConstants.autoHomePositionLow) {
-      fireTrigger.accept(RampTriggers.START_HOMING);
+      fireTrigger.accept(RampTriggers.HOME);
     } else {
       setVoltage(0.0);
     }

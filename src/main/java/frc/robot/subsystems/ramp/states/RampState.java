@@ -8,12 +8,11 @@ import java.util.function.Consumer;
 public abstract class RampState implements PeriodicStateInterface {
 
   public enum RampTriggers {
-    GOTO_IDLE,
-    START_INTAKE,
-    HOLD_INTAKE,
-    START_CLIMB,
-    HOMED,
-    START_HOMING
+    RETURN_TO_IDLE,
+    INTAKE,
+    CLIMB,
+    HOME,
+    HOMING_FINISHED
   }
 
   protected static RampMechanism mechanism;
