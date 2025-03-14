@@ -462,6 +462,24 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * sets the location to the reef pole directly next to current NOTE: this will not change sides of
+   * reef (stays on one side of hexagon)
+   */
+  public void sidestepReefLocation() {
+    int reefIndex = getDesiredLocationIndex();
+    if (reefIndex > 11 || reefIndex < 0) {
+      // not a reef location
+      return;
+    }
+
+    if (reefIndex % 2 == 0) {
+      desiredLocation = locationArray[reefIndex + 1];
+    } else {
+      desiredLocation = locationArray[reefIndex - 1];
+    }
+  }
+
+  /**
    * sets desired speeds of robot
    *
    * @param speeds - desired speeds of robot
