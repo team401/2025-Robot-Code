@@ -58,7 +58,7 @@ public class ClimbIOTalonFX implements ClimbIO {
                     .withAbsoluteSensorOffset(Radians.of(0))
                     .withAbsoluteSensorDiscontinuityPoint(0.5)
                     .withSensorDirection(true));
-    climbAngleCandi = new CANdi(ClimbConstants.synced.getObject().canDiID);
+    climbAngleCandi = new CANdi(ClimbConstants.synced.getObject().canDiID, "canivore");
     PhoenixUtil.tryUntilOk(1000, () -> climbAngleCandi.getConfigurator().apply(candiConfig));
 
     // HITL CODE: leadMotor = new TalonFX(6, "rio");
