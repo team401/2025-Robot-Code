@@ -112,19 +112,18 @@ public class ClimbIOTalonFX implements ClimbIO {
     inputs.motorAngle.mut_replace(climbAngleCandi.getPWM1Position().getValue());
   }
 
-  private double feedforward = 0.0;
-
-  public void setFF(double newFF) {
-    this.feedforward = newFF;
-  }
-
   @Override
   public void applyOutputs(ClimbOutputs outputs) {
+
+    /*Slot0Configs configs = talonFXConfigs.Slot0;
+
     if (goalAngle.lt(climbAngleCandi.getPWM1Position().getValue())) {
-      calculator.withPosition(goalAngle.in(Rotations)).withFeedForward(feedforward);
+      configs.kP = ClimbConstants.synced.getObject().climbkPInc;
     } else {
-      calculator.withPosition(goalAngle.in(Rotations)).withFeedForward(0.0);
-    }
+      configs.kP = ClimbConstants.synced.getObject().climbkP;
+    }*/
+
+    calculator.withPosition(goalAngle.in(Rotations));//.withSlot(configs);
 
     Logger.recordOutput("climb/calculatorAngle", leadMotor.getPosition().getValueAsDouble());
 

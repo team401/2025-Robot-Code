@@ -2,6 +2,7 @@ package frc.robot.subsystems.climb.states;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import frc.robot.constants.ClimbConstants;
+import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 
 public class LiftingState implements PeriodicStateInterface {
