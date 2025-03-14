@@ -6,61 +6,103 @@
   "blueReefCenterRotation": {
     "radians": 0.0
   },
-  "blueReef01Translation": {
+  "blueReefOTF0Translation": {
     "x": 6.56,
     "y": 4.0
   },
-  "blueReef01Rotation": {
+  "blueReefOTF0Rotation": {
     "radians": -3.141592653589793
   },
-  "blueReef23Translation": {
+  "blueReefOTF1Translation": {
+    "x": 6.56,
+    "y": 4.0
+  },
+  "blueReefOTF1Rotation": {
+    "radians": -3.141592653589793
+  },
+  "blueReefOTF2Translation": {
     "x": 5.5,
     "y": 2.3
   },
-  "blueReef23Rotation": {
+  "blueReefOTF2Rotation": {
     "radians": 2.0943951023931953
   },
-  "blueReef45Translation": {
+  "blueReefOTF3Translation": {
+    "x": 5.5,
+    "y": 2.3
+  },
+  "blueReefOTF3Rotation": {
+    "radians": 2.0943951023931953
+  },
+  "blueReefOTF4Translation": {
     "x": 3.5,
     "y": 2.5
   },
-  "blueReef45Rotation": {
+  "blueReefOTF4Rotation": {
     "radians": 1.0471975511965976
   },
-  "blueReef67Translation": {
+  "blueReefOTF5Translation": {
+    "x": 3.5,
+    "y": 2.5
+  },
+  "blueReefOTF5Rotation": {
+    "radians": 1.0471975511965976
+  },
+  "blueReefOTF6Translation": {
     "x": 2.64,
     "y": 4.0
   },
-  "blueReef67Rotation": {
+  "blueReefOTF6Rotation": {
     "radians": 0.0
   },
-  "blueReef89Translation": {
+  "blueReefOTF7Translation": {
+    "x": 2.64,
+    "y": 4.0
+  },
+  "blueReefOTF7Rotation": {
+    "radians": 0.0
+  },
+  "blueReefOTF8Translation": {
     "x": 3.5,
     "y": 5.6
   },
-  "blueReef89Rotation": {
+  "blueReefOTF8Rotation": {
     "radians": -1.0471975511965976
   },
-  "blueReef1011Translation": {
+  "blueReefOTF9Translation": {
+    "x": 3.5,
+    "y": 5.6
+  },
+  "blueReefOTF9Rotation": {
+    "radians": -1.0471975511965976
+  },
+  "blueReefOTF10Translation": {
     "x": 5.5,
     "y": 5.6
   },
-  "blueReef1011Rotation": {
+  "blueReefOTF10Rotation": {
+    "radians": -2.0943951023931953
+  },
+  "blueReefOTF11Translation": {
+    "x": 5.5,
+    "y": 5.6
+  },
+  "blueReefOTF11Rotation": {
     "radians": -2.0943951023931953
   },
   "blueCoralStationRightTranslation": {
-    "x": 1.55,
-    "y": 0.7
+    "x": 1.3,
+    "y": 1.0
   },
   "blueCoralStationRightRotation": {
-    "radians": 1.0035
+    "radians": 1.0471975511965976
   },
   "blueCoralStationLeftTranslation": {
-    "x": 1.55,
-    "y": 7.3
+    "x": 1.2,
+    "y": 7.0
   },
   "blueCoralStationLeftRotation": {
-    "radians": -1.0035
+    "radians": -1.0471975511965976
   },
   "coralAlgaeStackLeftTopCorner": {
     "x": 1.45,
