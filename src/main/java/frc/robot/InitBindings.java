@@ -3,6 +3,8 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.wpilib_interface.DriveWithJoysticks;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -12,6 +14,7 @@ import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem.ClimbAction;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.drive.ReefLineupUtil;
 import frc.robot.subsystems.ramp.RampSubsystem;
@@ -58,10 +61,19 @@ public final class InitBindings {
                       // And then fall through to the smart autonomy behavior (no break here is
                       // intentional)
                     case Smart:
+                      if (ScoringSubsystem.getInstance() != null) {
+                        // Update scoring locations (drive and scoring subsystems) from snakescreen
+                        // This is required here because it doesn't happen in periodic in Smart mode
+                        // to avoid undoing the auto algae height selector
+                        // The drive location is immediately overwritten below
+                        strategyManager.updateScoringLocationsFromSnakeScreen();
+                      }
+
                       // When the scoring trigger is pulled in smart autonomy, select the closest
                       // reef pole to score on
                       drive.setDesiredLocation(
                           ReefLineupUtil.getClosestReefLocation(drive.getPose()));
+
                       // Then fall through to scheduling OTF like in mixed autonomy (no break here
                       // is intentional)
                     case Mixed:
@@ -166,8 +178,31 @@ public final class InitBindings {
                       // And then fall through to the mixed autonomy behavior (no break here is
                       // intentional)
                     case Smart:
-                      // Smart does the same as mixed
-                      // TODO: Design what Smart autonomy will do for intaking
+                      // If in algae mode, automatically set level and pick nearest algae location
+                      if (ScoringSubsystem.getInstance() == null
+                          || ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Algae) {
+                        DesiredLocation desiredLocation =
+                            ReefLineupUtil.getClosestAlgaeLocation(drive.getPose());
+                        drive.setDesiredLocation(desiredLocation);
+
+                        // Set algae level automatically
+                        if (ScoringSubsystem.getInstance() != null) {
+                          ScoringSubsystem.getInstance()
+                              .setTarget(
+                                  ReefLineupUtil.getAlgaeLevelFromDesiredLocation(desiredLocation));
+                        }
+                      } else {
+                        if (DriverStation.getAlliance().isPresent()
+                            && DriverStation.getAlliance().get() == Alliance.Red) {
+                          drive.setDesiredLocation(
+                              JsonConstants.redFieldLocations.getClosestCoralStation(
+                                  drive.getPose()));
+                        } else {
+                          drive.setDesiredLocation(
+                              JsonConstants.blueFieldLocations.getClosestCoralStation(
+                                  drive.getPose()));
+                        }
+                      }
                     case Mixed:
                       // Start auto align if in mixed autonomy
                       drive.setGoToIntake(true);

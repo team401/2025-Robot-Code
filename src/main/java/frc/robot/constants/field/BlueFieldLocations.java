@@ -2,6 +2,7 @@ package frc.robot.constants.field;
 
 import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
@@ -27,11 +28,15 @@ public class BlueFieldLocations {
   public Translation2d blueReef0Translation = new Translation2d(5.285, 4.186);
   public Translation2d blueReef1Translation = new Translation2d(5.285, 3.861);
 
+  public Translation2d blueAlgae0Translation = new Translation2d(5.167, 4.018);
+
   public Translation2d blueReef23Translation = new Translation2d(5.5, 2.3);
   public Rotation2d blueReef23Rotation = new Rotation2d(Math.toRadians(120));
 
   public Translation2d blueReef2Translation = new Translation2d(5.024, 3.408);
   public Translation2d blueReef3Translation = new Translation2d(4.742, 3.241);
+
+  public Translation2d blueAlgae1Translation = new Translation2d(4.825, 3.442);
 
   public Translation2d blueReef45Translation = new Translation2d(3.5, 2.5);
   public Rotation2d blueReef45Rotation = new Rotation2d(Math.toRadians(60));
@@ -39,11 +44,15 @@ public class BlueFieldLocations {
   public Translation2d blueReef4Translation = new Translation2d(4.252, 3.264);
   public Translation2d blueReef5Translation = new Translation2d(3.952, 3.389);
 
+  public Translation2d blueAlgae2Translation = new Translation2d(4.15, 3.434);
+
   public Translation2d blueReef67Translation = new Translation2d(2.64, 4);
   public Rotation2d blueReef67Rotation = new Rotation2d(Math.toRadians(0));
 
   public Translation2d blueReef6Translation = new Translation2d(3.637, 3.859);
   public Translation2d blueReef7Translation = new Translation2d(3.637, 4.186);
+
+  public Translation2d blueAlgae3Translation = new Translation2d(3.82, 4.023);
 
   public Translation2d blueReef89Translation = new Translation2d(3.5, 5.6);
   public Rotation2d blueReef89Rotation = new Rotation2d(Math.toRadians(-60));
@@ -51,11 +60,15 @@ public class BlueFieldLocations {
   public Translation2d blueReef8Translation = new Translation2d(3.936, 4.635);
   public Translation2d blueReef9Translation = new Translation2d(4.245, 4.813);
 
+  public Translation2d blueAlgae4Translation = new Translation2d(4.124, 4.613);
+
   public Translation2d blueReef1011Translation = new Translation2d(5.5, 5.6);
   public Rotation2d blueReef1011Rotation = new Rotation2d(Math.toRadians(-120));
 
   public Translation2d blueReef10Translation = new Translation2d(4.745, 4.791);
   public Translation2d blueReef11Translation = new Translation2d(5.022, 4.647);
+
+  public Translation2d blueAlgae5Translation = new Translation2d(4.29, 4.609);
 
   public Translation2d blueCoralStationRightTranslation = new Translation2d(1.3, 1);
   public Rotation2d blueCoralStationRightRotation = new Rotation2d(Units.degreesToRadians(60));
@@ -104,6 +117,39 @@ public class BlueFieldLocations {
             "ERROR: Tried to find reef pole translation for non-reef-pole DesiredLocation "
                 + location.name());
         return Translation2d.kZero;
+    }
+  }
+
+  public Translation2d findAlgaeTranslationFromReefLocation(DesiredLocation location) {
+    switch (location) {
+      case Algae0:
+        return blueAlgae0Translation;
+      case Algae1:
+        return blueAlgae1Translation;
+      case Algae2:
+        return blueAlgae2Translation;
+      case Algae3:
+        return blueAlgae3Translation;
+      case Algae4:
+        return blueAlgae4Translation;
+      case Algae5:
+        return blueAlgae5Translation;
+      default:
+        System.out.println(
+            "ERROR: Tried to find reef algae translation for non-reef-algae DesiredLocation "
+                + location.name());
+        return Translation2d.kZero;
+    }
+  }
+
+  public DesiredLocation getClosestCoralStation(Pose2d robotPose) {
+    double leftDistance = robotPose.getTranslation().getDistance(blueCoralStationLeftTranslation);
+    double rightDistance = robotPose.getTranslation().getDistance(blueCoralStationRightTranslation);
+
+    if (leftDistance < rightDistance) {
+      return DesiredLocation.CoralStationLeft;
+    } else {
+      return DesiredLocation.CoralStationRight;
     }
   }
 }
