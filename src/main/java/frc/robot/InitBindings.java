@@ -13,6 +13,7 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem.ClimbAction;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
+import frc.robot.subsystems.drive.ReefLineupUtil;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.ramp.states.RampState.RampTriggers;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
@@ -56,6 +57,13 @@ public final class InitBindings {
                       strategyManager.setAutonomyMode(AutonomyMode.Mixed);
                       // And then fall through to the mixed autonomy behavior (no break here is
                       // intentional)
+                    case Smart:
+                      // When the scoring trigger is pulled in smart autonomy, select the closest
+                      // reef pole to score on
+                      drive.setDesiredLocation(
+                          ReefLineupUtil.getClosestReefLocation(drive.getPose()));
+                      // Then fall through to scheduling OTF like in mixed autonomy (no break here
+                      // is intentional)
                     case Mixed:
                       drive.setGoToIntake(false);
                       drive.fireTrigger(DriveTrigger.BeginOTF);
@@ -82,6 +90,7 @@ public final class InitBindings {
                       strategyManager.setAutonomyMode(AutonomyMode.Mixed);
                       // And then fall through to the mixed autonomy behavior (no break here is
                       // intentional)
+                    case Smart:
                     case Mixed:
                       // Cancel auto align if in mixed autonomy
                       drive.fireTrigger(DriveTrigger.CancelAutoAlignment);

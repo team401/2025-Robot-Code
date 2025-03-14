@@ -1,6 +1,11 @@
 package frc.robot.subsystems.drive;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constants.JsonConstants;
+import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 
@@ -97,5 +102,29 @@ public class ReefLineupUtil {
       }
       return JsonConstants.drivetrainConstants.driveCrossTrackFrontLeftAlgaeOffset; // algae
     }
+  }
+
+  public static DesiredLocation getClosestReefLocation(Pose2d robotPose) {
+    double closestDistance = Double.MAX_VALUE;
+    DesiredLocation closestLocation = DesiredLocation.Reef0;
+    for (DesiredLocation location : DesiredLocation.values()) {
+      Translation2d poleLocation;
+      if (DriverStation.getAlliance().isPresent()
+          && DriverStation.getAlliance().get() == Alliance.Red) {
+        poleLocation =
+            JsonConstants.redFieldLocations.findPoleTranslationFromReefLocation(location);
+      } else {
+        poleLocation =
+            JsonConstants.blueFieldLocations.findPoleTranslationFromReefLocation(location);
+      }
+      double distance = robotPose.getTranslation().getDistance(poleLocation);
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestLocation = location;
+      }
+    }
+
+    return closestLocation;
   }
 }
