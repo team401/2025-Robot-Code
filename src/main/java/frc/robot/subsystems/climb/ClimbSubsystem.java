@@ -212,10 +212,6 @@ public class ClimbSubsystem extends SubsystemBase {
     }
   }
 
-  public void setFeedforward(double newFF) {
-    io.setFF(newFF);
-  }
-
   public void setPID(double newP, double newI, double newD) {
     io.setPID(newP, newI, newD);
   }
