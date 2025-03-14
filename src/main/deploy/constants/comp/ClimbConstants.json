@@ -13,6 +13,7 @@
   },
   "leadClimbMotorId": 16,
   "followerClimbMotorId": 17,
+  "canDiID": 0,
   "climbkP": 30.0,
   "climbkI": 0.0,
   "climbkD": 0.0,

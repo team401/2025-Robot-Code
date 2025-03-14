@@ -13,7 +13,7 @@ import org.littletonrobotics.junction.Logger;
 public class ClimbIOSim extends ClimbIOTalonFX {
 
   TalonFXSimState leadMotorSimState = leadMotor.getSimState();
-  // TalonFXSimState followerMotorSimState = followerMotor.getSimState();
+  TalonFXSimState followerMotorSimState = followerMotor.getSimState();
   // CANcoderSimState climbEncoderSimState = climbAngleCoder.getSimState();
   CANdiSimState climbEncoderSimState = climbAngleCandi.getSimState();
 
