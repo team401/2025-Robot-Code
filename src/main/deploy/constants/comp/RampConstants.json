@@ -18,5 +18,5 @@
   "homingVoltage": -2.0,
   "climbVoltage": 1.5,
   "climbHoldVoltage": 0.5,
-  "extendingVoltage": 1.0
+  "extendingVoltage": 4.0
 }
