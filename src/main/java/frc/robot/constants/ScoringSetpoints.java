@@ -88,6 +88,15 @@ public class ScoringSetpoints {
   @JSONExclude private Drive driveReference = null;
 
   /**
+   * Keep track of whether or not we are currently using variable L4 setpoints. This can be false if
+   * a malformed setpoint map causes variable L4 setpoints to be disabled.
+   */
+  @JSONExclude private boolean usingVariableL4 = true;
+
+  /** Store maximum distance included in the variable L4 map to see if drive is within range */
+  @JSONExclude private double maxVariableDistance = 0.0;
+
+  /**
    * Give the ScoringSetpoints instance a reference to the drivetrain, used to obtain along track
    * distance
    *
@@ -104,6 +113,8 @@ public class ScoringSetpoints {
    * constants on an INSTANCE of ScoringSetpoints. Make sure it is called on an instance that has
    * synced its JSON constants already.
    *
+   * <p>This also fills in the maximum distance to be used by drive
+   *
    * @throws Exception If constants are incorrectly defined with different lengths, an exception
    *     will be thrown
    */
@@ -116,26 +127,26 @@ public class ScoringSetpoints {
     }
 
     for (int i = 0; i < variableL4AlongTrackDistances.length; i++) {
-      wristMap.put(
-          variableL4AlongTrackDistances[i].in(Meters), variableL4WristAngles[i].in(Rotations));
+      double distanceMeters = variableL4AlongTrackDistances[i].in(Meters);
+      wristMap.put(distanceMeters, variableL4WristAngles[i].in(Rotations));
+
+      if (distanceMeters > maxVariableDistance) {
+        maxVariableDistance = distanceMeters;
+      }
     }
 
     variableL4WristMap = new InterpolateDouble(wristMap);
+
+    usingVariableL4 = true;
   }
 
   /**
-   * Creates the L4 wrist map, except it is just the default L4 setpoint.
+   * Disable the use of variable L4 setpoints for this ScoringSetpoints instance.
    *
-   * <p>This can be used to fill the map if the constants are defined incorrectly, and must be
-   * called AFTER drivetrain constants are synced using JSON (it depends on a synced JSON value from
-   * drivetrainConstants)
+   * <p>This should be called if there is a failure to create the setpoint map.
    */
-  public void fillPlaceholderL4WristMap() {
-    HashMap<Double, Double> wristMap = new HashMap<>();
-
-    wristMap.put(0.0, L4.wristAngle().in(Rotations));
-
-    variableL4WristMap = new InterpolateDouble(wristMap);
+  public void disableVariableL4() {
+    this.usingVariableL4 = false;
   }
 
   public static ScoringSetpoint getVariableL4Setpoint(double alongTrackDistance) {
@@ -159,7 +170,7 @@ public class ScoringSetpoints {
       case L3:
         return JsonConstants.scoringSetpoints.L3;
       case L4:
-        if (JsonConstants.scoringFeatureFlags.useVariableL4Setpoint) {
+        if (usingVariableL4()) {
           double alongTrackDistance = 0.0;
 
           if (driveReference != null) {
@@ -167,9 +178,9 @@ public class ScoringSetpoints {
           }
 
           return getVariableL4Setpoint(alongTrackDistance);
+        } else {
+          return JsonConstants.scoringSetpoints.L4;
         }
-
-        return JsonConstants.scoringSetpoints.L4;
       case Net:
         return JsonConstants.scoringSetpoints.netWarmup;
       case Processor:
@@ -180,5 +191,24 @@ public class ScoringSetpoints {
             "ERROR: Can't warmup for FieldTarget " + target + ", defaulting to idle");
         return JsonConstants.scoringSetpoints.idle;
     }
+  }
+
+  /**
+   * Is the robot currently using variable L4 setpoints
+   *
+   * @return True if featureflags AND scoring setpoint validation BOTH say that L4 setpoints are
+   *     used
+   */
+  public boolean usingVariableL4() {
+    return JsonConstants.scoringFeatureFlags.useVariableL4Setpoint && usingVariableL4;
+  }
+
+  /**
+   * Get the furthest distance there is a defined setpoint for in the variable L4 map
+   *
+   * @return The largest distance in the variable L4 map
+   */
+  public double getMaxVariableDistance() {
+    return maxVariableDistance;
   }
 }

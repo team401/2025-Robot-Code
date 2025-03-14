@@ -25,6 +25,7 @@ import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.drive.Drive.VisionAlignment;
 import frc.robot.subsystems.drive.ReefLineupUtil;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 import org.littletonrobotics.junction.Logger;
 
@@ -247,9 +248,18 @@ public class LineupState implements PeriodicStateInterface {
     boolean rotationCorrect =
         Math.abs(drive.getRotation().getRadians() - getRotationForReefSide().getRadians())
             < JsonConstants.drivetrainConstants.lineupRotationMarginRadians;
-    boolean alongTrackCorrect =
-        observation.alongTrackDistance()
-            < JsonConstants.drivetrainConstants.lineupAlongTrackThresholdMeters;
+    boolean alongTrackCorrect;
+    if (ScoringSubsystem.getInstance() != null
+        && ScoringSubsystem.getInstance().getTarget() == FieldTarget.L4
+        && JsonConstants.scoringSetpoints.usingVariableL4()) {
+      alongTrackCorrect =
+          observation.alongTrackDistance()
+              < JsonConstants.scoringSetpoints.getMaxVariableDistance();
+    } else {
+      alongTrackCorrect =
+          observation.alongTrackDistance()
+              < JsonConstants.drivetrainConstants.lineupAlongTrackThresholdMeters;
+    }
     boolean crossTrackCorrect =
         Math.abs(observation.crossTrackDistance())
             < JsonConstants.drivetrainConstants.lineupCrossTrackThresholdMeters;
