@@ -17,6 +17,6 @@ public class ExtendingState extends RampState {
 
   @Override
   public boolean inPosition() {
-    return mechanism.inputs.position < JsonConstants.rampConstants.extendPosition;
+    return false;
   }
 }
