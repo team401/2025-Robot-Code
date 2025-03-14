@@ -664,6 +664,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
       determineProtectionClamps();
     }
 
+    Logger.recordOutput(
+        "scoring/usingVariableL4Setpoint", JsonConstants.scoringSetpoints.usingVariableL4());
     Logger.recordOutput("scoring/algaeCurrentDetected", algaeCurrentDetected);
     Logger.recordOutput("scoring/state", stateMachine.getCurrentState());
     Logger.recordOutput("scoring/isDriveLinedUp", isDriveLinedUpSupplier.getAsBoolean());
