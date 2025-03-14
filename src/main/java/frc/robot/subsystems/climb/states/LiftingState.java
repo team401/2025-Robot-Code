@@ -2,7 +2,6 @@ package frc.robot.subsystems.climb.states;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import frc.robot.constants.ClimbConstants;
-import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 
 public class LiftingState implements PeriodicStateInterface {
@@ -15,7 +14,10 @@ public class LiftingState implements PeriodicStateInterface {
 
   @Override
   public void periodic() {
-    climbSubsystem.setFeedforward(JsonConstants.climbConstants.climbFFVolts);
+    climbSubsystem.setPID(
+        ClimbConstants.synced.getObject().climbkPInc,
+        ClimbConstants.synced.getObject().climbkI,
+        ClimbConstants.synced.getObject().climbkD);
     climbSubsystem.setGoalAngle(ClimbConstants.synced.getObject().finalHangingAngle);
   }
 }
