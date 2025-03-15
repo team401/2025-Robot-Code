@@ -39,11 +39,11 @@ public class ClawConstants {
 
   public final Distance coralProximityThreshold = Centimeters.of(8.0);
   public final Distance coralProximityHysteresis = Centimeters.of(0.5);
-  public final double coralMinSignalStrengthForValidMeasurement = 2500.0;
+  public final Double coralMinSignalStrengthForValidMeasurement = 2500.0;
 
   public final Distance algaeProximityThreshold = Centimeters.of(5.0); // TODO: Tune this value
   public final Distance algaeProximityHysteresis = Centimeters.of(0.5);
-  public final double algaeMinSignalStrengthForValidMeasurement = 2500.0;
+  public final Double algaeMinSignalStrengthForValidMeasurement = 2500.0;
 
   public final Voltage coralIntakeVoltage = Volts.of(3.0);
   public final Voltage algaeIntakeVoltage = Volts.of(-3.0);
