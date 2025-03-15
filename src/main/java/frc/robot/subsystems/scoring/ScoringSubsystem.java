@@ -345,7 +345,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   public boolean canFarWarmup() {
     return currentPiece == GamePiece.Coral
-        && (currentTarget == FieldTarget.L3 || currentTarget == FieldTarget.L4);
+        && (currentTarget == FieldTarget.L3 || currentTarget == FieldTarget.L4)
+        && DriverStation.isAutonomous();
   }
 
   public void setIsDriveLinedUpSupplier(BooleanSupplier newSupplier) {
