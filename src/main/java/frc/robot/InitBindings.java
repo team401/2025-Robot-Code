@@ -134,6 +134,14 @@ public final class InitBindings {
                 },
                 drive));
 
+    rightJoystick
+        .button(3)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  drive.sidestepReefLocation();
+                }));
+
     // // pov right (reef 0-11 -> processor left -> processor right )
     // // pov left (goes backwards of right)
     // driverController
