@@ -76,6 +76,10 @@ public class DrivetrainConstants {
   public final Double driveCrossTrackKi = 0.0;
   public final Double driveCrossTrackKd = 0.0;
 
+  public final Double driveCrossTrackOtherCameraKp = 0.5;
+  public final Double driveCrossTrackOtherCameraKi = 0.0;
+  public final Double driveCrossTrackOtherCameraKd = 0.0;
+
   public final Double driveRotationKp = 0.5;
   public final Double driveRotationKi = 0.0;
   public final Double driveRotationKd = 0.0;
