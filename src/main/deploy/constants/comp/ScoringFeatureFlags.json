@@ -1,5 +1,6 @@
 {
   "runElevator": true,
   "runClaw": true,
-  "runWrist": true
+  "runWrist": true,
+  "useVariableL4Setpoint": true
 }

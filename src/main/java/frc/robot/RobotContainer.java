@@ -239,6 +239,10 @@ public class RobotContainer {
       }
     }
 
+    if (FeatureFlags.synced.getObject().runDrive && FeatureFlags.synced.getObject().runScoring) {
+      JsonConstants.scoringSetpoints.setDriveReference(drive);
+    }
+
     strategyManager = new StrategyManager(drive, scoringSubsystem);
   }
 

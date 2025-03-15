@@ -212,6 +212,9 @@ public class Drive implements DriveTemplate {
 
   private boolean driveLinedUp = false;
 
+  /** The last along track distance set by Lineup state (0.0 when not in lineup) */
+  private double latestAlongTrackDistance = 0.0;
+
   private enum DriveState implements StateContainer {
     Idle(new IdleState(instance)),
     OTF(new OTFState(instance)),
@@ -389,6 +392,17 @@ public class Drive implements DriveTemplate {
       setGoToIntake(false);
     } else if (goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
       setGoToIntake(false);
+    }
+
+    if (stateMachine.getCurrentState() == DriveState.OTF) {
+      // If we're in OTF, prepare to warm up for the farthest away setpoint (in case of early
+      // warmup)
+      setLatestAlongTrackDistance(JsonConstants.scoringSetpoints.getMaxVariableDistance());
+    } else if (stateMachine.getCurrentState() != DriveState.Lineup) {
+      // Reset alongtrack distance to zero if not in lineup to prevent scoring from getting stuck on
+      // a
+      // setpoint that's far away
+      setLatestAlongTrackDistance(0.0);
     }
 
     odometryLock.lock(); // Prevents odometry updates while reading data
@@ -1041,6 +1055,15 @@ public class Drive implements DriveTemplate {
           DriveConfiguration.getInstance().BackRight.LocationX,
           DriveConfiguration.getInstance().BackRight.LocationY)
     };
+  }
+
+  public void setLatestAlongTrackDistance(double alongTrackDistance) {
+    this.latestAlongTrackDistance = alongTrackDistance;
+  }
+
+  @AutoLogOutput(key = "Drive/latestAlongTrackDistance")
+  public double getLatestAlongTrackDistance() {
+    return latestAlongTrackDistance;
   }
 
   @FunctionalInterface
