@@ -12,14 +12,14 @@
     "unit": "Amp"
   },
   "coralProximityThreshold": {
-    "value": 8.0,
+    "value": 4.5,
     "unit": "Centimeter"
   },
   "coralProximityHysteresis": {
-    "value": 0.5,
+    "value": 1.0,
     "unit": "Centimeter"
   },
-  "coralMinSignalStrengthForValidMeasurement": 2500.0,
+  "coralMinSignalStrengthForValidMeasurement": 15000.0,
   "algaeProximityThreshold": {
     "value": 2.0,
     "unit": "Inch"

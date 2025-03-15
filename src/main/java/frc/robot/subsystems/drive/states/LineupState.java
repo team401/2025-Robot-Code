@@ -129,38 +129,38 @@ public class LineupState implements PeriodicStateInterface {
       case Reef1:
       case Algae0:
         return drive.isAllianceRed()
-            ? JsonConstants.redFieldLocations.redReef01Rotation
-            : JsonConstants.blueFieldLocations.blueReef01Rotation;
+            ? JsonConstants.redFieldLocations.redReefOTF0Rotation
+            : JsonConstants.blueFieldLocations.blueReefOTF0Rotation;
       case Reef2:
       case Reef3:
       case Algae1:
         return drive.isAllianceRed()
-            ? JsonConstants.redFieldLocations.redReef23Rotation
-            : JsonConstants.blueFieldLocations.blueReef23Rotation;
+            ? JsonConstants.redFieldLocations.redReefOTF2Rotation
+            : JsonConstants.blueFieldLocations.blueReefOTF2Rotation;
       case Reef4:
       case Reef5:
       case Algae2:
         return drive.isAllianceRed()
-            ? JsonConstants.redFieldLocations.redReef45Rotation
-            : JsonConstants.blueFieldLocations.blueReef45Rotation;
+            ? JsonConstants.redFieldLocations.redReefOTF4Rotation
+            : JsonConstants.blueFieldLocations.blueReefOTF4Rotation;
       case Reef6:
       case Reef7:
       case Algae3:
         return drive.isAllianceRed()
-            ? JsonConstants.redFieldLocations.redReef67Rotation
-            : JsonConstants.blueFieldLocations.blueReef67Rotation;
+            ? JsonConstants.redFieldLocations.redReefOTF6Rotation
+            : JsonConstants.blueFieldLocations.blueReefOTF6Rotation;
       case Reef8:
       case Reef9:
       case Algae4:
         return drive.isAllianceRed()
-            ? JsonConstants.redFieldLocations.redReef89Rotation
-            : JsonConstants.blueFieldLocations.blueReef89Rotation;
+            ? JsonConstants.redFieldLocations.redReefOTF8Rotation
+            : JsonConstants.blueFieldLocations.blueReefOTF8Rotation;
       case Reef10:
       case Reef11:
       case Algae5:
         return drive.isAllianceRed()
-            ? JsonConstants.redFieldLocations.redReef1011Rotation
-            : JsonConstants.blueFieldLocations.blueReef1011Rotation;
+            ? JsonConstants.redFieldLocations.redReefOTF10Rotation
+            : JsonConstants.blueFieldLocations.blueReefOTF10Rotation;
       default:
         return new Rotation2d();
     }
