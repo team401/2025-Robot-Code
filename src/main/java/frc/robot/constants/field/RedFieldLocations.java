@@ -82,7 +82,7 @@ public class RedFieldLocations {
   public Translation2d redReef9Translation = new Translation2d(13.317, 3.222);
 
   public Translation2d redAlgae4Translation = new Translation2d(13.403, 3.439);
-  
+
   public Translation2d redReef10Translation = new Translation2d(12.837, 3.256);
   public Translation2d redReef11Translation = new Translation2d(12.546, 3.428);
 
