@@ -2,6 +2,7 @@ package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 
 import coppercore.math.InterpolateDouble;
@@ -38,36 +39,35 @@ public class ScoringSetpoints {
   public final ScoringSetpoint idleWithAlgae =
       new ScoringSetpoint(
           "IdleWithAlgae",
-          Meters.of(0.2),
-          Rotations.of(-0.75)); // Hold algae with the wrist out and the arm up
+          Meters.of(0.3),
+          Rotations.of(-0.105)); // Hold algae with the wrist out and the arm up
 
-  public final ScoringSetpoint L1 = new ScoringSetpoint("L1", Meters.of(1.0), Rotations.of(0.3214));
-  public final ScoringSetpoint L2 = new ScoringSetpoint("L2", Meters.of(1.5), Rotations.of(0.3214));
-  public final ScoringSetpoint L3 = new ScoringSetpoint("L3", Meters.of(2.0), Rotations.of(0.3214));
-  public final ScoringSetpoint L4 = new ScoringSetpoint("L4", Meters.of(2.5), Rotations.of(0.3214));
+  public final ScoringSetpoint L1 = new ScoringSetpoint("L1", Meters.of(0.15), Rotations.of(0.3));
+  public final ScoringSetpoint L2 = new ScoringSetpoint("L2", Meters.of(0.29), Rotations.of(0.29));
+  public final ScoringSetpoint L3 = new ScoringSetpoint("L3", Meters.of(0.7), Rotations.of(0.29));
+  public final ScoringSetpoint L4 = new ScoringSetpoint("L4", Meters.of(1.6), Rotations.of(0.09));
 
   public final ScoringSetpoint farWarmup =
-      new ScoringSetpoint("farWarmup", Meters.of(0.6), Rotations.of(0.3214));
+      new ScoringSetpoint("farWarmup", Meters.of(0.65), Rotations.of(0.3));
 
   // TODO: Algae setpoints
   public final ScoringSetpoint L2algae =
-      new ScoringSetpoint("L2algae", Meters.of(1.8), Rotations.of(-0.75));
+      new ScoringSetpoint("L2algae", Meters.of(0.55), Rotations.of(-0.095));
   public final ScoringSetpoint L3algae =
-      new ScoringSetpoint("L3algae", Meters.of(2.3), Rotations.of(-0.75));
+      new ScoringSetpoint("L3algae", Meters.of(0.97393), Rotations.of(-0.095));
 
   public final ScoringSetpoint coralStation =
-      new ScoringSetpoint("coralStation", Meters.of(0.1), Rotations.of(0.25));
+      new ScoringSetpoint("coralStation", Meters.of(0.0), Rotations.of(0.3214));
 
   public final ScoringSetpoint processor =
-      new ScoringSetpoint("processor", Meters.of(0.1), Rotations.of(-0.75));
+      new ScoringSetpoint("processor", Meters.of(0.18), Rotations.of(-0.15));
 
   public final ScoringSetpoint netWarmup =
-      new ScoringSetpoint("netWarmup", Meters.of(0.25), Rotations.of(-0.105));
-  public final ScoringSetpoint net =
-      new ScoringSetpoint("net", Meters.of(1.25), Rotations.of(-0.75));
+      new ScoringSetpoint("netWarmup", Meters.of(1.8), Radians.of(1.3));
+  public final ScoringSetpoint net = new ScoringSetpoint("net", Meters.of(1.9), Rotations.of(0.0));
 
   public final ScoringSetpoint ground =
-      new ScoringSetpoint("ground", Meters.of(0.2), Rotations.of(-0.75));
+      new ScoringSetpoint("ground", Meters.of(0.2), Rotations.of(0.0));
 
   /**
    * Combined with variableL4WristAngles, these form the interpolate double used for variable
