@@ -154,6 +154,21 @@ public class Drive implements DriveTemplate {
     CoralStationRight,
   }
 
+  public static final DesiredLocation[] reefCoralLocations = {
+    DesiredLocation.Reef0,
+    DesiredLocation.Reef1,
+    DesiredLocation.Reef2,
+    DesiredLocation.Reef3,
+    DesiredLocation.Reef4,
+    DesiredLocation.Reef5,
+    DesiredLocation.Reef6,
+    DesiredLocation.Reef7,
+    DesiredLocation.Reef8,
+    DesiredLocation.Reef9,
+    DesiredLocation.Reef10,
+    DesiredLocation.Reef11,
+  };
+
   public DesiredLocation[] locationArray = {
     DesiredLocation.Reef0,
     DesiredLocation.Reef1,
@@ -172,7 +187,7 @@ public class Drive implements DriveTemplate {
     DesiredLocation.CoralStationRight
   };
 
-  public DesiredLocation[] algaeArray = {
+  public static final DesiredLocation[] reefAlgaeLocations = {
     DesiredLocation.Algae0,
     DesiredLocation.Algae1,
     DesiredLocation.Algae2,
@@ -704,8 +719,8 @@ public class Drive implements DriveTemplate {
    * @return a double representing the index of reef location
    */
   public int getDesiredAlgaeLocationIndex() {
-    for (int i = 0; i < algaeArray.length; i++) {
-      if (algaeArray[i] == desiredLocation) {
+    for (int i = 0; i < reefAlgaeLocations.length; i++) {
+      if (reefAlgaeLocations[i] == desiredLocation) {
         return i;
       }
     }
@@ -728,8 +743,8 @@ public class Drive implements DriveTemplate {
       return;
     }
 
-    if (isAlgae && algaeArray[(int) desiredIndex] != intakeLocation) {
-      this.setDesiredIntakeLocation(algaeArray[(int) desiredIndex]);
+    if (isAlgae && reefAlgaeLocations[(int) desiredIndex] != intakeLocation) {
+      this.setDesiredIntakeLocation(reefAlgaeLocations[(int) desiredIndex]);
       if (isDriveOTF()) {
         this.fireTrigger(DriveTrigger.ManualJoysticks);
         this.fireTrigger(DriveTrigger.BeginOTF);
