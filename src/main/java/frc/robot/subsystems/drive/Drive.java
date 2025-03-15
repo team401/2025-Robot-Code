@@ -394,9 +394,14 @@ public class Drive implements DriveTemplate {
       setGoToIntake(false);
     }
 
-    // Reset alongtrack distance to zero if not in lineup to prevent scoring from getting stuck on a
-    // setpoint that's far away
-    if (stateMachine.getCurrentState() != DriveState.Lineup) {
+    if (stateMachine.getCurrentState() == DriveState.OTF) {
+      // If we're in OTF, prepare to warm up for the farthest away setpoint (in case of early
+      // warmup)
+      setLatestAlongTrackDistance(JsonConstants.scoringSetpoints.getMaxVariableDistance());
+    } else if (stateMachine.getCurrentState() != DriveState.Lineup) {
+      // Reset alongtrack distance to zero if not in lineup to prevent scoring from getting stuck on
+      // a
+      // setpoint that's far away
       setLatestAlongTrackDistance(0.0);
     }
 
