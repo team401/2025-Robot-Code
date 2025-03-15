@@ -22,48 +22,66 @@ public class RedFieldLocations {
   public Translation2d redReefCenterTranslation = new Translation2d(12.5, 4.0259);
   public Rotation2d redReefCenterRotation = new Rotation2d();
 
-  public Translation2d redReef01Translation = new Translation2d(11.5, 4.1);
-  public Rotation2d redReef01Rotation = new Rotation2d(Math.toRadians(0));
+  public Translation2d redReefOTF0Translation = new Translation2d(11.5, 4.1);
+  public Rotation2d redReefOTF0Rotation = new Rotation2d(Math.toRadians(0));
+
+  public Translation2d redReefOTF1Translation = new Translation2d(11.5, 4.1);
+  public Rotation2d redReefOTF1Rotation = new Rotation2d(Math.toRadians(0));
+
+  public Translation2d redReefOTF2Translation = new Translation2d(12.2, 5.3);
+  public Rotation2d redReefOTF2Rotation = new Rotation2d(Math.toRadians(-60));
+
+  public Translation2d redReefOTF3Translation = new Translation2d(12.2, 5.3);
+  public Rotation2d redReefOTF3Rotation = new Rotation2d(Math.toRadians(-60));
+
+  public Translation2d redReefOTF4Translation = new Translation2d(14, 5.5);
+  public Rotation2d redReefOTF4Rotation = new Rotation2d(Math.toRadians(-120));
+
+  public Translation2d redReefOTF5Translation = new Translation2d(14, 5.5);
+  public Rotation2d redReefOTF5Rotation = new Rotation2d(Math.toRadians(-120));
+
+  public Translation2d redReefOTF6Translation = new Translation2d(14.7, 4);
+  public Rotation2d redReefOTF6Rotation = new Rotation2d(Math.toRadians(180));
+
+  public Translation2d redReefOTF7Translation = new Translation2d(14.7, 4);
+  public Rotation2d redReefOTF7Rotation = new Rotation2d(Math.toRadians(180));
+
+  public Translation2d redReefOTF8Translation = new Translation2d(14, 2.5);
+  public Rotation2d redReefOTF8Rotation = new Rotation2d(Math.toRadians(120));
+
+  public Translation2d redReefOTF9Translation = new Translation2d(14, 2.5);
+  public Rotation2d redReefOTF9Rotation = new Rotation2d(Math.toRadians(120));
+
+  public Translation2d redReefOTF10Translation = new Translation2d(12.2, 2.6);
+  public Rotation2d redReefOTF10Rotation = new Rotation2d(Math.toRadians(60));
+
+  public Translation2d redReefOTF11Translation = new Translation2d(12.2, 2.6);
+  public Rotation2d redReefOTF11Rotation = new Rotation2d(Math.toRadians(60));
 
   public Translation2d redReef0Translation = new Translation2d(12.273, 3.867);
   public Translation2d redReef1Translation = new Translation2d(12.273, 4.187);
 
   public Translation2d redAlgae0Translation = new Translation2d(12.377, 4.020);
 
-  public Translation2d redReef23Translation = new Translation2d(12.2, 5.3);
-  public Rotation2d redReef23Rotation = new Rotation2d(Math.toRadians(-60));
-
   public Translation2d redReef2Translation = new Translation2d(12.519, 4.621);
   public Translation2d redReef3Translation = new Translation2d(12.811, 4.817);
 
   public Translation2d redAlgae1Translation = new Translation2d(12.27, 4.611);
-
-  public Translation2d redReef45Translation = new Translation2d(14, 5.5);
-  public Rotation2d redReef45Rotation = new Rotation2d(Math.toRadians(-120));
 
   public Translation2d redReef4Translation = new Translation2d(13.305, 4.794);
   public Translation2d redReef5Translation = new Translation2d(13.605, 4.632);
 
   public Translation2d redAlgae2Translation = new Translation2d(13.389, 4.602);
 
-  public Translation2d redReef67Translation = new Translation2d(14.7, 4);
-  public Rotation2d redReef67Rotation = new Rotation2d(Math.toRadians(180));
-
   public Translation2d redReef6Translation = new Translation2d(13.864, 4.202);
   public Translation2d redReef7Translation = new Translation2d(13.864, 3.867);
 
   public Translation2d redAlgae3Translation = new Translation2d(13.739, 4.023);
 
-  public Translation2d redReef89Translation = new Translation2d(14, 2.5);
-  public Rotation2d redReef89Rotation = new Rotation2d(Math.toRadians(120));
-
   public Translation2d redReef8Translation = new Translation2d(13.6, 3.43);
   public Translation2d redReef9Translation = new Translation2d(13.317, 3.222);
 
   public Translation2d redAlgae4Translation = new Translation2d(13.403, 3.439);
-
-  public Translation2d redReef1011Translation = new Translation2d(12.2, 2.6);
-  public Rotation2d redReef1011Rotation = new Rotation2d(Math.toRadians(60));
 
   public Translation2d redReef10Translation = new Translation2d(12.837, 3.256);
   public Translation2d redReef11Translation = new Translation2d(12.546, 3.428);
