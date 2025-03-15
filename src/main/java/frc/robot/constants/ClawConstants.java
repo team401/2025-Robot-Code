@@ -48,6 +48,7 @@ public class ClawConstants {
   public final Voltage coralIntakeVoltage = Volts.of(3.0);
   public final Voltage algaeIntakeVoltage = Volts.of(-3.0);
   public final Voltage coralScoreVoltage = Volts.of(3.0);
+  public final Voltage coralL23ScoreVoltage = Volts.of(6.0);
   public final Voltage algaeScoreVoltage = Volts.of(-3.0);
 
   /** Voltage the claw should use to hold the algae in place while idling */

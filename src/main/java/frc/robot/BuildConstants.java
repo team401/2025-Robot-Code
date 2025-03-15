@@ -11,6 +11,7 @@ public final class BuildConstants {
   public static final String GIT_BRANCH = "joystick-override-lineup";
   public static final String BUILD_DATE = "2025-03-12 11:27:53 EDT";
   public static final long BUILD_UNIX_TIME = 1741793273583L;
+
   public static final int DIRTY = 1;
 
   private BuildConstants() {}

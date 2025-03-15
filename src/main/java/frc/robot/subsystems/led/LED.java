@@ -24,11 +24,13 @@ public class LED extends SubsystemBase {
   private List<LEDPattern> rightPatterns = new ArrayList<>();
 
   private final AddressableLED led = new AddressableLED(LEDConstants.ledPort);
-  public final AddressableLEDBuffer ledStrip = new AddressableLEDBuffer(LEDConstants.totalLength);
+  public AddressableLEDBuffer ledStrip = new AddressableLEDBuffer(LEDConstants.totalLength);
 
-  public final AddressableLEDBufferView leftData =
-      ledStrip.createView(0, LEDConstants.halfLength - 1);
-  private final AddressableLEDBufferView rightData =
+  public AddressableLEDBufferView leftData =
+      ledStrip
+          .createView(0, LEDConstants.halfLength - 1)
+          .reversed(); // these should both be reversed
+  private AddressableLEDBufferView rightData =
       ledStrip.createView(LEDConstants.halfLength, LEDConstants.totalLength - 1).reversed();
 
   private Supplier<Boolean> visionWorkingSupplier = () -> true;
@@ -36,6 +38,8 @@ public class LED extends SubsystemBase {
   private ScoringSubsystem scoringSubsystem;
   private ClimbSubsystem climbSubsystem;
   private Drive driveSubsystem;
+
+  private boolean enabled = false;
 
   /**
    * Constructs the LED subsystem.
@@ -52,10 +56,25 @@ public class LED extends SubsystemBase {
     led.start();
   }
 
+  private void setEnabled(boolean enabled) {
+    if (enabled != this.enabled) {
+      this.enabled = enabled;
+      if (enabled) {
+        ledStrip = new AddressableLEDBuffer(LEDConstants.totalLength);
+        leftData = ledStrip.createView(0, LEDConstants.halfLength - 1);
+        rightData =
+            ledStrip.createView(LEDConstants.halfLength, LEDConstants.totalLength - 1).reversed();
+        led.setLength(LEDConstants.totalLength);
+      } else {
+        ledStrip = new AddressableLEDBuffer(LEDConstants.totalLengthRainbow);
+        led.setLength(LEDConstants.totalLengthRainbow);
+      }
+    }
+  }
+
   /** Periodic method called every loop cycle. Updates LED patterns based on robot state. */
   @Override
   public void periodic() {
-
     if (!DriverStation.isDisabled()) {
 
       // Drive Subsystem Checks
@@ -111,11 +130,12 @@ public class LED extends SubsystemBase {
     // }
     else {
       // rainbow - all thirds
-      addPattern(LEDConstants.rainbowPattern);
-      if (!visionWorkingSupplier.get()) {
-        addPattern(LEDConstants.isBeeLinkWorkingPattern);
-      }
-      applyPatterns();
+      // addPattern(LEDConstants.rainbowPattern);
+      // if (!visionWorkingSupplier.get()) {
+      //   addPattern(LEDConstants.isBeeLinkWorkingPattern);
+      // }
+      // applyPatterns();
+      LEDConstants.rainbowPattern.applyTo(ledStrip);
     }
     led.setData(ledStrip);
   }

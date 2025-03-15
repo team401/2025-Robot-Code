@@ -35,7 +35,7 @@
   "L2": {
     "name": "L2",
     "elevatorHeight": {
-      "value": 0.25,
+      "value": 0.29,
       "unit": "Meter"
     },
     "wristAngle": {
@@ -112,7 +112,7 @@
   "processor": {
     "name": "processor",
     "elevatorHeight": {
-      "value": 0.2,
+      "value": 0.18,
       "unit": "Meter"
     },
     "wristAngle": {

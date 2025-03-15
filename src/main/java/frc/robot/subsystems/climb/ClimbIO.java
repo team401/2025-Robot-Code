@@ -36,5 +36,7 @@ public interface ClimbIO {
 
   public default void setPID(double p, double i, double d) {}
 
+  public default void setFF(double newFF) {}
+
   public default void setFF(double kS, double kV, double kA, double kG) {}
 }
