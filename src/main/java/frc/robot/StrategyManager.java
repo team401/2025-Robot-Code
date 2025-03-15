@@ -101,6 +101,7 @@ public class StrategyManager {
         break;
       case Smart:
         autonomyPublisher.accept("smart");
+        break;
       case Mixed:
         autonomyPublisher.accept("mid");
         break;

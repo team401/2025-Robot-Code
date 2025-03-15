@@ -264,7 +264,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.INTAKE);
+                  rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
 
     rightJoystick
