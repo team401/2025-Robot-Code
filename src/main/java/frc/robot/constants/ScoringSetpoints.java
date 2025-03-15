@@ -11,6 +11,7 @@ import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
@@ -97,6 +98,12 @@ public class ScoringSetpoints {
   @JSONExclude private double maxVariableDistance = 0.0;
 
   /**
+   * Reuse a mutable angle to generate variable setpoints instead of creating and freeing a new one
+   * each loop
+   */
+  @JSONExclude private static MutAngle variableWristSetpoint = Rotations.mutable(0.0);
+
+  /**
    * Give the ScoringSetpoints instance a reference to the drivetrain, used to obtain along track
    * distance
    *
@@ -150,10 +157,10 @@ public class ScoringSetpoints {
   }
 
   public static ScoringSetpoint getVariableL4Setpoint(double alongTrackDistance) {
-    Angle wristAngle = Rotations.of(variableL4WristMap.getValue(alongTrackDistance));
+    variableWristSetpoint.mut_replace(variableL4WristMap.getValue(alongTrackDistance), Rotations);
 
     return new ScoringSetpoint(
-        "L4Variable", JsonConstants.scoringSetpoints.L4.elevatorHeight(), wristAngle);
+        "L4Variable", JsonConstants.scoringSetpoints.L4.elevatorHeight(), variableWristSetpoint);
   }
 
   /**
