@@ -264,7 +264,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
+                  rampSubsystem.fireTrigger(RampTriggers.INTAKE);
                 }));
 
     rightJoystick
@@ -272,7 +272,7 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.GOTO_IDLE);
+                  rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
 
     leftJoystick
@@ -280,7 +280,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
+                  rampSubsystem.fireTrigger(RampTriggers.INTAKE);
                 }));
 
     leftJoystick
@@ -288,7 +288,7 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.GOTO_IDLE);
+                  rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
 
     leftJoystick
@@ -296,7 +296,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.START_CLIMB);
+                  rampSubsystem.fireTrigger(RampTriggers.CLIMB);
                 }));
 
     leftJoystick
@@ -304,7 +304,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.GOTO_IDLE);
+                  rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
   }
 
