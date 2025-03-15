@@ -258,9 +258,9 @@ public class StrategyManager {
       // Don't automatically set level in smart mode; this will be set when the warmup trigger is
       // pressed. This can't happen in periodic because algae level is automatically determined when
       // intake is pressed and would be overridden by this in each loop.
-      if (getAutonomyMode() != AutonomyMode.Smart) {
-        scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
-      }
+      // if (getAutonomyMode() != AutonomyMode.Smart) {
+      scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
+      // }
     }
 
     // update autonomy level
