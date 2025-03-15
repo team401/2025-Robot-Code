@@ -4,15 +4,17 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.configs.CANdiConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.PWM1Configs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
-import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -22,16 +24,18 @@ import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.constants.ClimbConstants;
 import frc.robot.constants.JsonConstants;
+import frc.robot.util.PhoenixUtil;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class ClimbIOTalonFX implements ClimbIO {
 
-  TalonFX leadMotor;
-  TalonFX followerMotor;
-  CANcoder climbAngleCoder;
+  protected final TalonFX leadMotor;
+  protected final TalonFX followerMotor;
+  protected final CANdi climbAngleCandi;
 
   TalonFXConfiguration talonFXConfigs;
+  CANdiConfiguration candiConfig;
 
   // TODO: replace when sensors become available - apparently this is not happening actually but
   // leaving this in case a better solution happens later
@@ -46,9 +50,21 @@ public class ClimbIOTalonFX implements ClimbIO {
       new MotionMagicVoltage(ClimbConstants.synced.getObject().restingAngle);
 
   public ClimbIOTalonFX() {
-    leadMotor = new TalonFX(16, "canivore");
-    followerMotor = new TalonFX(17, "canivore");
-    climbAngleCoder = new CANcoder(17, "canivore");
+
+    candiConfig =
+        new CANdiConfiguration()
+            .withPWM1(
+                new PWM1Configs()
+                    .withAbsoluteSensorOffset(Radians.of(0))
+                    .withAbsoluteSensorDiscontinuityPoint(0.5)
+                    .withSensorDirection(true));
+    climbAngleCandi = new CANdi(ClimbConstants.synced.getObject().canDiID, "canivore");
+    PhoenixUtil.tryUntilOk(1000, () -> climbAngleCandi.getConfigurator().apply(candiConfig));
+
+    // HITL CODE: leadMotor = new TalonFX(6, "rio");
+
+    leadMotor = new TalonFX(ClimbConstants.synced.getObject().leadClimbMotorId, "canivore");
+    followerMotor = new TalonFX(ClimbConstants.synced.getObject().followerClimbMotorId, "canivore");
 
     followerMotor.setControl(
         new Follower(
@@ -58,8 +74,8 @@ public class ClimbIOTalonFX implements ClimbIO {
         new TalonFXConfiguration()
             .withFeedback(
                 new FeedbackConfigs()
-                    .withFeedbackRemoteSensorID(climbAngleCoder.getDeviceID())
-                    .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder))
+                    .withFeedbackRemoteSensorID(climbAngleCandi.getDeviceID())
+                    .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANdiPWM1))
             .withMotorOutput(
                 new MotorOutputConfigs()
                     .withNeutralMode(NeutralModeValue.Brake)
@@ -93,22 +109,21 @@ public class ClimbIOTalonFX implements ClimbIO {
 
     inputs.lockedToCage = this.lockedToCage.getAsBoolean();
     inputs.goalAngle.mut_replace(goalAngle);
-    inputs.motorAngle.mut_replace(climbAngleCoder.getAbsolutePosition().getValue());
-  }
-
-  private double feedforward = 0.0;
-
-  public void setFF(double newFF) {
-    this.feedforward = newFF;
+    inputs.motorAngle.mut_replace(climbAngleCandi.getPWM1Position().getValue());
   }
 
   @Override
   public void applyOutputs(ClimbOutputs outputs) {
-    if (goalAngle.lt(climbAngleCoder.getAbsolutePosition().getValue())) {
-      calculator.withPosition(goalAngle.in(Rotations)).withFeedForward(feedforward);
+
+    /*Slot0Configs configs = talonFXConfigs.Slot0;
+
+    if (goalAngle.lt(climbAngleCandi.getPWM1Position().getValue())) {
+      configs.kP = ClimbConstants.synced.getObject().climbkPInc;
     } else {
-      calculator.withPosition(goalAngle.in(Rotations)).withFeedForward(0.0);
-    }
+      configs.kP = ClimbConstants.synced.getObject().climbkP;
+    }*/
+
+    calculator.withPosition(goalAngle.in(Rotations)); // .withSlot(configs);
 
     Logger.recordOutput("climb/calculatorAngle", leadMotor.getPosition().getValueAsDouble());
 

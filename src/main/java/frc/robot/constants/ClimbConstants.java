@@ -26,12 +26,14 @@ public class ClimbConstants {
 
   public final Integer leadClimbMotorId = 16;
   public final Integer followerClimbMotorId = 17;
+  public final Integer canDiID = 0;
 
   public final Double climbkS = 0.0;
   public final Double climbkV = 0.0;
   public final Double climbkA = 0.0;
   public final Double climbkG = 0.0;
   public final Double climbkP = 5.0;
+  public final Double climbkPInc = 20.0;
   public final Double climbkI = 0.0;
   public final Double climbkD = 0.0;
 
