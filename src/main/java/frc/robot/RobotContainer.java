@@ -209,6 +209,7 @@ public class RobotContainer {
               switch (strategyManager.getAutonomyMode()) {
                 case Manual:
                   return InitBindings.isManualScorePressed();
+                case Smart:
                 case Mixed:
                   return drive.isDriveAlignmentFinished() || InitBindings.isManualScorePressed();
                 case Full:
