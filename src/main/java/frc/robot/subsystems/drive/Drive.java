@@ -150,6 +150,7 @@ public class Drive implements DriveTemplate {
     Algae4,
     Algae5,
     Processor,
+    Net,
     CoralStationLeft,
     CoralStationRight,
   }
@@ -167,6 +168,10 @@ public class Drive implements DriveTemplate {
     DesiredLocation.Reef9,
     DesiredLocation.Reef10,
     DesiredLocation.Reef11,
+    DesiredLocation.Processor,
+    DesiredLocation.Net,
+    DesiredLocation.CoralStationLeft,
+    DesiredLocation.CoralStationRight
   };
 
   public DesiredLocation[] locationArray = {
@@ -650,7 +655,7 @@ public class Drive implements DriveTemplate {
                 || desiredLocation == DesiredLocation.CoralStationRight
                 || desiredLocation == DesiredLocation.Processor)
             && !goToIntake;
-    boolean isAlgaeReefTarget = isLocationAlgaeIntake(intakeLocation) && goToIntake;
+    boolean isAlgaeReefTarget = isLocationAlgaeIntake(desiredLocation) && goToIntake;
     return isCoralReefTarget || isAlgaeReefTarget;
   }
 

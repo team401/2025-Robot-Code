@@ -184,6 +184,10 @@ public class DrivetrainConstants {
   public final Double OTFMaxLinearAccel = 2.0;
   public final Double OTFMaxAngularVelocity = Math.PI;
   public final Double OTFMaxAngularAccel = Math.PI / 2;
+  public final Double OTFSlowLinearVelocity = 1.0;
+  public final Double OTFSlowLinearAccel = 0.5;
+  public final Double OTFSlowAngularVelocity = Math.PI / 2;
+  public final Double OTFSlowAngularAccel = Math.PI / 4;
 
   // These are only used for simulation
   @JSONExclude public final MomentOfInertia kSteerInertia = KilogramSquareMeters.of(0.01);

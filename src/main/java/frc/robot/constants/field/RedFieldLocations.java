@@ -5,7 +5,6 @@ import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;
 
@@ -88,11 +87,11 @@ public class RedFieldLocations {
 
   public Translation2d redAlgae5Translation = new Translation2d(12.714, 3.425);
 
-  public Translation2d redCoralStationRightTranslation = new Translation2d(16.3, 7);
-  public Rotation2d redCoralStationRightRotation = new Rotation2d(Units.degreesToRadians(-120));
+  public Translation2d redCoralStationRightTranslation = new Translation2d(15.82, 7.32);
+  public Rotation2d redCoralStationRightRotation = new Rotation2d(-2.2689);
 
-  public Translation2d redCoralStationLeftTranslation = new Translation2d(16.3, 1);
-  public Rotation2d redCoralStationLeftRotation = new Rotation2d(Units.degreesToRadians(120));
+  public Translation2d redCoralStationLeftTranslation = new Translation2d(15.82, 0.6048);
+  public Rotation2d redCoralStationLeftRotation = new Rotation2d(2.2689);
 
   public Translation2d redNetTranslation = new Translation2d(10.319, 2.768);
   public Rotation2d redNetRotation = new Rotation2d(Math.PI / 2);
