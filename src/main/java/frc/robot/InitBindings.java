@@ -67,6 +67,7 @@ public final class InitBindings {
                         // to avoid undoing the auto algae height selector
                         // The drive location is immediately overwritten below
                         strategyManager.updateScoringLocationsFromSnakeScreen();
+                        strategyManager.updateScoringLevelFromNetworkTables();
                       }
 
                       // When the scoring trigger is pulled in smart autonomy, select the closest
@@ -191,7 +192,7 @@ public final class InitBindings {
                           || ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Algae) {
                         DesiredLocation desiredLocation =
                             ReefLineupUtil.getClosestAlgaeLocation(drive.getPose());
-                        drive.setDesiredLocation(desiredLocation);
+                        drive.setDesiredIntakeLocation(desiredLocation);
 
                         // Set algae level automatically
                         if (ScoringSubsystem.getInstance() != null) {
@@ -202,11 +203,11 @@ public final class InitBindings {
                       } else {
                         if (DriverStation.getAlliance().isPresent()
                             && DriverStation.getAlliance().get() == Alliance.Red) {
-                          drive.setDesiredLocation(
+                          drive.setDesiredIntakeLocation(
                               JsonConstants.redFieldLocations.getClosestCoralStation(
                                   drive.getPose()));
                         } else {
-                          drive.setDesiredLocation(
+                          drive.setDesiredIntakeLocation(
                               JsonConstants.blueFieldLocations.getClosestCoralStation(
                                   drive.getPose()));
                         }
