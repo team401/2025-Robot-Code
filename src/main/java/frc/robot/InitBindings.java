@@ -192,7 +192,7 @@ public final class InitBindings {
                           || ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Algae) {
                         DesiredLocation desiredLocation =
                             ReefLineupUtil.getClosestAlgaeLocation(drive.getPose());
-                        drive.setDesiredLocation(desiredLocation);
+                        drive.setDesiredIntakeLocation(desiredLocation);
 
                         // Set algae level automatically
                         if (ScoringSubsystem.getInstance() != null) {
