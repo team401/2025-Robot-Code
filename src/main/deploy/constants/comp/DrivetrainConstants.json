@@ -43,6 +43,7 @@
   "allowLineupFinishWithCachedObservation": true,
   "otfPoseDistanceLimit": 0.5,
   "otfFarWarmupDistance": 2.5,
+  "otfTeleopFarWarmupDistance": 2.0,
   "otfWarmupDistance": 1.5,
   "otfVisionAlongTrackThreshold": 0.3,
   "otfVisionCrossTrackThreshold": 0.25,
@@ -354,6 +355,10 @@
   "OTFMaxLinearAccel": 4.0,
   "OTFMaxAngularVelocity": 3.141592653589793,
   "OTFMaxAngularAccel": 1.5707963267948966,
+  "TeleopOTFMaxLinearVelocity": 3.5,
+  "TeleopOTFMaxLinearAccel": 2.0,
+  "TeleopOTFMaxAngularVelocity": 3.141592653589793,
+  "TeleopOTFMaxAngularAccel": 1.5707963267948966,
   "DrivetrainConstants": {
     "CANBusName": "canivore",
     "Pigeon2Id": 13

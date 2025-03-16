@@ -6,6 +6,7 @@ import com.pathplanner.lib.path.PathConstraints;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -208,6 +209,15 @@ public class OTFState implements PeriodicStateInterface {
               JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
     }
 
+    if (DriverStation.isTeleop()) {
+      constraints =
+          new PathConstraints(
+              JsonConstants.drivetrainConstants.TeleopOTFMaxLinearVelocity,
+              JsonConstants.drivetrainConstants.TeleopOTFMaxLinearAccel,
+              JsonConstants.drivetrainConstants.TeleopOTFMaxAngularVelocity,
+              JsonConstants.drivetrainConstants.TeleopOTFMaxAngularAccel);
+    }
+
     return AutoBuilder.pathfindToPose(
         otfPose,
         constraints,
@@ -228,7 +238,9 @@ public class OTFState implements PeriodicStateInterface {
 
     if (drive.isDriveCloseForWarmup() && ScoringSubsystem.getInstance() != null) {
       ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
-    } else if (drive.isDriveCloseForFarWarmup() && ScoringSubsystem.getInstance() != null) {
+    } else if (drive.isDriveCloseForFarWarmup()
+        && ScoringSubsystem.getInstance() != null
+        && DriverStation.isAutonomous()) {
       ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartFarWarmup);
     }
 

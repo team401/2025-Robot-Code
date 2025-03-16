@@ -119,6 +119,7 @@ public class DrivetrainConstants {
   public final Double otfVisionCrossTrackThreshold = 0.5;
 
   public final Double otfFarWarmupDistance = 2.5;
+  public final Double otfTeleopFarWarmupDistance = 2.0;
 
   public final Double otfWarmupDistance = 1.5;
 
@@ -184,6 +185,12 @@ public class DrivetrainConstants {
   public final Double OTFMaxLinearAccel = 2.0;
   public final Double OTFMaxAngularVelocity = Math.PI;
   public final Double OTFMaxAngularAccel = Math.PI / 2;
+
+  // OTF Max speed / accel
+  public final Double TeleopOTFMaxLinearVelocity = 3.5;
+  public final Double TeleopOTFMaxLinearAccel = 2.0;
+  public final Double TeleopOTFMaxAngularVelocity = Math.PI;
+  public final Double TeleopOTFMaxAngularAccel = Math.PI / 2;
 
   // These are only used for simulation
   @JSONExclude public final MomentOfInertia kSteerInertia = KilogramSquareMeters.of(0.01);
