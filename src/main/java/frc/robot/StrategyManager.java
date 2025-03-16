@@ -255,12 +255,14 @@ public class StrategyManager {
         scoringSubsystem.setGamePiece(GamePiece.Algae);
       }
 
-      // Don't automatically set level in smart mode; this will be set when the warmup trigger is
+      // Don't automatically set level in smart mode FOR ALGAE; this will be set when the warmup
+      // trigger is
       // pressed. This can't happen in periodic because algae level is automatically determined when
       // intake is pressed and would be overridden by this in each loop.
-      // if (getAutonomyMode() != AutonomyMode.Smart) {
-      scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
-      // }
+      if (getAutonomyMode() != AutonomyMode.Smart
+          || scoringSubsystem.getGamePiece() != GamePiece.Algae) {
+        updateScoringLevelFromNetworkTables();
+      }
     }
 
     // update autonomy level
@@ -307,6 +309,10 @@ public class StrategyManager {
     // send and receive from SnakeScreen
     this.updateScoringLocationsFromSnakeScreen();
     this.publishCoralAndAlgae();
+  }
+
+  public void updateScoringLevelFromNetworkTables() {
+    scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
   }
 
   public void publishDefaultSubsystemValues() {

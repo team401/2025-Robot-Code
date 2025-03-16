@@ -67,6 +67,7 @@ public final class InitBindings {
                         // to avoid undoing the auto algae height selector
                         // The drive location is immediately overwritten below
                         strategyManager.updateScoringLocationsFromSnakeScreen();
+                        strategyManager.updateScoringLevelFromNetworkTables();
                       }
 
                       // When the scoring trigger is pulled in smart autonomy, select the closest
