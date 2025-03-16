@@ -203,11 +203,11 @@ public final class InitBindings {
                       } else {
                         if (DriverStation.getAlliance().isPresent()
                             && DriverStation.getAlliance().get() == Alliance.Red) {
-                          drive.setDesiredLocation(
+                          drive.setDesiredIntakeLocation(
                               JsonConstants.redFieldLocations.getClosestCoralStation(
                                   drive.getPose()));
                         } else {
-                          drive.setDesiredLocation(
+                          drive.setDesiredIntakeLocation(
                               JsonConstants.blueFieldLocations.getClosestCoralStation(
                                   drive.getPose()));
                         }
