@@ -196,7 +196,9 @@ public class OTFState implements PeriodicStateInterface {
 
     if (drive.isDriveCloseForWarmup() && ScoringSubsystem.getInstance() != null) {
       ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
-    } else if (drive.isDriveCloseForFarWarmup() && ScoringSubsystem.getInstance() != null && DriverStation.isAutonomous()) {
+    } else if (drive.isDriveCloseForFarWarmup()
+        && ScoringSubsystem.getInstance() != null
+        && DriverStation.isAutonomous()) {
       ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartFarWarmup);
     }
 

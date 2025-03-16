@@ -598,10 +598,15 @@ public class Drive implements DriveTemplate {
 
   @AutoLogOutput(key = "Drive/OTF/isDriveCloseForFarWarmup")
   public boolean isDriveCloseForFarWarmup() {
-    return this.getPose()
-            .getTranslation()
-            .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation())
-        < JsonConstants.drivetrainConstants.otfFarWarmupDistance;
+    return (DriverStation.isAutonomous()
+            && this.getPose()
+                    .getTranslation()
+                    .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation())
+                < JsonConstants.drivetrainConstants.otfFarWarmupDistance)
+        || this.getPose()
+                .getTranslation()
+                .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation())
+            < JsonConstants.drivetrainConstants.otfTeleopFarWarmupDistance;
   }
 
   public boolean isDriveCloseForWarmup() {

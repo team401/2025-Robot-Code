@@ -115,6 +115,7 @@ public class DrivetrainConstants {
   public final Double otfVisionCrossTrackThreshold = 0.5;
 
   public final Double otfFarWarmupDistance = 2.5;
+  public final Double otfTeleopFarWarmupDistance = 2.0;
 
   public final Double otfWarmupDistance = 1.5;
 
