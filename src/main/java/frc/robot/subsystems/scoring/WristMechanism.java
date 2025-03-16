@@ -101,6 +101,10 @@ public class WristMechanism {
     Logger.processInputs("wrist/outputs", outputs);
   }
 
+  public void setBrakeMode(boolean brake) {
+    io.setBrakeMode(brake);
+  }
+
   /** This method must be called from the subsystem's test periodic! */
   public void testPeriodic() {
     switch (TestModeManager.getTestMode()) {

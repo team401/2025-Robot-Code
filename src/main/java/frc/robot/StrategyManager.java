@@ -27,6 +27,7 @@ import org.littletonrobotics.junction.Logger;
 public class StrategyManager {
   public enum AutonomyMode {
     Full,
+    Smart,
     Mixed,
     Manual,
   }
@@ -97,6 +98,9 @@ public class StrategyManager {
     switch (mode) {
       case Full:
         autonomyPublisher.accept("high");
+        break;
+      case Smart:
+        autonomyPublisher.accept("smart");
         break;
       case Mixed:
         autonomyPublisher.accept("mid");
@@ -224,14 +228,20 @@ public class StrategyManager {
   public void updateScoringLocationsFromSnakeScreen() {
     // drive reef location
     if (drive != null) {
-      drive.updateDesiredLocationFromNetworkTables(
-          reefLocationSelector.get(), gamePieceSelector.get().equalsIgnoreCase("algae"));
+      // Don't set reef target from SnakeScreen in 'smart' mode, this will be picked automatically
+      // based on distance
+      if (getAutonomyMode() != AutonomyMode.Smart) {
+        drive.updateDesiredLocationFromNetworkTables(
+            reefLocationSelector.get(), gamePieceSelector.get().equalsIgnoreCase("algae"));
+      }
 
       // 20: left; 21: right
-      drive.setDesiredIntakeLocation(
-          intakeLocationSelector.get() == 20
-              ? DesiredLocation.CoralStationLeft
-              : DesiredLocation.CoralStationRight);
+      if (gamePieceSelector.get().equalsIgnoreCase("coral")) {
+        drive.setDesiredIntakeLocation(
+            intakeLocationSelector.get() == 20
+                ? DesiredLocation.CoralStationLeft
+                : DesiredLocation.CoralStationRight);
+      }
     }
 
     // scoring level selection
@@ -245,7 +255,12 @@ public class StrategyManager {
         scoringSubsystem.setGamePiece(GamePiece.Algae);
       }
 
+      // Don't automatically set level in smart mode; this will be set when the warmup trigger is
+      // pressed. This can't happen in periodic because algae level is automatically determined when
+      // intake is pressed and would be overridden by this in each loop.
+      // if (getAutonomyMode() != AutonomyMode.Smart) {
       scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
+      // }
     }
 
     // update autonomy level
@@ -253,6 +268,8 @@ public class StrategyManager {
 
     if (autonomyLevel.equalsIgnoreCase("high")) {
       this.setAutonomyMode(AutonomyMode.Full);
+    } else if (autonomyLevel.equalsIgnoreCase("smart")) {
+      this.setAutonomyMode(AutonomyMode.Smart);
     } else if (autonomyLevel.equalsIgnoreCase("mid")) {
       this.setAutonomyMode(AutonomyMode.Mixed);
     } else if (autonomyLevel.equalsIgnoreCase("low")) {
@@ -348,6 +365,9 @@ public class StrategyManager {
       case Full:
         autonomyPublisher.accept("high");
         break;
+      case Smart:
+        autonomyPublisher.accept("smart");
+        break;
       case Mixed:
         autonomyPublisher.accept("mid");
         break;
@@ -382,7 +402,7 @@ public class StrategyManager {
    * values
    */
   public void teleopInit() {
-    this.setAutonomyMode(AutonomyMode.Mixed);
+    this.setAutonomyMode(AutonomyMode.Smart);
 
     this.clearActions();
 
