@@ -134,6 +134,14 @@ public final class InitBindings {
                 },
                 drive));
 
+    rightJoystick
+        .button(3)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  drive.sidestepReefLocation();
+                }));
+
     // // pov right (reef 0-11 -> processor left -> processor right )
     // // pov left (goes backwards of right)
     // driverController
@@ -264,7 +272,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
+                  rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
 
     rightJoystick
@@ -272,7 +280,7 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.GOTO_IDLE);
+                  rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
 
     leftJoystick
@@ -280,7 +288,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
+                  rampSubsystem.fireTrigger(RampTriggers.INTAKE);
                 }));
 
     leftJoystick
@@ -288,7 +296,7 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.GOTO_IDLE);
+                  rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
 
     leftJoystick
@@ -296,7 +304,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.START_CLIMB);
+                  rampSubsystem.fireTrigger(RampTriggers.CLIMB);
                 }));
 
     leftJoystick
@@ -304,7 +312,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.GOTO_IDLE);
+                  rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
   }
 
