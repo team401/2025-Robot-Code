@@ -228,19 +228,20 @@ public class StrategyManager {
   public void updateScoringLocationsFromSnakeScreen() {
     // drive reef location
     if (drive != null) {
-      // Don't set reef target from SnakeScreen in 'smart' mode, this will be picked automatically
+      // Don't set reef target or intake location from SnakeScreen in 'smart' mode, this will be
+      // picked automatically
       // based on distance
       if (getAutonomyMode() != AutonomyMode.Smart) {
         drive.updateDesiredLocationFromNetworkTables(
             reefLocationSelector.get(), gamePieceSelector.get().equalsIgnoreCase("algae"));
-      }
 
-      // 20: left; 21: right
-      if (gamePieceSelector.get().equalsIgnoreCase("coral")) {
-        drive.setDesiredIntakeLocation(
-            intakeLocationSelector.get() == 20
-                ? DesiredLocation.CoralStationLeft
-                : DesiredLocation.CoralStationRight);
+        // 20: left; 21: right
+        if (gamePieceSelector.get().equalsIgnoreCase("coral")) {
+          drive.setDesiredIntakeLocation(
+              intakeLocationSelector.get() == 20
+                  ? DesiredLocation.CoralStationLeft
+                  : DesiredLocation.CoralStationRight);
+        }
       }
     }
 
