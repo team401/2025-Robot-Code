@@ -7,6 +7,7 @@ import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
@@ -42,6 +43,10 @@ public class IntakeState implements PeriodicStateInterface {
     detectedAngle = Rotations.mutable(0.0);
     isCounting = false;
     Logger.recordOutput("claw/intake/diff", 0.0);
+
+    if (DriverStation.isAutonomous()) {
+      scoringSubsystem.setShouldWarmupNextOTF(true);
+    }
   }
 
   // @Override

@@ -4,10 +4,10 @@ import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
-import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
@@ -22,8 +22,8 @@ public class ScoreState implements PeriodicStateInterface {
 
   @Override
   public void onEntry(Transition transition) {
-    if (Drive.getInstance() != null) {
-      Drive.getInstance().setShouldWarmupNextOTF(true);
+    if (DriverStation.isAutonomous()) {
+      scoringSubsystem.setShouldWarmupNextOTF(true);
     }
   }
 

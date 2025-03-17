@@ -27,6 +27,7 @@ import frc.robot.TestModeManager;
 import frc.robot.TestModeManager.TestMode;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ElevatorIO.ElevatorOutputMode;
 import frc.robot.subsystems.scoring.states.FarWarmupState;
 import frc.robot.subsystems.scoring.states.IdleState;
@@ -210,6 +211,9 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    * the ramp
    */
   private BooleanSupplier rampSafeSupplier = () -> true;
+
+  /** Should scoring tell drive to warmup next OTF at the end of this periodic? */
+  private boolean shouldWarmupNextOTF = false;
 
   public ScoringSubsystem(
       ElevatorMechanism elevatorMechanism,
@@ -667,6 +671,11 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     Logger.recordOutput("scoring/algaeCurrentDetected", algaeCurrentDetected);
     Logger.recordOutput("scoring/state", stateMachine.getCurrentState());
     Logger.recordOutput("scoring/isDriveLinedUp", isDriveLinedUpSupplier.getAsBoolean());
+
+    if (shouldWarmupNextOTF && Drive.getInstance() != null) {
+      Drive.getInstance().setShouldWarmupNextOTF(true);
+      shouldWarmupNextOTF = false;
+    }
   }
 
   /** This method must be called by RobotContainer, as it does not run automatically! */
@@ -896,5 +905,9 @@ public class ScoringSubsystem extends MonitoredSubsystem {
 
   public void setAlgaeCurrentDetected(boolean detected) {
     algaeCurrentDetected = detected;
+  }
+
+  public void setShouldWarmupNextOTF(boolean shouldWarmupNextOTF) {
+    this.shouldWarmupNextOTF = shouldWarmupNextOTF;
   }
 }
