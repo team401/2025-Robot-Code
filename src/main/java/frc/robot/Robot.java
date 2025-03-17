@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.pathplanner.lib.commands.PathfindingCommand;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -72,6 +73,13 @@ public class Robot extends LoggedRobot {
     robotContainer = new RobotContainer();
   }
 
+  Command warmupCommand = PathfindingCommand.warmupCommand();
+
+  @Override
+  public void robotInit() {
+    warmupCommand.schedule();
+  }
+
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
@@ -104,6 +112,10 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    if (warmupCommand.isScheduled()) {
+      warmupCommand.cancel();
+    }
+
     robotContainer.autonomousInit();
   }
 
@@ -122,6 +134,10 @@ public class Robot extends LoggedRobot {
     // this line or comment it out.
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
+    }
+
+    if (warmupCommand.isScheduled()) {
+      warmupCommand.cancel();
     }
 
     robotContainer.teleopInit();

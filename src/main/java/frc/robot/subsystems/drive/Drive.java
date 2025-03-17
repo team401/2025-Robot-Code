@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.CANBus;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -250,7 +249,7 @@ public class Drive implements DriveTemplate {
 
   private LocalADStarAK localADStar = new LocalADStarAK();
 
-  private Command warmupCommand = PathfindingCommand.warmupCommand();
+  // private Command warmupCommand = PathfindingCommand.warmupCommand();
 
   /**
    * Should drive warm up the next OTF path in periodic?
@@ -328,7 +327,7 @@ public class Drive implements DriveTemplate {
           getPose().getTranslation());
     }
 
-    warmupCommand.schedule();
+    // warmupCommand.schedule();
 
     angleController.enableContinuousInput(-Math.PI, Math.PI);
     // Configure SysId
@@ -379,9 +378,9 @@ public class Drive implements DriveTemplate {
 
   public void autonomousInit() {
 
-    if (warmupCommand != null && warmupCommand.isScheduled()) {
-      warmupCommand.cancel();
-    }
+    // if (warmupCommand != null && warmupCommand.isScheduled()) {
+    //   warmupCommand.cancel();
+    // }
   }
 
   /** remove algae coral stack obstacles for on the fly */
@@ -483,9 +482,9 @@ public class Drive implements DriveTemplate {
   }
 
   public void disabledPeriodic() {
-    if (warmupCommand != null) {
-      Logger.recordOutput("Drive/warmupScheduled", warmupCommand.isScheduled());
-    }
+    // if (warmupCommand != null) {
+    //   Logger.recordOutput("Drive/warmupScheduled", warmupCommand.isScheduled());
+    // }
 
     if (!OTFState.hasDriveToPoseCommand()) {
       OTFState.getDriveToPoseCommand(this);

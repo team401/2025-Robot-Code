@@ -407,7 +407,7 @@ public class LineupState implements PeriodicStateInterface {
 
     if (observation.isValid()) {
       usingOtherCamera = false;
-      driveCrossTrackLineupController.reset();
+      driveCrossTrackOtherCameraLineupController.reset();
       latestObservation = observation;
 
       poseAtLastObservation = drive.getPose();
@@ -418,7 +418,7 @@ public class LineupState implements PeriodicStateInterface {
       // check if the other camera has observation (maybe we switched to other pole or camera got
       // unplugged)
       usingOtherCamera = true;
-      driveCrossTrackOtherCameraLineupController.reset();
+      driveCrossTrackLineupController.reset();
       latestObservation = otherCameraObs;
       observation = otherCameraObs;
       observationAge = 0;

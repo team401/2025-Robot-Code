@@ -10,6 +10,7 @@ import coppercore.vision.VisionIOPhotonReal;
 import coppercore.vision.VisionIOPhotonSim;
 import coppercore.vision.VisionLocalizer;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -204,6 +205,7 @@ public final class InitSubsystems {
 
   public static VisionLocalizer initVisionSubsystem(Drive drive) {
     AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+    tagLayout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
     switch (ModeConstants.currentMode) {
       case REAL:
         return new VisionLocalizer(
