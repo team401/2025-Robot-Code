@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -78,6 +79,9 @@ public class Robot extends LoggedRobot {
   @Override
   public void robotInit() {
     warmupCommand.schedule();
+
+    SignalLogger.enableAutoLogging(false);
+    SignalLogger.stop();
   }
 
   /** This function is called periodically during all modes. */
