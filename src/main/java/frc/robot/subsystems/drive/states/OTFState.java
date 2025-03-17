@@ -323,12 +323,7 @@ public class OTFState implements PeriodicStateInterface {
             nextAction.type() == ActionType.Intake,
             Drive.getInstance().isAllianceRed());
 
-    System.out.println(driveToPose == null);
-    if (driveToPose == null) {
-      Drive.getInstance().fireTrigger(DriveTrigger.CancelOTF);
-    }
-
-    System.out.println("Warming up next OTF command");
+    System.out.println("Warmed up next OTF command");
     // TODO: Figure out if we should call driveToPose.initialize() or driveToPose.execute() to force
     // warmup
   }
