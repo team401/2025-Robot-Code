@@ -221,11 +221,6 @@ public class OTFState implements PeriodicStateInterface {
       this.onEntry(null);
     }
 
-    // finishes otf when we are 0.1 meters away
-    // if (drive.isDriveCloseToFinalLineupPose()) {
-    //   drive.fireTrigger(DriveTrigger.FinishOTF);
-    // }
-
     if (drive.isDriveCloseForWarmup() && ScoringSubsystem.getInstance() != null) {
       ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
     } else if (drive.isDriveCloseForFarWarmup() && ScoringSubsystem.getInstance() != null) {
@@ -236,15 +231,6 @@ public class OTFState implements PeriodicStateInterface {
       Logger.recordOutput("Drive/OTF/commandScheduled", driveToPose.isScheduled());
       Logger.recordOutput("Drive/OTF/commandFinished", driveToPose.isFinished());
 
-      // reschedule command if its not actually close
-      // if (driveToPose.isFinished() && !drive.isDriveCloseToFinalLineupPose()) {
-      //   driveToPose = this.getDriveToPoseCommand();
-      //   if (driveToPose == null) {
-      //     drive.fireTrigger(DriveTrigger.CancelOTF);
-      //   }
-      //   this.driveToPose.schedule();
-      //   // go to lineup if we want reef
-      // } else
       if ((driveToPose == null || driveToPose.isFinished())
           && !drive.isDriveCloseToFinalLineupPose()) {
         this.driveToPose = getDriveToPoseCommand(drive);
@@ -258,35 +244,6 @@ public class OTFState implements PeriodicStateInterface {
         drive.fireTrigger(DriveTrigger.CancelOTF);
         System.out.println("driveToPose isFinished canceled OTF!");
       }
-
-      // if (drive.isDesiredLocationReef()) {
-      //   // Check if we are close to a tag and can see the desired tag and go to OTF
-      //   int tagId = ReefLineupUtil.getTagIdForReef(drive);
-      //   int cameraIndex = ReefLineupUtil.getCameraIndexForLineup(drive);
-
-      //   if (tagId == -1 || cameraIndex == -1) {
-      //     // TODO: check if this might be false first time, but on another loop true
-      //     // drive.fireTrigger(DriveTrigger.CancelLineup);
-      //     return;
-      //   }
-
-      //   VisionAlignment alignmentSupplier = drive.getVisionAlignment();
-
-      //   DistanceToTag observation =
-      //       alignmentSupplier.get(
-      //           tagId,
-      //           cameraIndex,
-      //           ReefLineupUtil.getCrossTrackOffset(cameraIndex),
-      //           JsonConstants.drivetrainConstants.driveAlongTrackOffset);
-
-      //   if (observation.isValid()
-      //       && observation.alongTrackDistance()
-      //           < JsonConstants.drivetrainConstants.otfVisionAlongTrackThreshold
-      //       && Math.abs(observation.crossTrackDistance())
-      //           < JsonConstants.drivetrainConstants.otfVisionCrossTrackThreshold) {
-      //     drive.fireTrigger(DriveTrigger.BeginLineup);
-      //   }
-      // }
     }
   }
 }
