@@ -6,6 +6,7 @@ import com.pathplanner.lib.path.PathConstraints;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.StrategyManager;
 import frc.robot.constants.AutoStrategyContainer.Action;
@@ -48,6 +49,10 @@ public class OTFState implements PeriodicStateInterface {
     System.out.println("Cancelling command");
     if (driveToPose != null) {
       this.driveToPose.cancel();
+    }
+
+    if (DriverStation.isAutonomous() && drive.isGoingToIntake()) {
+      drive.setShouldWarmupNextOTF(true);
     }
   }
 
