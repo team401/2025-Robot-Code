@@ -7,7 +7,6 @@ import coppercore.controls.state_machine.transition.Transition;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
-import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.states.OTFState;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
@@ -37,7 +36,7 @@ public class ScoreState implements PeriodicStateInterface {
     ScoringSetpoint setpoint;
 
     if (hasStartedRollers) {
-      OTFState.getDriveToPoseCommand(Drive.getInstance());
+      OTFState.warmupForNextLocation();
     }
 
     // Only warmup like normal when we aren't doing algae in the net

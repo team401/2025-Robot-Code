@@ -7,8 +7,12 @@ import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.StrategyManager;
+import frc.robot.constants.AutoStrategyContainer.Action;
+import frc.robot.constants.AutoStrategyContainer.ActionType;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
@@ -56,12 +60,13 @@ public class OTFState implements PeriodicStateInterface {
    *
    * @return a pose representing the corresponding scoring location
    */
-  public static Pose2d findOTFPoseFromDesiredLocation(Drive driveInput) {
-    switch (driveInput.getDesiredLocation()) {
+  public static Pose2d findOTFPoseFromDesiredLocation(
+      DesiredLocation desiredLocation, boolean isAllianceRed) {
+    switch (desiredLocation) {
         // NOTE: pairs of reef sides (ie 0 and 1) will have the same otf pose (approximately 0.5-1
         // meter away from center of tag)
       case Reef0:
-        return driveInput.isAllianceRed()
+        return isAllianceRed
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF0Translation,
                 JsonConstants.redFieldLocations.redReefOTF0Rotation)
@@ -70,7 +75,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF0Rotation);
       case Reef1:
       case Algae0:
-        return driveInput.isAllianceRed()
+        return isAllianceRed
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF1Translation,
                 JsonConstants.redFieldLocations.redReefOTF1Rotation)
@@ -78,7 +83,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF1Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF1Rotation);
       case Reef2:
-        return driveInput.isAllianceRed()
+        return isAllianceRed
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF2Translation,
                 JsonConstants.redFieldLocations.redReefOTF2Rotation)
@@ -87,7 +92,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF2Rotation);
       case Reef3:
       case Algae1:
-        return driveInput.isAllianceRed()
+        return isAllianceRed
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF3Translation,
                 JsonConstants.redFieldLocations.redReefOTF3Rotation)
@@ -95,7 +100,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF3Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF3Rotation);
       case Reef4:
-        return driveInput.isAllianceRed()
+        return isAllianceRed
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF4Translation,
                 JsonConstants.redFieldLocations.redReefOTF4Rotation)
@@ -104,7 +109,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF4Rotation);
       case Reef5:
       case Algae2:
-        return driveInput.isAllianceRed()
+        return isAllianceRed
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF5Translation,
                 JsonConstants.redFieldLocations.redReefOTF5Rotation)
@@ -112,7 +117,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF5Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF5Rotation);
       case Reef6:
-        return driveInput.isAllianceRed()
+        return isAllianceRed
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF6Translation,
                 JsonConstants.redFieldLocations.redReefOTF6Rotation)
@@ -121,7 +126,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF6Rotation);
       case Reef7:
       case Algae3:
-        return driveInput.isAllianceRed()
+        return isAllianceRed
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF7Translation,
                 JsonConstants.redFieldLocations.redReefOTF7Rotation)
@@ -129,7 +134,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF7Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF7Rotation);
       case Reef8:
-        return driveInput.isAllianceRed()
+        return isAllianceRed
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF8Translation,
                 JsonConstants.redFieldLocations.redReefOTF8Rotation)
@@ -138,7 +143,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF8Rotation);
       case Reef9:
       case Algae4:
-        return driveInput.isAllianceRed()
+        return isAllianceRed
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF9Translation,
                 JsonConstants.redFieldLocations.redReefOTF9Rotation)
@@ -146,7 +151,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF9Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF9Rotation);
       case Reef10:
-        return driveInput.isAllianceRed()
+        return isAllianceRed
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF10Translation,
                 JsonConstants.redFieldLocations.redReefOTF10Rotation)
@@ -155,7 +160,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF10Rotation);
       case Reef11:
       case Algae5:
-        return driveInput.isAllianceRed()
+        return isAllianceRed
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF11Translation,
                 JsonConstants.redFieldLocations.redReefOTF11Rotation)
@@ -163,7 +168,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF11Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF11Rotation);
       case CoralStationRight:
-        return driveInput.isAllianceRed()
+        return isAllianceRed
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redCoralStationRightTranslation,
                 JsonConstants.redFieldLocations.redCoralStationRightRotation)
@@ -171,7 +176,7 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueCoralStationRightTranslation,
                 JsonConstants.blueFieldLocations.blueCoralStationRightRotation);
       case CoralStationLeft:
-        return driveInput.isAllianceRed()
+        return isAllianceRed
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redCoralStationLeftTranslation,
                 JsonConstants.redFieldLocations.redCoralStationLeftRotation)
@@ -181,6 +186,47 @@ public class OTFState implements PeriodicStateInterface {
       default:
         return null;
     }
+  }
+
+  /**
+   * finds a pose to pathfind to based on desiredLocation enum
+   *
+   * @return a pose representing the corresponding scoring location
+   */
+  public static Pose2d findOTFPoseFromDesiredLocation(Drive driveInput) {
+    return findOTFPoseFromDesiredLocation(
+        driveInput.getDesiredLocation(), driveInput.isAllianceRed());
+  }
+
+  public static Command getDriveToPoseCommand(
+      DesiredLocation location, boolean isGoingToIntake, boolean isAllianceRed) {
+    otfPose = findOTFPoseFromDesiredLocation(location, isAllianceRed);
+
+    if (otfPose == null) {
+      return null;
+    }
+
+    // Create the constraints to use while pathfinding
+    PathConstraints constraints =
+        new PathConstraints(
+            JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
+            JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
+            JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
+            JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
+
+    if (isGoingToIntake) {
+      constraints =
+          new PathConstraints(
+              JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
+              JsonConstants.drivetrainConstants.OTFMaxLinearAccel - 1,
+              JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
+              JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
+    }
+
+    return AutoBuilder.pathfindToPose(
+        otfPose,
+        constraints,
+        isGoingToIntake ? 0 : JsonConstants.drivetrainConstants.otfPoseEndingVelocity);
   }
 
   /**
@@ -225,6 +271,10 @@ public class OTFState implements PeriodicStateInterface {
       this.onEntry(null);
     }
 
+    if (driveToPose != null && !driveToPose.isScheduled()) {
+      driveToPose.schedule();
+    }
+
     if (drive.isDriveCloseForWarmup() && ScoringSubsystem.getInstance() != null) {
       ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
     } else if (drive.isDriveCloseForFarWarmup() && ScoringSubsystem.getInstance() != null) {
@@ -249,5 +299,37 @@ public class OTFState implements PeriodicStateInterface {
         System.out.println("driveToPose isFinished canceled OTF!");
       }
     }
+  }
+
+  /**
+   * Generate the next pathfinding command to generate the command before it is needed
+   *
+   * <p>This does not schedule the command!
+   */
+  public static void warmupForNextLocation() {
+    Action nextAction = StrategyManager.getInstance().getNextAction();
+
+    if (nextAction == null || Drive.getInstance() == null) {
+      return;
+    }
+
+    if (PathfindingCommand.warmupCommand().isScheduled()) {
+      PathfindingCommand.warmupCommand().cancel();
+    }
+
+    driveToPose =
+        getDriveToPoseCommand(
+            nextAction.location(),
+            nextAction.type() == ActionType.Intake,
+            Drive.getInstance().isAllianceRed());
+
+    System.out.println(driveToPose == null);
+    if (driveToPose == null) {
+      Drive.getInstance().fireTrigger(DriveTrigger.CancelOTF);
+    }
+
+    System.out.println("Warming up next OTF command");
+    // TODO: Figure out if we should call driveToPose.initialize() or driveToPose.execute() to force
+    // warmup
   }
 }

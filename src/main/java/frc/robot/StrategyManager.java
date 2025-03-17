@@ -418,4 +418,19 @@ public class StrategyManager {
 
     this.publishDefaultSubsystemValues();
   }
+
+  /**
+   * Peek the next Action from the action queue
+   *
+   * <p>If the action queue is empty, this method will return null
+   *
+   * @return The next Action, or null if there is no next action
+   */
+  public Action peekNextLocation() {
+    if (actions.isEmpty()) {
+      return null;
+    }
+
+    return actions.peek();
+  }
 }
