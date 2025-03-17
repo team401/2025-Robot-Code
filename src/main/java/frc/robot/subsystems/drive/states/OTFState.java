@@ -47,6 +47,10 @@ public class OTFState implements PeriodicStateInterface {
     }
   }
 
+  public static boolean hasDriveToPoseCommand() {
+    return driveToPose != null;
+  }
+
   /**
    * finds a pose to pathfind to based on desiredLocation enum
    *

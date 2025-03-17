@@ -474,6 +474,10 @@ public class Drive implements DriveTemplate {
     if (warmupCommand != null) {
       Logger.recordOutput("Drive/warmupScheduled", warmupCommand.isScheduled());
     }
+
+    if (!OTFState.hasDriveToPoseCommand()) {
+      OTFState.getDriveToPoseCommand(this);
+    }
   }
 
   /**
