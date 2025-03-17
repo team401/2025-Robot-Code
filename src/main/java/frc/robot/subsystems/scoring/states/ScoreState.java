@@ -7,7 +7,7 @@ import coppercore.controls.state_machine.transition.Transition;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
-import frc.robot.subsystems.drive.states.OTFState;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
@@ -15,7 +15,6 @@ import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 
 public class ScoreState implements PeriodicStateInterface {
   private ScoringSubsystem scoringSubsystem;
-  private boolean hasStartedRollers = false;
 
   public ScoreState(ScoringSubsystem scoringSubsystem) {
     this.scoringSubsystem = scoringSubsystem;
@@ -23,21 +22,17 @@ public class ScoreState implements PeriodicStateInterface {
 
   @Override
   public void onEntry(Transition transition) {
-    hasStartedRollers = false;
+    if (Drive.getInstance() != null) {
+      Drive.getInstance().setShouldWarmupNextOTF(true);
+    }
   }
 
   @Override
-  public void onExit(Transition transition) {
-    hasStartedRollers = false;
-  }
+  public void onExit(Transition transition) {}
 
   @Override
   public void periodic() {
     ScoringSetpoint setpoint;
-
-    if (hasStartedRollers) {
-      OTFState.warmupForNextLocation();
-    }
 
     // Only warmup like normal when we aren't doing algae in the net
     if (scoringSubsystem.getGamePiece() == GamePiece.Algae
@@ -56,10 +51,8 @@ public class ScoreState implements PeriodicStateInterface {
         if (scoringSubsystem.getTarget() == FieldTarget.L2
             || scoringSubsystem.getTarget() == FieldTarget.L3) {
           scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.coralL23ScoreVoltage);
-          hasStartedRollers = true;
         } else {
           scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.coralScoreVoltage);
-          hasStartedRollers = true;
         }
         if (!scoringSubsystem.isCoralDetected()) {
           scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
@@ -74,14 +67,12 @@ public class ScoreState implements PeriodicStateInterface {
                   JsonConstants.scoringSetpoints.net.elevatorHeight(),
                   JsonConstants.elevatorConstants.elevatorSetpointEpsilon)) {
             scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
-            hasStartedRollers = true;
           } else {
             scoringSubsystem.setClawRollerVoltage(Volts.zero());
           }
         } else {
           // If scoring algae but not in the net, run the rollers (score processor as normal)
           scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
-          hasStartedRollers = true;
         }
 
         if (JsonConstants.scoringFeatureFlags.runClaw) {

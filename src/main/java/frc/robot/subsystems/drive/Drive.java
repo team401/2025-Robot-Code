@@ -252,6 +252,13 @@ public class Drive implements DriveTemplate {
 
   private Command warmupCommand = PathfindingCommand.warmupCommand();
 
+  /**
+   * Should drive warm up the next OTF path in periodic?
+   *
+   * <p>This is set by scoring and is reset after it is executed once
+   */
+  private boolean shouldWarmupNextOTF = false;
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -384,6 +391,11 @@ public class Drive implements DriveTemplate {
 
   @Override
   public void periodic() {
+    if (shouldWarmupNextOTF) {
+      OTFState.warmupForNextLocation();
+      setShouldWarmupNextOTF(false);
+    }
+
     // Manually cancel go to intake if we have a gamepiece
     if (goToIntake && ScoringSubsystem.getInstance().isCoralDetected()) {
       setGoToIntake(false);
@@ -1074,6 +1086,10 @@ public class Drive implements DriveTemplate {
           DriveConfiguration.getInstance().BackRight.LocationX,
           DriveConfiguration.getInstance().BackRight.LocationY)
     };
+  }
+
+  public void setShouldWarmupNextOTF(boolean shouldWarmupNextOTF) {
+    this.shouldWarmupNextOTF = shouldWarmupNextOTF;
   }
 
   @FunctionalInterface
