@@ -595,6 +595,17 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * Get the current instance of the drive subsystem
+   *
+   * <p>This should be used for scoring to warmup otf while scoring
+   *
+   * @return Current instance of the drive subsystem.
+   */
+  public static Drive getInstance() {
+    return instance;
+  }
+
+  /**
    * checks if robot pose is sufficiently close to desired pose
    *
    * @return true if robot pose is close to desired pose

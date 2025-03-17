@@ -17,9 +17,9 @@ import org.littletonrobotics.junction.Logger;
 public class OTFState implements PeriodicStateInterface {
   private Drive drive;
 
-  private Command driveToPose = null;
+  public static Command driveToPose = null;
 
-  private Pose2d otfPose = null;
+  public static Pose2d otfPose = null;
 
   public OTFState(Drive drive) {
     this.drive = drive;
@@ -29,7 +29,7 @@ public class OTFState implements PeriodicStateInterface {
     if (PathfindingCommand.warmupCommand().isScheduled()) {
       PathfindingCommand.warmupCommand().cancel();
     }
-    driveToPose = this.getDriveToPoseCommand();
+    driveToPose = this.getDriveToPoseCommand(drive);
     System.out.println(driveToPose == null);
     if (driveToPose == null) {
       drive.fireTrigger(DriveTrigger.CancelOTF);
@@ -184,7 +184,7 @@ public class OTFState implements PeriodicStateInterface {
    *
    * @return command that drive can schedule to follow the path found
    */
-  public Command getDriveToPoseCommand() {
+  public static Command getDriveToPoseCommand(Drive drive) {
     otfPose = findOTFPoseFromDesiredLocation(drive);
 
     if (otfPose == null) {
@@ -247,7 +247,7 @@ public class OTFState implements PeriodicStateInterface {
       // } else
       if ((driveToPose == null || driveToPose.isFinished())
           && !drive.isDriveCloseToFinalLineupPose()) {
-        this.driveToPose = getDriveToPoseCommand();
+        this.driveToPose = getDriveToPoseCommand(drive);
         if (driveToPose != null) {
           driveToPose.schedule();
         }
