@@ -3,6 +3,7 @@ package frc.robot.subsystems.scoring;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -62,9 +63,12 @@ public class ScoringSubsystemMapleSim {
                     drive.getPose().getRotation(),
                     Meters.of(
                         scoring.getElevatorHeight().in(Meters)
-                            + 0.5), // initial height of the ball, in meters
+                            + 0.4), // initial height of the ball, in meters
                     MetersPerSecond.of(4), // initial velocity, in m/s
-                    Degrees.of((scoring.getWristAngle().in(Degrees)) * -1)) // shooter angle
+                    Degrees.of(
+                        (scoring.getWristAngle().in(Radians)
+                            + 0.465719787 * 180.0
+                            + 3.14))) // shooter angle
                 .withProjectileTrajectoryDisplayCallBack(
                     (poses) -> {},
                     (poses) ->
