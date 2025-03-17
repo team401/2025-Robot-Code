@@ -20,7 +20,7 @@
   },
   "elevatorCANCoderDiscontinuityPoint": 1.0,
   "elevatorLargeCANCoderID": 32,
-  "elevatorLargeCANCoderDirection": "CounterClockwise_Positive",
+  "elevatorLargeCANCoderDirection": "Clockwise_Positive",
   "elevatorSmallCANCoderID": 33,
   "elevatorSmallCANCoderDirection": "CounterClockwise_Positive",
   "elevatorkP": 60.0,

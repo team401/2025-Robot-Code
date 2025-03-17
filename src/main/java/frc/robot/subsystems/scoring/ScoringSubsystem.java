@@ -278,7 +278,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
         .permitIf(
             ScoringTrigger.WarmupReady,
             ScoringState.Score,
-            () -> isDriveLinedUpSupplier.getAsBoolean())
+            () -> true) // () -> isDriveLinedUpSupplier.getAsBoolean())
         .permit(ScoringTrigger.ReturnToIdle, ScoringState.Idle)
         .permit(ScoringTrigger.CancelWarmup, ScoringState.Idle);
 
