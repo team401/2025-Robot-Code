@@ -426,7 +426,7 @@ public class StrategyManager {
    *
    * @return The next Action, or null if there is no next action
    */
-  public Action peekNextLocation() {
+  public Action peekNextAction() {
     if (actions.isEmpty()) {
       return null;
     }

@@ -307,7 +307,7 @@ public class OTFState implements PeriodicStateInterface {
    * <p>This does not schedule the command!
    */
   public static void warmupForNextLocation() {
-    Action nextAction = StrategyManager.getInstance().getNextAction();
+    Action nextAction = StrategyManager.getInstance().peekNextAction();
 
     if (nextAction == null || Drive.getInstance() == null) {
       return;
