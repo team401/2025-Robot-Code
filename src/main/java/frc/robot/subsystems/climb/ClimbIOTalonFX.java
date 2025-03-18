@@ -33,6 +33,7 @@ public class ClimbIOTalonFX implements ClimbIO {
   protected final TalonFX leadMotor;
   protected final TalonFX followerMotor;
   protected final CANdi climbAngleCandi;
+  private double encoderOrigin = 0;
 
   TalonFXConfiguration talonFXConfigs;
   CANdiConfiguration candiConfig;
@@ -104,7 +105,10 @@ public class ClimbIOTalonFX implements ClimbIO {
 
     // TODO: set lockedToCage when ramp becomes available
   }
-
+  @Override
+  public void robotInit() {
+    encoderOrigin = Math.floor(climbAngleCandi.getPWM1Position().getValue().in(Rotations));
+  }
   @Override
   public void updateInputs(ClimbInputs inputs) {
 
@@ -124,9 +128,10 @@ public class ClimbIOTalonFX implements ClimbIO {
       configs.kP = ClimbConstants.synced.getObject().climbkP;
     }*/
 
-    calculator.withPosition(goalAngle.in(Rotations)); // .withSlot(configs);
+    calculator.withPosition(goalAngle.in(Rotations) + encoderOrigin); // .withSlot(configs);
 
     Logger.recordOutput("climb/calculatorAngle", leadMotor.getPosition().getValueAsDouble());
+    Logger.recordOutput("climb/encoderOrigin", encoderOrigin);
 
     if (override) {
       leadMotor.setVoltage(overrideVoltage.in(Volts));
