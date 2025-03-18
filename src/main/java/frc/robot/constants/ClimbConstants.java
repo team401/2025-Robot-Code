@@ -1,6 +1,7 @@
 package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Rotations;
 
 import com.ctre.phoenix6.signals.InvertedValue;
 import coppercore.parameter_tools.json.JSONExclude;
@@ -23,6 +24,8 @@ public class ClimbConstants {
   public final Angle restingAngle = Radians.of(0);
   public final Angle searchingAngle = Radians.of(1);
   public final Angle finalHangingAngle = Radians.of(0.1);
+
+  public final Angle canDiOffset = Rotations.of(-1.91);
 
   public final Integer leadClimbMotorId = 16;
   public final Integer followerClimbMotorId = 17;
