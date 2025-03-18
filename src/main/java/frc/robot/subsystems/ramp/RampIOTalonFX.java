@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.controller.PIDController;
 import frc.robot.constants.JsonConstants;
 
@@ -21,6 +22,7 @@ public class RampIOTalonFX implements RampIO {
 
   private TalonFX talon;
   public double angle_offset = 0.0;
+  public final double gearing = (21.0 / 8.0);
 
   public RampIOTalonFX() {
     talon = new TalonFX(JsonConstants.rampConstants.motorId, "canivore");
@@ -51,7 +53,11 @@ public class RampIOTalonFX implements RampIO {
   @Override
   public void updateInputs(RampInputs inputs) {
     inputs.position =
-        Rotations.of(talon.getPosition().getValueAsDouble()).in(Radians) + angle_offset;
+        Rotations.of(talon.getPosition().getValueAsDouble() / gearing).in(Radians) + angle_offset;
+  }
+
+  public void setBrakeMode(boolean brake) {
+    talon.setNeutralMode(brake ? NeutralModeValue.Brake : NeutralModeValue.Coast);
   }
 
   @Override

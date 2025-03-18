@@ -74,6 +74,10 @@ public class RampMechanism {
     positionControl = false;
   }
 
+  public void setBrakeMode(boolean brake) {
+    io.setBrakeMode(brake);
+  }
+
   public void testPeriodic() {
     switch (TestModeManager.getTestMode()) {
       case RampTuning:

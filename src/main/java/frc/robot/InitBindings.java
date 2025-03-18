@@ -4,12 +4,12 @@ import static edu.wpi.first.units.Units.Radian;
 import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.wpilib_interface.DriveWithJoysticks;
-import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.StrategyManager.AutonomyMode;
-import frc.robot.commands.drive.DesiredLocationSelector;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -17,6 +17,7 @@ import frc.robot.subsystems.climb.ClimbSubsystem.ClimbAction;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
+import frc.robot.subsystems.drive.ReefLineupUtil;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.ramp.states.RampState.RampTriggers;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
@@ -56,11 +57,29 @@ public final class InitBindings {
                 () -> {
                   switch (strategyManager.getAutonomyMode()) {
                     case Full:
-                      // If a binding is used in full autonomy, switch to mixed autonomy
-                      strategyManager.setAutonomyMode(AutonomyMode.Mixed);
-                      // And then fall through to the mixed autonomy behavior (no break here is
+                      // If a binding is used in full autonomy, switch to smart autonomy
+                      strategyManager.setAutonomyMode(AutonomyMode.Smart);
+                      // And then fall through to the smart autonomy behavior (no break here is
                       // intentional)
+                    case Smart:
+                      if (ScoringSubsystem.getInstance() != null) {
+                        // Update scoring locations (drive and scoring subsystems) from snakescreen
+                        // This is required here because it doesn't happen in periodic in Smart mode
+                        // to avoid undoing the auto algae height selector
+                        // The drive location is immediately overwritten below
+                        strategyManager.updateScoringLocationsFromSnakeScreen();
+                        strategyManager.updateScoringLevelFromNetworkTables();
+                      }
+
+                      // When the scoring trigger is pulled in smart autonomy, select the closest
+                      // reef pole to score on
+                      drive.setDesiredLocation(
+                          ReefLineupUtil.getClosestReefLocation(drive.getPose()));
+
+                      // Then fall through to scheduling OTF like in mixed autonomy (no break here
+                      // is intentional)
                     case Mixed:
+                      drive.setGoToIntake(false);
                       drive.fireTrigger(DriveTrigger.BeginOTF);
                       break;
                     case Manual:
@@ -82,9 +101,11 @@ public final class InitBindings {
                   switch (strategyManager.getAutonomyMode()) {
                     case Full:
                       // If a binding is used in full autonomy, switch to mixed autonomy
-                      strategyManager.setAutonomyMode(AutonomyMode.Mixed);
-                      // And then fall through to the mixed autonomy behavior (no break here is
+                      strategyManager.setAutonomyMode(AutonomyMode.Smart);
+                      // And then fall through to the smart/mixed autonomy behavior (no break here
+                      // is
                       // intentional)
+                    case Smart:
                     case Mixed:
                       // Cancel auto align if in mixed autonomy
                       drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
@@ -115,25 +136,33 @@ public final class InitBindings {
                 },
                 drive));
 
-    // pov right (reef 0-11 -> processor left -> processor right )
-    // pov left (goes backwards of right)
-    driverController
-        .povRight()
+    rightJoystick
+        .button(3)
         .onTrue(
             new InstantCommand(
                 () -> {
-                  DesiredLocationSelector.incrementIndex();
-                  DesiredLocationSelector.setLocationFromIndex(drive);
+                  drive.sidestepReefLocation();
                 }));
-    driverController
-        .povLeft()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  DesiredLocationSelector.decrementIndex();
-                  DesiredLocationSelector.setLocationFromIndex(drive);
-                },
-                drive));
+
+    // // pov right (reef 0-11 -> processor left -> processor right )
+    // // pov left (goes backwards of right)
+    // driverController
+    //     .povRight()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               DesiredLocationSelector.incrementIndex();
+    //               DesiredLocationSelector.setLocationFromIndex(drive);
+    //             }));
+    // driverController
+    //     .povLeft()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               DesiredLocationSelector.decrementIndex();
+    //               DesiredLocationSelector.setLocationFromIndex(drive);
+    //             },
+    //             drive));s
 
     // TODO: Rebind localization if necessary
     // leftJoystick
@@ -158,9 +187,34 @@ public final class InitBindings {
                       strategyManager.setAutonomyMode(AutonomyMode.Mixed);
                       // And then fall through to the mixed autonomy behavior (no break here is
                       // intentional)
+                    case Smart:
+                      // If in algae mode, automatically set level and pick nearest algae location
+                      if (ScoringSubsystem.getInstance() == null
+                          || ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Algae) {
+                        DesiredLocation desiredLocation =
+                            ReefLineupUtil.getClosestAlgaeLocation(drive.getPose());
+                        drive.setDesiredIntakeLocation(desiredLocation);
+
+                        // Set algae level automatically
+                        if (ScoringSubsystem.getInstance() != null) {
+                          ScoringSubsystem.getInstance()
+                              .setTarget(
+                                  ReefLineupUtil.getAlgaeLevelFromDesiredLocation(desiredLocation));
+                        }
+                      } else {
+                        if (DriverStation.getAlliance().isPresent()
+                            && DriverStation.getAlliance().get() == Alliance.Red) {
+                          drive.setDesiredIntakeLocation(
+                              JsonConstants.redFieldLocations.getClosestCoralStation(
+                                  drive.getPose()));
+                        } else {
+                          drive.setDesiredIntakeLocation(
+                              JsonConstants.blueFieldLocations.getClosestCoralStation(
+                                  drive.getPose()));
+                        }
+                      }
                     case Mixed:
                       // Start auto align if in mixed autonomy
-                      drive.setDesiredIntakeLocation(DesiredLocation.CoralStationRight);
                       drive.setGoToIntake(true);
                       drive.fireTrigger(DriveTrigger.BeginOTF);
                       // Then always start intake for scoring (no break here is intentional)
@@ -183,6 +237,7 @@ public final class InitBindings {
                       strategyManager.setAutonomyMode(AutonomyMode.Mixed);
                       // And then fall through to the mixed autonomy behavior (no break here is
                       // intentional)
+                    case Smart:
                     case Mixed:
                     case Manual:
                       // Cancel auto align if in mixed autonomy
@@ -199,27 +254,27 @@ public final class InitBindings {
   }
 
   public static void initRampBindings(RampSubsystem rampSubsystem) {
-    driverController
-        .a()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.START_CLIMB);
-                }));
-    driverController
-        .x()
-        .onTrue(
-            new InstantCommand(
-                () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
-                }));
+    // driverController
+    //     .a()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               rampSubsystem.fireTrigger(RampTriggers.START_CLIMB);
+    //             }));
+    // driverController
+    //     .x()
+    //     .onTrue(
+    //         new InstantCommand(
+    //             () -> {
+    //               rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
+    //             }));
 
     rightJoystick
         .trigger()
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
+                  rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
 
     rightJoystick
@@ -227,7 +282,39 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.GOTO_IDLE);
+                  rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
+                }));
+
+    leftJoystick
+        .trigger()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.fireTrigger(RampTriggers.INTAKE);
+                }));
+
+    leftJoystick
+        .trigger()
+        .onFalse(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
+                }));
+
+    leftJoystick
+        .button(3)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.fireTrigger(RampTriggers.CLIMB);
+                }));
+
+    leftJoystick
+        .button(4)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
   }
 
@@ -269,6 +356,17 @@ public final class InitBindings {
             new InstantCommand(
                 () -> {
                   scoring.setClawRollerVoltage(Volts.zero());
+                }));
+
+    rightJoystick
+        .top()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  if (ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Algae
+                      && ScoringSubsystem.getInstance().getTarget() == FieldTarget.Processor) {
+                    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.WarmupReady);
+                  }
                 }));
   }
 

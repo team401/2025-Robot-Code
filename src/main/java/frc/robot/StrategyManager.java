@@ -27,6 +27,7 @@ import org.littletonrobotics.junction.Logger;
 public class StrategyManager {
   public enum AutonomyMode {
     Full,
+    Smart,
     Mixed,
     Manual,
   }
@@ -97,6 +98,9 @@ public class StrategyManager {
     switch (mode) {
       case Full:
         autonomyPublisher.accept("high");
+        break;
+      case Smart:
+        autonomyPublisher.accept("smart");
         break;
       case Mixed:
         autonomyPublisher.accept("mid");
@@ -224,14 +228,21 @@ public class StrategyManager {
   public void updateScoringLocationsFromSnakeScreen() {
     // drive reef location
     if (drive != null) {
-      drive.updateDesiredLocationFromNetworkTables(
-          reefLocationSelector.get(), gamePieceSelector.get().equalsIgnoreCase("algae"));
+      // Don't set reef target or intake location from SnakeScreen in 'smart' mode, this will be
+      // picked automatically
+      // based on distance
+      if (getAutonomyMode() != AutonomyMode.Smart) {
+        drive.updateDesiredLocationFromNetworkTables(
+            reefLocationSelector.get(), gamePieceSelector.get().equalsIgnoreCase("algae"));
 
-      // 20: left; 21: right
-      drive.setDesiredIntakeLocation(
-          intakeLocationSelector.get() == 20
-              ? DesiredLocation.CoralStationLeft
-              : DesiredLocation.CoralStationRight);
+        // 20: left; 21: right
+        if (gamePieceSelector.get().equalsIgnoreCase("coral")) {
+          drive.setDesiredIntakeLocation(
+              intakeLocationSelector.get() == 20
+                  ? DesiredLocation.CoralStationLeft
+                  : DesiredLocation.CoralStationRight);
+        }
+      }
     }
 
     // scoring level selection
@@ -245,7 +256,14 @@ public class StrategyManager {
         scoringSubsystem.setGamePiece(GamePiece.Algae);
       }
 
-      scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
+      // Don't automatically set level in smart mode FOR ALGAE; this will be set when the warmup
+      // trigger is
+      // pressed. This can't happen in periodic because algae level is automatically determined when
+      // intake is pressed and would be overridden by this in each loop.
+      if (getAutonomyMode() != AutonomyMode.Smart
+          || scoringSubsystem.getGamePiece() != GamePiece.Algae) {
+        updateScoringLevelFromNetworkTables();
+      }
     }
 
     // update autonomy level
@@ -253,6 +271,8 @@ public class StrategyManager {
 
     if (autonomyLevel.equalsIgnoreCase("high")) {
       this.setAutonomyMode(AutonomyMode.Full);
+    } else if (autonomyLevel.equalsIgnoreCase("smart")) {
+      this.setAutonomyMode(AutonomyMode.Smart);
     } else if (autonomyLevel.equalsIgnoreCase("mid")) {
       this.setAutonomyMode(AutonomyMode.Mixed);
     } else if (autonomyLevel.equalsIgnoreCase("low")) {
@@ -292,6 +312,10 @@ public class StrategyManager {
     this.publishCoralAndAlgae();
   }
 
+  public void updateScoringLevelFromNetworkTables() {
+    scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
+  }
+
   public void publishDefaultSubsystemValues() {
     if (scoringSubsystem != null) {
       // publish default game piece
@@ -328,6 +352,9 @@ public class StrategyManager {
     if (drive != null) {
       // publish default reef location
       int reefLocation = drive.getDesiredLocationIndex();
+      if (gamePieceSelector.get().equalsIgnoreCase("algae")) {
+        reefLocation = drive.getDesiredAlgaeLocationIndex();
+      }
 
       if (reefLocation != -1) {
         reefLocationPublisher.accept(reefLocation);
@@ -344,6 +371,9 @@ public class StrategyManager {
     switch (this.getAutonomyMode()) {
       case Full:
         autonomyPublisher.accept("high");
+        break;
+      case Smart:
+        autonomyPublisher.accept("smart");
         break;
       case Mixed:
         autonomyPublisher.accept("mid");
@@ -364,7 +394,12 @@ public class StrategyManager {
   public void autonomousInit(AutoStrategy strategy) {
     this.setAutonomyMode(AutonomyMode.Full);
 
+    this.currentCommand = null;
+    this.currentAction = null;
+
+    actions.clear();
     this.addActionsFromAutoStrategy(strategy);
+    System.out.println("New actions loaded: " + String.valueOf(actions.size()));
 
     this.publishDefaultSubsystemValues();
   }
@@ -374,9 +409,12 @@ public class StrategyManager {
    * values
    */
   public void teleopInit() {
-    this.setAutonomyMode(AutonomyMode.Mixed);
+    this.setAutonomyMode(AutonomyMode.Smart);
 
     this.clearActions();
+
+    this.currentCommand = null;
+    this.currentAction = null;
 
     this.publishDefaultSubsystemValues();
   }

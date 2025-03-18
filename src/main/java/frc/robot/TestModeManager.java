@@ -23,6 +23,7 @@ public class TestModeManager {
     DriveSysIdDynamicForward,
     DriveSysIdDynamicBackward,
     DriveLineupTuning,
+    LEDTest,
     ClimbTuning,
     PitTest,
     None, // Default test mode that does nothing until a new one is selected.

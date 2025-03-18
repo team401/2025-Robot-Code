@@ -36,9 +36,6 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.networktables.DoubleSubscriber;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -146,10 +143,31 @@ public class Drive implements DriveTemplate {
     Reef9,
     Reef10,
     Reef11,
+    Algae0,
+    Algae1,
+    Algae2,
+    Algae3,
+    Algae4,
+    Algae5,
     Processor,
     CoralStationLeft,
     CoralStationRight,
   }
+
+  public static final DesiredLocation[] reefCoralLocations = {
+    DesiredLocation.Reef0,
+    DesiredLocation.Reef1,
+    DesiredLocation.Reef2,
+    DesiredLocation.Reef3,
+    DesiredLocation.Reef4,
+    DesiredLocation.Reef5,
+    DesiredLocation.Reef6,
+    DesiredLocation.Reef7,
+    DesiredLocation.Reef8,
+    DesiredLocation.Reef9,
+    DesiredLocation.Reef10,
+    DesiredLocation.Reef11,
+  };
 
   public DesiredLocation[] locationArray = {
     DesiredLocation.Reef0,
@@ -169,22 +187,18 @@ public class Drive implements DriveTemplate {
     DesiredLocation.CoralStationRight
   };
 
-  public DesiredLocation[] algaeArray = {
-    DesiredLocation.Reef0,
-    DesiredLocation.Reef2,
-    DesiredLocation.Reef4,
-    DesiredLocation.Reef6,
-    DesiredLocation.Reef8,
-    DesiredLocation.Reef10
+  public static final DesiredLocation[] reefAlgaeLocations = {
+    DesiredLocation.Algae0,
+    DesiredLocation.Algae1,
+    DesiredLocation.Algae2,
+    DesiredLocation.Algae3,
+    DesiredLocation.Algae4,
+    DesiredLocation.Algae5
   };
 
   private DesiredLocation desiredLocation = DesiredLocation.Reef9;
   private DesiredLocation intakeLocation = DesiredLocation.CoralStationLeft;
   private boolean goToIntake = false;
-
-  private NetworkTableInstance inst = NetworkTableInstance.getDefault();
-  private NetworkTable table = inst.getTable("");
-  private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
 
   @AutoLogOutput(key = "Drive/waitOnScore")
   private BooleanSupplier waitOnScore = () -> false;
@@ -236,6 +250,8 @@ public class Drive implements DriveTemplate {
 
   private LocalADStarAK localADStar = new LocalADStarAK();
 
+  private Command warmupCommand = PathfindingCommand.warmupCommand();
+
   public Drive(
       GyroIO gyroIO,
       ModuleIO flModuleIO,
@@ -277,7 +293,36 @@ public class Drive implements DriveTemplate {
         });
 
     // warm up java processing for faster pathfind later
-    PathfindingCommand.warmupCommand().schedule();
+    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+      localADStar.setDynamicObstacles(
+          List.of(
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackLeftTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackLeftBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.redFieldLocations.coralAlgaeStackRightTopCorner,
+                  JsonConstants.redFieldLocations.coralAlgaeStackRightBottomCorner)),
+          getPose().getTranslation());
+    } else {
+      localADStar.setDynamicObstacles(
+          List.of(
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleBottomCorner),
+              new Pair<Translation2d, Translation2d>(
+                  JsonConstants.blueFieldLocations.coralAlgaeStackRightTopCorner,
+                  JsonConstants.blueFieldLocations.coralAlgaeStackRightBottomCorner)),
+          getPose().getTranslation());
+    }
+
+    warmupCommand.schedule();
+
     angleController.enableContinuousInput(-Math.PI, Math.PI);
     // Configure SysId
     sysId =
@@ -325,48 +370,24 @@ public class Drive implements DriveTemplate {
     stateMachine = new StateMachine<>(stateMachineConfiguration, DriveState.Joystick);
   }
 
-  /** add algae coral stack obstacles for on the fly */
   public void autonomousInit() {
-    if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
-      localADStar.setDynamicObstacles(
-          List.of(
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.redFieldLocations.coralAlgaeStackLeftTopCorner,
-                  JsonConstants.redFieldLocations.coralAlgaeStackLeftBottomCorner),
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleTopCorner,
-                  JsonConstants.redFieldLocations.coralAlgaeStackMiddleBottomCorner),
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.redFieldLocations.coralAlgaeStackRightTopCorner,
-                  JsonConstants.redFieldLocations.coralAlgaeStackRightBottomCorner)),
-          getPose().getTranslation());
-    } else {
-      localADStar.setDynamicObstacles(
-          List.of(
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftTopCorner,
-                  JsonConstants.blueFieldLocations.coralAlgaeStackLeftBottomCorner),
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleTopCorner,
-                  JsonConstants.blueFieldLocations.coralAlgaeStackMiddleBottomCorner),
-              new Pair<Translation2d, Translation2d>(
-                  JsonConstants.blueFieldLocations.coralAlgaeStackRightTopCorner,
-                  JsonConstants.blueFieldLocations.coralAlgaeStackRightBottomCorner)),
-          getPose().getTranslation());
+
+    if (warmupCommand != null && warmupCommand.isScheduled()) {
+      warmupCommand.cancel();
     }
   }
 
   /** remove algae coral stack obstacles for on the fly */
   public void teleopInit() {
-    localADStar.setDynamicObstacles(
-        List.of(new Pair<Translation2d, Translation2d>(null, null)), getPose().getTranslation());
+    localADStar.setDynamicObstacles(List.of(), getPose().getTranslation());
   }
 
   @Override
   public void periodic() {
     // Manually cancel go to intake if we have a gamepiece
-    if (goToIntake && ScoringSubsystem.getInstance().isCoralDetected()
-        || ScoringSubsystem.getInstance().isAlgaeDetected()) {
+    if (goToIntake && ScoringSubsystem.getInstance().isCoralDetected()) {
+      setGoToIntake(false);
+    } else if (goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
       setGoToIntake(false);
     }
 
@@ -447,6 +468,30 @@ public class Drive implements DriveTemplate {
 
     Logger.recordOutput("Drive/goToIntake", goToIntake);
     Logger.recordOutput("Drive/driveLinedUp", driveLinedUp);
+  }
+
+  public void disabledPeriodic() {
+    if (warmupCommand != null) {
+      Logger.recordOutput("Drive/warmupScheduled", warmupCommand.isScheduled());
+    }
+  }
+
+  /**
+   * sets the location to the reef pole directly next to current NOTE: this will not change sides of
+   * reef (stays on one side of hexagon)
+   */
+  public void sidestepReefLocation() {
+    int reefIndex = getDesiredLocationIndex();
+    if (reefIndex > 11 || reefIndex < 0) {
+      // not a reef location
+      return;
+    }
+
+    if (reefIndex % 2 == 0) {
+      desiredLocation = locationArray[reefIndex + 1];
+    } else {
+      desiredLocation = locationArray[reefIndex - 1];
+    }
   }
 
   /**
@@ -577,6 +622,13 @@ public class Drive implements DriveTemplate {
         < JsonConstants.drivetrainConstants.otfFarWarmupDistance;
   }
 
+  public boolean isDriveCloseForWarmup() {
+    return this.getPose()
+            .getTranslation()
+            .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation())
+        < JsonConstants.drivetrainConstants.otfWarmupDistance;
+  }
+
   /**
    * checks if drive is currently lining up to a reef
    *
@@ -593,10 +645,13 @@ public class Drive implements DriveTemplate {
    * @return true if location is reef; false otherwise (processor / coral station)
    */
   public boolean isDesiredLocationReef() {
-    return !(desiredLocation == DesiredLocation.CoralStationLeft
-            || desiredLocation == DesiredLocation.CoralStationRight
-            || desiredLocation == DesiredLocation.Processor)
-        && !goToIntake; // only want reef if intake is false
+    boolean isCoralReefTarget =
+        !(desiredLocation == DesiredLocation.CoralStationLeft
+                || desiredLocation == DesiredLocation.CoralStationRight
+                || desiredLocation == DesiredLocation.Processor)
+            && !goToIntake;
+    boolean isAlgaeReefTarget = isLocationAlgaeIntake(intakeLocation) && goToIntake;
+    return isCoralReefTarget || isAlgaeReefTarget;
   }
 
   /**
@@ -604,9 +659,24 @@ public class Drive implements DriveTemplate {
    *
    * @return true if location is scoring (reef / processor)
    */
+  @AutoLogOutput(key = "Drive/isLocationScoring")
   public boolean isLocationScoring(DesiredLocation location) {
-    return !(location == DesiredLocation.CoralStationLeft
-        || location == DesiredLocation.CoralStationRight);
+    boolean isLocationCoralStation =
+        (location == DesiredLocation.CoralStationLeft
+            || location == DesiredLocation.CoralStationRight);
+    boolean isAlgaeIntake = isLocationAlgaeIntake(location);
+
+    return (!isLocationCoralStation && !isAlgaeIntake);
+  }
+
+  /** checks if location is reef (center of poles) */
+  public boolean isLocationAlgaeIntake(DesiredLocation location) {
+    return (location == DesiredLocation.Algae0
+        || location == DesiredLocation.Algae1
+        || location == DesiredLocation.Algae2
+        || location == DesiredLocation.Algae3
+        || location == DesiredLocation.Algae4
+        || location == DesiredLocation.Algae5);
   }
 
   /**
@@ -653,6 +723,20 @@ public class Drive implements DriveTemplate {
   }
 
   /**
+   * returns index of reef location for interfacing with snakescreen
+   *
+   * @return a double representing the index of reef location
+   */
+  public int getDesiredAlgaeLocationIndex() {
+    for (int i = 0; i < reefAlgaeLocations.length; i++) {
+      if (reefAlgaeLocations[i] == desiredLocation) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /**
    * sets desired path location calling this and then setting OTF to true will cause robot to drive
    * path from current pose to the location
    *
@@ -668,16 +752,14 @@ public class Drive implements DriveTemplate {
       return;
     }
 
-    // only change locations if its different
-    if (isAlgae && algaeArray[(int) desiredIndex] != desiredLocation) {
-      this.setDesiredLocation(algaeArray[(int) desiredIndex]);
+    if (isAlgae && reefAlgaeLocations[(int) desiredIndex] != intakeLocation) {
+      this.setDesiredIntakeLocation(reefAlgaeLocations[(int) desiredIndex]);
       if (isDriveOTF()) {
         this.fireTrigger(DriveTrigger.ManualJoysticks);
         this.fireTrigger(DriveTrigger.BeginOTF);
       }
       return;
-    }
-    if (locationArray[(int) desiredIndex] != desiredLocation) {
+    } else if (!isAlgae && locationArray[(int) desiredIndex] != desiredLocation) {
       if (isDriveOTF()) {
         this.updateDesiredLocation((int) desiredIndex);
       } else {
@@ -695,6 +777,13 @@ public class Drive implements DriveTemplate {
    */
   public void updateDesiredLocation(int locationIndex) {
     this.updateDesiredLocation(locationArray[locationIndex]);
+  }
+
+  /** sets brake mode for each module */
+  public void setBrakeMode(boolean brake) {
+    for (int i = 0; i < modules.length; i++) {
+      modules[i].setBrakeMode(brake);
+    }
   }
 
   /**

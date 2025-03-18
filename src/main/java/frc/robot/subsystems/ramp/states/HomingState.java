@@ -38,7 +38,7 @@ public class HomingState extends RampState {
         && homingTimer.hasElapsed(
             JsonConstants.elevatorConstants.homingMaxUnmovingTime.in(Seconds))) {
       mechanism.setHome();
-      fireTrigger.accept(RampTriggers.HOMED);
+      fireTrigger.accept(RampTriggers.HOMING_FINISHED);
     }
 
     double filteredAbsVelocity =
@@ -52,11 +52,11 @@ public class HomingState extends RampState {
         < JsonConstants.rampConstants.homingVelocityThresholdMetersPerSecond.in(RadiansPerSecond)) {
       if (hasMoved) {
         mechanism.setHome();
-        fireTrigger.accept(RampTriggers.HOMED);
+        fireTrigger.accept(RampTriggers.HOMING_FINISHED);
       } else if (homingTimer.hasElapsed(
           JsonConstants.rampConstants.homingMaxUnmovingTime.in(Seconds))) {
         mechanism.setHome();
-        fireTrigger.accept(RampTriggers.HOMED);
+        fireTrigger.accept(RampTriggers.HOMING_FINISHED);
       }
     } else {
       hasMoved = true;
@@ -64,9 +64,13 @@ public class HomingState extends RampState {
 
     if (homingTimer.hasElapsed(JsonConstants.rampConstants.homingMaxTime.in(Seconds))) {
       mechanism.setHome();
-      fireTrigger.accept(RampTriggers.HOMED);
+      fireTrigger.accept(RampTriggers.HOMING_FINISHED);
     }
 
     super.periodic();
+  }
+
+  public boolean inPosition() {
+    return false;
   }
 }

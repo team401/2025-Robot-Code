@@ -205,6 +205,12 @@ public class ScoringSubsystem extends MonitoredSubsystem {
 
   private Supplier<Distance> reefDistanceSupplier = () -> Meters.zero();
 
+  /**
+   * Supplies a boolean determining whether or not the elevator can safely move up without hitting
+   * the ramp
+   */
+  private BooleanSupplier rampSafeSupplier = () -> true;
+
   public ScoringSubsystem(
       ElevatorMechanism elevatorMechanism,
       WristMechanism wristMechanism,
@@ -366,6 +372,12 @@ public class ScoringSubsystem extends MonitoredSubsystem {
           break;
       }
     }
+  }
+
+  /** sets brake mode of relevant motors */
+  public void setBrakeMode(boolean brake) {
+    wristMechanism.setBrakeMode(brake);
+    elevatorMechanism.setBrakeMode(brake);
   }
 
   public void updateScoringLevelFromNetworkTables(String level) {
@@ -621,7 +633,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
         hasGamePiece = clawMechanism.isAlgaeDetected();
         break;
     }
-    return ((stateMachine.getCurrentState() == ScoringState.Warmup)
+    return ((stateMachine.getCurrentState() == ScoringState.Init)
+            || (stateMachine.getCurrentState() == ScoringState.Warmup)
             || (stateMachine.getCurrentState() == ScoringState.Score))
         && hasGamePiece;
   }
@@ -718,6 +731,16 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   public void setReefDistanceSupplier(Supplier<Distance> newSupplier) {
     reefDistanceSupplier = newSupplier;
+  }
+
+  /**
+   * Update the ramp safety supplier used to keep the elevator below the ramp during climb
+   *
+   * @param newSupplier The new supplier, which should supply "true" when ramp is in Idle/Intake
+   *     position and "false" when ramp is over the top of the elevator for climb.
+   */
+  public void setRampSafeSupplier(BooleanSupplier newSupplier) {
+    rampSafeSupplier = newSupplier;
   }
 
   /**
@@ -820,12 +843,23 @@ public class ScoringSubsystem extends MonitoredSubsystem {
       }
     }
 
+    boolean wristDownForAlgae = false;
+    if (isAlgaeDetected()
+        && elevatorMechanism
+            .getElevatorHeight()
+            .lt(JsonConstants.elevatorConstants.minAlgaeInHeight)) {
+      wristDownForAlgae = true;
+      wristMaxAngle.mut_replace(
+          (Angle) Measure.min(wristMaxAngle, JsonConstants.wristConstants.algaeUnderCrossbarAngle));
+    }
+
     Logger.recordOutput("scoring/clamps/closeToReef", closeToReef);
     Logger.recordOutput("scoring/clamps/wristInToAvoidReefBase", wristInToAvoidReefBase);
     Logger.recordOutput("scoring/clamps/elevatorUpToAvoidReefBase", elevatorUpToAvoidReefBase);
     Logger.recordOutput("scoring/clamps/wristInToPassReef", wristInToPassReef);
     Logger.recordOutput("scoring/clamps/elevatorBelowReefLevel", elevatorBelowReefLevel);
     Logger.recordOutput("scoring/clamps/elevatorAboveReefLevel", elevatorAboveReefLevel);
+    Logger.recordOutput("scoring/clamps/wristDownForAlgae", wristDownForAlgae);
 
     elevatorMechanism.setAllowedRangeOfMotion(elevatorMinHeight, elevatorMaxHeight);
     wristMechanism.setAllowedRangeOfMotion(wristMinAngle, wristMaxAngle);

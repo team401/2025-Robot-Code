@@ -46,6 +46,7 @@ public class AutoScore extends Command {
   public void end(boolean interrupted) {
     if (drive != null) {
       drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+      System.out.println("AutoScore canceled lineup!");
     }
   }
 

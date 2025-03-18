@@ -6,7 +6,15 @@ public class ClimbState extends RampState {
 
   @Override
   public void periodic() {
-    setPosition(JsonConstants.rampConstants.climbPosition);
+    if (mechanism.inputs.position < JsonConstants.rampConstants.climbPosition) {
+      setVoltage(JsonConstants.rampConstants.climbVoltage);
+    } else {
+      setVoltage(JsonConstants.rampConstants.climbHoldVoltage);
+    }
     super.periodic();
+  }
+
+  public boolean inPosition() {
+    return mechanism.inputs.position < JsonConstants.rampConstants.climbPosition;
   }
 }

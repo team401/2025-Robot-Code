@@ -1,6 +1,6 @@
 {
   "restingAngle": {
-    "value": 0.7,
+    "value": -0.18,
     "unit": "Radian"
   },
   "searchingAngle": {
@@ -17,5 +17,6 @@
   "climbkI": 0.0,
   "climbkD": 0.0,
   "climbCurrentLimit": 60,
-  "invertFollowerClimbMotor": true
+  "invertFollowerClimbMotor": true,
+  "climbFFVolts": -2.0
 }
