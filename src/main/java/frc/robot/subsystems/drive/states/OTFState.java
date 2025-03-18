@@ -35,10 +35,17 @@ public class OTFState implements PeriodicStateInterface {
       PathfindingCommand.warmupCommand().cancel();
     }
 
-    if (otfPose == findOTFPoseFromDesiredLocation(drive) && driveToPose != null) {
+    if (findOTFPoseFromDesiredLocation(drive).equals(otfPose) && driveToPose != null) {
       System.out.println("Scheduling already existing driveToPose command");
       driveToPose.schedule();
       return;
+    } else if (driveToPose == null) {
+      System.out.println("Not using pre-existing driveToPose command because driveToPose was null");
+    } else if (otfPose != findOTFPoseFromDesiredLocation(drive)) {
+      System.out.println(
+          "Not using pre-existing driveToPose command because otfPose was incorrect");
+      System.out.println("  otfPose = " + otfPose.toString());
+      System.out.println("  correct otfPose = " + findOTFPoseFromDesiredLocation(drive).toString());
     }
 
     driveToPose = this.getDriveToPoseCommand(drive);
@@ -338,7 +345,8 @@ public class OTFState implements PeriodicStateInterface {
             nextAction.type() == ActionType.Intake,
             Drive.getInstance().isAllianceRed());
 
-    System.out.println("Warmed up next OTF command");
+    System.out.println("Warmed up next OTF command with desiredLocation " + nextAction.location());
+    System.out.println("  otfPose = " + otfPose.toString());
     // TODO: Figure out if we should call driveToPose.initialize() or driveToPose.execute() to force
     // warmup
   }
