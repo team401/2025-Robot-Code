@@ -48,7 +48,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here
   private RampSubsystem rampSubsystem = null;
   private ScoringSubsystem scoringSubsystem = null;
-  private Drive drive = null;
+  public Drive drive = null;
   private ClimbSubsystem climbSubsystem = null;
   private VisionLocalizer vision = null;
   private LED led = null;
@@ -351,6 +351,8 @@ public class RobotContainer {
         break;
 
       case PitTest:
+      CommandScheduler.getInstance()
+            .schedule(AkitDriveCommands.SpinAroundTest(drive));
         break;
 
       default:

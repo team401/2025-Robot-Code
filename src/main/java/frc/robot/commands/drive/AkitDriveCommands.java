@@ -279,6 +279,45 @@ public class AkitDriveCommands {
                 }));
   }
 
+  public static Command SpinAroundTest(Drive drive) {
+    List<Double> velocitySamples = new LinkedList<>();
+    List<Double> voltageSamples = new LinkedList<>();
+    Timer timer = new Timer();
+
+    return Commands.sequence(
+        // Reset data
+        Commands.runOnce(
+            () -> {
+              velocitySamples.clear();
+              voltageSamples.clear();
+            }),
+
+        // Allow modules to orient
+        Commands.run(
+                () -> {
+                  drive.runSteerCharacterization(0.0);
+                },
+                drive)
+            .withTimeout(FF_START_DELAY),
+
+        // Start timer
+        Commands.runOnce(timer::restart),
+
+        // Accelerate and gather data
+        Commands.run(
+            () -> {
+              double voltage = timer.get() * FF_RAMP_RATE * 0.5;
+              drive.runSteerCharacterization(voltage);
+              velocitySamples.add(drive.getSteerCharacterizationVelocity());
+              voltageSamples.add(voltage);
+            },
+            drive));
+
+    // When cancelled, calculate and print results
+
+  }
+  ;
+
   /** Measures the robot's wheel radius by spinning in a circle. */
   public static Command wheelRadiusCharacterization(Drive drive) {
     SlewRateLimiter limiter = new SlewRateLimiter(WHEEL_RADIUS_RAMP_RATE);
