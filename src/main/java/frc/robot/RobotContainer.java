@@ -28,7 +28,6 @@ import frc.robot.constants.ClimbConstants;
 import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
-import frc.robot.subsystems.climb.ClimbIO;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.led.LED;
@@ -51,7 +50,6 @@ public class RobotContainer {
   private ScoringSubsystem scoringSubsystem = null;
   private Drive drive = null;
   private ClimbSubsystem climbSubsystem = null;
-  private ClimbIO climbIO;
   private VisionLocalizer vision = null;
   private LED led = null;
   private StrategyManager strategyManager = null;
@@ -272,7 +270,7 @@ public class RobotContainer {
   }
 
   public void robotInit() {
-    climbIO.robotInit();
+    climbSubsystem.robotInit();
   }
 
   public void periodic() {

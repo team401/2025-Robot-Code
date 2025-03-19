@@ -155,6 +155,10 @@ public class ClimbSubsystem extends SubsystemBase {
     return inputs.motorAngle;
   }
 
+  public void robotInit() {
+    io.robotInit();
+  }
+
   @Override
   public void periodic() {
 
