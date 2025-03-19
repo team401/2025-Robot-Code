@@ -389,6 +389,8 @@ public class Drive implements DriveTemplate {
       setGoToIntake(false);
     } else if (goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
       setGoToIntake(false);
+    } else if (goToIntake && isDriveAlignmentFinished()) {
+      setGoToIntake(false);
     }
 
     odometryLock.lock(); // Prevents odometry updates while reading data
