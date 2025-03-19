@@ -370,7 +370,7 @@ public class LineupState implements PeriodicStateInterface {
     DistanceToTag adjustedObservation =
         new DistanceToTag(
             latestObservation.crossTrackDistance() + adjustment.getY(),
-            latestObservation.alongTrackDistance() + adjustment.getX(),
+            latestObservation.alongTrackDistance() - adjustment.getX(),
             true);
     return adjustedObservation;
   }
