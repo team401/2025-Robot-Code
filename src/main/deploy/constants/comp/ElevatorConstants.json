@@ -23,7 +23,7 @@
   "elevatorLargeCANCoderDirection": "Clockwise_Positive",
   "elevatorSmallCANCoderID": 15,
   "elevatorSmallCANCoderDirection": "CounterClockwise_Positive",
-  "elevatorkP": 50.0,
+  "elevatorkP": 60.0,
   "elevatorkI": 0.0,
   "elevatorkD": 4.0,
   "elevatorkS": 0.0,
@@ -75,7 +75,7 @@
     "unit": "Meter"
   },
   "L4MinHeightAbove": {
-    "value": 1.55,
+    "value": 1.45,
     "unit": "Meter"
   },
   "L2MaxHeightBelow": {
