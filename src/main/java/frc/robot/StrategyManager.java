@@ -181,6 +181,9 @@ public class StrategyManager {
       FieldTarget scoringLevel =
           strategy.scoringLevels.size() > i ? strategy.scoringLevels.get(i) : FieldTarget.L1;
       // add scoring
+      if (strategy.alternatePath != null && strategy.alternatePath.get(i) != null) {
+        
+      }
       this.addAction(
           new Action(
               ActionType.Score, GamePiece.Coral, strategy.scoringLocations.get(i), scoringLevel));
