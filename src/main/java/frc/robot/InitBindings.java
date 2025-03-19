@@ -67,6 +67,7 @@ public final class InitBindings {
                         // to avoid undoing the auto algae height selector
                         // The drive location is immediately overwritten below
                         strategyManager.updateScoringLocationsFromSnakeScreen();
+                        strategyManager.updateScoringLevelFromNetworkTables();
                       }
 
                       // When the scoring trigger is pulled in smart autonomy, select the closest
@@ -134,6 +135,14 @@ public final class InitBindings {
                 },
                 drive));
 
+    rightJoystick
+        .button(3)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  drive.sidestepReefLocation();
+                }));
+
     // // pov right (reef 0-11 -> processor left -> processor right )
     // // pov left (goes backwards of right)
     // driverController
@@ -183,7 +192,7 @@ public final class InitBindings {
                           || ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Algae) {
                         DesiredLocation desiredLocation =
                             ReefLineupUtil.getClosestAlgaeLocation(drive.getPose());
-                        drive.setDesiredLocation(desiredLocation);
+                        drive.setDesiredIntakeLocation(desiredLocation);
 
                         // Set algae level automatically
                         if (ScoringSubsystem.getInstance() != null) {
@@ -194,11 +203,11 @@ public final class InitBindings {
                       } else {
                         if (DriverStation.getAlliance().isPresent()
                             && DriverStation.getAlliance().get() == Alliance.Red) {
-                          drive.setDesiredLocation(
+                          drive.setDesiredIntakeLocation(
                               JsonConstants.redFieldLocations.getClosestCoralStation(
                                   drive.getPose()));
                         } else {
-                          drive.setDesiredLocation(
+                          drive.setDesiredIntakeLocation(
                               JsonConstants.blueFieldLocations.getClosestCoralStation(
                                   drive.getPose()));
                         }
@@ -264,7 +273,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.INTAKE);
+                  rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
 
     rightJoystick

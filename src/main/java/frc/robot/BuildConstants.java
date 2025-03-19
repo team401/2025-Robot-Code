@@ -11,6 +11,7 @@ public final class BuildConstants {
   public static final String GIT_BRANCH = "170-update-climb-code-for-new-design";
   public static final String BUILD_DATE = "2025-03-19 16:27:45 EDT";
   public static final long BUILD_UNIX_TIME = 1742416065269L;
+
   public static final int DIRTY = 1;
 
   private BuildConstants() {}
