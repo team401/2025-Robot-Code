@@ -23,9 +23,9 @@ public interface ClimbIO {
     MutVoltage appliedVoltage = Volts.mutable(0);
     // MutAngle goalAngle = Radians.mutable(0);
   }
-  public default void robotInit(){
-    
-  }
+
+  public default void robotInit() {}
+
   public default void updateInputs(ClimbInputs inputs) {}
 
   public default void applyOutputs(ClimbOutputs outputs) {}

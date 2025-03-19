@@ -89,6 +89,11 @@ public class Robot extends LoggedRobot {
     Threads.setCurrentThreadPriority(false, 10);
   }
 
+  @Override
+  public void robotInit() {
+    robotContainer.robotInit();
+  }
+
   /** This function is called once when the robot is disabled. */
   @Override
   public void disabledInit() {

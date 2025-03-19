@@ -105,10 +105,12 @@ public class ClimbIOTalonFX implements ClimbIO {
 
     // TODO: set lockedToCage when ramp becomes available
   }
+
   @Override
   public void robotInit() {
     encoderOrigin = Math.floor(climbAngleCandi.getPWM1Position().getValue().in(Rotations));
   }
+
   @Override
   public void updateInputs(ClimbInputs inputs) {
 
