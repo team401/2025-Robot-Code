@@ -203,7 +203,7 @@ public class OTFState implements PeriodicStateInterface {
       constraints =
           new PathConstraints(
               JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
-              JsonConstants.drivetrainConstants.OTFMaxLinearAccel - 1,
+              JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
               JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
               JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
     }
