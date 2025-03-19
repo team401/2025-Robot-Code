@@ -45,6 +45,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
+import frc.robot.constants.ModeConstants.Mode;
 import frc.robot.subsystems.drive.states.IdleState;
 import frc.robot.subsystems.drive.states.JoystickDrive;
 import frc.robot.subsystems.drive.states.LineupState;
@@ -389,7 +390,12 @@ public class Drive implements DriveTemplate {
       setGoToIntake(false);
     } else if (goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
       setGoToIntake(false);
-    } else if (goToIntake && isDriveAlignmentFinished()) {
+    } else if (goToIntake
+        && ModeConstants.currentMode == Mode.REAL
+        && this.getPose()
+                .getTranslation()
+                .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation())
+            < 1) {
       setGoToIntake(false);
     }
 
