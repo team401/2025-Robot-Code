@@ -39,7 +39,7 @@ public class PathFollowState implements PeriodicStateInterface {
             () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red, drive);*/
       
     try {
-      AutoBuilder.followPath(PathPlannerPath.fromPathFile("R0 Lineup"););
+      AutoBuilder.followPath(PathPlannerPath.fromPathFile("R0 Lineup"));
     } catch (FileVersionException | IOException | ParseException e) {
       e.printStackTrace();
     }
