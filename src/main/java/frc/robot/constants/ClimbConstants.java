@@ -24,6 +24,8 @@ public class ClimbConstants {
   public final Angle searchingAngle = Radians.of(1);
   public final Angle finalHangingAngle = Radians.of(0.1);
 
+  public final Double climbEncoderOffsetRotations = -0.40234375;
+
   public final Integer leadClimbMotorId = 16;
   public final Integer followerClimbMotorId = 17;
 

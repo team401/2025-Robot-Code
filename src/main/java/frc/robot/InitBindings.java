@@ -71,15 +71,21 @@ public final class InitBindings {
                       }
 
                       // When the scoring trigger is pulled in smart autonomy, select the closest
-                      // reef pole to score on
-                      drive.setDesiredLocation(
-                          ReefLineupUtil.getClosestReefLocation(drive.getPose()));
+                      // reef pole to score on if coral
+                      if (ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+                        drive.setDesiredLocation(
+                            ReefLineupUtil.getClosestReefLocation(drive.getPose()));
+                      }
 
                       // Then fall through to scheduling OTF like in mixed autonomy (no break here
                       // is intentional)
                     case Mixed:
-                      drive.setGoToIntake(false);
-                      drive.fireTrigger(DriveTrigger.BeginOTF);
+                      if (ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+                        drive.setGoToIntake(false);
+                        drive.fireTrigger(DriveTrigger.BeginOTF);
+                      } else if (ScoringSubsystem.getInstance() != null) {
+                        ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+                      }
                       break;
                     case Manual:
                       // Only start scoring warmup if in manual autonomy; in mixed and full,
@@ -192,7 +198,7 @@ public final class InitBindings {
                           || ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Algae) {
                         DesiredLocation desiredLocation =
                             ReefLineupUtil.getClosestAlgaeLocation(drive.getPose());
-                        drive.setDesiredIntakeLocation(desiredLocation);
+                        // drive.setDesiredIntakeLocation(desiredLocation);
 
                         // Set algae level automatically
                         if (ScoringSubsystem.getInstance() != null) {
@@ -214,8 +220,10 @@ public final class InitBindings {
                       }
                     case Mixed:
                       // Start auto align if in mixed autonomy
-                      drive.setGoToIntake(true);
-                      drive.fireTrigger(DriveTrigger.BeginOTF);
+                      if (ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+                        drive.setGoToIntake(true);
+                        drive.fireTrigger(DriveTrigger.BeginOTF);
+                      }
                       // Then always start intake for scoring (no break here is intentional)
                     case Manual:
                       if (ScoringSubsystem.getInstance() != null) {

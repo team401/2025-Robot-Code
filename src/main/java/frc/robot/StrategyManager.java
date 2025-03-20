@@ -253,6 +253,7 @@ public class StrategyManager {
       if (gamePiece.equalsIgnoreCase("coral")) {
         scoringSubsystem.setGamePiece(GamePiece.Coral);
       } else if (gamePiece.equalsIgnoreCase("algae")) {
+        System.out.println("Setting algae in strategymanager");
         scoringSubsystem.setGamePiece(GamePiece.Algae);
       }
 

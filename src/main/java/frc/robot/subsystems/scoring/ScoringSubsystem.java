@@ -595,6 +595,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   public void setGamePiece(GamePiece piece) {
     currentPiece = piece;
+    System.out.println(piece);
     Logger.recordOutput("scoring/gamepiece", piece);
   }
 
