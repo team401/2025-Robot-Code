@@ -328,6 +328,9 @@ public class StrategyManager {
   }
 
   public void publishDefaultSubsystemValues() {
+    if (DriverStation.isTeleop()) {
+      this.setAutonomyMode(AutonomyMode.Smart);
+    }
     if (scoringSubsystem != null) {
       // publish default game piece
       switch (scoringSubsystem.getGamePiece()) {
