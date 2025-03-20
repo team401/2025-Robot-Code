@@ -341,6 +341,8 @@ public class StrategyManager {
           break;
       }
 
+      scoringSubsystem.setTarget(FieldTarget.L4);
+
       // publish default level
       switch (scoringSubsystem.getCoralTarget()) {
         case L1:
