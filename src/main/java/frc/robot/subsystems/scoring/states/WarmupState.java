@@ -14,6 +14,7 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 import org.littletonrobotics.junction.Logger;
 
@@ -44,7 +45,12 @@ public class WarmupState implements PeriodicStateInterface {
 
   @Override
   public void periodic() {
-    ScoringSetpoint setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getTarget());
+    ScoringSetpoint setpoint;
+    if (scoringSubsystem.getGamePiece() == GamePiece.Coral) {
+      setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getCoralTarget());
+    } else {
+      setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getAlgaeScoreTarget());
+    }
 
     scoringSubsystem.setGoalSetpoint(setpoint);
     scoringSubsystem.setClawRollerVoltage(Volts.zero());

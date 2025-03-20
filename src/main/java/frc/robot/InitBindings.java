@@ -371,7 +371,8 @@ public final class InitBindings {
             new InstantCommand(
                 () -> {
                   if (ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Algae
-                      && ScoringSubsystem.getInstance().getTarget() == FieldTarget.Processor) {
+                      && ScoringSubsystem.getInstance().getAlgaeScoreTarget()
+                          == FieldTarget.Processor) {
                     ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.WarmupReady);
                   }
                 }));
