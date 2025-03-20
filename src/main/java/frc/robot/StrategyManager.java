@@ -375,7 +375,7 @@ public class StrategyManager {
           break;
       }
 
-      switch (scoringSubsystem.getAlgaeIntakeTarget()) {
+      switch (scoringSubsystem.getAlgaeScoreTarget()) {
         case Processor:
           algaeScoreLevelPublisher.accept("level1");
           break;
