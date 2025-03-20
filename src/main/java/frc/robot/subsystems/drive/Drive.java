@@ -49,6 +49,7 @@ import frc.robot.subsystems.drive.states.IdleState;
 import frc.robot.subsystems.drive.states.JoystickDrive;
 import frc.robot.subsystems.drive.states.LineupState;
 import frc.robot.subsystems.drive.states.OTFState;
+import frc.robot.subsystems.drive.states.PathFollowState;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.util.LocalADStarAK;
 import java.util.List;
@@ -216,7 +217,9 @@ public class Drive implements DriveTemplate {
     Idle(new IdleState(instance)),
     OTF(new OTFState(instance)),
     Lineup(new LineupState(instance)),
-    Joystick(new JoystickDrive(instance));
+    Joystick(new JoystickDrive(instance)),
+    PathFollowState(new PathFollowState(instance));
+
     private final PeriodicStateInterface state;
 
     DriveState(PeriodicStateInterface state) {
@@ -239,6 +242,8 @@ public class Drive implements DriveTemplate {
     CancelLineup,
     FinishLineup,
     WaitForScore,
+    BeginPathFollow,
+    CancelPathFollow
   }
 
   private StateMachineConfiguration<DriveState, DriveTrigger> stateMachineConfiguration;
@@ -251,6 +256,8 @@ public class Drive implements DriveTemplate {
   private LocalADStarAK localADStar = new LocalADStarAK();
 
   private Command warmupCommand = PathfindingCommand.warmupCommand();
+
+  private static String pathToRun = null;
 
   public Drive(
       GyroIO gyroIO,
@@ -345,7 +352,8 @@ public class Drive implements DriveTemplate {
 
     stateMachineConfiguration
         .configure(DriveState.Joystick)
-        .permit(DriveTrigger.BeginOTF, DriveState.OTF);
+        .permit(DriveTrigger.BeginOTF, DriveState.OTF)
+        .permit(DriveTrigger.BeginPathFollow, DriveState.PathFollowState);
 
     stateMachineConfiguration
         .configure(DriveState.OTF)
@@ -363,6 +371,13 @@ public class Drive implements DriveTemplate {
 
     stateMachineConfiguration
         .configure(DriveState.Lineup)
+        .permit(DriveTrigger.CancelLineup, DriveState.Joystick)
+        .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick)
+        .permit(DriveTrigger.BeginOTF, DriveState.OTF);
+
+    stateMachineConfiguration
+        .configure(DriveState.PathFollowState)
+        .permit(DriveTrigger.CancelPathFollow, DriveState.Joystick)
         .permit(DriveTrigger.CancelLineup, DriveState.Joystick)
         .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick)
         .permit(DriveTrigger.BeginOTF, DriveState.OTF);
@@ -1068,5 +1083,13 @@ public class Drive implements DriveTemplate {
         int desiredCameraIndex,
         double crossTrackOffsetMeters,
         double alongTrackOffsetMeters);
+  }
+
+  public static void setPathToRun(String path) {
+    pathToRun = path;
+  }
+
+  public static String getPathToRun() {
+    return pathToRun;
   }
 }
