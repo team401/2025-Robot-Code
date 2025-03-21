@@ -68,19 +68,19 @@ public final class InitBindings {
                         // The drive location is immediately overwritten below
                         strategyManager.updateScoringLocationsFromSnakeScreen();
                         strategyManager.updateScoringLevelFromNetworkTables();
-                      }
 
-                      // When the scoring trigger is pulled in smart autonomy, select the closest
-                      // reef pole to score on if coral
-                      if (ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
-                        drive.setDesiredLocation(
-                            ReefLineupUtil.getClosestReefLocation(drive.getPose()));
+                        // When the scoring trigger is pulled in smart autonomy, select the closest
+                        // reef pole to score on if coral
+                        if (ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+                          drive.setDesiredLocation(
+                              ReefLineupUtil.getClosestReefLocation(drive.getPose()));
+                        }
                       }
-
                       // Then fall through to scheduling OTF like in mixed autonomy (no break here
                       // is intentional)
                     case Mixed:
-                      if (ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+                      if (ScoringSubsystem.getInstance() != null
+                          && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
                         drive.setGoToIntake(false);
                         drive.fireTrigger(DriveTrigger.BeginOTF);
                       } else if (ScoringSubsystem.getInstance() != null) {
@@ -220,7 +220,8 @@ public final class InitBindings {
                       }
                     case Mixed:
                       // Start auto align if in mixed autonomy
-                      if (ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+                      if (ScoringSubsystem.getInstance() != null
+                          && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
                         drive.setGoToIntake(true);
                         drive.fireTrigger(DriveTrigger.BeginOTF);
                       }
