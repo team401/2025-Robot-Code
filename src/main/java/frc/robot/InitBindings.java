@@ -322,7 +322,14 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
+                  // rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
+                }));
+    leftJoystick
+        .button(8)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.fireTrigger(RampTriggers.HOME);
                 }));
   }
 
@@ -333,7 +340,13 @@ public final class InitBindings {
     // TODO: Find actual numbers for these buttons using driverstation
     leftJoystick.button(3).onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)));
 
-    leftJoystick.button(4).onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)));
+    leftJoystick
+        .button(4)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  climb.fireTrigger(ClimbAction.CANCEL);
+                }));
   }
 
   public static void initScoringBindings(ScoringSubsystem scoring) {
