@@ -8,7 +8,7 @@
     "unit": "Radian"
   },
   "finalHangingAngle": {
-    "value": 0.3,
+    "value": 0.7,
     "unit": "Radian"
   },
   "leadClimbMotorId": 16,
