@@ -58,7 +58,7 @@ public class IntakeState implements PeriodicStateInterface {
         setpoint = JsonConstants.scoringSetpoints.coralStation;
         break;
       case Algae:
-        switch (scoringSubsystem.getTarget()) {
+        switch (scoringSubsystem.getAlgaeIntakeTarget()) {
           case L2:
             setpoint = JsonConstants.scoringSetpoints.L2algae;
             break;
@@ -69,7 +69,7 @@ public class IntakeState implements PeriodicStateInterface {
             // TODO: Decide if we want to default to L3 or ground
             System.out.println(
                 "ERROR: Scoring commanded to intake algae but FieldTarget was "
-                    + scoringSubsystem.getTarget().toString()
+                    + scoringSubsystem.getCoralTarget().toString()
                     + " (not L2, L3, or Ground). Defaulted to L3.");
           case L3:
             setpoint = JsonConstants.scoringSetpoints.L3algae;

@@ -147,6 +147,9 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   private FieldTarget currentTarget = FieldTarget.L1;
 
+  private FieldTarget currentAlgaeScoreTarget = FieldTarget.Net;
+  private FieldTarget currentAlgaeIntakeTarget = FieldTarget.L2;
+
   public enum GamePiece {
     Coral,
     Algae
@@ -380,29 +383,31 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     elevatorMechanism.setBrakeMode(brake);
   }
 
-  public void updateScoringLevelFromNetworkTables(String level) {
-    if (level.equalsIgnoreCase("-1")) {
-      return;
-    }
-
-    if (level.equalsIgnoreCase("level1")) {
-      if (currentPiece == GamePiece.Algae) {
-        this.setTarget(FieldTarget.Processor);
-      } else {
+  public void updateScoringLevelFromNetworkTables(
+      String coralLevel, String algaeIntakeLevel, String algaeScoreLevel) {
+    if (currentPiece == GamePiece.Coral) {
+      if (coralLevel.equalsIgnoreCase("-1")) {
+        return;
+      } else if (coralLevel.equalsIgnoreCase("level1")) {
         this.setTarget(FieldTarget.L1);
-      }
-    }
-    if (level.equalsIgnoreCase("level2")) {
-      this.setTarget(FieldTarget.L2);
-    }
-    if (level.equalsIgnoreCase("level3")) {
-      this.setTarget(FieldTarget.L3);
-    }
-    if (level.equalsIgnoreCase("level4")) {
-      if (currentPiece == GamePiece.Algae) {
-        this.setTarget(FieldTarget.Net);
-      } else {
+      } else if (coralLevel.equalsIgnoreCase("level2")) {
+        this.setTarget(FieldTarget.L2);
+      } else if (coralLevel.equalsIgnoreCase("level3")) {
+        this.setTarget(FieldTarget.L3);
+      } else if (coralLevel.equalsIgnoreCase("level4")) {
         this.setTarget(FieldTarget.L4);
+      }
+    } else if (currentPiece == GamePiece.Algae) {
+      if (algaeScoreLevel.equalsIgnoreCase("level1")) {
+        currentAlgaeScoreTarget = FieldTarget.Processor;
+      } else if (algaeScoreLevel.equalsIgnoreCase("level4")) {
+        currentAlgaeScoreTarget = FieldTarget.Net;
+      }
+
+      if (algaeIntakeLevel.equalsIgnoreCase("level2")) {
+        currentAlgaeIntakeTarget = FieldTarget.L2;
+      } else if (algaeIntakeLevel.equalsIgnoreCase("level3")) {
+        currentAlgaeIntakeTarget = FieldTarget.L3;
       }
     }
   }
@@ -584,8 +589,16 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    *
    * @return Which field target scoring is currently trying to score in. E.g. L2
    */
-  public FieldTarget getTarget() {
+  public FieldTarget getCoralTarget() {
     return currentTarget;
+  }
+
+  public FieldTarget getAlgaeScoreTarget() {
+    return currentAlgaeScoreTarget;
+  }
+
+  public FieldTarget getAlgaeIntakeTarget() {
+    return currentAlgaeIntakeTarget;
   }
 
   /**
@@ -595,6 +608,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   public void setGamePiece(GamePiece piece) {
     currentPiece = piece;
+    // System.out.println(currentPiece);
     Logger.recordOutput("scoring/gamepiece", piece);
   }
 

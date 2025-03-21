@@ -75,12 +75,14 @@ public class RampSubsystem extends SubsystemBase {
     config
         .configure(RampStates.INTAKE_POSITION)
         .permit(RampTriggers.RETURN_TO_IDLE, RampStates.IDLE)
-        .permit(RampTriggers.CLIMB, RampStates.CLIMB_POSITION);
+        .permit(RampTriggers.CLIMB, RampStates.CLIMB_POSITION)
+        .permit(RampTriggers.HOME, RampStates.HOMING);
 
     config
         .configure(RampStates.CLIMB_POSITION)
         .permit(RampTriggers.RETURN_TO_IDLE, RampStates.IDLE)
-        .permit(RampTriggers.INTAKE, RampStates.CLIMB_TO_INTAKE_HOMING);
+        .permit(RampTriggers.INTAKE, RampStates.CLIMB_TO_INTAKE_HOMING)
+        .permit(RampTriggers.HOME, RampStates.HOMING);
 
     config.configure(RampStates.HOMING).permit(RampTriggers.HOMING_FINISHED, RampStates.IDLE);
 

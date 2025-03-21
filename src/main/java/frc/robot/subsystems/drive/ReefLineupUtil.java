@@ -132,7 +132,7 @@ public class ReefLineupUtil {
 
   public static DesiredLocation getClosestAlgaeLocation(Pose2d robotPose) {
     double closestDistance = Double.MAX_VALUE;
-    DesiredLocation closestLocation = DesiredLocation.Reef0;
+    DesiredLocation closestLocation = DesiredLocation.Algae0;
 
     for (DesiredLocation location : Drive.reefAlgaeLocations) {
       Translation2d algaeLocation;
