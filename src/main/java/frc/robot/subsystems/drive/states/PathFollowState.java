@@ -43,6 +43,5 @@ public class PathFollowState implements PeriodicStateInterface {
     } catch (FileVersionException | IOException | ParseException e) {
       e.printStackTrace();
     }
-
   }
 }
