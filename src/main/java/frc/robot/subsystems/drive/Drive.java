@@ -47,6 +47,7 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.subsystems.drive.states.IdleState;
 import frc.robot.subsystems.drive.states.JoystickDrive;
+import frc.robot.subsystems.drive.states.LinearDriveState;
 import frc.robot.subsystems.drive.states.LineupState;
 import frc.robot.subsystems.drive.states.OTFState;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
@@ -216,6 +217,7 @@ public class Drive implements DriveTemplate {
     Idle(new IdleState(instance)),
     OTF(new OTFState(instance)),
     Lineup(new LineupState(instance)),
+    LinearDrive(new LinearDriveState(instance)),
     Joystick(new JoystickDrive(instance));
     private final PeriodicStateInterface state;
 
@@ -237,6 +239,8 @@ public class Drive implements DriveTemplate {
     BeginOTF,
     BeginLineup,
     CancelLineup,
+    BeginLinear,
+    CancelLinear,
     FinishLineup,
     WaitForScore,
   }
