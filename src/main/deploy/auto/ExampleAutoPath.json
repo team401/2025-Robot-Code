@@ -7,5 +7,9 @@
     "L1",
     "L1"
   ],
+  "alternatePath": [
+    "New New Path",
+    "Example Path"
+  ],
   "intakeLocation": "CoralStationRight"
 }

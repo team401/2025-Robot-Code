@@ -15,11 +15,16 @@ public class AutoStrategyContainer {
 
   public enum ActionType {
     Intake,
-    Score
+    Score,
+    Path
   };
 
   public static record Action(
-      ActionType type, GamePiece piece, DesiredLocation location, FieldTarget scoringTarget) {}
+      ActionType type,
+      GamePiece piece,
+      DesiredLocation location,
+      FieldTarget scoringTarget,
+      String path) {}
 
   public AutoStrategyContainer(File[] strategyNames) {
     String[] fileNames = new String[strategyNames.length];

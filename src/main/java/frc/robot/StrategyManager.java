@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.strategies.AutoIntake;
+import frc.robot.commands.strategies.AutoPath;
 import frc.robot.commands.strategies.AutoScore;
 import frc.robot.constants.AutoStrategy;
 import frc.robot.constants.AutoStrategyContainer.Action;
@@ -182,17 +183,22 @@ public class StrategyManager {
           strategy.scoringLevels.size() > i ? strategy.scoringLevels.get(i) : FieldTarget.L1;
       // add scoring
       if (strategy.alternatePath != null && strategy.alternatePath.get(i) != null) {
-        
+        this.addAction(
+            new Action(ActionType.Path, null, null, null, strategy.alternatePath.get(i)));
       }
       this.addAction(
           new Action(
-              ActionType.Score, GamePiece.Coral, strategy.scoringLocations.get(i), scoringLevel));
+              ActionType.Score,
+              GamePiece.Coral,
+              strategy.scoringLocations.get(i),
+              scoringLevel,
+              null));
 
       if (!(i == strategy.scoringLocations.size() - 1 && !strategy.intakeAfterLastScore)) {
         // intake after each score, only if it is not the last scoring location and the auto isn't
         // configured to not intake after last score
         this.addAction(
-            new Action(ActionType.Intake, GamePiece.Coral, strategy.intakeLocation, null));
+            new Action(ActionType.Intake, GamePiece.Coral, strategy.intakeLocation, null, null));
       }
     }
   }
@@ -222,6 +228,14 @@ public class StrategyManager {
         case Manual:
         default:
           return new AutoScore(drive, scoringSubsystem, action.location(), action.scoringTarget());
+      }
+    } else if (action.type() == ActionType.Path) {
+      switch (this.autonomyMode) {
+        case Full:
+        case Mixed:
+        case Manual:
+        default:
+          return new AutoPath(drive, scoringSubsystem, action.path());
       }
     } else {
       return null;
