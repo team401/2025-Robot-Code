@@ -203,7 +203,7 @@ public class LinearDriveState implements PeriodicStateInterface {
 
     double currentDistance = currentPose.getTranslation().getDistance(goalPose.getTranslation());
 
-    if (withinRange(currentPose, goalPose, 1e-9)) {
+    if (withinRange(currentPose, goalPose, 0.05)) {
       drive.setGoalSpeeds(new ChassisSpeeds(), true);
 
       if (drive.isDesiredLocationReef()) {
@@ -258,6 +258,7 @@ public class LinearDriveState implements PeriodicStateInterface {
   }
 
   public boolean withinRange(Pose2d a, Pose2d b, double error) {
+    System.out.println(Math.abs(a.getTranslation().getX() - b.getTranslation().getX()));
     return Math.abs(a.getTranslation().getX() - b.getTranslation().getX()) <= error
         && Math.abs(a.getTranslation().getY() - b.getTranslation().getY()) <= error
         && Math.abs(a.getRotation().getRadians() - b.getRotation().getRadians()) <= error;
