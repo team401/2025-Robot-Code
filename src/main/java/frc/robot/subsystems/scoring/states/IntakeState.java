@@ -95,15 +95,9 @@ public class IntakeState implements PeriodicStateInterface {
         }
         break;
       case Algae:
-        boolean algaeCurrentDetected = scoringSubsystem.isAlgaeCurrentDetected();
-
-        if (scoringSubsystem.isAlgaeDetected() || algaeCurrentDetected) {
+        if (scoringSubsystem.isAlgaeDetected()) {
           scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeIdleVoltage);
           scoringSubsystem.fireTrigger(ScoringTrigger.DoneIntaking);
-
-          if (algaeCurrentDetected) {
-            scoringSubsystem.setAlgaeCurrentDetected(true);
-          }
         }
         break;
     }
