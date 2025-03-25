@@ -10,7 +10,6 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.scoring.states.IntakeState;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class ClawMechanism {
@@ -115,19 +114,5 @@ public class ClawMechanism {
    */
   public boolean isAlgaeDetected() {
     return inputs.algaeDetected;
-  }
-
-  @AutoLogOutput(key = "scoring/claw/isAlgaeCurrentDetected")
-  public boolean isAlgaeCurrentDetected() {
-    boolean currentState =
-        inputs.clawStatorCurrent.gte(JsonConstants.clawConstants.algaeDetectionCurrent);
-    boolean riseDebounced = algaeRiseDebouncer.calculate(currentState);
-    boolean fallDebounced = algaeFallDebouncer.calculate(currentState);
-
-    Logger.recordOutput("scoring/claw/notDebounced", currentState);
-    Logger.recordOutput("scoring/claw/riseDebouncer", riseDebounced);
-    Logger.recordOutput("scoring/claw/fallDebounced", fallDebounced);
-
-    return riseDebounced || fallDebounced;
   }
 }
