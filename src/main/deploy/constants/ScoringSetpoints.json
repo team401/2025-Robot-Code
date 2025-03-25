@@ -127,7 +127,7 @@
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": 1.3,
+      "value": 0.0,
       "unit": "Radian"
     }
   },

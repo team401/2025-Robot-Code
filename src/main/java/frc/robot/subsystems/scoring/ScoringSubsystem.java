@@ -819,7 +819,9 @@ public class ScoringSubsystem extends MonitoredSubsystem {
             (Angle) Measure.max(wristMinAngle, JsonConstants.wristConstants.minReefSafeAngle));
       }
 
-      if (ReefAvoidanceHelper.willPassReefLevel(elevatorHeight, elevatorGoalHeight)) {
+      if (getGamePiece() == GamePiece.Coral
+          && ReefAvoidanceHelper.willPassReefLevel(elevatorHeight, elevatorGoalHeight)) {
+        // Don't run this protection when holding an algae
         wristInToPassReef = true;
         // If we will pass a reef level, clamp the wrist to be in a safe position to pass the reef
         wristMinAngle.mut_replace(
