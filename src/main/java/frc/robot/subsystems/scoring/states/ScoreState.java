@@ -42,6 +42,7 @@ public class ScoreState implements PeriodicStateInterface {
         } else {
           scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.coralScoreVoltage);
         }
+
         if (!scoringSubsystem.isCoralDetected()) {
           scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
         }
