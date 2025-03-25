@@ -242,7 +242,7 @@ public class LinearDriveState implements PeriodicStateInterface {
     ChassisSpeeds speeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
             driveVelocity.getX(), driveVelocity.getY(), headingVelocity, currentPose.getRotation());
-    drive.setGoalSpeeds(speeds, true);
+    drive.setGoalSpeeds(speeds, false);
 
     Logger.recordOutput("DriveToPoint/TargetPose", goalPose);
     Logger.recordOutput("DriveToPoint/DriveDistance", currentDistance);
@@ -258,9 +258,9 @@ public class LinearDriveState implements PeriodicStateInterface {
   }
 
   public boolean withinRange(Pose2d a, Pose2d b, double error) {
-    System.out.println(Math.abs(a.getTranslation().getX() - b.getTranslation().getX()));
-    return Math.abs(a.getTranslation().getX() - b.getTranslation().getX()) <= error
-        && Math.abs(a.getTranslation().getY() - b.getTranslation().getY()) <= error
+    return Math.pow(a.getTranslation().getX() - b.getTranslation().getX(), 2)
+                + Math.pow(a.getTranslation().getY() - b.getTranslation().getY(), 2)
+            <= error * error
         && Math.abs(a.getRotation().getRadians() - b.getRotation().getRadians()) <= error;
   }
 }
