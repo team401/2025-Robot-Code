@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import frc.robot.constants.DriveConstants;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
@@ -20,10 +21,10 @@ public class LinearDriveState implements PeriodicStateInterface {
 
   private Pose2d goalPose = null;
 
-  private double kDriveToPointTranslationP = 10;
-  private double kDriveToPointTranslationI = 0;
-  private double kDriveToPointTranslationD = 0;
-  private double kDriveTranslationMaxVelocity = 5;
+  private double kDriveToPointTranslationP = DriveConstants.synced.getObject().kDriveToPointTranslationP;
+  private double kDriveToPointTranslationI = DriveConstants.synced.getObject().kDriveToPointTranslationI;
+  private double kDriveToPointTranslationD = DriveConstants.synced.getObject().kDriveToPointTranslationD;
+  private double kDriveTranslationMaxVelocity = DriveConstants.synced.getObject().kDriveTranslationMaxVelocity;
   private double kDriveTranslationMaxAcceleration = 5;
   private double kPositionTolerance = 0.005;
   private double kVelocityTolerance = 0.005;
@@ -35,6 +36,8 @@ public class LinearDriveState implements PeriodicStateInterface {
   private double kDriveHeadingMaxAcceleration = 5;
   private double kAngleTolerance = 0.005;
   private double kAngularVelocityTolerance = 0.005;
+
+  private double lineupErrorMargin = 0.05;
 
   private ProfiledPIDController driveController =
       new ProfiledPIDController(
@@ -203,7 +206,7 @@ public class LinearDriveState implements PeriodicStateInterface {
 
     double currentDistance = currentPose.getTranslation().getDistance(goalPose.getTranslation());
 
-    if (withinRange(currentPose, goalPose, 0.05)) {
+    if (withinRange(currentPose, goalPose, lineupErrorMargin)) {
       drive.setGoalSpeeds(new ChassisSpeeds(), true);
 
       if (drive.isDesiredLocationReef()) {
