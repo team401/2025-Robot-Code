@@ -21,20 +21,27 @@ public class LinearDriveState implements PeriodicStateInterface {
 
   private Pose2d goalPose = null;
 
-  private double kDriveToPointTranslationP = DriveConstants.synced.getObject().kDriveToPointTranslationP;
-  private double kDriveToPointTranslationI = DriveConstants.synced.getObject().kDriveToPointTranslationI;
-  private double kDriveToPointTranslationD = DriveConstants.synced.getObject().kDriveToPointTranslationD;
-  private double kDriveTranslationMaxVelocity = DriveConstants.synced.getObject().kDriveTranslationMaxVelocity;
-  private double kDriveTranslationMaxAcceleration = 5;
-  private double kPositionTolerance = 0.005;
-  private double kVelocityTolerance = 0.005;
+  private double kDriveToPointTranslationP =
+      DriveConstants.synced.getObject().kDriveToPointTranslationP;
+  private double kDriveToPointTranslationI =
+      DriveConstants.synced.getObject().kDriveToPointTranslationI;
+  private double kDriveToPointTranslationD =
+      DriveConstants.synced.getObject().kDriveToPointTranslationD;
+  private double kDriveTranslationMaxVelocity =
+      DriveConstants.synced.getObject().kDriveTranslationMaxVelocity;
+  private double kDriveTranslationMaxAcceleration =
+      DriveConstants.synced.getObject().kDriveTranslationMaxAcceleration;
+  private double kPositionTolerance = DriveConstants.synced.getObject().kPositionTolerance;
+  private double kVelocityTolerance = DriveConstants.synced.getObject().kVelocityTolerance;
 
-  private double kDriveToPointHeadingP = 10;
-  private double kDriveToPointHeadingI = 0;
-  private double kDriveToPointHeadingD = 0;
-  private double kDriveHeadingMaxVelocity = 5;
-  private double kDriveHeadingMaxAcceleration = 5;
-  private double kAngleTolerance = 0.005;
+  private double kDriveToPointHeadingP = DriveConstants.synced.getObject().kDriveToPointHeadingP;
+  private double kDriveToPointHeadingI = DriveConstants.synced.getObject().kDriveToPointHeadingI;
+  private double kDriveToPointHeadingD = DriveConstants.synced.getObject().kDriveToPointHeadingD;
+  private double kDriveHeadingMaxVelocity =
+      DriveConstants.synced.getObject().kDriveHeadingMaxVelocity;
+  private double kDriveHeadingMaxAcceleration =
+      DriveConstants.synced.getObject().kDriveHeadingMaxAcceleration;
+  private double kAngleTolerance = DriveConstants.synced.getObject().kAngleTolerance;
   private double kAngularVelocityTolerance = 0.005;
 
   private double lineupErrorMargin = 0.05;
@@ -53,8 +60,6 @@ public class LinearDriveState implements PeriodicStateInterface {
           kDriveToPointHeadingI,
           kDriveToPointHeadingD,
           new TrapezoidProfile.Constraints(kDriveHeadingMaxVelocity, kDriveHeadingMaxAcceleration));
-
-  private double m_ffMinRadius = 0.35, m_ffMaxRadius = 0.8;
 
   public LinearDriveState(Drive drive) {
     this.drive = drive;
@@ -218,12 +223,7 @@ public class LinearDriveState implements PeriodicStateInterface {
     }
 
     // DRIVE
-    double ffScaler =
-        MathUtil.clamp(
-            (currentDistance - m_ffMinRadius) / (m_ffMaxRadius - m_ffMinRadius), 0.0, 1.0);
-    double driveVelocityScalar =
-        driveController.getSetpoint().velocity * ffScaler
-            + driveController.calculate(currentDistance, 0.0);
+    double driveVelocityScalar = driveController.calculate(currentDistance, 0.0);
     if (currentDistance < driveController.getPositionTolerance()) {
       driveVelocityScalar = 0.0;
     }
@@ -251,7 +251,6 @@ public class LinearDriveState implements PeriodicStateInterface {
     Logger.recordOutput("DriveToPoint/DriveDistance", currentDistance);
     Logger.recordOutput("DriveToPoint/HeadingError", headingError);
 
-    Logger.recordOutput("DriveToPoint/FFScaler", ffScaler);
     Logger.recordOutput("DriveToPoint/DriveVelocityScalar", driveVelocityScalar);
     Logger.recordOutput("DriveToPoint/HeadingVelocity", headingVelocity);
     Logger.recordOutput("DriveToPoint/DriveVelocityX", driveVelocity.getX());
