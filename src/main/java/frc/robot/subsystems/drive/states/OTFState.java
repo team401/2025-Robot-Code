@@ -65,7 +65,6 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF0Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF0Rotation);
       case Reef1:
-      case Algae0:
         return driveInput.isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF1Translation,
@@ -73,6 +72,14 @@ public class OTFState implements PeriodicStateInterface {
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueReefOTF1Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF1Rotation);
+      case Algae0:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefAlgaeOTF0Translation,
+                JsonConstants.redFieldLocations.redReefAlgaeOTF0Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAlgaeOTF0Translation,
+                JsonConstants.blueFieldLocations.blueReefAlgaeOTF0Rotation);
       case Reef2:
         return driveInput.isAllianceRed()
             ? new Pose2d(
@@ -82,7 +89,6 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF2Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF2Rotation);
       case Reef3:
-      case Algae1:
         return driveInput.isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF3Translation,
@@ -90,6 +96,14 @@ public class OTFState implements PeriodicStateInterface {
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueReefOTF3Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF3Rotation);
+      case Algae1:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefAlgaeOTF1Translation,
+                JsonConstants.redFieldLocations.redReefAlgaeOTF1Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAlgaeOTF1Translation,
+                JsonConstants.blueFieldLocations.blueReefAlgaeOTF1Rotation);
       case Reef4:
         return driveInput.isAllianceRed()
             ? new Pose2d(
@@ -99,7 +113,6 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF4Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF4Rotation);
       case Reef5:
-      case Algae2:
         return driveInput.isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF5Translation,
@@ -107,6 +120,14 @@ public class OTFState implements PeriodicStateInterface {
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueReefOTF5Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF5Rotation);
+      case Algae2:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefAlgaeOTF2Translation,
+                JsonConstants.redFieldLocations.redReefAlgaeOTF2Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAlgaeOTF2Translation,
+                JsonConstants.blueFieldLocations.blueReefAlgaeOTF2Rotation);
       case Reef6:
         return driveInput.isAllianceRed()
             ? new Pose2d(
@@ -116,7 +137,6 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF6Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF6Rotation);
       case Reef7:
-      case Algae3:
         return driveInput.isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF7Translation,
@@ -124,6 +144,14 @@ public class OTFState implements PeriodicStateInterface {
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueReefOTF7Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF7Rotation);
+      case Algae3:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefAlgaeOTF3Translation,
+                JsonConstants.redFieldLocations.redReefAlgaeOTF3Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAlgaeOTF3Translation,
+                JsonConstants.blueFieldLocations.blueReefAlgaeOTF3Rotation);
       case Reef8:
         return driveInput.isAllianceRed()
             ? new Pose2d(
@@ -133,7 +161,6 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF8Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF8Rotation);
       case Reef9:
-      case Algae4:
         return driveInput.isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF9Translation,
@@ -141,6 +168,14 @@ public class OTFState implements PeriodicStateInterface {
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueReefOTF9Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF9Rotation);
+      case Algae4:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefAlgaeOTF4Translation,
+                JsonConstants.redFieldLocations.redReefAlgaeOTF4Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAlgaeOTF4Translation,
+                JsonConstants.blueFieldLocations.blueReefAlgaeOTF4Rotation);
       case Reef10:
         return driveInput.isAllianceRed()
             ? new Pose2d(
@@ -150,7 +185,6 @@ public class OTFState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF10Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF10Rotation);
       case Reef11:
-      case Algae5:
         return driveInput.isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF11Translation,
@@ -158,6 +192,14 @@ public class OTFState implements PeriodicStateInterface {
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueReefOTF11Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF11Rotation);
+      case Algae5:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefAlgaeOTF5Translation,
+                JsonConstants.redFieldLocations.redReefAlgaeOTF5Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefAlgaeOTF5Translation,
+                JsonConstants.blueFieldLocations.blueReefAlgaeOTF5Rotation);
       case CoralStationRight:
         return driveInput.isAllianceRed()
             ? new Pose2d(

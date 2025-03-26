@@ -72,7 +72,7 @@ public class BlueFieldLocations {
 
   public Translation2d blueReefAlgaeOTF4Translation = new Translation2d(3.661, 5.435);
   public Rotation2d blueReefAlgaeOTF4Rotation = new Rotation2d(Math.toRadians(-60));
-  
+
   public Translation2d blueReefAlgaeOTF5Translation = new Translation2d(5.312, 5.435);
   public Rotation2d blueReefAlgaeOTF5Rotation = new Rotation2d(Math.toRadians(-120));
 
