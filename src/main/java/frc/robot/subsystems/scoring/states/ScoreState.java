@@ -24,25 +24,30 @@ public class ScoreState implements PeriodicStateInterface {
 
     // Only warmup like normal when we aren't doing algae in the net
     if (scoringSubsystem.getGamePiece() == GamePiece.Algae
-        && scoringSubsystem.getTarget() == FieldTarget.Net) {
+        && scoringSubsystem.getAlgaeScoreTarget() == FieldTarget.Net) {
       // Force the net setpoint only in score since the "warmup" for the net stays low to use
       // elevator to shoot algae upward
       setpoint = JsonConstants.scoringSetpoints.net;
     } else {
-      setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getTarget());
+      setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getCoralTarget());
     }
 
     scoringSubsystem.setGoalSetpoint(setpoint);
 
     switch (scoringSubsystem.getGamePiece()) {
       case Coral:
-        scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.coralScoreVoltage);
+        if (scoringSubsystem.getCoralTarget() == FieldTarget.L2
+            || scoringSubsystem.getCoralTarget() == FieldTarget.L3) {
+          scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.coralL23ScoreVoltage);
+        } else {
+          scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.coralScoreVoltage);
+        }
         if (!scoringSubsystem.isCoralDetected()) {
           scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
         }
         break;
       case Algae:
-        if (scoringSubsystem.getTarget() == FieldTarget.Net) {
+        if (scoringSubsystem.getAlgaeScoreTarget() == FieldTarget.Net) {
           // Only run claw rollers when elevator is at setpoint
           if (scoringSubsystem
               .getElevatorHeight()

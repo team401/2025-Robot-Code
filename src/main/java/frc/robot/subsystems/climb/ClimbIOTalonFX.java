@@ -4,8 +4,10 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
@@ -16,6 +18,7 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutVoltage;
@@ -85,6 +88,15 @@ public class ClimbIOTalonFX implements ClimbIO {
     leadMotor.getConfigurator().apply(talonFXConfigs);
     followerMotor.getConfigurator().apply(talonFXConfigs);
 
+    CANcoderConfiguration canCoderConfig =
+        new CANcoderConfiguration()
+            .withMagnetSensor(
+                new MagnetSensorConfigs()
+                    .withMagnetOffset(JsonConstants.climbConstants.climbEncoderOffsetRotations)
+                    .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive));
+
+    climbAngleCoder.getConfigurator().apply(canCoderConfig);
+
     // TODO: set lockedToCage when ramp becomes available
   }
 
@@ -94,12 +106,30 @@ public class ClimbIOTalonFX implements ClimbIO {
     inputs.lockedToCage = this.lockedToCage.getAsBoolean();
     inputs.goalAngle.mut_replace(goalAngle);
     inputs.motorAngle.mut_replace(climbAngleCoder.getAbsolutePosition().getValue());
+
+    inputs.leadMotorStatorCurrent.mut_replace(leadMotor.getStatorCurrent().getValue());
+    inputs.followerMotorStatorCurrent.mut_replace(followerMotor.getStatorCurrent().getValue());
+  }
+
+  private double feedforward = 0.0;
+
+  public void setFF(double newFF) {
+    this.feedforward = newFF;
   }
 
   @Override
   public void applyOutputs(ClimbOutputs outputs) {
+    Logger.recordOutput("climb/feedforward", feedforward);
 
-    calculator.withPosition(goalAngle.in(Rotations));
+    boolean usingFeedforward = false;
+    if (goalAngle.lt(climbAngleCoder.getAbsolutePosition().getValue())) {
+      calculator.withPosition(goalAngle.in(Rotations)).withFeedForward(feedforward);
+      usingFeedforward = true;
+    } else {
+      calculator.withPosition(goalAngle.in(Rotations)).withFeedForward(0.0);
+    }
+
+    Logger.recordOutput("climb/usingFeedforward", usingFeedforward);
 
     Logger.recordOutput("climb/calculatorAngle", leadMotor.getPosition().getValueAsDouble());
 
@@ -108,6 +138,7 @@ public class ClimbIOTalonFX implements ClimbIO {
     } else {
       leadMotor.setControl(calculator);
     }
+
     // tried to replace the above if statement with leadMotor.setControl(new VoltageOut(5));,
     // doesn't work
     // the getMotorVoltage continuously returns 0 despite leadMotor's literal voltage being set to 5

@@ -24,7 +24,7 @@ public class LED extends SubsystemBase {
   private List<LEDPattern> rightPatterns = new ArrayList<>();
 
   private final AddressableLED led = new AddressableLED(LEDConstants.ledPort);
-  public AddressableLEDBuffer ledStrip = new AddressableLEDBuffer(LEDConstants.totalLengthRainbow);
+  public AddressableLEDBuffer ledStrip = new AddressableLEDBuffer(LEDConstants.totalLength);
 
   public AddressableLEDBufferView leftData =
       ledStrip
@@ -75,7 +75,6 @@ public class LED extends SubsystemBase {
   /** Periodic method called every loop cycle. Updates LED patterns based on robot state. */
   @Override
   public void periodic() {
-    setEnabled(DriverStation.isEnabled());
     if (!DriverStation.isDisabled()) {
 
       // Drive Subsystem Checks
@@ -99,13 +98,13 @@ public class LED extends SubsystemBase {
           addPattern(LEDConstants.clearTop);
         }
         // Field Target Checks - bottom and middle thirds
-        if (scoringSubsystem.getTarget() == FieldTarget.L1) {
+        if (scoringSubsystem.getCoralTarget() == FieldTarget.L1) {
           addPattern(LEDConstants.targetOnReefL1Pattern);
-        } else if (scoringSubsystem.getTarget() == FieldTarget.L2) {
+        } else if (scoringSubsystem.getCoralTarget() == FieldTarget.L2) {
           addPattern(LEDConstants.targetOnReefL2Pattern);
-        } else if (scoringSubsystem.getTarget() == FieldTarget.L3) {
+        } else if (scoringSubsystem.getCoralTarget() == FieldTarget.L3) {
           addPattern(LEDConstants.targetOnReefL3Pattern);
-        } else if (scoringSubsystem.getTarget() == FieldTarget.L4) {
+        } else if (scoringSubsystem.getCoralTarget() == FieldTarget.L4) {
           addPattern(LEDConstants.targetOnReefL4Pattern);
         }
       }

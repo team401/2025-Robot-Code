@@ -27,6 +27,7 @@ import org.littletonrobotics.junction.Logger;
 public class StrategyManager {
   public enum AutonomyMode {
     Full,
+    Smart,
     Mixed,
     Manual,
   }
@@ -45,7 +46,11 @@ public class StrategyManager {
   private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
   private DoubleSubscriber intakeLocationSelector =
       table.getDoubleTopic("stationTarget").subscribe(-1);
-  private StringSubscriber reefLevelSelector = table.getStringTopic("scoreHeight").subscribe("-1");
+  private StringSubscriber coralLevelSelector = table.getStringTopic("coralHeight").subscribe("-1");
+  private StringSubscriber algaeScoreLevelSelector =
+      table.getStringTopic("algaeScoreHeight").subscribe("-1");
+  private StringSubscriber algaeIntakeLevelSelector =
+      table.getStringTopic("algaeIntakeHeight").subscribe("-1");
   private StringSubscriber autonomySelector =
       table.getStringTopic("autonomyLevel").subscribe("mid");
   private StringSubscriber gamePieceSelector = table.getStringTopic("gpMode").subscribe("-1");
@@ -53,7 +58,11 @@ public class StrategyManager {
   private StringPublisher autonomyPublisher = table.getStringTopic("autonomyLevel").publish();
   private DoublePublisher reefLocationPublisher = table.getDoubleTopic("reefTarget").publish();
   private DoublePublisher intakeLocationPublisher = table.getDoubleTopic("stationTarget").publish();
-  private StringPublisher reefLevelPublisher = table.getStringTopic("scoreHeight").publish();
+  private StringPublisher coralLevelPublisher = table.getStringTopic("coralHeight").publish();
+  private StringPublisher algaeScoreLevelPublisher =
+      table.getStringTopic("algaeScoreHeight").publish();
+  private StringPublisher algaeIntakeLevelPublisher =
+      table.getStringTopic("algaeIntakeHeight").publish();
   private StringPublisher gamePiecePublisher = table.getStringTopic("gpMode").publish();
   private BooleanPublisher hasCoralPublisher = table.getBooleanTopic("hasCoral").publish();
   private BooleanPublisher hasAlgaePublisher = table.getBooleanTopic("hasAlgae").publish();
@@ -97,6 +106,9 @@ public class StrategyManager {
     switch (mode) {
       case Full:
         autonomyPublisher.accept("high");
+        break;
+      case Smart:
+        autonomyPublisher.accept("smart");
         break;
       case Mixed:
         autonomyPublisher.accept("mid");
@@ -224,15 +236,20 @@ public class StrategyManager {
   public void updateScoringLocationsFromSnakeScreen() {
     // drive reef location
     if (drive != null) {
-      drive.updateDesiredLocationFromNetworkTables(
-          reefLocationSelector.get(), gamePieceSelector.get().equalsIgnoreCase("algae"));
+      // Don't set reef target or intake location from SnakeScreen in 'smart' mode, this will be
+      // picked automatically
+      // based on distance
+      if (getAutonomyMode() != AutonomyMode.Smart) {
+        drive.updateDesiredLocationFromNetworkTables(
+            reefLocationSelector.get(), gamePieceSelector.get().equalsIgnoreCase("algae"));
 
-      // 20: left; 21: right
-      if (gamePieceSelector.get().equalsIgnoreCase("coral")) {
-        drive.setDesiredIntakeLocation(
-            intakeLocationSelector.get() == 20
-                ? DesiredLocation.CoralStationLeft
-                : DesiredLocation.CoralStationRight);
+        // 20: left; 21: right
+        if (gamePieceSelector.get().equalsIgnoreCase("coral")) {
+          drive.setDesiredIntakeLocation(
+              intakeLocationSelector.get() == 20
+                  ? DesiredLocation.CoralStationLeft
+                  : DesiredLocation.CoralStationRight);
+        }
       }
     }
 
@@ -240,14 +257,23 @@ public class StrategyManager {
     if (scoringSubsystem != null) {
       // update scoring gamepiece
       String gamePiece = gamePieceSelector.get();
+      // System.out.println(gamePiece);
 
       if (gamePiece.equalsIgnoreCase("coral")) {
         scoringSubsystem.setGamePiece(GamePiece.Coral);
       } else if (gamePiece.equalsIgnoreCase("algae")) {
+        // System.out.println("Setting algae in strategymanager");
         scoringSubsystem.setGamePiece(GamePiece.Algae);
       }
 
-      scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
+      // Don't automatically set level in smart mode FOR ALGAE; this will be set when the warmup
+      // trigger is
+      // pressed. This can't happen in periodic because algae level is automatically determined when
+      // intake is pressed and would be overridden by this in each loop.
+      if (getAutonomyMode() != AutonomyMode.Smart
+          || scoringSubsystem.getGamePiece() != GamePiece.Algae) {
+        updateScoringLevelFromNetworkTables();
+      }
     }
 
     // update autonomy level
@@ -255,6 +281,8 @@ public class StrategyManager {
 
     if (autonomyLevel.equalsIgnoreCase("high")) {
       this.setAutonomyMode(AutonomyMode.Full);
+    } else if (autonomyLevel.equalsIgnoreCase("smart")) {
+      this.setAutonomyMode(AutonomyMode.Smart);
     } else if (autonomyLevel.equalsIgnoreCase("mid")) {
       this.setAutonomyMode(AutonomyMode.Mixed);
     } else if (autonomyLevel.equalsIgnoreCase("low")) {
@@ -294,7 +322,15 @@ public class StrategyManager {
     this.publishCoralAndAlgae();
   }
 
+  public void updateScoringLevelFromNetworkTables() {
+    scoringSubsystem.updateScoringLevelFromNetworkTables(
+        coralLevelSelector.get(), algaeIntakeLevelSelector.get(), algaeScoreLevelSelector.get());
+  }
+
   public void publishDefaultSubsystemValues() {
+    if (DriverStation.isTeleop()) {
+      this.setAutonomyMode(AutonomyMode.Smart);
+    }
     if (scoringSubsystem != null) {
       // publish default game piece
       switch (scoringSubsystem.getGamePiece()) {
@@ -308,19 +344,43 @@ public class StrategyManager {
           break;
       }
 
+      scoringSubsystem.setTarget(FieldTarget.L4);
+
       // publish default level
-      switch (scoringSubsystem.getTarget()) {
+      switch (scoringSubsystem.getCoralTarget()) {
         case L1:
-          reefLevelPublisher.accept("level1");
+          coralLevelPublisher.accept("level1");
           break;
         case L2:
-          reefLevelPublisher.accept("level2");
+          coralLevelPublisher.accept("level2");
           break;
         case L3:
-          reefLevelPublisher.accept("level3");
+          coralLevelPublisher.accept("level3");
           break;
         case L4:
-          reefLevelPublisher.accept("level4");
+          coralLevelPublisher.accept("level4");
+          break;
+        default:
+          break;
+      }
+
+      switch (scoringSubsystem.getAlgaeIntakeTarget()) {
+        case L2:
+          algaeIntakeLevelPublisher.accept("level2");
+          break;
+        case L3:
+          algaeIntakeLevelPublisher.accept("level3");
+          break;
+        default:
+          break;
+      }
+
+      switch (scoringSubsystem.getAlgaeScoreTarget()) {
+        case Processor:
+          algaeScoreLevelPublisher.accept("level1");
+          break;
+        case Net:
+          algaeScoreLevelPublisher.accept("level4");
           break;
         default:
           break;
@@ -349,6 +409,9 @@ public class StrategyManager {
     switch (this.getAutonomyMode()) {
       case Full:
         autonomyPublisher.accept("high");
+        break;
+      case Smart:
+        autonomyPublisher.accept("smart");
         break;
       case Mixed:
         autonomyPublisher.accept("mid");
@@ -384,7 +447,7 @@ public class StrategyManager {
    * values
    */
   public void teleopInit() {
-    this.setAutonomyMode(AutonomyMode.Mixed);
+    this.setAutonomyMode(AutonomyMode.Smart);
 
     this.clearActions();
 

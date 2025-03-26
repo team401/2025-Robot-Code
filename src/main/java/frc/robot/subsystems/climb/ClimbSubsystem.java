@@ -8,7 +8,7 @@ import coppercore.controls.state_machine.StateMachineConfiguration;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.state.StateContainer;
 import coppercore.parameter_tools.LoggedTunableNumber;
-import edu.wpi.first.units.measure.*;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.TestModeManager;
 import frc.robot.constants.ClimbConstants;
@@ -95,7 +95,7 @@ public class ClimbSubsystem extends SubsystemBase {
 
     climbMachineConfiguration
         .configure(ClimbState.LIFTING)
-        .permit(ClimbAction.CANCEL, ClimbState.IDLE);
+        .permit(ClimbAction.CANCEL, ClimbState.SEARCHING);
 
     climbMachineConfiguration
         .configure(ClimbState.OVERRIDE)
@@ -210,5 +210,9 @@ public class ClimbSubsystem extends SubsystemBase {
       default:
         break;
     }
+  }
+
+  public void setFeedforward(double newFF) {
+    io.setFF(newFF);
   }
 }

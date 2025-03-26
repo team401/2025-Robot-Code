@@ -1,7 +1,13 @@
 package frc.robot.subsystems.drive;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.constants.JsonConstants;
+import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 
 /** Provides utilities for finding the reef tag ID and camera ID to use for lineup */
@@ -96,6 +102,80 @@ public class ReefLineupUtil {
         return JsonConstants.drivetrainConstants.driveCrossTrackFrontLeftOffset; // coral
       }
       return JsonConstants.drivetrainConstants.driveCrossTrackFrontLeftAlgaeOffset; // algae
+    }
+  }
+
+  public static DesiredLocation getClosestReefLocation(Pose2d robotPose) {
+    double closestDistance = Double.MAX_VALUE;
+    DesiredLocation closestLocation = DesiredLocation.Reef0;
+
+    for (DesiredLocation location : Drive.reefCoralLocations) {
+      Translation2d poleLocation;
+      if (DriverStation.getAlliance().isPresent()
+          && DriverStation.getAlliance().get() == Alliance.Red) {
+        poleLocation =
+            JsonConstants.redFieldLocations.findPoleTranslationFromReefLocation(location);
+      } else {
+        poleLocation =
+            JsonConstants.blueFieldLocations.findPoleTranslationFromReefLocation(location);
+      }
+      double distance = robotPose.getTranslation().getDistance(poleLocation);
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestLocation = location;
+      }
+    }
+
+    return closestLocation;
+  }
+
+  public static DesiredLocation getClosestAlgaeLocation(Pose2d robotPose) {
+    double closestDistance = Double.MAX_VALUE;
+    DesiredLocation closestLocation = DesiredLocation.Algae0;
+
+    for (DesiredLocation location : Drive.reefAlgaeLocations) {
+      Translation2d algaeLocation;
+      if (DriverStation.getAlliance().isPresent()
+          && DriverStation.getAlliance().get() == Alliance.Red) {
+        algaeLocation =
+            JsonConstants.redFieldLocations.findAlgaeTranslationFromReefLocation(location);
+      } else {
+        algaeLocation =
+            JsonConstants.blueFieldLocations.findAlgaeTranslationFromReefLocation(location);
+      }
+      double distance = robotPose.getTranslation().getDistance(algaeLocation);
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestLocation = location;
+      }
+    }
+
+    return closestLocation;
+  }
+
+  /**
+   * Given the desired location of an algae on the reef, get the level to intake at
+   *
+   * @param location The location of the reef algae
+   * @return A FieldTarget describing what height the algae is at
+   */
+  public static FieldTarget getAlgaeLevelFromDesiredLocation(DesiredLocation location) {
+    switch (location) {
+      default:
+        System.out.println(
+            "ERROR: Tried to get algae level from a non-algae desired location "
+                + location.name()
+                + ", defaulting to L2");
+      case Algae0:
+      case Algae2:
+      case Algae4:
+        return FieldTarget.L2;
+      case Algae1:
+      case Algae3:
+      case Algae5:
+        return FieldTarget.L3;
     }
   }
 }
