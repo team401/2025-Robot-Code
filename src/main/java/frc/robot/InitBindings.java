@@ -82,7 +82,7 @@ public final class InitBindings {
                       if (ScoringSubsystem.getInstance() != null
                           && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
                         drive.setGoToIntake(false);
-                        drive.fireTrigger(DriveTrigger.BeginOTF);
+                        drive.fireTrigger(DriveTrigger.BeginLinear);
                       } else if (ScoringSubsystem.getInstance() != null) {
                         ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
                       }
