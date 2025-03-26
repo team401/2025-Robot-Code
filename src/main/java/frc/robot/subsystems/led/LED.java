@@ -11,8 +11,6 @@ import frc.robot.constants.LEDConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
-import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
-import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -52,60 +50,28 @@ public class LED extends SubsystemBase {
     this.scoringSubsystem = scoringSubsystem;
     this.climbSubsystem = climbSubsystem;
     this.driveSubsystem = drive;
-    led.setLength(LEDConstants.totalLengthRainbow);
+    led.setLength(LEDConstants.totalLength);
     led.start();
-  }
-
-  private void setEnabled(boolean enabled) {
-    if (enabled != this.enabled) {
-      this.enabled = enabled;
-      if (enabled) {
-        ledStrip = new AddressableLEDBuffer(LEDConstants.totalLength);
-        leftData = ledStrip.createView(0, LEDConstants.halfLength - 1);
-        rightData =
-            ledStrip.createView(LEDConstants.halfLength, LEDConstants.totalLength - 1).reversed();
-        led.setLength(LEDConstants.totalLength);
-      } else {
-        ledStrip = new AddressableLEDBuffer(LEDConstants.totalLengthRainbow);
-        led.setLength(LEDConstants.totalLengthRainbow);
-      }
-    }
   }
 
   /** Periodic method called every loop cycle. Updates LED patterns based on robot state. */
   @Override
   public void periodic() {
     if (!DriverStation.isDisabled()) {
-
-      // Drive Subsystem Checks
-      // otf - bottom middle third of left strip
-      if (driveSubsystem != null) {
-        if (driveSubsystem.isDesiredLocationReef()) {
-          addSplitPattern(LEDConstants.targetOnReefOTF, LEDConstants.clear);
-        }
+      if (DriverStation.getMatchTime() < 20 && DriverStation.getMatchTime() > 17) {
+        addPattern(LEDConstants.endGame);
       }
       // Scoring Subsystem Checks
       if (scoringSubsystem != null) {
-        // Game Piece Checks - top thirds
-        if (scoringSubsystem.getGamePiece() == GamePiece.Algae) {
+        if (scoringSubsystem.isCoralDetected() == true) {
           addPattern(LEDConstants.holdingAlgaePattern);
-        } else if (scoringSubsystem.getGamePiece() == GamePiece.Coral) {
+        } else if (scoringSubsystem.isAlgaeDetected() == true) {
           addPattern(LEDConstants.holdingCoralPattern);
-        } else if (scoringSubsystem.getGamePiece() == GamePiece.Coral
-            && scoringSubsystem.getGamePiece() == GamePiece.Algae) {
+        } else if (scoringSubsystem.isCoralDetected() == true
+            && scoringSubsystem.isAlgaeDetected() == true) {
           addPattern(LEDConstants.holdingBothPattern);
         } else {
-          addPattern(LEDConstants.clearTop);
-        }
-        // Field Target Checks - bottom and middle thirds
-        if (scoringSubsystem.getCoralTarget() == FieldTarget.L1) {
-          addPattern(LEDConstants.targetOnReefL1Pattern);
-        } else if (scoringSubsystem.getCoralTarget() == FieldTarget.L2) {
-          addPattern(LEDConstants.targetOnReefL2Pattern);
-        } else if (scoringSubsystem.getCoralTarget() == FieldTarget.L3) {
-          addPattern(LEDConstants.targetOnReefL3Pattern);
-        } else if (scoringSubsystem.getCoralTarget() == FieldTarget.L4) {
-          addPattern(LEDConstants.targetOnReefL4Pattern);
+          addPattern(LEDConstants.clear);
         }
       }
 
@@ -114,27 +80,14 @@ public class LED extends SubsystemBase {
         addPattern(LEDConstants.isBeeLinkWorkingPattern);
       }
 
-      // Hang Check - all thirds
-      if (climbSubsystem != null) {
-        if (climbSubsystem.getLockedToCage()) {
-          addPattern(LEDConstants.lockedOnHangPattern);
-        }
-      }
-
       applyPatterns();
 
-    }
-    // lasers(disabled) - all thirds
-    // else if (driveSubsystem.isBrakeMode()) {
-    //  addPattern(LEDConstants.lasers);
-    // }
-    else {
-      // rainbow - all thirds
-      // addPattern(LEDConstants.rainbowPattern);
-      // if (!visionWorkingSupplier.get()) {
-      //   addPattern(LEDConstants.isBeeLinkWorkingPattern);
-      // }
-      // applyPatterns();
+    } else {
+      addPattern(LEDConstants.rainbowPattern);
+      if (!visionWorkingSupplier.get()) {
+        addPattern(LEDConstants.isBeeLinkWorkingPattern);
+      }
+      applyPatterns();
       LEDConstants.rainbowPattern.applyTo(ledStrip);
     }
     led.setData(ledStrip);

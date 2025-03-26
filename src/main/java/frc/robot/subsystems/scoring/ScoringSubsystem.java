@@ -593,6 +593,16 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     return currentTarget;
   }
 
+  public FieldTarget getTarget() {
+    if (currentPiece == GamePiece.Coral) {
+      return currentTarget;
+    } else if (currentPiece == GamePiece.Algae) {
+      return currentAlgaeIntakeTarget;
+    } else {
+      return currentTarget;
+    }
+  }
+
   public FieldTarget getAlgaeScoreTarget() {
     return currentAlgaeScoreTarget;
   }
