@@ -9,8 +9,8 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import frc.robot.constants.DriveConstants;
 import frc.robot.constants.JsonConstants;
+import frc.robot.constants.subsystems.DrivetrainConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import org.littletonrobotics.junction.Logger;
@@ -21,26 +21,29 @@ public class LinearDriveState implements PeriodicStateInterface {
   private Pose2d goalPose = null;
 
   private double kDriveToPointTranslationP =
-      DriveConstants.synced.getObject().kDriveToPointTranslationP;
+      DrivetrainConstants.synced.getObject().kDriveToPointTranslationP;
   private double kDriveToPointTranslationI =
-      DriveConstants.synced.getObject().kDriveToPointTranslationI;
+      DrivetrainConstants.synced.getObject().kDriveToPointTranslationI;
   private double kDriveToPointTranslationD =
-      DriveConstants.synced.getObject().kDriveToPointTranslationD;
+      DrivetrainConstants.synced.getObject().kDriveToPointTranslationD;
   private double kDriveTranslationMaxVelocity =
-      DriveConstants.synced.getObject().kDriveTranslationMaxVelocity;
+      DrivetrainConstants.synced.getObject().kDriveTranslationMaxVelocity;
   private double kDriveTranslationMaxAcceleration =
-      DriveConstants.synced.getObject().kDriveTranslationMaxAcceleration;
-  private double kPositionTolerance = DriveConstants.synced.getObject().kPositionTolerance;
-  private double kVelocityTolerance = DriveConstants.synced.getObject().kVelocityTolerance;
+      DrivetrainConstants.synced.getObject().kDriveTranslationMaxAcceleration;
+  private double kPositionTolerance = DrivetrainConstants.synced.getObject().kPositionTolerance;
+  private double kVelocityTolerance = DrivetrainConstants.synced.getObject().kVelocityTolerance;
 
-  private double kDriveToPointHeadingP = DriveConstants.synced.getObject().kDriveToPointHeadingP;
-  private double kDriveToPointHeadingI = DriveConstants.synced.getObject().kDriveToPointHeadingI;
-  private double kDriveToPointHeadingD = DriveConstants.synced.getObject().kDriveToPointHeadingD;
+  private double kDriveToPointHeadingP =
+      DrivetrainConstants.synced.getObject().kDriveToPointHeadingP;
+  private double kDriveToPointHeadingI =
+      DrivetrainConstants.synced.getObject().kDriveToPointHeadingI;
+  private double kDriveToPointHeadingD =
+      DrivetrainConstants.synced.getObject().kDriveToPointHeadingD;
   private double kDriveHeadingMaxVelocity =
-      DriveConstants.synced.getObject().kDriveHeadingMaxVelocity;
+      DrivetrainConstants.synced.getObject().kDriveHeadingMaxVelocity;
   private double kDriveHeadingMaxAcceleration =
-      DriveConstants.synced.getObject().kDriveHeadingMaxAcceleration;
-  private double kAngleTolerance = DriveConstants.synced.getObject().kAngleTolerance;
+      DrivetrainConstants.synced.getObject().kDriveHeadingMaxAcceleration;
+  private double kAngleTolerance = DrivetrainConstants.synced.getObject().kAngleTolerance;
   private double kAngularVelocityTolerance = 0.005;
 
   private double lineupErrorMargin = 0.05;
