@@ -36,7 +36,8 @@ public class ScoreState implements PeriodicStateInterface {
 
     switch (scoringSubsystem.getGamePiece()) {
       case Coral:
-        if (scoringSubsystem.getCoralTarget() == FieldTarget.L2
+        if (scoringSubsystem.getCoralTarget() == FieldTarget.L1
+            || scoringSubsystem.getCoralTarget() == FieldTarget.L2
             || scoringSubsystem.getCoralTarget() == FieldTarget.L3) {
           scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.coralL23ScoreVoltage);
         } else {
