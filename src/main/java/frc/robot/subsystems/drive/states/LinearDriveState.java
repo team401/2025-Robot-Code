@@ -2,13 +2,17 @@ package frc.robot.subsystems.drive.states;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.subsystems.DrivetrainConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -56,6 +60,11 @@ public class LinearDriveState implements PeriodicStateInterface {
           new TrapezoidProfile.Constraints(
               kDriveTranslationMaxVelocity, kDriveTranslationMaxAcceleration));
 
+  private TrapezoidProfile driveProfile =
+      new TrapezoidProfile(
+          new TrapezoidProfile.Constraints(
+              kDriveTranslationMaxVelocity, kDriveTranslationMaxAcceleration));
+
   private ProfiledPIDController headingController =
       new ProfiledPIDController(
           kDriveToPointHeadingP,
@@ -69,6 +78,14 @@ public class LinearDriveState implements PeriodicStateInterface {
 
   public void onEntry(Transition transition) {
     goalPose = findLinearDriveFromDesiredLocation(drive);
+
+    headingController.reset(drive.getPose().getRotation().getRadians());
+
+    driveProfile =
+        new TrapezoidProfile(
+            new TrapezoidProfile.Constraints(
+                JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
+                JsonConstants.drivetrainConstants.OTFMaxLinearAccel));
   }
 
   public void onExit(Transition transition) {}
@@ -221,6 +238,43 @@ public class LinearDriveState implements PeriodicStateInterface {
     return Math.acos(dot_product / (u_norm * v_norm));
   }
 
+  /**
+   * Find the velocity of an object toward a target point
+   *
+   * <p>This exists here in case we end up needing to use it instead of trusting the profile to
+   * calculate it for us
+   *
+   * @param velocity The velocity of the object
+   * @param currentTranslation The current position of the object
+   * @param targetTranslation The position of the target point
+   * @return The velocity toward the target point (a negative number if object is moving away)
+   */
+  public static double findVelocityTowardPoint(
+      Vector<N2> velocity, Translation2d currentTranslation, Translation2d targetTranslation) {
+    // Calculate the velocity to the goal based on this formula
+    // https://web.ma.utexas.edu/users/m408m/Display12-3-4.shtml
+
+    // Vector from current to target (translate target so that current is now 0, 0)
+    Translation2d currentToTarget = targetTranslation.minus(currentTranslation);
+
+    // Get the angle of the vector from current to target
+    Rotation2d targetAngle =
+        Rotation2d.fromRadians(Math.atan2(currentToTarget.getY(), currentToTarget.getX()));
+
+    // Get the angle of the velocity vector
+    Rotation2d velocityAngle =
+        Rotation2d.fromRadians(Math.atan2(velocity.get(1, 0), velocity.get(0, 0)));
+
+    // Calculate theta, the angle between the speakerAngle and the current velocity angle
+    Rotation2d theta = velocityAngle.minus(targetAngle);
+
+    // Project the velocity vector onto the speaker vector with ||u|| * cos(theta)
+    // Where u is the velocity vector
+    double velocityToGoal = velocity.norm() * theta.getCos();
+
+    return velocityToGoal;
+  }
+
   @Override
   public void periodic() {
     Pose2d currentPose = drive.getPose();
@@ -238,6 +292,7 @@ public class LinearDriveState implements PeriodicStateInterface {
 
     // Get distances to goal positions.
     double distanceToGoal = currentPose.getTranslation().getDistance(goalPose.getTranslation());
+
     // double distanceToPhase1Pose =
     //     currentPose.getTranslation().getDistance(phase1Pose.getTranslation());
 
@@ -269,7 +324,24 @@ public class LinearDriveState implements PeriodicStateInterface {
         headingController.calculate(
             currentPose.getRotation().getRadians(), goalPose.getRotation().getRadians());
 
-    double driveVelocityScalar = driveController.calculate(distanceToGoal, 0.0);
+    // double driveVelocityScalar = driveController.calculate(distanceToGoal, 0.0);
+
+    ChassisSpeeds chassisSpeeds =
+        ChassisSpeeds.fromRobotRelativeSpeeds(drive.getChassisSpeeds(), currentPose.getRotation());
+    Vector<N2> velocity =
+        VecBuilder.fill(chassisSpeeds.vxMetersPerSecond, chassisSpeeds.vyMetersPerSecond);
+
+    double velocityToGoal =
+        findVelocityTowardPoint(
+            velocity, currentPose.getTranslation(), currentGoalPose.getTranslation());
+
+    double driveVelocityScalar =
+        driveProfile.calculate(
+                0.02,
+                new State(distanceToGoal, -Math.abs(velocityToGoal)),
+                new State(0.0, JsonConstants.drivetrainConstants.linearDriveEndVelocity))
+            .velocity;
+
     Translation2d driveVelocity =
         new Pose2d(
                 0.0,
@@ -288,6 +360,7 @@ public class LinearDriveState implements PeriodicStateInterface {
     Logger.recordOutput("DriveToPoint/Phase2Pose", goalPose);
     Logger.recordOutput("DriveToPoint/TargetPose", currentGoalPose);
     Logger.recordOutput("DriveToPoint/DriveDistance", distanceToGoal);
+    Logger.recordOutput("DriveToPoint/VelocityToGoal", velocityToGoal);
     Logger.recordOutput("DriveToPoint/HeadingError", headingError);
 
     Logger.recordOutput("DriveToPoint/DriveVelocityScalar", driveVelocityScalar);
