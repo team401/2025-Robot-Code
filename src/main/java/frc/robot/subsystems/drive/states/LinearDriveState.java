@@ -30,8 +30,6 @@ public class LinearDriveState implements PeriodicStateInterface {
       DrivetrainConstants.synced.getObject().kDriveTranslationMaxVelocity;
   private double kDriveTranslationMaxAcceleration =
       DrivetrainConstants.synced.getObject().kDriveTranslationMaxAcceleration;
-  private double kPositionTolerance = DrivetrainConstants.synced.getObject().kPositionTolerance;
-  private double kVelocityTolerance = DrivetrainConstants.synced.getObject().kVelocityTolerance;
 
   private double kDriveToPointHeadingP =
       DrivetrainConstants.synced.getObject().kDriveToPointHeadingP;
@@ -43,8 +41,6 @@ public class LinearDriveState implements PeriodicStateInterface {
       DrivetrainConstants.synced.getObject().kDriveHeadingMaxVelocity;
   private double kDriveHeadingMaxAcceleration =
       DrivetrainConstants.synced.getObject().kDriveHeadingMaxAcceleration;
-  private double kAngleTolerance = DrivetrainConstants.synced.getObject().kAngleTolerance;
-  private double kAngularVelocityTolerance = 0.005;
 
   private double lineupErrorMargin = 0.05;
 
@@ -69,6 +65,33 @@ public class LinearDriveState implements PeriodicStateInterface {
 
   public void onEntry(Transition transition) {
     goalPose = findLinearDriveFromDesiredLocation(drive);
+
+    Pose2d currentPose = drive.getPose();
+
+    driveController =
+        new ProfiledPIDController(
+            JsonConstants.drivetrainConstants.kDriveToPointTranslationP,
+            JsonConstants.drivetrainConstants.kDriveToPointTranslationI,
+            JsonConstants.drivetrainConstants.kDriveToPointTranslationD,
+            new TrapezoidProfile.Constraints(
+                JsonConstants.drivetrainConstants.kDriveTranslationMaxVelocity,
+                JsonConstants.drivetrainConstants.kDriveTranslationMaxAcceleration));
+
+    double distanceToGoal = currentPose.getTranslation().getDistance(goalPose.getTranslation());
+    driveController.reset(distanceToGoal);
+
+    headingController =
+        new ProfiledPIDController(
+            JsonConstants.drivetrainConstants.kDriveToPointHeadingP,
+            JsonConstants.drivetrainConstants.kDriveToPointHeadingI,
+            JsonConstants.drivetrainConstants.kDriveToPointHeadingD,
+            new TrapezoidProfile.Constraints(
+                JsonConstants.drivetrainConstants.kDriveHeadingMaxVelocity,
+                JsonConstants.drivetrainConstants.kDriveHeadingMaxAcceleration));
+
+    headingController.reset(currentPose.getRotation().getRadians());
+
+    lineupErrorMargin = JsonConstants.drivetrainConstants.lineupErrorMargin;
   }
 
   public void onExit(Transition transition) {}
