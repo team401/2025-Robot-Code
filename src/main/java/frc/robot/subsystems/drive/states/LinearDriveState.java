@@ -65,8 +65,6 @@ public class LinearDriveState implements PeriodicStateInterface {
 
   public LinearDriveState(Drive drive) {
     this.drive = drive;
-    driveController.setTolerance(kPositionTolerance, kVelocityTolerance);
-    driveController.setTolerance(kAngleTolerance, kAngularVelocityTolerance);
   }
 
   public void onEntry(Transition transition) {
@@ -207,15 +205,56 @@ public class LinearDriveState implements PeriodicStateInterface {
     }
   }
 
+  final double kPhase2Distance = 1.0;
+  final double kPhase2Angle = Math.toRadians(45.0);
+  final double kPhase1EndSpeed = 2.0;
+
+  private double getAngleBetweenVectors(Translation2d u, Translation2d v) {
+    double u_norm = u.getNorm();
+    double v_norm = v.getNorm();
+    double dot_product = u.getX() * v.getX() + u.getY() * v.getY();
+
+    // Avoid cases that break acos() and return 0.0 in these cases.
+    if (u_norm * v_norm < 1e-10 || dot_product > (u_norm * v_norm)) {
+      return 0.0;
+    }
+    return Math.acos(dot_product / (u_norm * v_norm));
+  }
+
   @Override
   public void periodic() {
     Pose2d currentPose = drive.getPose();
 
-    double currentDistance = currentPose.getTranslation().getDistance(goalPose.getTranslation());
+    // Project the goal pose backwards to find the phase 1 goal pose.
+    double phase1OffsetX =
+        kPhase2Distance * Math.cos(goalPose.getRotation().getRadians() + Math.PI);
+    double phase1OffsetY =
+        kPhase2Distance * Math.sin(goalPose.getRotation().getRadians() + Math.PI);
+    Pose2d phase1Pose =
+        new Pose2d(
+            goalPose.getX() + phase1OffsetX,
+            goalPose.getY() + phase1OffsetY,
+            goalPose.getRotation());
 
-    if (withinRange(currentPose, goalPose, lineupErrorMargin)) {
-      drive.setGoalSpeeds(new ChassisSpeeds(), true);
+    // Get distances to goal positions.
+    double distanceToGoal = currentPose.getTranslation().getDistance(goalPose.getTranslation());
+    // double distanceToPhase1Pose =
+    //     currentPose.getTranslation().getDistance(phase1Pose.getTranslation());
 
+    // Find if the robot is within the slice area to transition to phase 2.
+    Translation2d phase1PoseToGoal = goalPose.minus(phase1Pose).getTranslation();
+    Translation2d robotToGoal = goalPose.minus(currentPose).getTranslation();
+    double angleToTarget = getAngleBetweenVectors(robotToGoal, phase1PoseToGoal);
+
+    // Determine which pose to aim at. However, always use the distance to the final pose to compute
+    // the target speed.
+    Pose2d currentGoalPose = phase1Pose;
+    if (distanceToGoal < kPhase2Distance || Math.abs(angleToTarget) < kPhase2Angle) {
+      currentGoalPose = goalPose;
+    }
+
+    // We only exit this state when the phase 2 pose has been achieved.
+    if (distanceToGoal < lineupErrorMargin) {
       if (drive.isDesiredLocationReef()) {
         drive.fireTrigger(DriveTrigger.BeginLineup);
       } else {
@@ -224,33 +263,31 @@ public class LinearDriveState implements PeriodicStateInterface {
       return;
     }
 
-    // DRIVE
-    double driveVelocityScalar = driveController.calculate(currentDistance, 0.0);
-    if (currentDistance < driveController.getPositionTolerance()) {
-      driveVelocityScalar = 0.0;
-    }
-
     // HEADING
     double headingError = currentPose.getRotation().minus(goalPose.getRotation()).getRadians();
     double headingVelocity =
         headingController.calculate(
             currentPose.getRotation().getRadians(), goalPose.getRotation().getRadians());
-    if (Math.abs(headingError) < headingController.getPositionTolerance()) {
-      headingVelocity = 0.0;
-    }
 
+    double driveVelocityScalar = driveController.calculate(distanceToGoal, 0.0);
     Translation2d driveVelocity =
         new Pose2d(
-                0.0, 0.0, currentPose.getTranslation().minus(goalPose.getTranslation()).getAngle())
+                0.0,
+                0.0,
+                currentPose.getTranslation().minus(currentGoalPose.getTranslation()).getAngle())
             .transformBy(new Transform2d(driveVelocityScalar, 0.0, new Rotation2d()))
             .getTranslation();
+
     ChassisSpeeds speeds =
         ChassisSpeeds.fromFieldRelativeSpeeds(
             driveVelocity.getX(), driveVelocity.getY(), headingVelocity, currentPose.getRotation());
     drive.setGoalSpeeds(speeds, false);
 
-    Logger.recordOutput("DriveToPoint/TargetPose", goalPose);
-    Logger.recordOutput("DriveToPoint/DriveDistance", currentDistance);
+    Logger.recordOutput("DriveToPoint/AngleToTarget", angleToTarget);
+    Logger.recordOutput("DriveToPoint/Phase1Pose", phase1Pose);
+    Logger.recordOutput("DriveToPoint/Phase2Pose", goalPose);
+    Logger.recordOutput("DriveToPoint/TargetPose", currentGoalPose);
+    Logger.recordOutput("DriveToPoint/DriveDistance", distanceToGoal);
     Logger.recordOutput("DriveToPoint/HeadingError", headingError);
 
     Logger.recordOutput("DriveToPoint/DriveVelocityScalar", driveVelocityScalar);
@@ -259,12 +296,5 @@ public class LinearDriveState implements PeriodicStateInterface {
     Logger.recordOutput("DriveToPoint/DriveVelocityY", driveVelocity.getY());
 
     Logger.recordOutput("DriveToPoint/DriveSpeeds", speeds);
-  }
-
-  public boolean withinRange(Pose2d a, Pose2d b, double error) {
-    return Math.pow(a.getTranslation().getX() - b.getTranslation().getX(), 2)
-                + Math.pow(a.getTranslation().getY() - b.getTranslation().getY(), 2)
-            <= error * error
-        && Math.abs(a.getRotation().getRadians() - b.getRotation().getRadians()) <= error;
   }
 }

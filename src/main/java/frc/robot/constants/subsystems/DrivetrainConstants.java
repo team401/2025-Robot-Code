@@ -244,19 +244,19 @@ public class DrivetrainConstants {
 
   // Linear Drive
 
-  public final Double kDriveToPointTranslationP = 10.0;
+  public final Double kDriveToPointTranslationP = 5.0;
   public final Double kDriveToPointTranslationI = 0.0;
   public final Double kDriveToPointTranslationD = 0.0;
-  public final Double kDriveTranslationMaxVelocity = 5.0;
-  public final Double kDriveTranslationMaxAcceleration = 5.0;
-  public final Double kPositionTolerance = 0.005;
-  public final Double kVelocityTolerance = 0.005;
+  public final Double kDriveTranslationMaxVelocity = 4.5;
+  public final Double kDriveTranslationMaxAcceleration = 3.8;
+  public final Double kPositionTolerance = 0.25;
+  public final Double kVelocityTolerance = 0.1;
 
   public final Double kDriveToPointHeadingP = 10.0;
   public final Double kDriveToPointHeadingI = 0.0;
   public final Double kDriveToPointHeadingD = 0.0;
-  public final Double kDriveHeadingMaxVelocity = 5.0;
-  public final Double kDriveHeadingMaxAcceleration = 5.0;
+  public final Double kDriveHeadingMaxVelocity = Math.PI;
+  public final Double kDriveHeadingMaxAcceleration = Math.PI / 2.0;
   public final Double kAngleTolerance = 0.005;
   public final Double kAngularVelocityTolerance = 0.005;
 

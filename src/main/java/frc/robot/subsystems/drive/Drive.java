@@ -396,10 +396,12 @@ public class Drive implements DriveTemplate {
   @Override
   public void periodic() {
     // Manually cancel go to intake if we have a gamepiece
-    if (goToIntake && ScoringSubsystem.getInstance().isCoralDetected()) {
-      setGoToIntake(false);
-    } else if (goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
-      setGoToIntake(false);
+    if (ScoringSubsystem.getInstance() != null) {
+      if (goToIntake && ScoringSubsystem.getInstance().isCoralDetected()) {
+        setGoToIntake(false);
+      } else if (goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
+        setGoToIntake(false);
+      }
     }
 
     odometryLock.lock(); // Prevents odometry updates while reading data
