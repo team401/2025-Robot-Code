@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.StrategyManager;
 import frc.robot.StrategyManager.AutonomyMode;
@@ -36,17 +35,7 @@ public class LineupState implements PeriodicStateInterface {
   private boolean hadObservationYet = false;
   private int observationAge;
   private DesiredLocation lastReefLocation = DesiredLocation.Reef0;
-
-  // along track pid test mode
-  private LoggedTunableNumber alongTrackKp =
-      new LoggedTunableNumber(
-          "DriveLineupGains/AlongTrackKp", JsonConstants.drivetrainConstants.driveAlongTrackKp);
-  private LoggedTunableNumber alongTrackKi =
-      new LoggedTunableNumber(
-          "DriveLineupGains/AlongTrackKi", JsonConstants.drivetrainConstants.driveAlongTrackKi);
-  private LoggedTunableNumber alongTrackKd =
-      new LoggedTunableNumber(
-          "DriveLineupGains/AlongTrackKd", JsonConstants.drivetrainConstants.driveAlongTrackKd);
+  private boolean usingOtherCamera = false;
 
   // cross tack pid test mode
   private LoggedTunableNumber crossTrackKp =
@@ -70,21 +59,17 @@ public class LineupState implements PeriodicStateInterface {
       new LoggedTunableNumber(
           "DriveLineupGains/rotationkD", JsonConstants.drivetrainConstants.driveRotationKd);
 
-  private PIDController driveAlongTrackLineupController =
-      new PIDController(
-          JsonConstants.drivetrainConstants.driveAlongTrackKp,
-          JsonConstants.drivetrainConstants.driveAlongTrackKi,
-          JsonConstants.drivetrainConstants.driveAlongTrackKd);
   private PIDController driveCrossTrackLineupController =
       new PIDController(
           JsonConstants.drivetrainConstants.driveCrossTrackKp,
           JsonConstants.drivetrainConstants.driveCrossTrackKi,
           JsonConstants.drivetrainConstants.driveCrossTrackKd);
 
-  private Constraints driveAlongTrackProfileConstraints =
-      new Constraints(
-          JsonConstants.drivetrainConstants.driveAlongTrackVelocity,
-          JsonConstants.drivetrainConstants.driveAlongTrackVelocity);
+  private PIDController driveCrossTrackOtherCameraLineupController =
+      new PIDController(
+          JsonConstants.drivetrainConstants.driveCrossTrackOtherCameraKp,
+          JsonConstants.drivetrainConstants.driveCrossTrackOtherCameraKi,
+          JsonConstants.drivetrainConstants.driveCrossTrackOtherCameraKd);
 
   private PIDController rotationController =
       new PIDController(
@@ -145,38 +130,38 @@ public class LineupState implements PeriodicStateInterface {
       case Reef1:
       case Algae0:
         return drive.isAllianceRed()
-            ? JsonConstants.redFieldLocations.redReef01Rotation
-            : JsonConstants.blueFieldLocations.blueReef01Rotation;
+            ? JsonConstants.redFieldLocations.redReefOTF0Rotation
+            : JsonConstants.blueFieldLocations.blueReefOTF0Rotation;
       case Reef2:
       case Reef3:
       case Algae1:
         return drive.isAllianceRed()
-            ? JsonConstants.redFieldLocations.redReef23Rotation
-            : JsonConstants.blueFieldLocations.blueReef23Rotation;
+            ? JsonConstants.redFieldLocations.redReefOTF2Rotation
+            : JsonConstants.blueFieldLocations.blueReefOTF2Rotation;
       case Reef4:
       case Reef5:
       case Algae2:
         return drive.isAllianceRed()
-            ? JsonConstants.redFieldLocations.redReef45Rotation
-            : JsonConstants.blueFieldLocations.blueReef45Rotation;
+            ? JsonConstants.redFieldLocations.redReefOTF4Rotation
+            : JsonConstants.blueFieldLocations.blueReefOTF4Rotation;
       case Reef6:
       case Reef7:
       case Algae3:
         return drive.isAllianceRed()
-            ? JsonConstants.redFieldLocations.redReef67Rotation
-            : JsonConstants.blueFieldLocations.blueReef67Rotation;
+            ? JsonConstants.redFieldLocations.redReefOTF6Rotation
+            : JsonConstants.blueFieldLocations.blueReefOTF6Rotation;
       case Reef8:
       case Reef9:
       case Algae4:
         return drive.isAllianceRed()
-            ? JsonConstants.redFieldLocations.redReef89Rotation
-            : JsonConstants.blueFieldLocations.blueReef89Rotation;
+            ? JsonConstants.redFieldLocations.redReefOTF8Rotation
+            : JsonConstants.blueFieldLocations.blueReefOTF8Rotation;
       case Reef10:
       case Reef11:
       case Algae5:
         return drive.isAllianceRed()
-            ? JsonConstants.redFieldLocations.redReef1011Rotation
-            : JsonConstants.blueFieldLocations.blueReef1011Rotation;
+            ? JsonConstants.redFieldLocations.redReefOTF10Rotation
+            : JsonConstants.blueFieldLocations.blueReefOTF10Rotation;
       default:
         return new Rotation2d();
     }
@@ -395,7 +380,7 @@ public class LineupState implements PeriodicStateInterface {
     DistanceToTag adjustedObservation =
         new DistanceToTag(
             latestObservation.crossTrackDistance() + adjustment.getY(),
-            latestObservation.alongTrackDistance() + adjustment.getX(),
+            latestObservation.alongTrackDistance() - adjustment.getX(),
             true);
     return adjustedObservation;
   }
@@ -431,6 +416,8 @@ public class LineupState implements PeriodicStateInterface {
     Logger.recordOutput("Drive/Lineup/usingOtherCamera", false);
 
     if (observation.isValid()) {
+      usingOtherCamera = false;
+      driveCrossTrackOtherCameraLineupController.reset();
       latestObservation = observation;
 
       poseAtLastObservation = drive.getPose();
@@ -440,6 +427,8 @@ public class LineupState implements PeriodicStateInterface {
     } else if (otherCameraObs != null && otherCameraObs.isValid()) {
       // check if the other camera has observation (maybe we switched to other pole or camera got
       // unplugged)
+      usingOtherCamera = true;
+      driveCrossTrackLineupController.reset();
       latestObservation = otherCameraObs;
       observation = otherCameraObs;
       observationAge = 0;
@@ -486,19 +475,12 @@ public class LineupState implements PeriodicStateInterface {
           rotationController.calculate(
               drive.getRotation().getRadians(), this.getRotationForReefSide().getRadians());
 
+      if (usingOtherCamera) {
+        vy = driveCrossTrackOtherCameraLineupController.calculate(observation.crossTrackDistance());
+      }
+
       drive.setGoalSpeeds(new ChassisSpeeds(vx, vy, omega), false);
     }
-  }
-
-  /**
-   * sets lineup along track pid gains
-   *
-   * @param kP proportional gain
-   * @param kI integral gain
-   * @param kD derivative gain
-   */
-  public void setAlongTrackPID(double kP, double kI, double kD) {
-    this.driveAlongTrackLineupController = new PIDController(kP, kI, kD);
   }
 
   /**
@@ -527,14 +509,6 @@ public class LineupState implements PeriodicStateInterface {
   public void testPeriodic() {
     switch (TestModeManager.getTestMode()) {
       case DriveLineupTuning:
-        LoggedTunableNumber.ifChanged(
-            hashCode(),
-            (pid) -> {
-              this.setAlongTrackPID(pid[0], pid[1], pid[2]);
-            },
-            alongTrackKp,
-            alongTrackKi,
-            alongTrackKd);
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (pid) -> {

@@ -1,7 +1,6 @@
 package frc.robot.subsystems.drive.states;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.path.PathConstraints;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
@@ -26,9 +25,6 @@ public class OTFState implements PeriodicStateInterface {
   }
 
   public void onEntry(Transition transition) {
-    if (PathfindingCommand.warmupCommand().isScheduled()) {
-      PathfindingCommand.warmupCommand().cancel();
-    }
     driveToPose = this.getDriveToPoseCommand();
     System.out.println(driveToPose == null);
     if (driveToPose == null) {
@@ -57,65 +53,107 @@ public class OTFState implements PeriodicStateInterface {
         // NOTE: pairs of reef sides (ie 0 and 1) will have the same otf pose (approximately 0.5-1
         // meter away from center of tag)
       case Reef0:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefOTF0Translation,
+                JsonConstants.redFieldLocations.redReefOTF0Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefOTF0Translation,
+                JsonConstants.blueFieldLocations.blueReefOTF0Rotation);
       case Reef1:
       case Algae0:
         return driveInput.isAllianceRed()
             ? new Pose2d(
-                JsonConstants.redFieldLocations.redReef01Translation,
-                JsonConstants.redFieldLocations.redReef01Rotation)
+                JsonConstants.redFieldLocations.redReefOTF1Translation,
+                JsonConstants.redFieldLocations.redReefOTF1Rotation)
             : new Pose2d(
-                JsonConstants.blueFieldLocations.blueReef01Translation,
-                JsonConstants.blueFieldLocations.blueReef01Rotation);
+                JsonConstants.blueFieldLocations.blueReefOTF1Translation,
+                JsonConstants.blueFieldLocations.blueReefOTF1Rotation);
       case Reef2:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefOTF2Translation,
+                JsonConstants.redFieldLocations.redReefOTF2Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefOTF2Translation,
+                JsonConstants.blueFieldLocations.blueReefOTF2Rotation);
       case Reef3:
       case Algae1:
         return driveInput.isAllianceRed()
             ? new Pose2d(
-                JsonConstants.redFieldLocations.redReef23Translation,
-                JsonConstants.redFieldLocations.redReef23Rotation)
+                JsonConstants.redFieldLocations.redReefOTF3Translation,
+                JsonConstants.redFieldLocations.redReefOTF3Rotation)
             : new Pose2d(
-                JsonConstants.blueFieldLocations.blueReef23Translation,
-                JsonConstants.blueFieldLocations.blueReef23Rotation);
+                JsonConstants.blueFieldLocations.blueReefOTF3Translation,
+                JsonConstants.blueFieldLocations.blueReefOTF3Rotation);
       case Reef4:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefOTF4Translation,
+                JsonConstants.redFieldLocations.redReefOTF4Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefOTF4Translation,
+                JsonConstants.blueFieldLocations.blueReefOTF4Rotation);
       case Reef5:
       case Algae2:
         return driveInput.isAllianceRed()
             ? new Pose2d(
-                JsonConstants.redFieldLocations.redReef45Translation,
-                JsonConstants.redFieldLocations.redReef45Rotation)
+                JsonConstants.redFieldLocations.redReefOTF5Translation,
+                JsonConstants.redFieldLocations.redReefOTF5Rotation)
             : new Pose2d(
-                JsonConstants.blueFieldLocations.blueReef45Translation,
-                JsonConstants.blueFieldLocations.blueReef45Rotation);
+                JsonConstants.blueFieldLocations.blueReefOTF5Translation,
+                JsonConstants.blueFieldLocations.blueReefOTF5Rotation);
       case Reef6:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefOTF6Translation,
+                JsonConstants.redFieldLocations.redReefOTF6Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefOTF6Translation,
+                JsonConstants.blueFieldLocations.blueReefOTF6Rotation);
       case Reef7:
       case Algae3:
         return driveInput.isAllianceRed()
             ? new Pose2d(
-                JsonConstants.redFieldLocations.redReef67Translation,
-                JsonConstants.redFieldLocations.redReef67Rotation)
+                JsonConstants.redFieldLocations.redReefOTF7Translation,
+                JsonConstants.redFieldLocations.redReefOTF7Rotation)
             : new Pose2d(
-                JsonConstants.blueFieldLocations.blueReef67Translation,
-                JsonConstants.blueFieldLocations.blueReef67Rotation);
+                JsonConstants.blueFieldLocations.blueReefOTF7Translation,
+                JsonConstants.blueFieldLocations.blueReefOTF7Rotation);
       case Reef8:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefOTF8Translation,
+                JsonConstants.redFieldLocations.redReefOTF8Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefOTF8Translation,
+                JsonConstants.blueFieldLocations.blueReefOTF8Rotation);
       case Reef9:
       case Algae4:
         return driveInput.isAllianceRed()
             ? new Pose2d(
-                JsonConstants.redFieldLocations.redReef89Translation,
-                JsonConstants.redFieldLocations.redReef89Rotation)
+                JsonConstants.redFieldLocations.redReefOTF9Translation,
+                JsonConstants.redFieldLocations.redReefOTF9Rotation)
             : new Pose2d(
-                JsonConstants.blueFieldLocations.blueReef89Translation,
-                JsonConstants.blueFieldLocations.blueReef89Rotation);
+                JsonConstants.blueFieldLocations.blueReefOTF9Translation,
+                JsonConstants.blueFieldLocations.blueReefOTF9Rotation);
       case Reef10:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redReefOTF10Translation,
+                JsonConstants.redFieldLocations.redReefOTF10Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueReefOTF10Translation,
+                JsonConstants.blueFieldLocations.blueReefOTF10Rotation);
       case Reef11:
       case Algae5:
         return driveInput.isAllianceRed()
             ? new Pose2d(
-                JsonConstants.redFieldLocations.redReef1011Translation,
-                JsonConstants.redFieldLocations.redReef1011Rotation)
+                JsonConstants.redFieldLocations.redReefOTF11Translation,
+                JsonConstants.redFieldLocations.redReefOTF11Rotation)
             : new Pose2d(
-                JsonConstants.blueFieldLocations.blueReef1011Translation,
-                JsonConstants.blueFieldLocations.blueReef1011Rotation);
+                JsonConstants.blueFieldLocations.blueReefOTF11Translation,
+                JsonConstants.blueFieldLocations.blueReefOTF11Rotation);
       case CoralStationRight:
         return driveInput.isAllianceRed()
             ? new Pose2d(
@@ -161,7 +199,7 @@ public class OTFState implements PeriodicStateInterface {
       constraints =
           new PathConstraints(
               JsonConstants.drivetrainConstants.OTFMaxLinearVelocity,
-              JsonConstants.drivetrainConstants.OTFMaxLinearAccel - 1,
+              JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
               JsonConstants.drivetrainConstants.OTFMaxAngularVelocity,
               JsonConstants.drivetrainConstants.OTFMaxAngularAccel);
     }

@@ -67,18 +67,25 @@ public final class InitBindings {
                         // to avoid undoing the auto algae height selector
                         // The drive location is immediately overwritten below
                         strategyManager.updateScoringLocationsFromSnakeScreen();
+                        strategyManager.updateScoringLevelFromNetworkTables();
+
+                        // When the scoring trigger is pulled in smart autonomy, select the closest
+                        // reef pole to score on if coral
+                        if (ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+                          drive.setDesiredLocation(
+                              ReefLineupUtil.getClosestReefLocation(drive.getPose()));
+                        }
                       }
-
-                      // When the scoring trigger is pulled in smart autonomy, select the closest
-                      // reef pole to score on
-                      drive.setDesiredLocation(
-                          ReefLineupUtil.getClosestReefLocation(drive.getPose()));
-
                       // Then fall through to scheduling OTF like in mixed autonomy (no break here
                       // is intentional)
                     case Mixed:
-                      drive.setGoToIntake(false);
-                      drive.fireTrigger(DriveTrigger.BeginOTF);
+                      if (ScoringSubsystem.getInstance() != null
+                          && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+                        drive.setGoToIntake(false);
+                        drive.fireTrigger(DriveTrigger.BeginOTF);
+                      } else if (ScoringSubsystem.getInstance() != null) {
+                        ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+                      }
                       break;
                     case Manual:
                       // Only start scoring warmup if in manual autonomy; in mixed and full,
@@ -122,17 +129,18 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  // Left joystick top button toggles reef align
-                  if (drive.isAligningToFieldElement()) {
-                    // If already aligning, stop
-                    drive.disableAlign();
-                  } else {
-                    // If not already aligning, start
-                    drive.angleController.reset(drive.getRotation().getRadians());
-                    drive.alignToFieldElement();
-                  }
+                  // Left joystick top button seeds direction as forward
+                  drive.seedDirectionForward();
                 },
                 drive));
+
+    rightJoystick
+        .button(3)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  drive.sidestepReefLocation();
+                }));
 
     // // pov right (reef 0-11 -> processor left -> processor right )
     // // pov left (goes backwards of right)
@@ -183,7 +191,7 @@ public final class InitBindings {
                           || ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Algae) {
                         DesiredLocation desiredLocation =
                             ReefLineupUtil.getClosestAlgaeLocation(drive.getPose());
-                        drive.setDesiredLocation(desiredLocation);
+                        // drive.setDesiredIntakeLocation(desiredLocation);
 
                         // Set algae level automatically
                         if (ScoringSubsystem.getInstance() != null) {
@@ -194,19 +202,22 @@ public final class InitBindings {
                       } else {
                         if (DriverStation.getAlliance().isPresent()
                             && DriverStation.getAlliance().get() == Alliance.Red) {
-                          drive.setDesiredLocation(
+                          drive.setDesiredIntakeLocation(
                               JsonConstants.redFieldLocations.getClosestCoralStation(
                                   drive.getPose()));
                         } else {
-                          drive.setDesiredLocation(
+                          drive.setDesiredIntakeLocation(
                               JsonConstants.blueFieldLocations.getClosestCoralStation(
                                   drive.getPose()));
                         }
                       }
                     case Mixed:
                       // Start auto align if in mixed autonomy
-                      drive.setGoToIntake(true);
-                      drive.fireTrigger(DriveTrigger.BeginOTF);
+                      if (ScoringSubsystem.getInstance() != null
+                          && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+                        drive.setGoToIntake(true);
+                        drive.fireTrigger(DriveTrigger.BeginOTF);
+                      }
                       // Then always start intake for scoring (no break here is intentional)
                     case Manual:
                       if (ScoringSubsystem.getInstance() != null) {
@@ -264,7 +275,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
+                  rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
 
     rightJoystick
@@ -272,7 +283,7 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.GOTO_IDLE);
+                  rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
 
     leftJoystick
@@ -280,7 +291,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
+                  rampSubsystem.fireTrigger(RampTriggers.INTAKE);
                 }));
 
     leftJoystick
@@ -288,7 +299,7 @@ public final class InitBindings {
         .onFalse(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.GOTO_IDLE);
+                  rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
 
     leftJoystick
@@ -296,7 +307,7 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.START_CLIMB);
+                  rampSubsystem.fireTrigger(RampTriggers.CLIMB);
                 }));
 
     leftJoystick
@@ -304,7 +315,14 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  rampSubsystem.fireTrigger(RampTriggers.GOTO_IDLE);
+                  // rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
+                }));
+    leftJoystick
+        .button(8)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  rampSubsystem.fireTrigger(RampTriggers.HOME);
                 }));
   }
 
@@ -315,7 +333,13 @@ public final class InitBindings {
     // TODO: Find actual numbers for these buttons using driverstation
     leftJoystick.button(3).onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)));
 
-    leftJoystick.button(4).onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)));
+    leftJoystick
+        .button(4)
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  climb.fireTrigger(ClimbAction.CANCEL);
+                }));
   }
 
   public static void initScoringBindings(ScoringSubsystem scoring) {
@@ -354,7 +378,8 @@ public final class InitBindings {
             new InstantCommand(
                 () -> {
                   if (ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Algae
-                      && ScoringSubsystem.getInstance().getTarget() == FieldTarget.Processor) {
+                      && ScoringSubsystem.getInstance().getAlgaeScoreTarget()
+                          == FieldTarget.Processor) {
                     ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.WarmupReady);
                   }
                 }));

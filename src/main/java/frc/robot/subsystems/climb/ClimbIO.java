@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutCurrent;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
@@ -16,6 +17,9 @@ public interface ClimbIO {
 
     MutAngle motorAngle = Radians.mutable(0);
     MutAngle goalAngle = Radians.mutable(0);
+
+    MutCurrent leadMotorStatorCurrent = Amps.mutable(0.0);
+    MutCurrent followerMotorStatorCurrent = Amps.mutable(0.0);
   }
 
   @AutoLog

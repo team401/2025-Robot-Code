@@ -6,61 +6,110 @@
   "redReefCenterRotation": {
     "radians": 0.0
   },
-  "redReef01Translation": {
-    "x": 11.5,
-    "y": 4.1
+  "redReefOTF0Translation": {
+    "x": 11.410,
+    "y": 3.849
   },
-  "redReef01Rotation": {
+  "redReefOTF0Rotation": {
     "radians": 0.0
   },
-  "redReef23Translation": {
-    "x": 12.2,
-    "y": 5.3
+  "redReefOTF1Translation": {
+    "x": 11.410,
+    "y": 4.295
   },
-  "redReef23Rotation": {
+  "redReefOTF1Rotation": {
+    "radians": 0.0
+  },
+  "redReefOTF2Translation": {
+    "x": 12.029,
+    "y": 5.299
+  },
+  "redReefOTF2Rotation": {
     "radians": -1.0471975511965976
   },
-  "redReef45Translation": {
-    "x": 14.0,
-    "y": 5.5
+  "redReefOTF3Translation": {
+    "x": 12.231,
+    "y": 5.445
   },
-  "redReef45Rotation": {
+  "redReefOTF3Rotation": {
+    "radians": -1.0471975511965976
+  },
+  "redReefOTF4Translation": {
+    "x": 13.7,
+    "y": 5.6
+  },
+  "redReefOTF4Rotation": {
     "radians": -2.0943951023931953
   },
-  "redReef67Translation": {
-    "x": 14.7,
-    "y": 4.0
+  "redReefOTF5Translation": {
+    "x": 14.104,
+    "y": 5.337
   },
-  "redReef67Rotation": {
+  "redReefOTF5Rotation": {
+    "radians": -2.0943951023931953
+  },
+  "redReefOTF6Translation": {
+    "x": 14.729,
+    "y": 4.241
+  },
+  "redReefOTF6Rotation": {
     "radians": 3.141592653589793
   },
-  "redReef89Translation": {
-    "x": 14.0,
-    "y": 2.5
+  "redReefOTF7Translation": {
+    "x": 14.729,
+    "y": 3.822
   },
-  "redReef89Rotation": {
+  "redReefOTF7Rotation": {
+    "radians": 3.141592653589793
+  },
+  "redReefOTF8Translation": {
+    "x": 14.161,
+    "y": 2.786
+  },
+  "redReefOTF8Rotation": {
     "radians": 2.0943951023931953
   },
-  "redReef1011Translation": {
-    "x": 12.2,
-    "y": 2.6
+  "redReefOTF9Translation": {
+    "x": 13.787,
+    "y": 2.588
   },
-  "redReef1011Rotation": {
+  "redReefOTF9Rotation": {
+    "radians": 2.0943951023931953
+  },
+  "redReefOTF10Translation": {
+    "x": 12.471,
+    "y": 2.491
+  },
+  "redReefOTF10Rotation": {
+    "radians": 1.0471975511965976
+  },
+  "redReefOTF11Translation": {
+    "x": 12.055,
+    "y": 2.679
+  },
+  "redReefOTF11Rotation": {
     "radians": 1.0471975511965976
   },
   "redCoralStationRightTranslation": {
     "x": 15.99,
-    "y": 7.28
+    "y": 7.4
   },
   "redCoralStationRightRotation": {
-    "radians": -2.251
+    "radians": -2.0943951023931953
   },
   "redCoralStationLeftTranslation": {
-    "x": 16.3,
-    "y": 1.0
+    "x": 15.96,
+    "y": 0.64
   },
   "redCoralStationLeftRotation": {
     "radians": 2.0943951023931953
+  },
+  "redNetTranslation": {
+    "x": 10.319,
+    "y": 2.768
+  },
+  "redNetRotation": {
+    "radians": 1.5707963267948966
   },
   "coralAlgaeStackLeftTopCorner": {
     "x": 15.95,

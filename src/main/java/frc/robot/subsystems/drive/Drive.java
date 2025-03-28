@@ -196,7 +196,7 @@ public class Drive implements DriveTemplate {
     DesiredLocation.Algae5
   };
 
-  private DesiredLocation desiredLocation = DesiredLocation.Reef9;
+  private DesiredLocation desiredLocation = DesiredLocation.Reef0;
   private DesiredLocation intakeLocation = DesiredLocation.CoralStationLeft;
   private boolean goToIntake = false;
 
@@ -487,6 +487,24 @@ public class Drive implements DriveTemplate {
   public void disabledPeriodic() {
     if (warmupCommand != null) {
       Logger.recordOutput("Drive/warmupScheduled", warmupCommand.isScheduled());
+    }
+  }
+
+  /**
+   * sets the location to the reef pole directly next to current NOTE: this will not change sides of
+   * reef (stays on one side of hexagon)
+   */
+  public void sidestepReefLocation() {
+    int reefIndex = getDesiredLocationIndex();
+    if (reefIndex > 11 || reefIndex < 0) {
+      // not a reef location
+      return;
+    }
+
+    if (reefIndex % 2 == 0) {
+      desiredLocation = locationArray[reefIndex + 1];
+    } else {
+      desiredLocation = locationArray[reefIndex - 1];
     }
   }
 
@@ -1073,5 +1091,14 @@ public class Drive implements DriveTemplate {
         int desiredCameraIndex,
         double crossTrackOffsetMeters,
         double alongTrackOffsetMeters);
+  }
+
+  public void seedDirectionForward() {
+    if (!DriverStation.getAlliance().isPresent()
+        || DriverStation.getAlliance().get() == Alliance.Red) {
+      poseEstimator.resetRotation(Rotation2d.k180deg);
+    } else {
+      poseEstimator.resetRotation(Rotation2d.kZero);
+    }
   }
 }
