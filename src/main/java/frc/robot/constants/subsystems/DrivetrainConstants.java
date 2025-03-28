@@ -260,6 +260,7 @@ public class DrivetrainConstants {
   public final Double kAngleTolerance = 0.005;
   public final Double kAngularVelocityTolerance = 0.005;
 
+  public final Double kDriveToPointEndVelocity = 0.5;
   public final Double lineupErrorMargin = 0.05;
 
   /**

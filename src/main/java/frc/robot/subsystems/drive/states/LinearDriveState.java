@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.subsystems.DrivetrainConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -78,7 +79,7 @@ public class LinearDriveState implements PeriodicStateInterface {
                 JsonConstants.drivetrainConstants.kDriveTranslationMaxAcceleration));
 
     double distanceToGoal = currentPose.getTranslation().getDistance(goalPose.getTranslation());
-    driveController.reset(distanceToGoal);
+    driveController.reset(new State(distanceToGoal, 0.0));
 
     headingController =
         new ProfiledPIDController(
@@ -89,6 +90,7 @@ public class LinearDriveState implements PeriodicStateInterface {
                 JsonConstants.drivetrainConstants.kDriveHeadingMaxVelocity,
                 JsonConstants.drivetrainConstants.kDriveHeadingMaxAcceleration));
 
+    headingController.enableContinuousInput(0.0, Math.PI * 2);
     headingController.reset(currentPose.getRotation().getRadians());
 
     lineupErrorMargin = JsonConstants.drivetrainConstants.lineupErrorMargin;
@@ -292,7 +294,10 @@ public class LinearDriveState implements PeriodicStateInterface {
         headingController.calculate(
             currentPose.getRotation().getRadians(), goalPose.getRotation().getRadians());
 
-    double driveVelocityScalar = driveController.calculate(distanceToGoal, 0.0);
+    double driveVelocityScalar =
+        driveController.calculate(
+            distanceToGoal,
+            new State(0.0, JsonConstants.drivetrainConstants.kDriveToPointEndVelocity));
     Translation2d driveVelocity =
         new Pose2d(
                 0.0,
