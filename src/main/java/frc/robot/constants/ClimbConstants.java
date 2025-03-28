@@ -43,6 +43,9 @@ public class ClimbConstants {
   public final Boolean invertFollowerClimbMotor = true;
 
   public final Double climbFFVolts = -10.0;
+  public final Double searchingFFVolts = 5.0;
+
+  public final Angle searchingFFMargin = Radians.of(0.3);
 
   public static final class Sim {
     @JSONExclude
