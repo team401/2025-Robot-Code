@@ -11,7 +11,6 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.constants.JsonConstants;
-import frc.robot.constants.ScoringSetpoints;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
@@ -47,9 +46,11 @@ public class WarmupState implements PeriodicStateInterface {
   public void periodic() {
     ScoringSetpoint setpoint;
     if (scoringSubsystem.getGamePiece() == GamePiece.Coral) {
-      setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getCoralTarget());
+      setpoint =
+          JsonConstants.scoringSetpoints.getWarmupSetpoint(scoringSubsystem.getCoralTarget());
     } else {
-      setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getAlgaeScoreTarget());
+      setpoint =
+          JsonConstants.scoringSetpoints.getWarmupSetpoint(scoringSubsystem.getAlgaeScoreTarget());
     }
 
     scoringSubsystem.setGoalSetpoint(setpoint);
