@@ -52,6 +52,8 @@ public class LinearDriveState implements PeriodicStateInterface {
 
   private double lineupErrorMargin = 0.05;
 
+  private State lastState;
+
   private ProfiledPIDController driveController =
       new ProfiledPIDController(
           kDriveToPointTranslationP,
@@ -86,6 +88,13 @@ public class LinearDriveState implements PeriodicStateInterface {
             new TrapezoidProfile.Constraints(
                 JsonConstants.drivetrainConstants.OTFMaxLinearAccel,
                 JsonConstants.drivetrainConstants.OTFMaxLinearAccel));
+
+    Pose2d currentPose = drive.getPose();
+
+    // Get distances to goal positions.
+    double distanceToGoal = currentPose.getTranslation().getDistance(goalPose.getTranslation());
+
+    lastState = new State(distanceToGoal, 0.0);
   }
 
   public void onExit(Transition transition) {}
@@ -335,12 +344,13 @@ public class LinearDriveState implements PeriodicStateInterface {
         findVelocityTowardPoint(
             velocity, currentPose.getTranslation(), currentGoalPose.getTranslation());
 
-    double driveVelocityScalar =
+    lastState =
         driveProfile.calculate(
-                0.02,
-                new State(distanceToGoal, -Math.abs(velocityToGoal)),
-                new State(0.0, JsonConstants.drivetrainConstants.linearDriveEndVelocity))
-            .velocity;
+            0.02,
+            lastState,
+            new State(0.0, JsonConstants.drivetrainConstants.linearDriveEndVelocity));
+
+    double driveVelocityScalar = -Math.abs(lastState.velocity);
 
     Translation2d driveVelocity =
         new Pose2d(
