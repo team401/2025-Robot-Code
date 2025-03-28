@@ -1,6 +1,6 @@
 {
   "restingAngle": {
-    "value": 0.0,
+    "value": 0.3,
     "unit": "Radian"
   },
   "searchingAngle": {
@@ -8,7 +8,7 @@
     "unit": "Radian"
   },
   "finalHangingAngle": {
-    "value": 0.1,
+    "value": 0.7,
     "unit": "Radian"
   },
   "climbEncoderOffsetRotations": -0.40234375,
