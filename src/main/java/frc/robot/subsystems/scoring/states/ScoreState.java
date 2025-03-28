@@ -28,7 +28,8 @@ public class ScoreState implements PeriodicStateInterface {
       // elevator to shoot algae upward
       setpoint = JsonConstants.scoringSetpoints.net;
     } else {
-      setpoint = JsonConstants.scoringSetpoints.getWarmupSetpoint(scoringSubsystem.getCoralTarget());
+      setpoint =
+          JsonConstants.scoringSetpoints.getWarmupSetpoint(scoringSubsystem.getCoralTarget());
     }
 
     scoringSubsystem.setGoalSetpoint(setpoint);

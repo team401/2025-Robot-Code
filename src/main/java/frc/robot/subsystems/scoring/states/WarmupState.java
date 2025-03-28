@@ -46,9 +46,11 @@ public class WarmupState implements PeriodicStateInterface {
   public void periodic() {
     ScoringSetpoint setpoint;
     if (scoringSubsystem.getGamePiece() == GamePiece.Coral) {
-      setpoint = JsonConstants.scoringSetpoints.getWarmupSetpoint(scoringSubsystem.getCoralTarget());
+      setpoint =
+          JsonConstants.scoringSetpoints.getWarmupSetpoint(scoringSubsystem.getCoralTarget());
     } else {
-      setpoint = JsonConstants.scoringSetpoints.getWarmupSetpoint(scoringSubsystem.getAlgaeScoreTarget());
+      setpoint =
+          JsonConstants.scoringSetpoints.getWarmupSetpoint(scoringSubsystem.getAlgaeScoreTarget());
     }
 
     scoringSubsystem.setGoalSetpoint(setpoint);

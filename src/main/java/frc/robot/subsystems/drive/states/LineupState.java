@@ -235,7 +235,7 @@ public class LineupState implements PeriodicStateInterface {
             < JsonConstants.drivetrainConstants.lineupRotationMarginRadians;
     boolean alongTrackCorrect;
     if (ScoringSubsystem.getInstance() != null
-        && ScoringSubsystem.getInstance().getTarget() == FieldTarget.L4
+        && ScoringSubsystem.getInstance().getCoralTarget() == FieldTarget.L4
         && JsonConstants.scoringSetpoints.usingVariableL4()) {
       alongTrackCorrect =
           observation.alongTrackDistance()
