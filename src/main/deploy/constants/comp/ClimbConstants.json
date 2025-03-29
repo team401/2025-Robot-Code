@@ -8,15 +8,22 @@
     "unit": "Radian"
   },
   "finalHangingAngle": {
-    "value": 0.7,
+    "value": 0.6,
     "unit": "Radian"
   },
+  "climbEncoderOffsetRotations": -0.40234375,
   "leadClimbMotorId": 16,
   "followerClimbMotorId": 17,
-  "climbkP": 30.0,
+  "climbkP": 45.0,
   "climbkI": 0.0,
   "climbkD": 0.0,
-  "climbCurrentLimit": 60,
+  "climbCurrentLimit": 60.0,
+  "climbInvertValue": "Clockwise_Positive",
   "invertFollowerClimbMotor": true,
-  "climbFFVolts": -10.0
+  "climbFFVolts": -12.0,
+  "searchingFFVolts": 12.0,
+  "searchingFFMargin": {
+    "value": 0.0,
+    "unit": "Radian"
+  }
 }
