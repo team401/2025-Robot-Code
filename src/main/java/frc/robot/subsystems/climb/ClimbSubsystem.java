@@ -80,7 +80,7 @@ public class ClimbSubsystem extends SubsystemBase {
 
     climbMachineConfiguration
         .configure(ClimbState.IDLE)
-        .permit(ClimbAction.CLIMB, ClimbState.WAITING)
+        .permit(ClimbAction.CLIMB, ClimbState.SEARCHING)
         .permit(ClimbAction.OVERRIDE, ClimbState.OVERRIDE);
 
     climbMachineConfiguration
