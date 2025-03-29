@@ -240,6 +240,8 @@ public class LinearDriveState implements PeriodicStateInterface {
     return Math.acos(dot_product / (u_norm * v_norm));
   }
 
+  private double driveVelocityScalar = 0.0;
+
   @Override
   public void periodic() {
     Pose2d currentPose = drive.getPose();
@@ -278,14 +280,20 @@ public class LinearDriveState implements PeriodicStateInterface {
         || Math.abs(angleToTarget) < JsonConstants.drivetrainConstants.kDriveToPointPhase2Angle) {
       currentGoalPose = goalPose;
 
-      distanceToCurrentGoal = distanceToGoal;
-
       endVelocityGoal = JsonConstants.drivetrainConstants.kDriveToPointEndVelocity;
 
       if (!hasEnteredPhase2) {
+        // Bumplessing
         hasEnteredPhase2 = true;
-        driveController.reset(new State(distanceToGoal, 0.0));
+        State lastState = driveController.getSetpoint();
+        double lastVelocity = lastState.velocity;
+        double lastError = distanceToCurrentGoal - lastState.position;
+        double adjustedPosition = distanceToGoal - lastError;
+        driveController.reset(new State(adjustedPosition, lastVelocity));
       }
+
+      // This has to be here because distanceToCurrentGoal is used for PID reset adjustment meme
+      distanceToCurrentGoal = distanceToGoal;
     }
 
     // We only exit this state when the phase 2 pose has been achieved.
@@ -304,7 +312,7 @@ public class LinearDriveState implements PeriodicStateInterface {
         headingController.calculate(
             currentPose.getRotation().getRadians(), goalPose.getRotation().getRadians());
 
-    double driveVelocityScalar =
+    driveVelocityScalar =
         driveController.calculate(distanceToCurrentGoal, new State(0.0, endVelocityGoal));
     Translation2d driveVelocity =
         new Pose2d(
@@ -326,6 +334,8 @@ public class LinearDriveState implements PeriodicStateInterface {
     Logger.recordOutput("DriveToPoint/PhaseDriveDistance", distanceToCurrentGoal);
     Logger.recordOutput("DriveToPoint/DriveDistance", distanceToGoal);
     Logger.recordOutput("DriveToPoint/HeadingError", headingError);
+    Logger.recordOutput("DriveToPoint/setpoint/position", driveController.getSetpoint().position);
+    Logger.recordOutput("DriveToPoint/setpoint/velocity", driveController.getSetpoint().velocity);
 
     Logger.recordOutput("DriveToPoint/DriveVelocityScalar", driveVelocityScalar);
     Logger.recordOutput("DriveToPoint/HeadingVelocity", headingVelocity);
