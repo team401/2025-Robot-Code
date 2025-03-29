@@ -261,6 +261,8 @@ public class DrivetrainConstants {
   public final Double kAngularVelocityTolerance = 0.005;
 
   public final Double kDriveToPointEndVelocity = 0.5;
+  public final Double kDriveToPointPhase2Distance = 1.0;
+  public final Double kDriveToPointPhase2Angle = Math.toRadians(45.0);
   public final Double lineupErrorMargin = 0.05;
 
   /**

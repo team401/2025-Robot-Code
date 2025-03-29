@@ -414,7 +414,8 @@ public class LineupState implements PeriodicStateInterface {
 
       hadObservationYet = true;
       observationAge = 0;
-    } else if (otherCameraObs != null && otherCameraObs.isValid()) { // Issues were had initially with this enabled on 3/27
+    } else if (otherCameraObs != null
+        && otherCameraObs.isValid()) { // Issues were had initially with this enabled on 3/27
       // check if the other camera has observation (maybe we switched to other pole or camera got
       // unplugged)
       usingOtherCamera = true;

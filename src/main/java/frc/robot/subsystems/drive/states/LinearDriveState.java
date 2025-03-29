@@ -2,6 +2,7 @@ package frc.robot.subsystems.drive.states;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -53,18 +54,18 @@ public class LinearDriveState implements PeriodicStateInterface {
           new TrapezoidProfile.Constraints(
               kDriveTranslationMaxVelocity, kDriveTranslationMaxAcceleration));
 
-  private ProfiledPIDController headingController =
-      new ProfiledPIDController(
-          kDriveToPointHeadingP,
-          kDriveToPointHeadingI,
-          kDriveToPointHeadingD,
-          new TrapezoidProfile.Constraints(kDriveHeadingMaxVelocity, kDriveHeadingMaxAcceleration));
+  private PIDController headingController =
+      new PIDController(kDriveToPointHeadingP, kDriveToPointHeadingI, kDriveToPointHeadingD);
 
   public LinearDriveState(Drive drive) {
     this.drive = drive;
   }
 
+  private boolean hasEnteredPhase2 = false;
+
   public void onEntry(Transition transition) {
+    hasEnteredPhase2 = false;
+
     goalPose = findLinearDriveFromDesiredLocation(drive);
 
     Pose2d currentPose = drive.getPose();
@@ -82,16 +83,13 @@ public class LinearDriveState implements PeriodicStateInterface {
     driveController.reset(new State(distanceToGoal, 0.0));
 
     headingController =
-        new ProfiledPIDController(
+        new PIDController(
             JsonConstants.drivetrainConstants.kDriveToPointHeadingP,
             JsonConstants.drivetrainConstants.kDriveToPointHeadingI,
-            JsonConstants.drivetrainConstants.kDriveToPointHeadingD,
-            new TrapezoidProfile.Constraints(
-                JsonConstants.drivetrainConstants.kDriveHeadingMaxVelocity,
-                JsonConstants.drivetrainConstants.kDriveHeadingMaxAcceleration));
+            JsonConstants.drivetrainConstants.kDriveToPointHeadingD);
 
-    headingController.enableContinuousInput(0.0, Math.PI * 2);
-    headingController.reset(currentPose.getRotation().getRadians());
+    headingController.enableContinuousInput(-Math.PI, Math.PI);
+    headingController.reset();
 
     lineupErrorMargin = JsonConstants.drivetrainConstants.lineupErrorMargin;
   }
@@ -230,14 +228,10 @@ public class LinearDriveState implements PeriodicStateInterface {
     }
   }
 
-  final double kPhase2Distance = 1.0;
-  final double kPhase2Angle = Math.toRadians(45.0);
-  final double kPhase1EndSpeed = 2.0;
-
   private double getAngleBetweenVectors(Translation2d u, Translation2d v) {
     double u_norm = u.getNorm();
     double v_norm = v.getNorm();
-    double dot_product = u.getX() * v.getX() + u.getY() * v.getY();
+    double dot_product = u.toVector().dot(v.toVector());
 
     // Avoid cases that break acos() and return 0.0 in these cases.
     if (u_norm * v_norm < 1e-10 || dot_product > (u_norm * v_norm)) {
@@ -252,9 +246,11 @@ public class LinearDriveState implements PeriodicStateInterface {
 
     // Project the goal pose backwards to find the phase 1 goal pose.
     double phase1OffsetX =
-        kPhase2Distance * Math.cos(goalPose.getRotation().getRadians() + Math.PI);
+        JsonConstants.drivetrainConstants.kDriveToPointPhase2Distance
+            * Math.cos(goalPose.getRotation().getRadians() + Math.PI);
     double phase1OffsetY =
-        kPhase2Distance * Math.sin(goalPose.getRotation().getRadians() + Math.PI);
+        JsonConstants.drivetrainConstants.kDriveToPointPhase2Distance
+            * Math.sin(goalPose.getRotation().getRadians() + Math.PI);
     Pose2d phase1Pose =
         new Pose2d(
             goalPose.getX() + phase1OffsetX,
@@ -267,15 +263,18 @@ public class LinearDriveState implements PeriodicStateInterface {
     //     currentPose.getTranslation().getDistance(phase1Pose.getTranslation());
 
     // Find if the robot is within the slice area to transition to phase 2.
-    Translation2d phase1PoseToGoal = goalPose.minus(phase1Pose).getTranslation();
-    Translation2d robotToGoal = goalPose.minus(currentPose).getTranslation();
+    Translation2d phase1PoseToGoal = goalPose.getTranslation().minus(phase1Pose.getTranslation());
+    Translation2d robotToGoal = goalPose.getTranslation().minus(currentPose.getTranslation());
     double angleToTarget = getAngleBetweenVectors(robotToGoal, phase1PoseToGoal);
 
     // Determine which pose to aim at. However, always use the distance to the final pose to compute
     // the target speed.
     Pose2d currentGoalPose = phase1Pose;
-    if (distanceToGoal < kPhase2Distance || Math.abs(angleToTarget) < kPhase2Angle) {
+    if (hasEnteredPhase2
+        || distanceToGoal < JsonConstants.drivetrainConstants.kDriveToPointPhase2Distance
+        || Math.abs(angleToTarget) < JsonConstants.drivetrainConstants.kDriveToPointPhase2Angle) {
       currentGoalPose = goalPose;
+      hasEnteredPhase2 = true;
     }
 
     // We only exit this state when the phase 2 pose has been achieved.
