@@ -774,6 +774,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     MutAngle wristMaxAngle = JsonConstants.wristConstants.wristMaxMaxAngle.mutableCopy();
 
     Angle wristAngle = wristMechanism.getWristAngle();
+    Angle wristGoalAngle = wristMechanism.getWristGoalAngle();
 
     boolean wristAboveChassis = false;
     // If the elevator is below the minimum safe height for wrist to be down, clamp wrist above its
@@ -867,30 +868,33 @@ public class ScoringSubsystem extends MonitoredSubsystem {
           (Angle) Measure.min(wristMaxAngle, JsonConstants.wristConstants.algaeUnderCrossbarAngle));
     }
 
-    boolean inDangerZone =
-        getElevatorHeight().gt(JsonConstants.elevatorConstants.crossbarBottomCollisionHeight)
-            && getElevatorHeight().lt(JsonConstants.elevatorConstants.crossbarTopCollisionHeight);
+    boolean wristInDangerZone =
+        wristAngle.gt(JsonConstants.wristConstants.crossbarBottomCollisionAngle)
+            && wristAngle.lt(JsonConstants.wristConstants.crossbarTopCollisionAngle);
     boolean willPassDangerZoneUp =
-        elevatorHeight.lt(JsonConstants.elevatorConstants.crossbarBottomCollisionHeight)
-            && elevatorGoalHeight.gt(JsonConstants.elevatorConstants.crossbarBottomCollisionHeight);
+        wristAngle.lt(JsonConstants.wristConstants.crossbarBottomCollisionAngle)
+            && wristGoalAngle.gt(JsonConstants.wristConstants.crossbarBottomCollisionAngle);
     boolean willPassDangerZoneDown =
-        elevatorHeight.gt(JsonConstants.elevatorConstants.crossbarTopCollisionHeight)
-            && elevatorGoalHeight.lt(JsonConstants.elevatorConstants.crossbarTopCollisionHeight);
+        wristAngle.gt(JsonConstants.wristConstants.crossbarTopCollisionAngle)
+            && wristGoalAngle.lt(JsonConstants.wristConstants.crossbarTopCollisionAngle);
     boolean willPassDangerZone = willPassDangerZoneUp || willPassDangerZoneDown;
 
-    boolean canWristHitCrossbar = inDangerZone || willPassDangerZone;
+    boolean canWristHitCrossbar = wristInDangerZone || willPassDangerZone;
 
     if (canWristHitCrossbar) {
-      // If the wrist can hit the crossbar, keep it on the same side of the crossbar that it is
-      if (wristAngle.lt(JsonConstants.wristConstants.crossbarTopCollisionAngle)) {
-        wristMaxAngle.mut_replace(
-            (Angle)
+      // If the wrist can hit the crossbar, keep elevator on the same side of the crossbar that it
+      // is
+      if (elevatorHeight.lt(JsonConstants.elevatorConstants.crossbarTopCollisionHeight)) {
+        elevatorMaxHeight.mut_replace(
+            (Distance)
                 Measure.min(
-                    wristMaxAngle, JsonConstants.wristConstants.crossbarBottomCollisionAngle));
+                    elevatorMaxHeight,
+                    JsonConstants.elevatorConstants.crossbarBottomCollisionHeight));
       } else {
-        wristMinAngle.mut_replace(
-            (Angle)
-                Measure.max(wristMinAngle, JsonConstants.wristConstants.crossbarTopCollisionAngle));
+        elevatorMinHeight.mut_replace(
+            (Distance)
+                Measure.max(
+                    elevatorMinHeight, JsonConstants.elevatorConstants.crossbarTopCollisionHeight));
       }
     }
 
