@@ -259,8 +259,8 @@ public class LinearDriveState implements PeriodicStateInterface {
 
     // Get distances to goal positions.
     double distanceToGoal = currentPose.getTranslation().getDistance(goalPose.getTranslation());
-    // double distanceToPhase1Pose =
-    //     currentPose.getTranslation().getDistance(phase1Pose.getTranslation());
+    double distanceToPhase1Pose =
+        currentPose.getTranslation().getDistance(phase1Pose.getTranslation());
 
     // Find if the robot is within the slice area to transition to phase 2.
     Translation2d phase1PoseToGoal = goalPose.getTranslation().minus(phase1Pose.getTranslation());
@@ -270,11 +270,22 @@ public class LinearDriveState implements PeriodicStateInterface {
     // Determine which pose to aim at. However, always use the distance to the final pose to compute
     // the target speed.
     Pose2d currentGoalPose = phase1Pose;
+    // Use whichever distance we're going to so that we slow down on the way to phase 1 pose
+    double distanceToCurrentGoal = distanceToPhase1Pose;
+    double endVelocityGoal = 0.0; // Try to reach 0 velocity in phase 1
     if (hasEnteredPhase2
         || distanceToGoal < JsonConstants.drivetrainConstants.kDriveToPointPhase2Distance
         || Math.abs(angleToTarget) < JsonConstants.drivetrainConstants.kDriveToPointPhase2Angle) {
       currentGoalPose = goalPose;
-      hasEnteredPhase2 = true;
+
+      distanceToCurrentGoal = distanceToGoal;
+
+      endVelocityGoal = JsonConstants.drivetrainConstants.kDriveToPointEndVelocity;
+
+      if (!hasEnteredPhase2) {
+        hasEnteredPhase2 = true;
+        driveController.reset(new State(distanceToGoal, 0.0));
+      }
     }
 
     // We only exit this state when the phase 2 pose has been achieved.
@@ -294,9 +305,7 @@ public class LinearDriveState implements PeriodicStateInterface {
             currentPose.getRotation().getRadians(), goalPose.getRotation().getRadians());
 
     double driveVelocityScalar =
-        driveController.calculate(
-            distanceToGoal,
-            new State(0.0, JsonConstants.drivetrainConstants.kDriveToPointEndVelocity));
+        driveController.calculate(distanceToCurrentGoal, new State(0.0, endVelocityGoal));
     Translation2d driveVelocity =
         new Pose2d(
                 0.0,
@@ -314,6 +323,7 @@ public class LinearDriveState implements PeriodicStateInterface {
     Logger.recordOutput("DriveToPoint/Phase1Pose", phase1Pose);
     Logger.recordOutput("DriveToPoint/Phase2Pose", goalPose);
     Logger.recordOutput("DriveToPoint/TargetPose", currentGoalPose);
+    Logger.recordOutput("DriveToPoint/PhaseDriveDistance", distanceToCurrentGoal);
     Logger.recordOutput("DriveToPoint/DriveDistance", distanceToGoal);
     Logger.recordOutput("DriveToPoint/HeadingError", headingError);
 
