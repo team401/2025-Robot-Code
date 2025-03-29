@@ -207,9 +207,10 @@ public final class ElevatorConstants {
   public final Double maxElevatorSetpointVelocityMetersPerSecond = 0.01;
 
   /** The top of the height range where claw can hit crossbar */
-  public final Distance crossbarTopCollisionAngle = Inches.of(32.0);
+  public final Distance crossbarTopCollisionHeight = Inches.of(32.0);
+
   /** The bottom of the height range where claw can hit crossbar */
-  public final Distance crossbarBottomCollisionAngle = Inches.of(32.0);
+  public final Distance crossbarBottomCollisionHeight = Inches.of(32.0);
 
   public static final class Sim {
     @JSONExclude

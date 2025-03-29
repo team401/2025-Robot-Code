@@ -110,6 +110,7 @@ public class WristConstants {
 
   /** The angle at which the wrist will collide with the crossbar when rotating downward */
   public final Angle crossbarTopCollisionAngle = Rotations.of(0.32);
+
   /** The angle at which the wrist will collide with the crossbar when rotating upward */
   public final Angle crossbarBottomCollisionAngle = Rotations.of(0.32);
 

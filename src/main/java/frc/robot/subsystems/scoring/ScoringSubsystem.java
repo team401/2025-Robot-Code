@@ -867,8 +867,32 @@ public class ScoringSubsystem extends MonitoredSubsystem {
           (Angle) Measure.min(wristMaxAngle, JsonConstants.wristConstants.algaeUnderCrossbarAngle));
     }
 
-    boolean canWristHitCrossbar = false;
-    if (getElevatorHeight())
+    boolean inDangerZone =
+        getElevatorHeight().gt(JsonConstants.elevatorConstants.crossbarBottomCollisionHeight)
+            && getElevatorHeight().lt(JsonConstants.elevatorConstants.crossbarTopCollisionHeight);
+    boolean willPassDangerZoneUp =
+        elevatorHeight.lt(JsonConstants.elevatorConstants.crossbarBottomCollisionHeight)
+            && elevatorGoalHeight.gt(JsonConstants.elevatorConstants.crossbarBottomCollisionHeight);
+    boolean willPassDangerZoneDown =
+        elevatorHeight.gt(JsonConstants.elevatorConstants.crossbarTopCollisionHeight)
+            && elevatorGoalHeight.lt(JsonConstants.elevatorConstants.crossbarTopCollisionHeight);
+    boolean willPassDangerZone = willPassDangerZoneUp || willPassDangerZoneDown;
+
+    boolean canWristHitCrossbar = inDangerZone || willPassDangerZone;
+
+    if (canWristHitCrossbar) {
+      // If the wrist can hit the crossbar, keep it on the same side of the crossbar that it is
+      if (wristAngle.lt(JsonConstants.wristConstants.crossbarTopCollisionAngle)) {
+        wristMaxAngle.mut_replace(
+            (Angle)
+                Measure.min(
+                    wristMaxAngle, JsonConstants.wristConstants.crossbarBottomCollisionAngle));
+      } else {
+        wristMinAngle.mut_replace(
+            (Angle)
+                Measure.max(wristMinAngle, JsonConstants.wristConstants.crossbarTopCollisionAngle));
+      }
+    }
 
     Logger.recordOutput("scoring/clamps/closeToReef", closeToReef);
     Logger.recordOutput("scoring/clamps/wristInToAvoidReefBase", wristInToAvoidReefBase);
@@ -877,6 +901,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     Logger.recordOutput("scoring/clamps/elevatorBelowReefLevel", elevatorBelowReefLevel);
     Logger.recordOutput("scoring/clamps/elevatorAboveReefLevel", elevatorAboveReefLevel);
     Logger.recordOutput("scoring/clamps/wristDownForAlgae", wristDownForAlgae);
+    Logger.recordOutput("scoring/clamps/canWristHitCrossbar", canWristHitCrossbar);
 
     elevatorMechanism.setAllowedRangeOfMotion(elevatorMinHeight, elevatorMaxHeight);
     wristMechanism.setAllowedRangeOfMotion(wristMinAngle, wristMaxAngle);
