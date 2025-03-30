@@ -50,7 +50,7 @@ public class LED extends SubsystemBase {
   @Override
   public void periodic() {
     if (!DriverStation.isDisabled()) {
-      
+
       // Scoring Subsystem Checks
       if (scoringSubsystem != null) {
         if (scoringSubsystem.isCoralDetected() == true) {
@@ -73,7 +73,7 @@ public class LED extends SubsystemBase {
       if (DriverStation.getMatchTime() < 20 && DriverStation.getMatchTime() > 17) {
         addPattern(LEDConstants.endGame);
       }
-      
+
       applyPatterns();
 
     } else {
