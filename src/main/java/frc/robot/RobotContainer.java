@@ -231,7 +231,7 @@ public class RobotContainer {
     }
 
     if (FeatureFlags.synced.getObject().runLEDs) {
-      led = InitSubsystems.initLEDs(scoringSubsystem, climbSubsystem, drive);
+      led = InitSubsystems.initLEDs(scoringSubsystem);
       if (FeatureFlags.synced.getObject().runVision) {
         // led.setVisionWorkingSupplier(() -> vision.coprocessorConnected());
       } else {

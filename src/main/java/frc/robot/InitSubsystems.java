@@ -253,15 +253,14 @@ public final class InitSubsystems {
     }
   }
 
-  public static LED initLEDs(
-      ScoringSubsystem scoringSubsystem, ClimbSubsystem climbSubsystem, Drive drive) {
+  public static LED initLEDs(ScoringSubsystem scoringSubsystem) {
 
     switch (ModeConstants.currentMode) {
       case REAL:
-        return new LED(scoringSubsystem, climbSubsystem, drive);
+        return new LED(scoringSubsystem);
       case SIM:
       case MAPLESIM:
-        return new LED(scoringSubsystem, climbSubsystem, drive);
+        return new LED(scoringSubsystem);
 
       case REPLAY:
         throw new UnsupportedOperationException("LED replay is not yet implemented.");

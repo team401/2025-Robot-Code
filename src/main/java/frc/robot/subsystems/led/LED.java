@@ -8,8 +8,6 @@ import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.LEDConstants;
-import frc.robot.subsystems.climb.ClimbSubsystem;
-import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +32,6 @@ public class LED extends SubsystemBase {
   private Supplier<Boolean> visionWorkingSupplier = () -> true;
 
   private ScoringSubsystem scoringSubsystem;
-  private ClimbSubsystem climbSubsystem;
-  private Drive driveSubsystem;
-
-  private boolean enabled = false;
 
   /**
    * Constructs the LED subsystem.
@@ -46,10 +40,8 @@ public class LED extends SubsystemBase {
    * @param climbSubsystem The climb subsystem
    * @param drive The drive subsystem
    */
-  public LED(ScoringSubsystem scoringSubsystem, ClimbSubsystem climbSubsystem, Drive drive) {
+  public LED(ScoringSubsystem scoringSubsystem) {
     this.scoringSubsystem = scoringSubsystem;
-    this.climbSubsystem = climbSubsystem;
-    this.driveSubsystem = drive;
     led.setLength(LEDConstants.totalLength);
     led.start();
   }
@@ -58,9 +50,7 @@ public class LED extends SubsystemBase {
   @Override
   public void periodic() {
     if (!DriverStation.isDisabled()) {
-      if (DriverStation.getMatchTime() < 20 && DriverStation.getMatchTime() > 17) {
-        addPattern(LEDConstants.endGame);
-      }
+      
       // Scoring Subsystem Checks
       if (scoringSubsystem != null) {
         if (scoringSubsystem.isCoralDetected() == true) {
@@ -80,6 +70,10 @@ public class LED extends SubsystemBase {
         addPattern(LEDConstants.isBeeLinkWorkingPattern);
       }
 
+      if (DriverStation.getMatchTime() < 20 && DriverStation.getMatchTime() > 17) {
+        addPattern(LEDConstants.endGame);
+      }
+      
       applyPatterns();
 
     } else {
