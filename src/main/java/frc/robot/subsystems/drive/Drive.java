@@ -533,7 +533,8 @@ public class Drive implements DriveTemplate {
     }
   }
 
-  public void alignToFieldElement() {
+  /** Enable reef center alignment */
+  public void enableReefCenterAlignment() {
     if (isDesiredLocationReef()) {
       lockedAlignPosition =
           isAllianceRed()
@@ -543,7 +544,8 @@ public class Drive implements DriveTemplate {
     }
   }
 
-  public void disableAlign() {
+  /** Disable reef center alignment */
+  public void disableReefCenterAlignment() {
     isAligningToFieldElement = false;
   }
 
@@ -902,6 +904,7 @@ public class Drive implements DriveTemplate {
 
   /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
   public void runVelocity() {
+    Logger.recordOutput("Drive/isAligningToFieldElement", isAligningToFieldElement);
     if (isAligningToFieldElement) {
       alignToTarget();
     }

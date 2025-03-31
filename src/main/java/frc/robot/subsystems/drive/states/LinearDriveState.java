@@ -92,6 +92,8 @@ public class LinearDriveState implements PeriodicStateInterface {
     headingController.reset();
 
     lineupErrorMargin = JsonConstants.drivetrainConstants.lineupErrorMargin;
+
+    drive.enableReefCenterAlignment();
   }
 
   public void onExit(Transition transition) {}
@@ -290,6 +292,8 @@ public class LinearDriveState implements PeriodicStateInterface {
         double lastError = distanceToCurrentGoal - lastState.position;
         double adjustedPosition = distanceToGoal - lastError;
         driveController.reset(new State(adjustedPosition, lastVelocity));
+
+        drive.disableReefCenterAlignment();
       }
 
       // This has to be here because distanceToCurrentGoal is used for PID reset adjustment meme

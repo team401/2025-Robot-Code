@@ -95,7 +95,7 @@ public class LineupState implements PeriodicStateInterface {
     drive.setDriveLinedUp(false);
 
     // cancel rotation lock on center
-    drive.disableAlign();
+    drive.disableReefCenterAlignment();
 
     // dont rely on previous estimates
     latestObservation = null;
