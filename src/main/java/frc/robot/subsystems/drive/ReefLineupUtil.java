@@ -91,14 +91,14 @@ public class ReefLineupUtil {
    */
   public static Double getCrossTrackOffset(int cameraIndex) {
     if (cameraIndex == JsonConstants.visionConstants.FrontRightCameraIndex) {
-      if (ScoringSubsystem.getInstance() != null
-          && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+      if (ScoringSubsystem.getInstance() == null
+          || ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
         return JsonConstants.drivetrainConstants.driveCrossTrackFrontRightOffset; // coral
       }
       return JsonConstants.drivetrainConstants.driveCrossTrackFrontRightAlgaeOffset; // algae
     } else {
-      if (ScoringSubsystem.getInstance() != null
-          && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+      if (ScoringSubsystem.getInstance() == null
+          || ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
         return JsonConstants.drivetrainConstants.driveCrossTrackFrontLeftOffset; // coral
       }
       return JsonConstants.drivetrainConstants.driveCrossTrackFrontLeftAlgaeOffset; // algae

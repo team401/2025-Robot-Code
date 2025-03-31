@@ -241,7 +241,7 @@ public final class InitSubsystems {
             new VisionIOPhotonSim(
                 "Front-Left",
                 JsonConstants.visionConstants.FrontLeftTransform,
-                drive::getPose,
+                RobotContainer.driveSim::getSimulatedDriveTrainPose,
                 tagLayout));
       default:
         return new VisionLocalizer(
