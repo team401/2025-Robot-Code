@@ -1082,4 +1082,13 @@ public class Drive implements DriveTemplate {
         double crossTrackOffsetMeters,
         double alongTrackOffsetMeters);
   }
+
+  public void seedDirectionForward() {
+    if (!DriverStation.getAlliance().isPresent()
+        || DriverStation.getAlliance().get() == Alliance.Red) {
+      poseEstimator.resetRotation(Rotation2d.k180deg);
+    } else {
+      poseEstimator.resetRotation(Rotation2d.kZero);
+    }
+  }
 }

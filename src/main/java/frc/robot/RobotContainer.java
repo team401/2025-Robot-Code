@@ -384,6 +384,10 @@ public class RobotContainer {
     checkSwitchForDisabled();
     checkLedSwitch();
 
+    if (drive != null) {
+      drive.disabledPeriodic();
+    }
+
     Logger.recordOutput("Switches/brake", brakeSwitch.get());
     Logger.recordOutput("Switches/led", ledSwitch.get());
   }

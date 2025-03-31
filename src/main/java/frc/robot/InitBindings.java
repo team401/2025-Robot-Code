@@ -130,15 +130,8 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  // Left joystick top button toggles reef align
-                  if (drive.isAligningToFieldElement()) {
-                    // If already aligning, stop
-                    drive.disableAlign();
-                  } else {
-                    // If not already aligning, start
-                    drive.angleController.reset(drive.getRotation().getRadians());
-                    drive.alignToFieldElement();
-                  }
+                  // Left joystick top button seeds direction as forward
+                  drive.seedDirectionForward();
                 },
                 drive));
 
