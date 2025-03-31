@@ -1,28 +1,26 @@
 package frc.robot.subsystems.drive;
 
-import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
-import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
-import org.ironmaple.simulation.motorsims.SimulatedMotorController;
-
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.Amp;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Radian;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
+
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Timer;
-
+import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
+import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
+import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 
 /**
  * Physics sim implementation of module IO. The sim models are configured using a set of module
@@ -80,12 +78,14 @@ public class ModuleIOSimMaple implements ModuleIO {
     moduleSimulation = new SwerveModuleSimulation(configs);
     driveSim =
         moduleSimulation
-            .useDriveMotorController(new SimulatedMotorController.GenericMotorController(DRIVE_GEARBOX))
+            .useDriveMotorController(
+                new SimulatedMotorController.GenericMotorController(DRIVE_GEARBOX))
             .withCurrentLimit(Current.ofRelativeUnits(60, Amp));
 
     turnSim =
         moduleSimulation
-            .useSteerMotorController(new SimulatedMotorController.GenericMotorController(TURN_GEARBOX))
+            .useSteerMotorController(
+                new SimulatedMotorController.GenericMotorController(TURN_GEARBOX))
             // .useGenericControllerForSteer()
             .withCurrentLimit(Current.ofRelativeUnits(20, Amp));
 
