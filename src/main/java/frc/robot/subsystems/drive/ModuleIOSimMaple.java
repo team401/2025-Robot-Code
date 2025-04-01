@@ -40,7 +40,7 @@ public class ModuleIOSimMaple implements ModuleIO {
   // TODO:FIX
   private static final double DriveMotorGearRatio = 1.5;
   private static final double SteerMotorGearRatio = 1.5;
-  private static final double WheelRadius = 0;
+  private static final double WheelRadius = 0.05;
 
   private final SwerveModuleSimulation moduleSimulation;
   private final SimulatedMotorController.GenericMotorController driveSim;
@@ -78,12 +78,15 @@ public class ModuleIOSimMaple implements ModuleIO {
     moduleSimulation = new SwerveModuleSimulation(configs);
     driveSim =
         moduleSimulation
-            .useGenericMotorControllerForDrive()
+            .useDriveMotorController(
+                new SimulatedMotorController.GenericMotorController(DRIVE_GEARBOX))
             .withCurrentLimit(Current.ofRelativeUnits(60, Amp));
 
     turnSim =
         moduleSimulation
-            .useGenericControllerForSteer()
+            .useSteerMotorController(
+                new SimulatedMotorController.GenericMotorController(TURN_GEARBOX))
+            // .useGenericControllerForSteer()
             .withCurrentLimit(Current.ofRelativeUnits(20, Amp));
 
     // Enable wrapping for turn PID
