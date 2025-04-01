@@ -448,8 +448,8 @@ public class StrategyManager {
           && DriverStation.getAlliance().get() == Alliance.Blue) {
         startPose =
             new Pose2d(
-                17.5 - startPose.getX(),
-                8 - startPose.getY(),
+                17.3736 - startPose.getX(),
+                7.9248 - startPose.getY(),
                 new Rotation2d(startPose.getRotation().getRadians() - Math.PI / 2));
       }
       drive.setPose(startPose);
