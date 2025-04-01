@@ -6,5 +6,12 @@
     "L4"
   ],
   "intakeLocation": "CoralStationRight",
-  "intakeAfterLastScore": false
+  "intakeAfterLastScore": false,
+  "startSeededPositionTranslation": {
+    "x": 11.7,
+    "y": 4
+  },
+  "startSeededPositionRotation": {
+    "degrees": 0
+  }
 }

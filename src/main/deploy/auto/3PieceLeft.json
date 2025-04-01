@@ -9,5 +9,12 @@
     "L4",
     "L4"
   ],
-  "intakeLocation": "CoralStationLeft"
+  "intakeLocation": "CoralStationLeft",
+  "startSeededPositionTranslation": {
+    "x": 11.7,
+    "y": 1.5
+  },
+  "startSeededPositionRotation": {
+    "degrees": -40
+  }
 }
