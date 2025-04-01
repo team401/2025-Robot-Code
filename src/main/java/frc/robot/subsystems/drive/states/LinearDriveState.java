@@ -100,7 +100,10 @@ public class LinearDriveState implements PeriodicStateInterface {
     drive.enableReefCenterAlignment();
   }
 
-  public void onExit(Transition transition) {}
+  public void onExit(Transition transition) {
+    // Disable reef center alignment in case we stop linear driving before reaching phase 2
+    drive.disableReefCenterAlignment();
+  }
 
   /**
    * finds a pose to pathfind to based on desiredLocation enum
