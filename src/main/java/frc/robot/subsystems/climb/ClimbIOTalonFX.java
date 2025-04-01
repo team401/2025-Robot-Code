@@ -62,7 +62,7 @@ public class ClimbIOTalonFX implements ClimbIO {
             .withFeedback(
                 new FeedbackConfigs()
                     .withFeedbackRemoteSensorID(climbAngleCoder.getDeviceID())
-                    .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder))
+                    .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder))
             .withMotorOutput(
                 new MotorOutputConfigs()
                     .withNeutralMode(NeutralModeValue.Brake)

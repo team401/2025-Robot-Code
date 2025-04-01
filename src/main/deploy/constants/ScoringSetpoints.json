@@ -2,12 +2,12 @@
   "idle": {
     "name": "Idle",
     "elevatorHeight": {
-      "value": 1.5,
+      "value": 6,
       "unit": "Inch"
     },
     "wristAngle": {
-      "value": 0.3214,
-      "unit": "Rotation"
+      "value": 2.04,
+      "unit": "Radian"
     }
   },
   "idleWithAlgae": {
@@ -24,7 +24,18 @@
   "L1": {
     "name": "L1",
     "elevatorHeight": {
-      "value": 0.15,
+      "value": 0.44,
+      "unit": "Meter"
+    },
+    "wristAngle": {
+      "value": 0.32,
+      "unit": "Rotation"
+    }
+  },
+  "L2": {
+    "name": "L2",
+    "elevatorHeight": {
+      "value": 0.316,
       "unit": "Meter"
     },
     "wristAngle": {
@@ -32,36 +43,25 @@
       "unit": "Rotation"
     }
   },
-  "L2": {
-    "name": "L2",
-    "elevatorHeight": {
-      "value": 0.29,
-      "unit": "Meter"
-    },
-    "wristAngle": {
-      "value": 0.29,
-      "unit": "Rotation"
-    }
-  },
   "L3": {
     "name": "L3",
     "elevatorHeight": {
-      "value": 0.7,
+      "value": 0.75,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": 0.29,
+      "value": 0.3,
       "unit": "Rotation"
     }
   },
   "L4": {
     "name": "L4",
     "elevatorHeight": {
-      "value": 1.6,
+      "value": 1.503,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": 0.09,
+      "value": 0.22,
       "unit": "Rotation"
     }
   },
