@@ -23,7 +23,7 @@
   "wristKA": 0.0,
   "wristKP": 25.0,
   "wristKI": 1.0,
-  "wristKD": 0.5,
+  "wristKD": 0.0,
   "wristMotionMagicCruiseVelocityRotationsPerSecond": 3.0,
   "wristMotionMagicExpo_kA": 0.4,
   "wristMotionMagicExpo_kV": 0.1,
@@ -32,7 +32,7 @@
     "unit": "Rotation"
   },
   "wristCANcoderMagnetOffset": {
-    "value": -0.315185546875,
+    "value": 0.190185546875,
     "unit": "Rotation"
   },
   "wristCANcoderSensorDirection": "Clockwise_Positive",

@@ -2,12 +2,12 @@
   "idle": {
     "name": "Idle",
     "elevatorHeight": {
-      "value": 1.5,
+      "value": 6,
       "unit": "Inch"
     },
     "wristAngle": {
-      "value": 0.3214,
-      "unit": "Rotation"
+      "value": 2.04,
+      "unit": "Radian"
     }
   },
   "idleWithAlgae": {
@@ -35,7 +35,7 @@
   "L2": {
     "name": "L2",
     "elevatorHeight": {
-      "value": 0.29,
+      "value": 0.33,
       "unit": "Meter"
     },
     "wristAngle": {
@@ -46,7 +46,7 @@
   "L3": {
     "name": "L3",
     "elevatorHeight": {
-      "value": 0.7,
+      "value": 0.74,
       "unit": "Meter"
     },
     "wristAngle": {
@@ -57,12 +57,12 @@
   "L4": {
     "name": "L4",
     "elevatorHeight": {
-      "value": 1.6,
+      "value": 1.403,
       "unit": "Meter"
     },
     "wristAngle": {
-      "value": 0.09,
-      "unit": "Rotation"
+      "value": 1.5,
+      "unit": "Radian"
     }
   },
   "farWarmup": {
