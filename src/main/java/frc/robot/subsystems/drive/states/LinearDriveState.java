@@ -308,11 +308,11 @@ public class LinearDriveState implements PeriodicStateInterface {
           double adjustedPosition = distanceToGoal - lastError;
           driveController.reset(new State(adjustedPosition, lastVelocity));
 
-          System.out.println("Switched to phase 1 with bumplessing");
+          System.out.println("Switched to phase 2 with bumplessing");
         } else {
           driveController.reset(new State(distanceToGoal, 0.0));
 
-          System.out.println("Switched to phase 1 instantly");
+          System.out.println("Switched to phase 2 instantly");
         }
 
         drive.disableReefCenterAlignment();
