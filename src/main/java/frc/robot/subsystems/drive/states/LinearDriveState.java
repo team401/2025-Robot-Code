@@ -61,14 +61,18 @@ public class LinearDriveState implements PeriodicStateInterface {
     this.drive = drive;
   }
 
+  private boolean hasRunPhase1 = false;
   private boolean hasEnteredPhase2 = false;
 
   public void onEntry(Transition transition) {
+    hasRunPhase1 = false;
     hasEnteredPhase2 = false;
 
     goalPose = findLinearDriveFromDesiredLocation(drive);
 
     Pose2d currentPose = drive.getPose();
+
+    Pose2d phase1Pose = findPhase1Pose(goalPose);
 
     driveController =
         new ProfiledPIDController(
@@ -79,7 +83,7 @@ public class LinearDriveState implements PeriodicStateInterface {
                 JsonConstants.drivetrainConstants.kDriveTranslationMaxVelocity,
                 JsonConstants.drivetrainConstants.kDriveTranslationMaxAcceleration));
 
-    double distanceToGoal = currentPose.getTranslation().getDistance(goalPose.getTranslation());
+    double distanceToGoal = currentPose.getTranslation().getDistance(phase1Pose.getTranslation());
     driveController.reset(new State(distanceToGoal, 0.0));
 
     headingController =
@@ -244,22 +248,28 @@ public class LinearDriveState implements PeriodicStateInterface {
 
   private double driveVelocityScalar = 0.0;
 
+  private Pose2d findPhase1Pose(Pose2d phase2Pose) {
+    // Project the goal pose backwards to find the phase 1 goal pose.
+    double phase1OffsetX =
+        JsonConstants.drivetrainConstants.kDriveToPointPhase2Distance
+            * Math.cos(phase2Pose.getRotation().getRadians() + Math.PI);
+    double phase1OffsetY =
+        JsonConstants.drivetrainConstants.kDriveToPointPhase2Distance
+            * Math.sin(phase2Pose.getRotation().getRadians() + Math.PI);
+    Pose2d phase1Pose =
+        new Pose2d(
+            phase2Pose.getX() + phase1OffsetX,
+            phase2Pose.getY() + phase1OffsetY,
+            phase2Pose.getRotation());
+
+    return phase1Pose;
+  }
+
   @Override
   public void periodic() {
     Pose2d currentPose = drive.getPose();
 
-    // Project the goal pose backwards to find the phase 1 goal pose.
-    double phase1OffsetX =
-        JsonConstants.drivetrainConstants.kDriveToPointPhase2Distance
-            * Math.cos(goalPose.getRotation().getRadians() + Math.PI);
-    double phase1OffsetY =
-        JsonConstants.drivetrainConstants.kDriveToPointPhase2Distance
-            * Math.sin(goalPose.getRotation().getRadians() + Math.PI);
-    Pose2d phase1Pose =
-        new Pose2d(
-            goalPose.getX() + phase1OffsetX,
-            goalPose.getY() + phase1OffsetY,
-            goalPose.getRotation());
+    Pose2d phase1Pose = findPhase1Pose(goalPose);
 
     // Get distances to goal positions.
     double distanceToGoal = currentPose.getTranslation().getDistance(goalPose.getTranslation());
@@ -285,19 +295,30 @@ public class LinearDriveState implements PeriodicStateInterface {
       endVelocityGoal = JsonConstants.drivetrainConstants.kDriveToPointEndVelocity;
 
       if (!hasEnteredPhase2) {
-        // Bumplessing
         hasEnteredPhase2 = true;
-        State lastState = driveController.getSetpoint();
-        double lastVelocity = lastState.velocity;
-        double lastError = distanceToCurrentGoal - lastState.position;
-        double adjustedPosition = distanceToGoal - lastError;
-        driveController.reset(new State(adjustedPosition, lastVelocity));
+
+        if (hasRunPhase1) {
+          // Bumplessing
+          State lastState = driveController.getSetpoint();
+          double lastVelocity = lastState.velocity;
+          double lastError = distanceToCurrentGoal - lastState.position;
+          double adjustedPosition = distanceToGoal - lastError;
+          driveController.reset(new State(adjustedPosition, lastVelocity));
+
+          System.out.println("Switched to phase 1 with bumplessing");
+        } else {
+          driveController.reset(new State(distanceToGoal, 0.0));
+
+          System.out.println("Switched to phase 1 instantly");
+        }
 
         drive.disableReefCenterAlignment();
       }
 
       // This has to be here because distanceToCurrentGoal is used for PID reset adjustment meme
       distanceToCurrentGoal = distanceToGoal;
+    } else {
+      hasRunPhase1 = true;
     }
 
     // We only exit this state when the phase 2 pose has been achieved.
@@ -331,6 +352,8 @@ public class LinearDriveState implements PeriodicStateInterface {
             driveVelocity.getX(), driveVelocity.getY(), headingVelocity, currentPose.getRotation());
     drive.setGoalSpeeds(speeds, false);
 
+    Logger.recordOutput("DriveToPoint/HasRunPhase1", hasRunPhase1);
+    Logger.recordOutput("DriveToPoint/HasEnteredPhase2", hasEnteredPhase2);
     Logger.recordOutput("DriveToPoint/AngleToTarget", angleToTarget);
     Logger.recordOutput("DriveToPoint/Phase1Pose", phase1Pose);
     Logger.recordOutput("DriveToPoint/Phase2Pose", goalPose);
