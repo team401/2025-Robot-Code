@@ -21,7 +21,7 @@
   "climbInvertValue": "Clockwise_Positive",
   "invertFollowerClimbMotor": true,
   "climbFFVolts": -8.0,
-  "searchingFFVolts": 8.0,
+  "searchingFFVolts": 5.0,
   "searchingFFMargin": {
     "value": 0.0,
     "unit": "Radian"
