@@ -441,7 +441,8 @@ public class StrategyManager {
     this.currentAction = null;
 
     if (!FeatureFlags.synced.getObject().runVision
-        || drive.getVisionMeasurementCount() < VisionConstants.synced.getObject().safetyThreshold) {
+        || drive.getVisionMeasurementCount()
+            < VisionConstants.synced.getObject().minimumVisionMeasurementInitCount) {
       Pose2d startPose =
           new Pose2d(strategy.startSeededPositionTranslation, strategy.startSeededPositionRotation);
       if (DriverStation.getAlliance().isPresent()
