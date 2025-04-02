@@ -46,6 +46,10 @@ public class AutoIntake extends Command {
    * @return true if we are ready for next path
    */
   public boolean isReadyForNextAction() {
+    if (scoringSubsystem == null && drive != null) {
+      return drive.isDriveAlignmentFinished();
+    }
+
     return (scoringSubsystem == null || !scoringSubsystem.shouldWaitOnIntake());
   }
 

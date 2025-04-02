@@ -95,7 +95,7 @@ public class LineupState implements PeriodicStateInterface {
     drive.setDriveLinedUp(false);
 
     // cancel rotation lock on center
-    drive.disableAlign();
+    drive.disableReefCenterAlignment();
 
     // dont rely on previous estimates
     latestObservation = null;
@@ -370,7 +370,7 @@ public class LineupState implements PeriodicStateInterface {
     DistanceToTag adjustedObservation =
         new DistanceToTag(
             latestObservation.crossTrackDistance() + adjustment.getY(),
-            latestObservation.alongTrackDistance() + adjustment.getX(),
+            latestObservation.alongTrackDistance() - adjustment.getX(),
             true);
     return adjustedObservation;
   }
@@ -407,18 +407,19 @@ public class LineupState implements PeriodicStateInterface {
 
     if (observation.isValid()) {
       usingOtherCamera = false;
-      driveCrossTrackLineupController.reset();
+      driveCrossTrackOtherCameraLineupController.reset();
       latestObservation = observation;
 
       poseAtLastObservation = drive.getPose();
 
       hadObservationYet = true;
       observationAge = 0;
-    } else if (otherCameraObs != null && otherCameraObs.isValid()) {
+    } else if (otherCameraObs != null
+        && otherCameraObs.isValid()) { // Issues were had initially with this enabled on 3/27
       // check if the other camera has observation (maybe we switched to other pole or camera got
       // unplugged)
       usingOtherCamera = true;
-      driveCrossTrackOtherCameraLineupController.reset();
+      driveCrossTrackLineupController.reset();
       latestObservation = otherCameraObs;
       observation = otherCameraObs;
       observationAge = 0;
@@ -426,7 +427,7 @@ public class LineupState implements PeriodicStateInterface {
     } else {
       observation = updateDistanceFromCachedPose();
       if (!observation.isValid()) {
-        // go back to otf?
+        drive.fireTrigger(DriveTrigger.BeginLinear);
       }
     }
 

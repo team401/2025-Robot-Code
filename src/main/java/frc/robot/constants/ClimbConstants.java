@@ -24,6 +24,8 @@ public class ClimbConstants {
   public final Angle searchingAngle = Radians.of(1);
   public final Angle finalHangingAngle = Radians.of(0.1);
 
+  public final Double climbEncoderOffsetRotations = -0.40234375;
+
   public final Integer leadClimbMotorId = 16;
   public final Integer followerClimbMotorId = 17;
 
@@ -41,6 +43,9 @@ public class ClimbConstants {
   public final Boolean invertFollowerClimbMotor = true;
 
   public final Double climbFFVolts = -10.0;
+  public final Double searchingFFVolts = 5.0;
+
+  public final Angle searchingFFMargin = Radians.of(0.3);
 
   public static final class Sim {
     @JSONExclude

@@ -46,7 +46,11 @@ public class StrategyManager {
   private DoubleSubscriber reefLocationSelector = table.getDoubleTopic("reefTarget").subscribe(-1);
   private DoubleSubscriber intakeLocationSelector =
       table.getDoubleTopic("stationTarget").subscribe(-1);
-  private StringSubscriber reefLevelSelector = table.getStringTopic("scoreHeight").subscribe("-1");
+  private StringSubscriber coralLevelSelector = table.getStringTopic("coralHeight").subscribe("-1");
+  private StringSubscriber algaeScoreLevelSelector =
+      table.getStringTopic("algaeScoreHeight").subscribe("-1");
+  private StringSubscriber algaeIntakeLevelSelector =
+      table.getStringTopic("algaeIntakeHeight").subscribe("-1");
   private StringSubscriber autonomySelector =
       table.getStringTopic("autonomyLevel").subscribe("mid");
   private StringSubscriber gamePieceSelector = table.getStringTopic("gpMode").subscribe("-1");
@@ -54,7 +58,11 @@ public class StrategyManager {
   private StringPublisher autonomyPublisher = table.getStringTopic("autonomyLevel").publish();
   private DoublePublisher reefLocationPublisher = table.getDoubleTopic("reefTarget").publish();
   private DoublePublisher intakeLocationPublisher = table.getDoubleTopic("stationTarget").publish();
-  private StringPublisher reefLevelPublisher = table.getStringTopic("scoreHeight").publish();
+  private StringPublisher coralLevelPublisher = table.getStringTopic("coralHeight").publish();
+  private StringPublisher algaeScoreLevelPublisher =
+      table.getStringTopic("algaeScoreHeight").publish();
+  private StringPublisher algaeIntakeLevelPublisher =
+      table.getStringTopic("algaeIntakeHeight").publish();
   private StringPublisher gamePiecePublisher = table.getStringTopic("gpMode").publish();
   private BooleanPublisher hasCoralPublisher = table.getBooleanTopic("hasCoral").publish();
   private BooleanPublisher hasAlgaePublisher = table.getBooleanTopic("hasAlgae").publish();
@@ -249,10 +257,12 @@ public class StrategyManager {
     if (scoringSubsystem != null) {
       // update scoring gamepiece
       String gamePiece = gamePieceSelector.get();
+      // System.out.println(gamePiece);
 
       if (gamePiece.equalsIgnoreCase("coral")) {
         scoringSubsystem.setGamePiece(GamePiece.Coral);
       } else if (gamePiece.equalsIgnoreCase("algae")) {
+        // System.out.println("Setting algae in strategymanager");
         scoringSubsystem.setGamePiece(GamePiece.Algae);
       }
 
@@ -313,10 +323,14 @@ public class StrategyManager {
   }
 
   public void updateScoringLevelFromNetworkTables() {
-    scoringSubsystem.updateScoringLevelFromNetworkTables(reefLevelSelector.get());
+    scoringSubsystem.updateScoringLevelFromNetworkTables(
+        coralLevelSelector.get(), algaeIntakeLevelSelector.get(), algaeScoreLevelSelector.get());
   }
 
   public void publishDefaultSubsystemValues() {
+    if (DriverStation.isTeleop()) {
+      this.setAutonomyMode(AutonomyMode.Smart);
+    }
     if (scoringSubsystem != null) {
       // publish default game piece
       switch (scoringSubsystem.getGamePiece()) {
@@ -330,19 +344,43 @@ public class StrategyManager {
           break;
       }
 
+      scoringSubsystem.setTarget(FieldTarget.L4);
+
       // publish default level
-      switch (scoringSubsystem.getTarget()) {
+      switch (scoringSubsystem.getCoralTarget()) {
         case L1:
-          reefLevelPublisher.accept("level1");
+          coralLevelPublisher.accept("level1");
           break;
         case L2:
-          reefLevelPublisher.accept("level2");
+          coralLevelPublisher.accept("level2");
           break;
         case L3:
-          reefLevelPublisher.accept("level3");
+          coralLevelPublisher.accept("level3");
           break;
         case L4:
-          reefLevelPublisher.accept("level4");
+          coralLevelPublisher.accept("level4");
+          break;
+        default:
+          break;
+      }
+
+      switch (scoringSubsystem.getAlgaeIntakeTarget()) {
+        case L2:
+          algaeIntakeLevelPublisher.accept("level2");
+          break;
+        case L3:
+          algaeIntakeLevelPublisher.accept("level3");
+          break;
+        default:
+          break;
+      }
+
+      switch (scoringSubsystem.getAlgaeScoreTarget()) {
+        case Processor:
+          algaeScoreLevelPublisher.accept("level1");
+          break;
+        case Net:
+          algaeScoreLevelPublisher.accept("level4");
           break;
         default:
           break;

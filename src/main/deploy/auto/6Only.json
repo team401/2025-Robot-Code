@@ -1,0 +1,10 @@
+{
+  "scoringLocations": [
+    "Reef6"
+  ],
+  "scoringLevels": [
+    "L4"
+  ],
+  "intakeLocation": "CoralStationRight",
+  "intakeAfterLastScore": false
+}

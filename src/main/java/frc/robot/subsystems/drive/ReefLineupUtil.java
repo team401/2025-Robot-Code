@@ -91,14 +91,14 @@ public class ReefLineupUtil {
    */
   public static Double getCrossTrackOffset(int cameraIndex) {
     if (cameraIndex == JsonConstants.visionConstants.FrontRightCameraIndex) {
-      if (ScoringSubsystem.getInstance() != null
-          && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+      if (ScoringSubsystem.getInstance() == null
+          || ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
         return JsonConstants.drivetrainConstants.driveCrossTrackFrontRightOffset; // coral
       }
       return JsonConstants.drivetrainConstants.driveCrossTrackFrontRightAlgaeOffset; // algae
     } else {
-      if (ScoringSubsystem.getInstance() != null
-          && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+      if (ScoringSubsystem.getInstance() == null
+          || ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
         return JsonConstants.drivetrainConstants.driveCrossTrackFrontLeftOffset; // coral
       }
       return JsonConstants.drivetrainConstants.driveCrossTrackFrontLeftAlgaeOffset; // algae
@@ -132,7 +132,7 @@ public class ReefLineupUtil {
 
   public static DesiredLocation getClosestAlgaeLocation(Pose2d robotPose) {
     double closestDistance = Double.MAX_VALUE;
-    DesiredLocation closestLocation = DesiredLocation.Reef0;
+    DesiredLocation closestLocation = DesiredLocation.Algae0;
 
     for (DesiredLocation location : Drive.reefAlgaeLocations) {
       Translation2d algaeLocation;

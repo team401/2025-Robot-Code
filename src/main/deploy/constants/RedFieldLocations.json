@@ -28,8 +28,8 @@
     "radians": -1.0471975511965976
   },
   "redReefOTF3Translation": {
-    "x": 12.35,
-    "y": 5.55
+    "x": 12.37,
+    "y": 5.5
   },
   "redReefOTF3Rotation": {
     "radians": -1.0471975511965976
@@ -49,8 +49,8 @@
     "radians": -2.0943951023931953
   },
   "redReefOTF6Translation": {
-    "x": 14.729,
-    "y": 4.241
+    "x": 14.83,
+    "y": 4.31
   },
   "redReefOTF6Rotation": {
     "radians": 3.141592653589793
@@ -91,15 +91,15 @@
     "radians": 1.0471975511965976
   },
   "redCoralStationRightTranslation": {
-    "x": 16.3,
-    "y": 7.0
+    "x": 15.99,
+    "y": 7.4
   },
   "redCoralStationRightRotation": {
     "radians": -2.0943951023931953
   },
   "redCoralStationLeftTranslation": {
-    "x": 16.3,
-    "y": 1.0
+    "x": 15.96,
+    "y": 0.64
   },
   "redCoralStationLeftRotation": {
     "radians": 2.0943951023931953
