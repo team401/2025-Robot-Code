@@ -111,30 +111,35 @@ public class IntakeState implements PeriodicStateInterface {
     }
 
     scoringSubsystem.setGoalSetpoint(setpoint);
-    scoringSubsystem.setElevatorOverrideVoltage(JsonConstants.elevatorConstants.homingVoltage);
-    scoringSubsystem.setElevatorOverrideMode(ElevatorOutputMode.Voltage);
 
-    // Seed the elevator to 0 when at the bottom of intake.
-    double filteredAbsVelocity =
-        velocityFilter.calculate(scoringSubsystem.getElevatorVelocity().abs(MetersPerSecond));
-    if (filteredAbsVelocity
-        < JsonConstants.elevatorConstants.homingVelocityThresholdMetersPerSecond) {
-      // If the elevator is NOT moving:
-      if (hasMovedYet) {
-        // If it HAS moved yet, that means it's moved and then come to rest, therefore we are at
-        // zero
-        System.out.println("Homed by moving then stopping");
-        scoringSubsystem.seedElevatorToZero();
-      } else if (homingTimer.hasElapsed(
-          JsonConstants.elevatorConstants.homingMaxUnmovingTime.in(Seconds))) {
-        // If it hasn't moved yet, and it's been longer than our threshold, we're satisfied that it
-        // was already at zero
-        System.out.println("Homed by never moving");
-        scoringSubsystem.seedElevatorToZero();
+    // Seed the elevator to 0 when at the bottom of intake when intaking a coral.
+    if (scoringSubsystem.getGamePiece() == GamePiece.Coral) {
+      scoringSubsystem.setElevatorOverrideVoltage(JsonConstants.elevatorConstants.homingVoltage);
+      scoringSubsystem.setElevatorOverrideMode(ElevatorOutputMode.Voltage);
+
+      double filteredAbsVelocity =
+          velocityFilter.calculate(scoringSubsystem.getElevatorVelocity().abs(MetersPerSecond));
+      if (filteredAbsVelocity
+          < JsonConstants.elevatorConstants.homingVelocityThresholdMetersPerSecond) {
+        // If the elevator is NOT moving:
+        if (hasMovedYet) {
+          // If it HAS moved yet, that means it's moved and then come to rest, therefore we are at
+          // zero
+          System.out.println("Homed by moving then stopping");
+          scoringSubsystem.seedElevatorToZero();
+        } else if (homingTimer.hasElapsed(
+            JsonConstants.elevatorConstants.homingMaxUnmovingTime.in(Seconds))) {
+          // If it hasn't moved yet, and it's been longer than our threshold, we're satisfied that
+          // it
+          // was already at zero
+          System.out.println("Homed by never moving");
+          scoringSubsystem.seedElevatorToZero();
+        }
+      } else {
+        // If the elevator IS moving, we keep track of that in hasMovedYet so we'll know when it
+        // stops
+        hasMovedYet = true;
       }
-    } else {
-      // If the elevator IS moving, we keep track of that in hasMovedYet so we'll know when it stops
-      hasMovedYet = true;
     }
 
     switch (scoringSubsystem.getGamePiece()) {
