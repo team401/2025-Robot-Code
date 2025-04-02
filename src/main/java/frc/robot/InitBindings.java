@@ -68,21 +68,22 @@ public final class InitBindings {
                         // The drive location is immediately overwritten below
                         strategyManager.updateScoringLocationsFromSnakeScreen();
                         strategyManager.updateScoringLevelFromNetworkTables();
+                      }
 
-                        // When the scoring trigger is pulled in smart autonomy, select the closest
-                        // reef pole to score on if coral
-                        if (ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
-                          drive.setDesiredLocation(
-                              ReefLineupUtil.getClosestReefLocation(drive.getPose()));
-                        }
+                      // When the scoring trigger is pulled in smart autonomy, select the closest
+                      // reef pole to score on if coral
+                      if (ScoringSubsystem.getInstance() == null
+                          || ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+                        drive.setDesiredLocation(
+                            ReefLineupUtil.getClosestReefLocation(drive.getPose()));
                       }
                       // Then fall through to scheduling OTF like in mixed autonomy (no break here
                       // is intentional)
                     case Mixed:
-                      if (ScoringSubsystem.getInstance() != null
-                          && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+                      if (ScoringSubsystem.getInstance() == null
+                          || ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
                         drive.setGoToIntake(false);
-                        drive.fireTrigger(DriveTrigger.BeginOTF);
+                        drive.fireTrigger(DriveTrigger.BeginLinear);
                       } else if (ScoringSubsystem.getInstance() != null) {
                         ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
                       }
@@ -129,15 +130,8 @@ public final class InitBindings {
         .onTrue(
             new InstantCommand(
                 () -> {
-                  // Left joystick top button toggles reef align
-                  if (drive.isAligningToFieldElement()) {
-                    // If already aligning, stop
-                    drive.disableAlign();
-                  } else {
-                    // If not already aligning, start
-                    drive.angleController.reset(drive.getRotation().getRadians());
-                    drive.alignToFieldElement();
-                  }
+                  // Left joystick top button seeds direction as forward
+                  drive.seedDirectionForward();
                 },
                 drive));
 
@@ -334,8 +328,8 @@ public final class InitBindings {
   }
 
   public static void initClimbBindings(ClimbSubsystem climb) {
-    driverController.a().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)));
-    driverController.b().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)));
+    // driverController.a().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)));
+    // driverController.b().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)));
 
     // TODO: Find actual numbers for these buttons using driverstation
     leftJoystick.button(3).onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)));
