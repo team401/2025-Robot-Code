@@ -47,6 +47,7 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
 import frc.robot.subsystems.drive.states.IdleState;
 import frc.robot.subsystems.drive.states.JoystickDrive;
+import frc.robot.subsystems.drive.states.LinearDriveState;
 import frc.robot.subsystems.drive.states.LineupState;
 import frc.robot.subsystems.drive.states.OTFState;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
@@ -216,6 +217,7 @@ public class Drive implements DriveTemplate {
     Idle(new IdleState(instance)),
     OTF(new OTFState(instance)),
     Lineup(new LineupState(instance)),
+    LinearDrive(new LinearDriveState(instance)),
     Joystick(new JoystickDrive(instance));
     private final PeriodicStateInterface state;
 
@@ -237,6 +239,8 @@ public class Drive implements DriveTemplate {
     BeginOTF,
     BeginLineup,
     CancelLineup,
+    BeginLinear,
+    CancelLinear,
     FinishLineup,
     WaitForScore,
   }
@@ -345,7 +349,8 @@ public class Drive implements DriveTemplate {
 
     stateMachineConfiguration
         .configure(DriveState.Joystick)
-        .permit(DriveTrigger.BeginOTF, DriveState.OTF);
+        .permit(DriveTrigger.BeginOTF, DriveState.OTF)
+        .permit(DriveTrigger.BeginLinear, DriveState.LinearDrive);
 
     stateMachineConfiguration
         .configure(DriveState.OTF)
@@ -362,9 +367,16 @@ public class Drive implements DriveTemplate {
         .permitIf(DriveTrigger.BeginLineup, DriveState.Lineup, () -> this.isDesiredLocationReef());
 
     stateMachineConfiguration
+        .configure(DriveState.LinearDrive)
+        .permit(DriveTrigger.CancelLinear, DriveState.Joystick)
+        .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick)
+        .permitIf(DriveTrigger.BeginLineup, DriveState.Lineup, () -> this.isDesiredLocationReef());
+
+    stateMachineConfiguration
         .configure(DriveState.Lineup)
         .permit(DriveTrigger.CancelLineup, DriveState.Joystick)
         .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick)
+        .permit(DriveTrigger.BeginLinear, DriveState.LinearDrive)
         .permit(DriveTrigger.BeginOTF, DriveState.OTF);
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, DriveState.Joystick);
@@ -385,10 +397,12 @@ public class Drive implements DriveTemplate {
   @Override
   public void periodic() {
     // Manually cancel go to intake if we have a gamepiece
-    if (goToIntake && ScoringSubsystem.getInstance().isCoralDetected()) {
-      setGoToIntake(false);
-    } else if (goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
-      setGoToIntake(false);
+    if (ScoringSubsystem.getInstance() != null) {
+      if (goToIntake && ScoringSubsystem.getInstance().isCoralDetected()) {
+        setGoToIntake(false);
+      } else if (goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
+        setGoToIntake(false);
+      }
     }
 
     odometryLock.lock(); // Prevents odometry updates while reading data
@@ -520,7 +534,8 @@ public class Drive implements DriveTemplate {
     }
   }
 
-  public void alignToFieldElement() {
+  /** Enable reef center alignment */
+  public void enableReefCenterAlignment() {
     if (isDesiredLocationReef()) {
       lockedAlignPosition =
           isAllianceRed()
@@ -530,7 +545,8 @@ public class Drive implements DriveTemplate {
     }
   }
 
-  public void disableAlign() {
+  /** Disable reef center alignment */
+  public void disableReefCenterAlignment() {
     isAligningToFieldElement = false;
   }
 
@@ -889,6 +905,7 @@ public class Drive implements DriveTemplate {
 
   /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
   public void runVelocity() {
+    Logger.recordOutput("Drive/isAligningToFieldElement", isAligningToFieldElement);
     if (isAligningToFieldElement) {
       alignToTarget();
     }
@@ -1068,5 +1085,14 @@ public class Drive implements DriveTemplate {
         int desiredCameraIndex,
         double crossTrackOffsetMeters,
         double alongTrackOffsetMeters);
+  }
+
+  public void seedDirectionForward() {
+    if (!DriverStation.getAlliance().isPresent()
+        || DriverStation.getAlliance().get() == Alliance.Red) {
+      poseEstimator.resetRotation(Rotation2d.k180deg);
+    } else {
+      poseEstimator.resetRotation(Rotation2d.kZero);
+    }
   }
 }

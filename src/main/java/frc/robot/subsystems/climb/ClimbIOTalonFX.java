@@ -62,7 +62,7 @@ public class ClimbIOTalonFX implements ClimbIO {
             .withFeedback(
                 new FeedbackConfigs()
                     .withFeedbackRemoteSensorID(climbAngleCoder.getDeviceID())
-                    .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder))
+                    .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder))
             .withMotorOutput(
                 new MotorOutputConfigs()
                     .withNeutralMode(NeutralModeValue.Brake)
@@ -121,15 +121,7 @@ public class ClimbIOTalonFX implements ClimbIO {
   public void applyOutputs(ClimbOutputs outputs) {
     Logger.recordOutput("climb/feedforward", feedforward);
 
-    boolean usingFeedforward = false;
-    if (goalAngle.lt(climbAngleCoder.getAbsolutePosition().getValue())) {
-      calculator.withPosition(goalAngle.in(Rotations)).withFeedForward(feedforward);
-      usingFeedforward = true;
-    } else {
-      calculator.withPosition(goalAngle.in(Rotations)).withFeedForward(0.0);
-    }
-
-    Logger.recordOutput("climb/usingFeedforward", usingFeedforward);
+    calculator.withPosition(goalAngle.in(Rotations)).withFeedForward(feedforward);
 
     Logger.recordOutput("climb/calculatorAngle", leadMotor.getPosition().getValueAsDouble());
 
