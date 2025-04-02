@@ -126,9 +126,6 @@ public class ScoringSubsystem extends MonitoredSubsystem {
 
   private BooleanSupplier isDriveLinedUpSupplier;
 
-  /** Whether we detected an algae using current bc canrange dead */
-  private boolean algaeCurrentDetected = false;
-
   public enum FieldTarget {
     L1,
     L2,
@@ -563,7 +560,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   public boolean isAlgaeDetected() {
     if (JsonConstants.scoringFeatureFlags.runClaw) {
-      return clawMechanism.isAlgaeDetected() || algaeCurrentDetected;
+      return clawMechanism.isAlgaeDetected();
     } else {
       return false;
     }
@@ -678,7 +675,6 @@ public class ScoringSubsystem extends MonitoredSubsystem {
       determineProtectionClamps();
     }
 
-    Logger.recordOutput("scoring/algaeCurrentDetected", algaeCurrentDetected);
     Logger.recordOutput("scoring/state", stateMachine.getCurrentState());
     Logger.recordOutput("scoring/isDriveLinedUp", isDriveLinedUpSupplier.getAsBoolean());
   }
@@ -930,17 +926,5 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   public static ScoringSubsystem getInstance() {
     return instance;
-  }
-
-  public boolean isAlgaeCurrentDetected() {
-    if (clawMechanism != null) {
-      return clawMechanism.isAlgaeCurrentDetected();
-    }
-
-    return false;
-  }
-
-  public void setAlgaeCurrentDetected(boolean detected) {
-    algaeCurrentDetected = detected;
   }
 }
