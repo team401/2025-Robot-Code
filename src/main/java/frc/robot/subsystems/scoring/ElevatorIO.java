@@ -75,6 +75,8 @@ public interface ElevatorIO {
 
     /** Velocity of the mechanism, as reported by the lead motor TalonFX */
     public MutAngularVelocity elevatorMechanismVelocity = RotationsPerSecond.mutable(0.0);
+
+    public MutAngle leadMotorAngle = Rotations.mutable(0.0);
   }
 
   @AutoLog

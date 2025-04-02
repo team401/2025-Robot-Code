@@ -376,6 +376,7 @@ public class Drive implements DriveTemplate {
         .configure(DriveState.Lineup)
         .permit(DriveTrigger.CancelLineup, DriveState.Joystick)
         .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick)
+        .permit(DriveTrigger.BeginLinear, DriveState.LinearDrive)
         .permit(DriveTrigger.BeginOTF, DriveState.OTF);
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, DriveState.Joystick);
@@ -533,7 +534,8 @@ public class Drive implements DriveTemplate {
     }
   }
 
-  public void alignToFieldElement() {
+  /** Enable reef center alignment */
+  public void enableReefCenterAlignment() {
     if (isDesiredLocationReef()) {
       lockedAlignPosition =
           isAllianceRed()
@@ -543,7 +545,8 @@ public class Drive implements DriveTemplate {
     }
   }
 
-  public void disableAlign() {
+  /** Disable reef center alignment */
+  public void disableReefCenterAlignment() {
     isAligningToFieldElement = false;
   }
 
@@ -902,6 +905,7 @@ public class Drive implements DriveTemplate {
 
   /** Runs the drive at the desired speeds set in (@Link setGoalSpeeds) */
   public void runVelocity() {
+    Logger.recordOutput("Drive/isAligningToFieldElement", isAligningToFieldElement);
     if (isAligningToFieldElement) {
       alignToTarget();
     }

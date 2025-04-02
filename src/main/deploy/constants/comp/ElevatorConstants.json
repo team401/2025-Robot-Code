@@ -53,7 +53,7 @@
   "medianFilterWindowSize": 10,
   "ignoreCRT": true,
   "homingVoltage": {
-    "value": -3.0,
+    "value": -5.0,
     "unit": "Volt"
   },
   "homingVelocityThresholdMetersPerSecond": 0.1,
@@ -62,7 +62,7 @@
     "unit": "Second"
   },
   "homingMaxUnmovingTime": {
-    "value": 0.25,
+    "value": 0.5,
     "unit": "Second"
   },
   "homingVelocityFilterWindowSize": 5,
@@ -75,7 +75,7 @@
     "unit": "Meter"
   },
   "L4MinHeightAbove": {
-    "value": 1.45,
+    "value": 1.4,
     "unit": "Meter"
   },
   "L2MaxHeightBelow": {
