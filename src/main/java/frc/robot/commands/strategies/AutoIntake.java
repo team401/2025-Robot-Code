@@ -17,24 +17,36 @@ public class AutoIntake extends Command {
 
   private FieldTarget intakeFieldTarget;
 
+  private GamePiece gamePiece;
+
   public AutoIntake(
-      Drive drive, ScoringSubsystem scoring, DesiredLocation intakeLocation, FieldTarget target) {
+      Drive drive,
+      ScoringSubsystem scoring,
+      GamePiece piece,
+      DesiredLocation intakeLocation,
+      FieldTarget target) {
     this.drive = drive;
     this.scoringSubsystem = scoring;
     this.intakeLocation = intakeLocation;
     this.intakeFieldTarget = target;
+    this.gamePiece = piece;
     // we dont want to require subsystems (it prevents drive otf from running)
   }
 
   public void initialize() {
     if (drive != null) {
-      drive.setDesiredIntakeLocation(intakeLocation);
-      drive.setGoToIntake(true);
+      if (gamePiece == GamePiece.Coral) {
+        drive.setDesiredIntakeLocation(intakeLocation);
+        drive.setGoToIntake(true);
+      } else {
+        drive.setDesiredLocation(intakeLocation);
+        drive.setGoToIntake(false);
+      }
       drive.fireTrigger(DriveTrigger.BeginOTF);
     }
 
     if (scoringSubsystem != null) {
-      scoringSubsystem.setGamePiece(GamePiece.Coral);
+      scoringSubsystem.setGamePiece(gamePiece);
       scoringSubsystem.setTarget(intakeFieldTarget);
       scoringSubsystem.fireTrigger(ScoringTrigger.BeginIntake);
     }

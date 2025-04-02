@@ -94,6 +94,9 @@ public class BlueFieldLocations {
   public Translation2d blueCoralStationLeftTranslation = new Translation2d(1.2, 7);
   public Rotation2d blueCoralStationLeftRotation = new Rotation2d(Units.degreesToRadians(-60));
 
+  public Translation2d blueNetTranslation = new Translation2d(7.459, 6.284);
+  public Rotation2d blueNetRotation = new Rotation2d(0);
+
   // left stack center (1.2, 5.85)
   public Translation2d coralAlgaeStackLeftTopCorner = new Translation2d(1.45, 6.1);
   public Translation2d coralAlgaeStackLeftBottomCorner = new Translation2d(0.95, 5.6);

@@ -185,20 +185,8 @@ public class StrategyManager {
    * @param strategy AutoStrategy defined in java and json
    */
   public void addActionsFromAutoStrategy(AutoStrategy strategy) {
-    for (int i = 0; i < strategy.scoringLocations.size(); i++) {
-      FieldTarget scoringLevel =
-          strategy.scoringLevels.size() > i ? strategy.scoringLevels.get(i) : FieldTarget.L1;
-      // add scoring
-      this.addAction(
-          new Action(
-              ActionType.Score, GamePiece.Coral, strategy.scoringLocations.get(i), scoringLevel));
-
-      if (!(i == strategy.scoringLocations.size() - 1 && !strategy.intakeAfterLastScore)) {
-        // intake after each score, only if it is not the last scoring location and the auto isn't
-        // configured to not intake after last score
-        this.addAction(
-            new Action(ActionType.Intake, GamePiece.Coral, strategy.intakeLocation, null));
-      }
+    for (Action action : strategy.actions) {
+      this.addAction(action);
     }
   }
 
@@ -218,7 +206,8 @@ public class StrategyManager {
         case Mixed:
         case Manual:
         default:
-          return new AutoIntake(drive, scoringSubsystem, action.location(), action.scoringTarget());
+          return new AutoIntake(
+              drive, scoringSubsystem, action.piece(), action.location(), action.scoringTarget());
       }
     } else if (action.type() == ActionType.Score) {
       switch (this.autonomyMode) {
@@ -226,7 +215,8 @@ public class StrategyManager {
         case Mixed:
         case Manual:
         default:
-          return new AutoScore(drive, scoringSubsystem, action.location(), action.scoringTarget());
+          return new AutoScore(
+              drive, scoringSubsystem, action.piece(), action.location(), action.scoringTarget());
       }
     } else {
       return null;

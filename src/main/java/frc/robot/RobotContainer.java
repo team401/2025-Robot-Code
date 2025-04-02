@@ -172,7 +172,7 @@ public class RobotContainer {
         new File(Filesystem.getDeployDirectory().toPath().resolve("auto").toString());
     strategyContainer = new AutoStrategyContainer(autoDirectory.listFiles());
     for (AutoStrategy strategy : strategyContainer.getStrategies()) {
-      if (strategy.autoStrategyName.equals("1PieceBarge")) {
+      if (strategy.autoStrategyName.equals("RW")) {
         autoChooser.setDefaultOption(strategy.autoStrategyName, strategy);
         firstDefault = true;
       } else {

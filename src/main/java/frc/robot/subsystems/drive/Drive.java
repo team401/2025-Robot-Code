@@ -153,6 +153,7 @@ public class Drive implements DriveTemplate {
     Processor,
     CoralStationLeft,
     CoralStationRight,
+    Net
   }
 
   public static final DesiredLocation[] reefCoralLocations = {
@@ -185,7 +186,8 @@ public class Drive implements DriveTemplate {
     DesiredLocation.Reef11,
     DesiredLocation.Processor,
     DesiredLocation.CoralStationLeft,
-    DesiredLocation.CoralStationRight
+    DesiredLocation.CoralStationRight,
+    DesiredLocation.Net
   };
 
   public static final DesiredLocation[] reefAlgaeLocations = {
