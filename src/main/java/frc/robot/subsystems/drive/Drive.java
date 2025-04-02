@@ -395,7 +395,8 @@ public class Drive implements DriveTemplate {
         && this.getPose()
                 .getTranslation()
                 .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation())
-            < 1) {
+            < JsonConstants.drivetrainConstants.teleopOTFIntakeThresholdMeters
+        && DriverStation.isTeleop()) {
       setGoToIntake(false);
     }
 
