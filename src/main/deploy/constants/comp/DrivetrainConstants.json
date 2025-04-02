@@ -75,7 +75,7 @@
       "ControlTimesyncFreqHz": 0.0
     },
     "CurrentLimits": {
-      "StatorCurrentLimit": 120.0,
+      "StatorCurrentLimit": 80.0,
       "StatorCurrentLimitEnable": true,
       "SupplyCurrentLimit": 70.0,
       "SupplyCurrentLimitEnable": true,
