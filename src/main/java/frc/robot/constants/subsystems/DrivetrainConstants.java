@@ -106,7 +106,7 @@ public class DrivetrainConstants {
   public final Double otfPoseDistanceLimit = 0.1;
   public final Double otfPoseEndingVelocity = 0.5;
 
-  / ** When within this distance of the OTF pose in teleop, drive will not OTF to intake */
+  /** When within this distance of the OTF pose in teleop, drive will not OTF to intake */
   public final Double teleopOTFIntakeThresholdMeters = 1.0;
 
   /**
