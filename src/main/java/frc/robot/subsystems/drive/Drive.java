@@ -376,6 +376,7 @@ public class Drive implements DriveTemplate {
         .configure(DriveState.Lineup)
         .permit(DriveTrigger.CancelLineup, DriveState.Joystick)
         .permit(DriveTrigger.CancelAutoAlignment, DriveState.Joystick)
+        .permit(DriveTrigger.BeginLinear, DriveState.LinearDrive)
         .permit(DriveTrigger.BeginOTF, DriveState.OTF);
 
     stateMachine = new StateMachine<>(stateMachineConfiguration, DriveState.Joystick);

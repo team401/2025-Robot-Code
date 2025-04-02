@@ -15,6 +15,8 @@ import frc.robot.constants.JsonConstants;
 import frc.robot.constants.subsystems.DrivetrainConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
+import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 import org.littletonrobotics.junction.Logger;
 
 public class LinearDriveState implements PeriodicStateInterface {
@@ -44,7 +46,7 @@ public class LinearDriveState implements PeriodicStateInterface {
   private double kDriveHeadingMaxAcceleration =
       DrivetrainConstants.synced.getObject().kDriveHeadingMaxAcceleration;
 
-  private double lineupErrorMargin = 0.05;
+  private double linearDriveErrorMargin = 0.25;
 
   private ProfiledPIDController driveController =
       new ProfiledPIDController(
@@ -92,17 +94,18 @@ public class LinearDriveState implements PeriodicStateInterface {
             JsonConstants.drivetrainConstants.kDriveToPointHeadingI,
             JsonConstants.drivetrainConstants.kDriveToPointHeadingD);
 
-    headingController.enableContinuousInput(-Math.PI, Math.PI);
     headingController.reset();
+    headingController.enableContinuousInput(-Math.PI, Math.PI);
 
-    lineupErrorMargin = JsonConstants.drivetrainConstants.lineupErrorMargin;
+    // Using the lineup margin as the linear drive margin is totally wrong:
+    // linearDriveErrorMargin = JsonConstants.drivetrainConstants.lineupErrorMargin;
 
-    drive.enableReefCenterAlignment();
+    // drive.enableReefCenterAlignment();
   }
 
   public void onExit(Transition transition) {
     // Disable reef center alignment in case we stop linear driving before reaching phase 2
-    drive.disableReefCenterAlignment();
+    // drive.disableReefCenterAlignment();
   }
 
   /**
@@ -315,7 +318,7 @@ public class LinearDriveState implements PeriodicStateInterface {
           System.out.println("Switched to phase 2 instantly");
         }
 
-        drive.disableReefCenterAlignment();
+        // drive.disableReefCenterAlignment();
       }
 
       // This has to be here because distanceToCurrentGoal is used for PID reset adjustment meme
@@ -324,8 +327,16 @@ public class LinearDriveState implements PeriodicStateInterface {
       hasRunPhase1 = true;
     }
 
+    if (distanceToGoal < JsonConstants.drivetrainConstants.otfWarmupDistance
+        && ScoringSubsystem.getInstance() != null) {
+      ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+    } else if (distanceToGoal < JsonConstants.drivetrainConstants.otfFarWarmupDistance
+        && ScoringSubsystem.getInstance() != null) {
+      ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartFarWarmup);
+    }
+
     // We only exit this state when the phase 2 pose has been achieved.
-    if (distanceToGoal < lineupErrorMargin) {
+    if (distanceToGoal < linearDriveErrorMargin) {
       if (drive.isDesiredLocationReef()) {
         drive.fireTrigger(DriveTrigger.BeginLineup);
       } else {

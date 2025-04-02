@@ -154,6 +154,7 @@ public class ElevatorIOTalonFX implements ElevatorIO {
     inputs.smallEncoderPos.mut_replace(smallCANCoder.getPosition().getValue());
 
     inputs.largeEncoderVel.mut_replace(largeCANCoder.getVelocity().getValue());
+    inputs.leadMotorAngle.mut_replace(leadMotor.getPosition().getValue());
 
     StatusCode refreshStatus = BaseStatusSignal.refreshAll(largeCANcoderAbsolutePosition);
 

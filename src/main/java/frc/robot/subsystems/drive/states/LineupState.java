@@ -427,7 +427,7 @@ public class LineupState implements PeriodicStateInterface {
     } else {
       observation = updateDistanceFromCachedPose();
       if (!observation.isValid()) {
-        // go back to otf?
+        drive.fireTrigger(DriveTrigger.BeginLinear);
       }
     }
 
