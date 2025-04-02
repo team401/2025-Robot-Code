@@ -24,4 +24,6 @@ public class VisionConstants {
           Units.inchesToMeters(-5.5),
           Units.inchesToMeters(12.0),
           new Rotation3d(0, 0, 0));
+
+  public final Integer minimumVisionMeasurementInitCount = 10;
 }

@@ -122,6 +122,8 @@ public class Drive implements DriveTemplate {
 
   private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
 
+  private int visionValueCount = 0;
+
   public ProfiledPIDController angleController =
       new ProfiledPIDController(
           JsonConstants.drivetrainConstants.rotationAlignKp,
@@ -387,6 +389,11 @@ public class Drive implements DriveTemplate {
     if (warmupCommand != null && warmupCommand.isScheduled()) {
       warmupCommand.cancel();
     }
+  }
+
+  @AutoLogOutput(key = "Vision/MeasurementCount")
+  public int getVisionMeasurementCount() {
+    return visionValueCount;
   }
 
   /** remove algae coral stack obstacles for on the fly */
@@ -1046,6 +1053,7 @@ public class Drive implements DriveTemplate {
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
+    visionValueCount += 1;
     poseEstimator.addVisionMeasurement(
         visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
   }
