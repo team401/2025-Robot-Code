@@ -1,14 +1,20 @@
 package frc.robot.subsystems.scoring.states;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
+import edu.wpi.first.math.filter.MedianFilter;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
+import frc.robot.subsystems.scoring.ElevatorIO.ElevatorOutputMode;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
@@ -34,6 +40,14 @@ public class IntakeState implements PeriodicStateInterface {
   /** Are we currently counting rotations to stop intake */
   private boolean isCounting;
 
+  /** Track if the elevator has moved in the intake state. */
+  private boolean hasMovedYet = false;
+
+  private MedianFilter velocityFilter =
+      new MedianFilter(JsonConstants.elevatorConstants.homingVelocityFilterWindowSize);
+
+  private Timer homingTimer = new Timer();
+
   public IntakeState(ScoringSubsystem scoringSubsystem) {
     this.scoringSubsystem = scoringSubsystem;
   }
@@ -42,10 +56,21 @@ public class IntakeState implements PeriodicStateInterface {
     detectedAngle = Rotations.mutable(0.0);
     isCounting = false;
     Logger.recordOutput("claw/intake/diff", 0.0);
+
+    // Reset variables to do homing.
+    hasMovedYet = false;
+    velocityFilter.reset();
+    homingTimer.reset();
+    homingTimer.start();
   }
 
   // @Override
   public void periodic() {
+    if (!DriverStation.isEnabled()) {
+      homingTimer.restart();
+      return;
+    }
+
     if (scoringSubsystem.getGamePiece() == GamePiece.Algae) {
       scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeIntakeVoltage);
     } else {
@@ -87,6 +112,36 @@ public class IntakeState implements PeriodicStateInterface {
 
     scoringSubsystem.setGoalSetpoint(setpoint);
 
+    // Seed the elevator to 0 when at the bottom of intake when intaking a coral.
+    if (scoringSubsystem.getGamePiece() == GamePiece.Coral) {
+      scoringSubsystem.setElevatorOverrideVoltage(JsonConstants.elevatorConstants.homingVoltage);
+      scoringSubsystem.setElevatorOverrideMode(ElevatorOutputMode.Voltage);
+
+      double filteredAbsVelocity =
+          velocityFilter.calculate(scoringSubsystem.getElevatorVelocity().abs(MetersPerSecond));
+      if (filteredAbsVelocity
+          < JsonConstants.elevatorConstants.homingVelocityThresholdMetersPerSecond) {
+        // If the elevator is NOT moving:
+        if (hasMovedYet) {
+          // If it HAS moved yet, that means it's moved and then come to rest, therefore we are at
+          // zero
+          System.out.println("Homed by moving then stopping");
+          scoringSubsystem.seedElevatorToZero();
+        } else if (homingTimer.hasElapsed(
+            JsonConstants.elevatorConstants.homingMaxUnmovingTime.in(Seconds))) {
+          // If it hasn't moved yet, and it's been longer than our threshold, we're satisfied that
+          // it
+          // was already at zero
+          System.out.println("Homed by never moving");
+          scoringSubsystem.seedElevatorToZero();
+        }
+      } else {
+        // If the elevator IS moving, we keep track of that in hasMovedYet so we'll know when it
+        // stops
+        hasMovedYet = true;
+      }
+    }
+
     switch (scoringSubsystem.getGamePiece()) {
       case Coral:
         if (scoringSubsystem.isCoralDetected()) {
@@ -117,5 +172,10 @@ public class IntakeState implements PeriodicStateInterface {
 
   public static void setIntakeAnglePastAlgaerange(Angle newAngle) {
     intakeAnglePastAlgaeRange = newAngle;
+  }
+
+  @Override
+  public void onExit(Transition transition) {
+    scoringSubsystem.setElevatorOverrideMode(ElevatorOutputMode.ClosedLoop);
   }
 }

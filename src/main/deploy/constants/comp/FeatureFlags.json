@@ -3,5 +3,8 @@
   "runVision": false,
   "runScoring": true,
   "runClimb": true,
+  "runVision": true,
+  "runScoring": true,
+  "runClimb": false,
   "runRamp": true
 }
