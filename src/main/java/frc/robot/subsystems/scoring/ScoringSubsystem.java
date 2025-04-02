@@ -774,6 +774,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     MutAngle wristMaxAngle = JsonConstants.wristConstants.wristMaxMaxAngle.mutableCopy();
 
     Angle wristAngle = wristMechanism.getWristAngle();
+    Angle wristGoalAngle = wristMechanism.getWristGoalAngle();
 
     boolean wristAboveChassis = false;
     // If the elevator is below the minimum safe height for wrist to be down, clamp wrist above its
@@ -867,6 +868,36 @@ public class ScoringSubsystem extends MonitoredSubsystem {
           (Angle) Measure.min(wristMaxAngle, JsonConstants.wristConstants.algaeUnderCrossbarAngle));
     }
 
+    boolean wristInDangerZone =
+        wristAngle.gt(JsonConstants.wristConstants.crossbarBottomCollisionAngle)
+            && wristAngle.lt(JsonConstants.wristConstants.crossbarTopCollisionAngle);
+    boolean willPassDangerZoneUp =
+        wristAngle.lt(JsonConstants.wristConstants.crossbarBottomCollisionAngle)
+            && wristGoalAngle.gt(JsonConstants.wristConstants.crossbarBottomCollisionAngle);
+    boolean willPassDangerZoneDown =
+        wristAngle.gt(JsonConstants.wristConstants.crossbarTopCollisionAngle)
+            && wristGoalAngle.lt(JsonConstants.wristConstants.crossbarTopCollisionAngle);
+    boolean willPassDangerZone = willPassDangerZoneUp || willPassDangerZoneDown;
+
+    boolean canWristHitCrossbar = wristInDangerZone || willPassDangerZone;
+
+    if (canWristHitCrossbar) {
+      // If the wrist can hit the crossbar, keep elevator on the same side of the crossbar that it
+      // is
+      if (elevatorHeight.lt(JsonConstants.elevatorConstants.crossbarTopCollisionHeight)) {
+        elevatorMaxHeight.mut_replace(
+            (Distance)
+                Measure.min(
+                    elevatorMaxHeight,
+                    JsonConstants.elevatorConstants.crossbarBottomCollisionHeight));
+      } else {
+        elevatorMinHeight.mut_replace(
+            (Distance)
+                Measure.max(
+                    elevatorMinHeight, JsonConstants.elevatorConstants.crossbarTopCollisionHeight));
+      }
+    }
+
     Logger.recordOutput("scoring/clamps/closeToReef", closeToReef);
     Logger.recordOutput("scoring/clamps/wristInToAvoidReefBase", wristInToAvoidReefBase);
     Logger.recordOutput("scoring/clamps/elevatorUpToAvoidReefBase", elevatorUpToAvoidReefBase);
@@ -874,6 +905,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     Logger.recordOutput("scoring/clamps/elevatorBelowReefLevel", elevatorBelowReefLevel);
     Logger.recordOutput("scoring/clamps/elevatorAboveReefLevel", elevatorAboveReefLevel);
     Logger.recordOutput("scoring/clamps/wristDownForAlgae", wristDownForAlgae);
+    Logger.recordOutput("scoring/clamps/canWristHitCrossbar", canWristHitCrossbar);
 
     elevatorMechanism.setAllowedRangeOfMotion(elevatorMinHeight, elevatorMaxHeight);
     wristMechanism.setAllowedRangeOfMotion(wristMinAngle, wristMaxAngle);

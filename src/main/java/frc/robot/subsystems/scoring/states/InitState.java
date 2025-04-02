@@ -83,7 +83,6 @@ public class InitState implements PeriodicStateInterface {
       // If the elevator IS moving, we keep track of that in hasMovedYet so we'll know when it stops
       hasMovedYet = true;
     }
-    ;
 
     if (homingTimer.hasElapsed(JsonConstants.elevatorConstants.homingMaxTime.in(Seconds))) {
       // If it's been a really long time, give up and say we're at zero
