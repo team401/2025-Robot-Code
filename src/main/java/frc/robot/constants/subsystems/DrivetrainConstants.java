@@ -252,6 +252,9 @@ public class DrivetrainConstants {
   public final Double kPositionTolerance = 0.25;
   public final Double kVelocityTolerance = 0.1;
 
+  public final Double kDriveTranslationMaxVelocitySlow = 1.5;
+  public final Double kDriveTranslationMaxAccelerationSlow = 1.0;
+
   public final Double kDriveToPointHeadingP = 10.0;
   public final Double kDriveToPointHeadingI = 0.0;
   public final Double kDriveToPointHeadingD = 0.0;

@@ -16,6 +16,7 @@ import frc.robot.constants.subsystems.DrivetrainConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 import org.littletonrobotics.junction.Logger;
 
@@ -76,14 +77,21 @@ public class LinearDriveState implements PeriodicStateInterface {
 
     Pose2d phase1Pose = findPhase1Pose(goalPose);
 
+    TrapezoidProfile.Constraints driveConstraints =
+        drive.shouldLinearDriveSlowly()
+            ? new TrapezoidProfile.Constraints(
+                JsonConstants.drivetrainConstants.kDriveTranslationMaxVelocitySlow,
+                JsonConstants.drivetrainConstants.kDriveTranslationMaxAccelerationSlow)
+            : new TrapezoidProfile.Constraints(
+                JsonConstants.drivetrainConstants.kDriveTranslationMaxVelocity,
+                JsonConstants.drivetrainConstants.kDriveTranslationMaxAcceleration);
+
     driveController =
         new ProfiledPIDController(
             JsonConstants.drivetrainConstants.kDriveToPointTranslationP,
             JsonConstants.drivetrainConstants.kDriveToPointTranslationI,
             JsonConstants.drivetrainConstants.kDriveToPointTranslationD,
-            new TrapezoidProfile.Constraints(
-                JsonConstants.drivetrainConstants.kDriveTranslationMaxVelocity,
-                JsonConstants.drivetrainConstants.kDriveTranslationMaxAcceleration));
+            driveConstraints);
 
     double distanceToGoal = currentPose.getTranslation().getDistance(phase1Pose.getTranslation());
     driveController.reset(new State(distanceToGoal, 0.0));
@@ -235,7 +243,16 @@ public class LinearDriveState implements PeriodicStateInterface {
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueCoralStationLeftTranslation,
                 JsonConstants.blueFieldLocations.blueCoralStationLeftRotation);
+      case AutoLine:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redAutoLineTranslation,
+                JsonConstants.redFieldLocations.redAutoLineRotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueAutoLineTranslation,
+                JsonConstants.blueFieldLocations.blueAutoLineRotation);
       default:
+        System.out.println("WARNING: Unknown field location " + driveInput.getDesiredLocation());
         return null;
     }
   }
@@ -298,7 +315,10 @@ public class LinearDriveState implements PeriodicStateInterface {
         || Math.abs(angleToTarget) < JsonConstants.drivetrainConstants.kDriveToPointPhase2Angle) {
       currentGoalPose = goalPose;
 
-      endVelocityGoal = JsonConstants.drivetrainConstants.kDriveToPointEndVelocity;
+      // Slow linear drive should end at zero, normal linear drive should end at correct end speed
+      if (!drive.shouldLinearDriveSlowly()) {
+        endVelocityGoal = JsonConstants.drivetrainConstants.kDriveToPointEndVelocity;
+      }
 
       if (!hasEnteredPhase2) {
         hasEnteredPhase2 = true;
@@ -337,7 +357,9 @@ public class LinearDriveState implements PeriodicStateInterface {
 
     // We only exit this state when the phase 2 pose has been achieved.
     if (distanceToGoal < linearDriveErrorMargin) {
-      if (drive.isDesiredLocationReef()) {
+      if (drive.isDesiredLocationReef()
+          && (ScoringSubsystem.getInstance() == null
+              || ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral)) {
         drive.fireTrigger(DriveTrigger.BeginLineup);
       } else {
         drive.fireTrigger(DriveTrigger.CancelLinear);
