@@ -242,6 +242,29 @@ public class DrivetrainConstants {
   public final Distance kBackRightXPos = Inches.of(-13);
   public final Distance kBackRightYPos = Inches.of(-11.5);
 
+  // Linear Drive
+
+  public final Double kDriveToPointTranslationP = 5.0;
+  public final Double kDriveToPointTranslationI = 0.0;
+  public final Double kDriveToPointTranslationD = 0.0;
+  public final Double kDriveTranslationMaxVelocity = 4.5;
+  public final Double kDriveTranslationMaxAcceleration = 3.8;
+  public final Double kPositionTolerance = 0.25;
+  public final Double kVelocityTolerance = 0.1;
+
+  public final Double kDriveToPointHeadingP = 10.0;
+  public final Double kDriveToPointHeadingI = 0.0;
+  public final Double kDriveToPointHeadingD = 0.0;
+  public final Double kDriveHeadingMaxVelocity = Math.PI;
+  public final Double kDriveHeadingMaxAcceleration = Math.PI / 2.0;
+  public final Double kAngleTolerance = 0.005;
+  public final Double kAngularVelocityTolerance = 0.005;
+
+  public final Double kDriveToPointEndVelocity = 0.5;
+  public final Double kDriveToPointPhase2Distance = 1.0;
+  public final Double kDriveToPointPhase2Angle = Math.toRadians(45.0);
+  public final Double lineupErrorMargin = 0.05;
+
   /**
    * Creates a CommandSwerveDrivetrain instance. This should only be called once in your robot
    * program,.

@@ -126,9 +126,6 @@ public class ScoringSubsystem extends MonitoredSubsystem {
 
   private BooleanSupplier isDriveLinedUpSupplier;
 
-  /** Whether we detected an algae using current bc canrange dead */
-  private boolean algaeCurrentDetected = false;
-
   public enum FieldTarget {
     L1,
     L2,
@@ -563,7 +560,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   public boolean isAlgaeDetected() {
     if (JsonConstants.scoringFeatureFlags.runClaw) {
-      return clawMechanism.isAlgaeDetected() || algaeCurrentDetected;
+      return clawMechanism.isAlgaeDetected();
     } else {
       return false;
     }
@@ -678,7 +675,6 @@ public class ScoringSubsystem extends MonitoredSubsystem {
       determineProtectionClamps();
     }
 
-    Logger.recordOutput("scoring/algaeCurrentDetected", algaeCurrentDetected);
     Logger.recordOutput("scoring/state", stateMachine.getCurrentState());
     Logger.recordOutput("scoring/isDriveLinedUp", isDriveLinedUpSupplier.getAsBoolean());
   }
@@ -774,6 +770,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     MutAngle wristMaxAngle = JsonConstants.wristConstants.wristMaxMaxAngle.mutableCopy();
 
     Angle wristAngle = wristMechanism.getWristAngle();
+    Angle wristGoalAngle = wristMechanism.getWristGoalAngle();
 
     boolean wristAboveChassis = false;
     // If the elevator is below the minimum safe height for wrist to be down, clamp wrist above its
@@ -819,7 +816,9 @@ public class ScoringSubsystem extends MonitoredSubsystem {
             (Angle) Measure.max(wristMinAngle, JsonConstants.wristConstants.minReefSafeAngle));
       }
 
-      if (ReefAvoidanceHelper.willPassReefLevel(elevatorHeight, elevatorGoalHeight)) {
+      if (getGamePiece() == GamePiece.Coral
+          && ReefAvoidanceHelper.willPassReefLevel(elevatorHeight, elevatorGoalHeight)) {
+        // Don't run this protection when holding an algae
         wristInToPassReef = true;
         // If we will pass a reef level, clamp the wrist to be in a safe position to pass the reef
         wristMinAngle.mut_replace(
@@ -867,6 +866,36 @@ public class ScoringSubsystem extends MonitoredSubsystem {
           (Angle) Measure.min(wristMaxAngle, JsonConstants.wristConstants.algaeUnderCrossbarAngle));
     }
 
+    boolean wristInDangerZone =
+        wristAngle.gt(JsonConstants.wristConstants.crossbarBottomCollisionAngle)
+            && wristAngle.lt(JsonConstants.wristConstants.crossbarTopCollisionAngle);
+    boolean willPassDangerZoneUp =
+        wristAngle.lt(JsonConstants.wristConstants.crossbarBottomCollisionAngle)
+            && wristGoalAngle.gt(JsonConstants.wristConstants.crossbarBottomCollisionAngle);
+    boolean willPassDangerZoneDown =
+        wristAngle.gt(JsonConstants.wristConstants.crossbarTopCollisionAngle)
+            && wristGoalAngle.lt(JsonConstants.wristConstants.crossbarTopCollisionAngle);
+    boolean willPassDangerZone = willPassDangerZoneUp || willPassDangerZoneDown;
+
+    boolean canWristHitCrossbar = wristInDangerZone || willPassDangerZone;
+
+    if (canWristHitCrossbar) {
+      // If the wrist can hit the crossbar, keep elevator on the same side of the crossbar that it
+      // is
+      if (elevatorHeight.lt(JsonConstants.elevatorConstants.crossbarTopCollisionHeight)) {
+        elevatorMaxHeight.mut_replace(
+            (Distance)
+                Measure.min(
+                    elevatorMaxHeight,
+                    JsonConstants.elevatorConstants.crossbarBottomCollisionHeight));
+      } else {
+        elevatorMinHeight.mut_replace(
+            (Distance)
+                Measure.max(
+                    elevatorMinHeight, JsonConstants.elevatorConstants.crossbarTopCollisionHeight));
+      }
+    }
+
     Logger.recordOutput("scoring/clamps/closeToReef", closeToReef);
     Logger.recordOutput("scoring/clamps/wristInToAvoidReefBase", wristInToAvoidReefBase);
     Logger.recordOutput("scoring/clamps/elevatorUpToAvoidReefBase", elevatorUpToAvoidReefBase);
@@ -874,6 +903,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     Logger.recordOutput("scoring/clamps/elevatorBelowReefLevel", elevatorBelowReefLevel);
     Logger.recordOutput("scoring/clamps/elevatorAboveReefLevel", elevatorAboveReefLevel);
     Logger.recordOutput("scoring/clamps/wristDownForAlgae", wristDownForAlgae);
+    Logger.recordOutput("scoring/clamps/canWristHitCrossbar", canWristHitCrossbar);
 
     elevatorMechanism.setAllowedRangeOfMotion(elevatorMinHeight, elevatorMaxHeight);
     wristMechanism.setAllowedRangeOfMotion(wristMinAngle, wristMaxAngle);
@@ -898,17 +928,5 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   public static ScoringSubsystem getInstance() {
     return instance;
-  }
-
-  public boolean isAlgaeCurrentDetected() {
-    if (clawMechanism != null) {
-      return clawMechanism.isAlgaeCurrentDetected();
-    }
-
-    return false;
-  }
-
-  public void setAlgaeCurrentDetected(boolean detected) {
-    algaeCurrentDetected = detected;
   }
 }

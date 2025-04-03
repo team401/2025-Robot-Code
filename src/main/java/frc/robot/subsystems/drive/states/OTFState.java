@@ -1,7 +1,6 @@
 package frc.robot.subsystems.drive.states;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.path.PathConstraints;
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
@@ -26,9 +25,6 @@ public class OTFState implements PeriodicStateInterface {
   }
 
   public void onEntry(Transition transition) {
-    if (PathfindingCommand.warmupCommand().isScheduled()) {
-      PathfindingCommand.warmupCommand().cancel();
-    }
     driveToPose = this.getDriveToPoseCommand();
     System.out.println(driveToPose == null);
     if (driveToPose == null) {

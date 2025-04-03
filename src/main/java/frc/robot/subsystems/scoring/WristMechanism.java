@@ -297,4 +297,9 @@ public class WristMechanism {
   public void setMotorsDisabled(boolean disabled) {
     io.setMotorsDisabled(disabled);
   }
+
+  /** Get the current unclamped angle of the wrist */
+  public Angle getWristGoalAngle() {
+    return goalAngle;
+  }
 }

@@ -95,7 +95,7 @@ public class LineupState implements PeriodicStateInterface {
     drive.setDriveLinedUp(false);
 
     // cancel rotation lock on center
-    drive.disableAlign();
+    drive.disableReefCenterAlignment();
 
     // dont rely on previous estimates
     latestObservation = null;
@@ -414,7 +414,8 @@ public class LineupState implements PeriodicStateInterface {
 
       hadObservationYet = true;
       observationAge = 0;
-    } else if (otherCameraObs != null && otherCameraObs.isValid()) {
+    } else if (otherCameraObs != null
+        && otherCameraObs.isValid()) { // Issues were had initially with this enabled on 3/27
       // check if the other camera has observation (maybe we switched to other pole or camera got
       // unplugged)
       usingOtherCamera = true;
@@ -426,7 +427,7 @@ public class LineupState implements PeriodicStateInterface {
     } else {
       observation = updateDistanceFromCachedPose();
       if (!observation.isValid()) {
-        // go back to otf?
+        drive.fireTrigger(DriveTrigger.BeginLinear);
       }
     }
 
