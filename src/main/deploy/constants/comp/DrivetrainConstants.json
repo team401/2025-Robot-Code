@@ -59,6 +59,7 @@
   "lineupAlongTrackSlowDownDistance": 0.1,
   "lineupAlongTrackSlowDownMultiplier": 0.5,
   "otfPoseEndingVelocity": 0.0,
+  "teleopOTFIntakeThresholdMeters": 2.0,
   "kSteerClosedLoopOutput": "Voltage",
   "kDriveClosedLoopOutput": "TorqueCurrentFOC",
   "kDriveMotorType": "TalonFX_Integrated",
