@@ -43,6 +43,7 @@ public class ScoreState implements PeriodicStateInterface {
         } else {
           scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.coralScoreVoltage);
         }
+
         if (!scoringSubsystem.isCoralDetected()) {
           scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
         }
@@ -51,10 +52,10 @@ public class ScoreState implements PeriodicStateInterface {
         if (scoringSubsystem.getAlgaeScoreTarget() == FieldTarget.Net) {
           // Only run claw rollers when elevator is at setpoint
           if (scoringSubsystem
-              .getElevatorHeight()
+              .getWristAngle()
               .isNear(
-                  JsonConstants.scoringSetpoints.net.elevatorHeight(),
-                  JsonConstants.elevatorConstants.elevatorSetpointEpsilon)) {
+                  JsonConstants.scoringSetpoints.net.wristAngle(),
+                  JsonConstants.wristConstants.netShotRollerWristEpsilon)) {
             scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
           } else {
             scoringSubsystem.setClawRollerVoltage(Volts.zero());
@@ -62,10 +63,6 @@ public class ScoreState implements PeriodicStateInterface {
         } else {
           // If scoring algae but not in the net, run the rollers (score processor as normal)
           scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
-        }
-
-        if (JsonConstants.scoringFeatureFlags.runClaw) {
-          scoringSubsystem.setAlgaeCurrentDetected(scoringSubsystem.isAlgaeCurrentDetected());
         }
 
         if (!scoringSubsystem.isAlgaeDetected()) {
