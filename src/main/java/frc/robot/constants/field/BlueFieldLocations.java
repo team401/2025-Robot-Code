@@ -58,6 +58,24 @@ public class BlueFieldLocations {
   public Translation2d blueReefOTF11Translation = new Translation2d(5.5, 5.6);
   public Rotation2d blueReefOTF11Rotation = new Rotation2d(Math.toRadians(-120));
 
+  public Translation2d blueReefAlgaeOTF0Translation = new Translation2d(6.102, 4.034);
+  public Rotation2d blueReefAlgaeOTF0Rotation = new Rotation2d(Math.toRadians(-180));
+
+  public Translation2d blueReefAlgaeOTF1Translation = new Translation2d(5.322, 2.647);
+  public Rotation2d blueReefAlgaeOTF1Rotation = new Rotation2d(Math.toRadians(120));
+
+  public Translation2d blueReefAlgaeOTF2Translation = new Translation2d(3.667, 2.621);
+  public Rotation2d blueReefAlgaeOTF2Rotation = new Rotation2d(Math.toRadians(60));
+
+  public Translation2d blueReefAlgaeOTF3Translation = new Translation2d(2.879, 4.001);
+  public Rotation2d blueReefAlgaeOTF3Rotation = new Rotation2d(Math.toRadians(0));
+
+  public Translation2d blueReefAlgaeOTF4Translation = new Translation2d(3.661, 5.435);
+  public Rotation2d blueReefAlgaeOTF4Rotation = new Rotation2d(Math.toRadians(-60));
+
+  public Translation2d blueReefAlgaeOTF5Translation = new Translation2d(5.312, 5.435);
+  public Rotation2d blueReefAlgaeOTF5Rotation = new Rotation2d(Math.toRadians(-120));
+
   public Translation2d blueReef0Translation = new Translation2d(5.285, 4.186);
   public Translation2d blueReef1Translation = new Translation2d(5.285, 3.861);
 

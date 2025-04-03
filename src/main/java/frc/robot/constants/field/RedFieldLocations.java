@@ -58,6 +58,24 @@ public class RedFieldLocations {
   public Translation2d redReefOTF11Translation = new Translation2d(12.2, 2.6);
   public Rotation2d redReefOTF11Rotation = new Rotation2d(Math.toRadians(60));
 
+  public Translation2d redReefAlgaeOTF0Translation = new Translation2d(11.403, 4.049);
+  public Rotation2d redReefAlgaeOTF0Rotation = new Rotation2d(Math.toRadians(0));
+
+  public Translation2d redReefAlgaeOTF1Translation = new Translation2d(12.232, 5.421);
+  public Rotation2d redReefAlgaeOTF1Rotation = new Rotation2d(Math.toRadians(-60));
+
+  public Translation2d redReefAlgaeOTF2Translation = new Translation2d(13.871, 5.421);
+  public Rotation2d redReefAlgaeOTF2Rotation = new Rotation2d(Math.toRadians(-120));
+
+  public Translation2d redReefAlgaeOTF3Translation = new Translation2d(14.673, 4.025);
+  public Rotation2d redReefAlgaeOTF3Rotation = new Rotation2d(Math.toRadians(180));
+
+  public Translation2d redReefAlgaeOTF4Translation = new Translation2d(13.921, 2.637);
+  public Rotation2d redReefAlgaeOTF4Rotation = new Rotation2d(Math.toRadians(120));
+
+  public Translation2d redReefAlgaeOTF5Translation = new Translation2d(12.203, 2.627);
+  public Rotation2d redReefAlgaeOTF5Rotation = new Rotation2d(Math.toRadians(120));
+
   public Translation2d redReef0Translation = new Translation2d(12.273, 3.867);
   public Translation2d redReef1Translation = new Translation2d(12.273, 4.187);
 

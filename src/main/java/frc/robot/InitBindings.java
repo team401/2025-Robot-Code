@@ -192,7 +192,7 @@ public final class InitBindings {
                           || ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Algae) {
                         DesiredLocation desiredLocation =
                             ReefLineupUtil.getClosestAlgaeLocation(drive.getPose());
-                        // drive.setDesiredIntakeLocation(desiredLocation);
+                        drive.setDesiredIntakeLocation(desiredLocation);
 
                         // Set algae level automatically
                         if (ScoringSubsystem.getInstance() != null) {
@@ -214,11 +214,13 @@ public final class InitBindings {
                       }
                     case Mixed:
                       // Start auto align if in mixed autonomy
-                      if (ScoringSubsystem.getInstance() != null
-                          && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
-                        drive.setGoToIntake(true);
-                        drive.fireTrigger(DriveTrigger.BeginOTF);
-                      }
+                      drive.setGoToIntake(true);
+                      drive.fireTrigger(DriveTrigger.BeginOTF);
+                      // if (ScoringSubsystem.getInstance() != null
+                      //     && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+                      //   drive.setGoToIntake(true);
+                      //   drive.fireTrigger(DriveTrigger.BeginOTF);
+                      // }
                       // Then always start intake for scoring (no break here is intentional)
                     case Manual:
                       if (ScoringSubsystem.getInstance() != null) {
