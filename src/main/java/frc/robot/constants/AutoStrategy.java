@@ -11,4 +11,5 @@ public class AutoStrategy {
   public List<FieldTarget> scoringLevels = null;
   public final DesiredLocation intakeLocation = null;
   public final Boolean intakeAfterLastScore = true;
+  public final Boolean isBargeAuto = false;
 }

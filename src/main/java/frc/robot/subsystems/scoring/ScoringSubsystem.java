@@ -374,6 +374,10 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     }
   }
 
+  public ScoringState getCurrentState() {
+    return stateMachine.getCurrentState();
+  }
+
   /** sets brake mode of relevant motors */
   public void setBrakeMode(boolean brake) {
     wristMechanism.setBrakeMode(brake);
@@ -592,6 +596,16 @@ public class ScoringSubsystem extends MonitoredSubsystem {
 
   public FieldTarget getAlgaeScoreTarget() {
     return currentAlgaeScoreTarget;
+  }
+
+  /**
+   * Update the algae intake target, should be used in auto since this is done automatically in
+   * teleop
+   *
+   * @param algaeIntakeTarget new algae intake target
+   */
+  public void setAlgaeIntakeTarget(FieldTarget algaeIntakeTarget) {
+    currentAlgaeIntakeTarget = algaeIntakeTarget;
   }
 
   public FieldTarget getAlgaeIntakeTarget() {
