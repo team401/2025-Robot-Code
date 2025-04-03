@@ -193,6 +193,9 @@ public final class ElevatorConstants {
   /** When within this distance, the elevator is considered "at its setpoint" */
   public final Distance elevatorSetpointEpsilon = Meters.of(0.05);
 
+  /** When within this distance, spin the rollers during net pop shot */
+  public final Distance netScoreSetpointEpsilon = Meters.of(0.25);
+
   /**
    * How high elevator must go before we can swing the algae up into the robot without getting stuck
    * on crossbar or elevator
