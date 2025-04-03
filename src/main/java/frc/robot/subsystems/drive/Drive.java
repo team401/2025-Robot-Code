@@ -398,9 +398,13 @@ public class Drive implements DriveTemplate {
   @Override
   public void periodic() {
     // Manually cancel go to intake if we have a gamepiece
-    if (goToIntake && ScoringSubsystem.getInstance().isCoralDetected()) {
+    if (goToIntake
+        && (ScoringSubsystem.getInstance() == null
+            || ScoringSubsystem.getInstance().isCoralDetected())) {
       setGoToIntake(false);
-    } else if (goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
+    } else if (goToIntake
+        && (ScoringSubsystem.getInstance() == null
+            || ScoringSubsystem.getInstance().isAlgaeDetected())) {
       setGoToIntake(false);
     } else if (goToIntake
         && ModeConstants.currentMode == Mode.REAL
