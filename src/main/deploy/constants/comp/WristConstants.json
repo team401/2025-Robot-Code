@@ -60,6 +60,10 @@
     "value": 5.0,
     "unit": "Degree"
   },
+  "netShotRollerWristEpsilon": {
+    "value": 45.0,
+    "unit": "Degree"
+  },
   "maxWristSetpointVelocityRotationsPerSecond": 0.008333,
   "wristStableDebounceTimeSeconds": 0.1,
   "algaeUnderCrossbarAngle": {

@@ -52,10 +52,10 @@ public class ScoreState implements PeriodicStateInterface {
         if (scoringSubsystem.getAlgaeScoreTarget() == FieldTarget.Net) {
           // Only run claw rollers when elevator is at setpoint
           if (scoringSubsystem
-              .getElevatorHeight()
+              .getWristAngle()
               .isNear(
-                  JsonConstants.scoringSetpoints.net.elevatorHeight(),
-                  JsonConstants.elevatorConstants.elevatorSetpointEpsilon)) {
+                  JsonConstants.scoringSetpoints.net.wristAngle(),
+                  JsonConstants.wristConstants.netShotRollerWristEpsilon)) {
             scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
           } else {
             scoringSubsystem.setClawRollerVoltage(Volts.zero());
