@@ -215,7 +215,8 @@ public final class InitBindings {
                     case Mixed:
                       // Start auto align if in mixed autonomy
                       if (ScoringSubsystem.getInstance() != null
-                          && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+                          && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral
+                          && DriverStation.isAutonomous()) {
                         drive.setGoToIntake(true);
                         drive.fireTrigger(DriveTrigger.BeginOTF);
                       }
@@ -381,6 +382,8 @@ public final class InitBindings {
                   if (ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Algae
                       && ScoringSubsystem.getInstance().getAlgaeScoreTarget()
                           == FieldTarget.Processor) {
+                    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.WarmupReady);
+                  } else if (ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
                     ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.WarmupReady);
                   }
                 }));

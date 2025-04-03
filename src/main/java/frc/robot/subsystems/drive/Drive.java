@@ -409,7 +409,8 @@ public class Drive implements DriveTemplate {
                 .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation())
             < JsonConstants.drivetrainConstants.teleopOTFIntakeThresholdMeters
         && DriverStation.isTeleop()) {
-      setGoToIntake(false);
+      // setGoToIntake(false);
+      this.fireTrigger(DriveTrigger.ManualJoysticks);
     }
 
     odometryLock.lock(); // Prevents odometry updates while reading data
