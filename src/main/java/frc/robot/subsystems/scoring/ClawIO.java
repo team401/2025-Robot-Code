@@ -1,12 +1,14 @@
 package frc.robot.subsystems.scoring;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutCurrent;
+import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
@@ -22,8 +24,18 @@ public interface ClawIO {
      */
     public boolean coralDetected = false;
 
+    public double coralSignalStrength = 0.0;
+    public MutDistance coralDistance = Meters.mutable(0.0);
+
+    public boolean coralRangeConnected = false;
+
     /** Whether or not the sensor detects an algae */
     public boolean algaeDetected = false;
+
+    public double algaeSignalStrength = 0.0;
+    public MutDistance algaeDistance = Meters.mutable(0.0);
+
+    public boolean algaeRangeConnected = false;
 
     public MutAngle clawMotorPos = Rotations.mutable(0.0);
 

@@ -454,6 +454,10 @@ public final class InitBindings {
     return rightJoystick.top().getAsBoolean();
   }
 
+  public static boolean isWarmupPressed() {
+    return rightJoystick.trigger().getAsBoolean();
+  }
+
   public static boolean isIntakeHeld() {
     return leftJoystick.trigger().getAsBoolean();
   }

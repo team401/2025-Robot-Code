@@ -105,8 +105,8 @@
       "unit": "Inch"
     },
     "wristAngle": {
-      "value": 0.3214,
-      "unit": "Rotation"
+      "value": 2.0,
+      "unit": "Radian"
     }
   },
   "processor": {

@@ -780,7 +780,12 @@ public class Drive implements DriveTemplate {
       return;
     }
 
-    if (isAlgae && reefAlgaeLocations[(int) desiredIndex] != intakeLocation) {
+    if (isAlgae
+        && ((int) desiredIndex >= 6
+            || reefAlgaeLocations[(int) desiredIndex % 6] != intakeLocation)) {
+      if (desiredIndex >= 6) {
+        desiredIndex = 0; // No idea why this is greater than 6 but it needs to not explode
+      }
       this.setDesiredIntakeLocation(reefAlgaeLocations[(int) desiredIndex]);
       if (isDriveOTF()) {
         this.fireTrigger(DriveTrigger.ManualJoysticks);
