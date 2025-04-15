@@ -1,11 +1,12 @@
 {
   "scoringLocations": [
     "Reef11",
-    "Reef10",
+    "Reef8",
     "Reef9",
-    "Reef8"
+    "Reef7"
   ],
   "scoringLevels": [
+    "L4",
     "L4",
     "L4",
     "L4"

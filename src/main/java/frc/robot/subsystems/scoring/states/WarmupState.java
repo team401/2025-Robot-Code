@@ -61,7 +61,12 @@ public class WarmupState implements PeriodicStateInterface {
     }
 
     scoringSubsystem.setGoalSetpoint(setpoint);
-    scoringSubsystem.setClawRollerVoltage(Volts.zero());
+
+    if (scoringSubsystem.getGamePiece() == GamePiece.Algae) {
+      scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeIdleVoltage);
+    } else {
+      scoringSubsystem.setClawRollerVoltage(Volts.zero());
+    }
 
     boolean elevatorAtSetpoint =
         scoringSubsystem
