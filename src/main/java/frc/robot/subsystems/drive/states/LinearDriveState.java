@@ -357,7 +357,7 @@ public class LinearDriveState implements PeriodicStateInterface {
 
     if (distanceToGoal < JsonConstants.drivetrainConstants.otfWarmupDistance
         && ScoringSubsystem.getInstance() != null) {
-      ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+      ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartEarlyWarmup);
     } else if (distanceToGoal < JsonConstants.drivetrainConstants.otfFarWarmupDistance
         && ScoringSubsystem.getInstance() != null) {
       ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartFarWarmup);

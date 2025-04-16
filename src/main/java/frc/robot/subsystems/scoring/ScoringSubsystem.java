@@ -118,6 +118,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   private enum StateAfterInit {
     Idle,
+    EarlyWarmup,
     Warmup,
     FarWarmup
   }
@@ -181,6 +182,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     CancelIntake,
     DoneIntaking,
     StartWarmup, // drive automatically enters warmup when lineup begins
+    StartEarlyWarmup, // drive automatically enters warmup when a certain distance away from OTF
+    // target (after FarWarmup) ONLY FOR CORAL
     StartFarWarmup, // Start a "far warmup" when drive is a certain distance from it's OTF target
     WarmupReady,
     CancelWarmup, // Warmup button was released, go back to idle
@@ -238,6 +241,13 @@ public class ScoringSubsystem extends MonitoredSubsystem {
                     && warmupStateAfterInit == StateAfterInit.Warmup)
         .permitIf(
             ScoringTrigger.Seeded,
+            ScoringState.Warmup,
+            () ->
+                !isScoringTuningSupplier.getAsBoolean()
+                    && warmupStateAfterInit == StateAfterInit.EarlyWarmup
+                    && canFarWarmup())
+        .permitIf(
+            ScoringTrigger.Seeded,
             ScoringState.FarWarmup,
             () ->
                 !isScoringTuningSupplier.getAsBoolean()
@@ -256,6 +266,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
             ScoringTrigger.BeginIntake,
             ScoringState.Intake,
             () -> !(isCoralDetected() || isAlgaeDetected()))
+        .permitIf(ScoringTrigger.StartEarlyWarmup, ScoringState.Warmup, () -> canFarWarmup())
         .permitIf(ScoringTrigger.StartFarWarmup, ScoringState.FarWarmup, () -> canFarWarmup())
         .permit(ScoringTrigger.StartWarmup, ScoringState.Warmup)
         .permitIf(ScoringTrigger.EnterTestMode, ScoringState.Tuning, isScoringTuningSupplier);
@@ -362,6 +373,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
 
     if (stateMachine.getCurrentState() == ScoringState.Init) {
       switch (trigger) {
+        case StartEarlyWarmup:
+          warmupStateAfterInit = StateAfterInit.EarlyWarmup;
         case StartWarmup:
           warmupStateAfterInit = StateAfterInit.Warmup;
           break;
