@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.DoubleSubscriber;
@@ -8,6 +10,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StringPublisher;
 import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.strategies.AutoIntake;
@@ -15,6 +18,8 @@ import frc.robot.commands.strategies.AutoScore;
 import frc.robot.constants.AutoStrategy;
 import frc.robot.constants.AutoStrategyContainer.Action;
 import frc.robot.constants.AutoStrategyContainer.ActionType;
+import frc.robot.constants.FeatureFlags;
+import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
@@ -434,6 +439,22 @@ public class StrategyManager {
 
     this.currentCommand = null;
     this.currentAction = null;
+
+    if (!FeatureFlags.synced.getObject().runVision
+        || drive.getVisionMeasurementCount()
+            < VisionConstants.synced.getObject().minimumVisionMeasurementInitCount) {
+      Pose2d startPose =
+          new Pose2d(strategy.startSeededPositionTranslation, strategy.startSeededPositionRotation);
+      if (DriverStation.getAlliance().isPresent()
+          && DriverStation.getAlliance().get() == Alliance.Blue) {
+        startPose =
+            new Pose2d(
+                17.3736 - startPose.getX(),
+                7.9248 - startPose.getY(),
+                new Rotation2d(startPose.getRotation().getRadians() - Math.PI / 2));
+      }
+      drive.setPose(startPose);
+    }
 
     actions.clear();
     this.addActionsFromAutoStrategy(strategy);

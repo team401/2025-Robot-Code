@@ -7,5 +7,10 @@
     "L1",
     "L1"
   ],
-  "intakeLocation": "CoralStationRight"
+  "intakeLocation": "CoralStationRight",
+  "startSeededPosition": {
+    "x": 11.7,
+    "y": 6.5,
+    "degrees": 40
+  }
 }
