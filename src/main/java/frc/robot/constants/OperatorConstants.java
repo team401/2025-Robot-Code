@@ -14,7 +14,5 @@ public final class OperatorConstants {
           EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
-  public Integer kDriverControllerPort = 2;
-  public Integer kLeftJoystickPort = 0;
-  public Integer kRightJoystickPort = 1;
+  public String mappingFile = "controller.json";
 }

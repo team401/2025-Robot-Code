@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.StrategyManager.AutonomyMode;
 import frc.robot.constants.JsonConstants;
+import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem.ClimbAction;
 import frc.robot.subsystems.drive.Drive;
@@ -30,12 +31,12 @@ public final class InitBindings {
 
   private static List<Controllers.Controller> controllers;
 
-  
   public static void initControllers() {
+    OperatorConstants.synced.loadData();
     Controllers.synced.setFile(
         EnvironmentHandler.getEnvironmentHandler()
             .getEnvironmentPathProvider()
-            .resolveReadPath("controllers-xbox.json"));
+            .resolveReadPath(OperatorConstants.synced.getObject().mappingFile));
     Controllers.loadControllers();
 
     controllers = Controllers.getControllers();
