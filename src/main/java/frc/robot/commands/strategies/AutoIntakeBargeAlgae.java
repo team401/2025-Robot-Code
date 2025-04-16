@@ -1,5 +1,7 @@
 package frc.robot.commands.strategies;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;
@@ -16,6 +18,8 @@ public class AutoIntakeBargeAlgae extends Command {
   private ScoringSubsystem scoringSubsystem;
 
   private DesiredLocation driveTarget;
+
+  private Debouncer hasAlgaeDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
   public AutoIntakeBargeAlgae(
       Drive drive, ScoringSubsystem scoring, DesiredLocation driveLocation) {
@@ -46,7 +50,7 @@ public class AutoIntakeBargeAlgae extends Command {
 
   public void end(boolean interrupted) {
     if (drive != null) {
-      drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+      drive.fireTrigger(DriveTrigger.CancelLinear);
       drive.setShouldLinearDriveSlowly(false);
       System.out.println("AutoScore canceled lineup!");
     }
@@ -62,12 +66,11 @@ public class AutoIntakeBargeAlgae extends Command {
       Logger.recordOutput(
           "AutoIntakeBargeAlgae/driveFinished", drive.isDriveCloseToFinalLineupPose());
     }
-    if (scoringSubsystem != null) {
-      Logger.recordOutput("AutoIntakeBargeAlgae/hasAlgae", scoringSubsystem.isAlgaeDetected());
-    }
 
     if (scoringSubsystem == null) {
       return (drive == null || drive.isDriveCloseToFinalLineupPose());
+    } else {
+      Logger.recordOutput("AutoIntakeBargeAlgae/hasAlgae", scoringSubsystem.isAlgaeDetected());
     }
 
     return scoringSubsystem == null || scoringSubsystem.isAlgaeDetected();

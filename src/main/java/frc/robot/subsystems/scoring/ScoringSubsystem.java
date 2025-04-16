@@ -828,12 +828,23 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     boolean wristInToPassReef = false;
     boolean elevatorBelowReefLevel = false;
     boolean elevatorAboveReefLevel = false;
+    boolean elevatorUpToAvoidReefBaseAlgae = false;
 
     Distance reefDistance = reefDistanceSupplier.get();
     Logger.recordOutput("scoring/reefDistanceSupplier", reefDistance);
     if (reefDistance.lt(JsonConstants.wristConstants.closeToReefThreshold)
         && !DriverStation.isTest()) {
       closeToReef = true;
+
+      // If we're close to the reef and the wrist is down, keep the elevator up
+      if (wristAngle.lte(JsonConstants.wristConstants.maxReefBaseWristDownCollisionAngle)) {
+        elevatorUpToAvoidReefBaseAlgae = true;
+        elevatorMinHeight.mut_replace(
+            (Distance)
+                Measure.max(
+                    elevatorMinHeight,
+                    JsonConstants.elevatorConstants.minWristDownReefBaseSafeHeight));
+      }
 
       if (elevatorHeight.lte(JsonConstants.elevatorConstants.minReefSafeHeight)
           && currentPiece != GamePiece.Algae) {
@@ -931,6 +942,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     Logger.recordOutput("scoring/clamps/elevatorAboveReefLevel", elevatorAboveReefLevel);
     Logger.recordOutput("scoring/clamps/wristDownForAlgae", wristDownForAlgae);
     Logger.recordOutput("scoring/clamps/canWristHitCrossbar", canWristHitCrossbar);
+    Logger.recordOutput(
+        "scoring/clamps/elevatorUpToAvoidReefBaseAlgae", elevatorUpToAvoidReefBaseAlgae);
 
     elevatorMechanism.setAllowedRangeOfMotion(elevatorMinHeight, elevatorMaxHeight);
     wristMechanism.setAllowedRangeOfMotion(wristMinAngle, wristMaxAngle);

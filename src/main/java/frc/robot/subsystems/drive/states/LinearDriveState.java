@@ -106,7 +106,7 @@ public class LinearDriveState implements PeriodicStateInterface {
     headingController.enableContinuousInput(-Math.PI, Math.PI);
 
     // Using the lineup margin as the linear drive margin is totally wrong:
-    // linearDriveErrorMargin = JsonConstants.drivetrainConstants.lineupErrorMargin;
+    linearDriveErrorMargin = JsonConstants.drivetrainConstants.kDriveToPointFinishMargin;
 
     // drive.enableReefCenterAlignment();
   }
@@ -372,6 +372,8 @@ public class LinearDriveState implements PeriodicStateInterface {
 
     // We only exit this state when the phase 2 pose has been achieved.
     if (distanceToGoal < linearDriveErrorMargin) {
+      Logger.recordOutput("DriveToPoint/DriveDistance", distanceToGoal);
+      System.out.println("Linear drive close to goal (distance " + distanceToGoal + ")");
       if (drive.isDesiredLocationReef()
           && (ScoringSubsystem.getInstance() == null
               || ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral)) {

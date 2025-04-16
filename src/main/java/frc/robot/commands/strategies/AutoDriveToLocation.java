@@ -34,9 +34,10 @@ public class AutoDriveToLocation extends Command {
 
   public void end(boolean interrupted) {
     if (drive != null) {
+      drive.fireTrigger(DriveTrigger.CancelLinear);
       drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
       drive.setShouldLinearDriveSlowly(false);
-      System.out.println("AutoDriveToLine canceled lineup!");
+      System.out.println("AutoDriveToLine canceled lineup! Interrupted: " + interrupted);
     }
   }
 
