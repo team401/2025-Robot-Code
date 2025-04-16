@@ -2,15 +2,15 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import coppercore.parameter_tools.path_provider.EnvironmentHandler;
+import coppercore.wpilib_interface.Controllers;
 import coppercore.wpilib_interface.DriveWithJoysticks;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.StrategyManager.AutonomyMode;
 import frc.robot.constants.JsonConstants;
-import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem.ClimbAction;
 import frc.robot.subsystems.drive.Drive;
@@ -23,34 +23,62 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
+import java.util.List;
+import java.util.function.DoubleSupplier;
 
 public final class InitBindings {
-  // Controller
-  private static final CommandJoystick leftJoystick =
-      new CommandJoystick(OperatorConstants.synced.getObject().kLeftJoystickPort);
 
-  private static final CommandJoystick rightJoystick =
-      new CommandJoystick(OperatorConstants.synced.getObject().kRightJoystickPort);
+  private static List<Controllers.Controller> controllers;
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private static final CommandXboxController driverController =
-      new CommandXboxController(OperatorConstants.synced.getObject().kDriverControllerPort);
+  
+  public static void initControllers() {
+    Controllers.synced.setFile(
+        EnvironmentHandler.getEnvironmentHandler()
+            .getEnvironmentPathProvider()
+            .resolveReadPath("controllers-xbox.json"));
+    Controllers.loadControllers();
+
+    controllers = Controllers.getControllers();
+    manualScore = getButton("ManualScore");
+    warmupPressed = getButton("OTF");
+    isIntakeHeld = getButton("Intake");
+  }
+
+  public static DoubleSupplier getAxis(String command) {
+    for (Controllers.Controller controller : controllers) {
+      if (controller.hasAxis(command)) {
+        return controller.getAxis(command);
+      }
+    }
+    System.out.println("Could not find Axis with command: " + command);
+    return () -> 0;
+  }
+
+  public static Trigger getButton(String command) {
+    for (Controllers.Controller controller : controllers) {
+      if (controller.hasButton(command)) {
+        return controller.getButton(command);
+      }
+    }
+    System.out.println("Could not find Button with command: " + command);
+    return new Trigger(() -> false);
+  }
 
   public static void initDriveBindings(Drive drive, StrategyManager strategyManager) {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         new DriveWithJoysticks(
             drive, // type: DriveTemplate
-            leftJoystick, // type: CommandJoystick
-            rightJoystick, // type: CommandJoystick
+            () -> getAxis("driveX").getAsDouble(),
+            () -> getAxis("driveY").getAsDouble(),
+            () -> getAxis("driveRotation").getAsDouble(),
             JsonConstants.drivetrainConstants.maxLinearSpeed, // type: double (m/s)
             JsonConstants.drivetrainConstants.maxAngularSpeed, // type: double (rad/s)
             JsonConstants.drivetrainConstants.joystickDeadband // type: double
             ));
 
     // hold right joystick trigger down to have drive go to desired location
-    rightJoystick
-        .trigger()
+    getButton("OTF")
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -99,8 +127,7 @@ public final class InitBindings {
                 },
                 drive));
 
-    rightJoystick
-        .trigger()
+    getButton("OTF")
         .onFalse(
             new InstantCommand(
                 () -> {
@@ -125,8 +152,7 @@ public final class InitBindings {
                 },
                 drive));
 
-    leftJoystick
-        .top()
+    getButton("seed_rotation")
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -135,8 +161,7 @@ public final class InitBindings {
                 },
                 drive));
 
-    rightJoystick
-        .button(3)
+    getButton("sidestep")
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -175,8 +200,7 @@ public final class InitBindings {
     //             }));
 
     // Hold left trigger to intake, release to cancel
-    leftJoystick
-        .trigger()
+    getButton("intake")
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -229,8 +253,7 @@ public final class InitBindings {
                   }
                 },
                 drive));
-    leftJoystick
-        .trigger()
+    getButton("intake")
         .onFalse(
             new InstantCommand(
                 () -> {
@@ -272,55 +295,48 @@ public final class InitBindings {
     //               rampSubsystem.fireTrigger(RampTriggers.START_INTAKE);
     //             }));
 
-    rightJoystick
-        .trigger()
+    getButton("OTF")
         .onTrue(
             new InstantCommand(
                 () -> {
                   rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
 
-    rightJoystick
-        .trigger()
+    getButton("OTF")
         .onFalse(
             new InstantCommand(
                 () -> {
                   rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
 
-    leftJoystick
-        .trigger()
+    getButton("intake")
         .onTrue(
             new InstantCommand(
                 () -> {
                   rampSubsystem.fireTrigger(RampTriggers.INTAKE);
                 }));
 
-    leftJoystick
-        .trigger()
+    getButton("intake")
         .onFalse(
             new InstantCommand(
                 () -> {
                   rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
 
-    leftJoystick
-        .button(3)
+    getButton("climb")
         .onTrue(
             new InstantCommand(
                 () -> {
                   rampSubsystem.fireTrigger(RampTriggers.CLIMB);
                 }));
 
-    leftJoystick
-        .button(4)
+    getButton("cancel_climb")
         .onTrue(
             new InstantCommand(
                 () -> {
                   // rampSubsystem.fireTrigger(RampTriggers.RETURN_TO_IDLE);
                 }));
-    leftJoystick
-        .button(8)
+    getButton("home_ramp")
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -333,10 +349,9 @@ public final class InitBindings {
     // driverController.b().onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CANCEL)));
 
     // TODO: Find actual numbers for these buttons using driverstation
-    leftJoystick.button(3).onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)));
+    getButton("climb").onTrue(new InstantCommand(() -> climb.fireTrigger(ClimbAction.CLIMB)));
 
-    leftJoystick
-        .button(4)
+    getButton("cancel_climb")
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -345,15 +360,13 @@ public final class InitBindings {
   }
 
   public static void initScoringBindings(ScoringSubsystem scoring) {
-    driverController
-        .x()
+    getButton("SecondIntake")
         .onTrue(
             new InstantCommand(
                 () -> {
                   scoring.fireTrigger(ScoringTrigger.BeginIntake);
                 }));
-    driverController
-        .y()
+    getButton("L4Score")
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -361,8 +374,7 @@ public final class InitBindings {
                   scoring.setGamePiece(GamePiece.Coral);
                   scoring.fireTrigger(ScoringTrigger.StartWarmup);
                 }));
-    driverController
-        .rightBumper()
+    getButton("RunClawCoralScore")
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -374,8 +386,7 @@ public final class InitBindings {
                   scoring.setClawRollerVoltage(Volts.zero());
                 }));
 
-    rightJoystick
-        .top()
+    getButton("ManualScore")
         .onTrue(
             new InstantCommand(
                 () -> {
@@ -398,8 +409,7 @@ public final class InitBindings {
     switch (TestModeManager.getTestMode()) {
       case SetpointTuning:
         // Use B to manually run claw forward
-        driverController
-            .b()
+        getButton("SetpointTuningClawForward")
             .onTrue(
                 new InstantCommand(
                     () -> {
@@ -413,8 +423,7 @@ public final class InitBindings {
                     }));
 
         // Use A to manually run claw backward (good for repositioning coral)
-        driverController
-            .a()
+        getButton("SetpointTuningClawBackward")
             .onTrue(
                 new InstantCommand(
                     () -> {
@@ -429,8 +438,7 @@ public final class InitBindings {
                     }));
 
         // Use Y to manually score coral
-        driverController
-            .y()
+        getButton("SetpointTuningScoreCoral")
             .onTrue(
                 new InstantCommand(
                     () -> {
@@ -444,21 +452,25 @@ public final class InitBindings {
                     }));
 
         ScoringSubsystem.getInstance()
-            .setTuningHeightSetpointAdjustmentSupplier(() -> driverController.getLeftY());
+            .setTuningHeightSetpointAdjustmentSupplier(getAxis("SetpointTuningElevator"));
       default:
         break;
     }
   }
 
+  private static Trigger manualScore;
+  private static Trigger warmupPressed;
+  private static Trigger isIntakeHeld;
+
   public static boolean isManualScorePressed() {
-    return rightJoystick.top().getAsBoolean();
+    return manualScore.getAsBoolean();
   }
 
   public static boolean isWarmupPressed() {
-    return rightJoystick.trigger().getAsBoolean();
+    return warmupPressed.getAsBoolean();
   }
 
   public static boolean isIntakeHeld() {
-    return leftJoystick.trigger().getAsBoolean();
+    return isIntakeHeld.getAsBoolean();
   }
 }

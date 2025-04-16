@@ -1,0 +1,127 @@
+{
+  "buttonShorthands": {
+    "XBOX_A": 1,
+    "XBOX_B": 2,
+    "XBOX_X": 3,
+    "XBOX_Y": 4,
+    "XBOX_BACK": 7,
+    "XBOX_START": 8,
+    "XBOX_LEFT_BUMPER": 5,
+    "XBOX_RIGHT_BUMPER": 6,
+    "XBOX_LEFT_STICK": 10,
+    "JOYSTICK_TRIGGER": 1,
+    "JOYSTICK_TOP": 2,
+    "JOYSTICK_TOP_LEFT": 3,
+    "JOYSTICK_TOP_RIGHT": 4
+  },
+  "axesShorthands": {
+    "XBOX_LEFT_X": 0,
+    "XBOX_LEFT_Y": 1,
+    "XBOX_RIGHT_X": 4,
+    "XBOX_RIGHT_Y": 5,
+    "JOYSTICK_X": 0,
+    "JOYSTICK_Y": 1
+  },
+  "controllers": [
+    {
+      "port": 0,
+      "type": "joystick",
+      "buttons": [
+        {
+          "command": "intake",
+          "button": "JOYSTICK_TRIGGER"
+        },
+        {
+          "command": "seed_rotation",
+          "button": "JOYSTICK_TOP"
+        },
+        {
+          "command": "climb",
+          "button": "JOYSTICK_TOP_LEFT"
+        },
+        {
+          "command": "cancel_climb",
+          "button": "JOYSTICK_TOP_RIGHT"
+        },
+        {
+          "command": "home_ramp",
+          "button": "8"
+        }
+      ],
+      "axes": [
+        {
+          "command": "driveX",
+          "axis": "JOYSTICK_X",
+          "negate": false
+        },
+        {
+          "command": "driveY",
+          "axis": "JOYSTICK_Y",
+          "negate": false
+        }
+      ]
+    },
+    {
+      "port": 1,
+      "type": "joystick",
+      "buttons": [
+        {
+          "command": "OTF",
+          "button": "JOYSTICK_TRIGGER"
+        },
+        {
+          "command": "sidestep",
+          "button": "JOYSTICK_TOP_LEFT"
+        },
+        {
+          "command": "ManualScore",
+          "button": "JOYSTICK_TOP"
+        }
+      ],
+      "axes": [
+        {
+          "command": "driveRotation",
+          "axis": "JOYSTICK_X",
+          "negate": false
+        }
+      ]
+    },
+    {
+      "port": 2,
+      "type": "xbox",
+      "buttons": [
+        {
+          "command": "SetpointTuningClawBackward",
+          "button": "XBOX_A"
+        },
+        {
+          "command": "SetpointTuningClawForward",
+          "button": "XBOX_B"
+        },
+        {
+          "command": "SecondIntake",
+          "button": "XBOX_X"
+        },
+        {
+          "command": "SetpointTuningScoreCoral",
+          "button": "XBOX_Y"
+        },
+        {
+          "command": "L4Score",
+          "button": "XBOX_Y"
+        },
+        {
+          "command": "RunClawCoralScore",
+          "button": "XBOX_RIGHT_BUMPER"
+        }
+      ],
+      "axes": [
+        {
+          "command": "SetpointTuningElevator",
+          "axis": "XBOX_LEFT_X",
+          "negate": false
+        }
+      ]
+    }
+  ]
+}
