@@ -39,8 +39,8 @@
   "driveRotationKd": 0.0,
   "driveAlongTrackMultiplier": 1,
   "driveAlongTrackOffset": 0.27,
-  "driveCrossTrackFrontRightOffset": -0.03,
-  "driveCrossTrackFrontLeftOffset": -0.04,
+  "driveCrossTrackFrontRightOffset": -0.02,
+  "driveCrossTrackFrontLeftOffset": -0.03,
   "driveCrossTrackFrontRightAlgaeOffset": 0.25,
   "driveCrossTrackFrontLeftAlgaeOffset": 0.25,
   "lineupRotationMarginRadians": 0.05,
@@ -59,6 +59,7 @@
   "lineupAlongTrackSlowDownDistance": 0.1,
   "lineupAlongTrackSlowDownMultiplier": 0.5,
   "otfPoseEndingVelocity": 0.0,
+  "teleopOTFIntakeThresholdMeters": 2.0,
   "kSteerClosedLoopOutput": "Voltage",
   "kDriveClosedLoopOutput": "TorqueCurrentFOC",
   "kDriveMotorType": "TalonFX_Integrated",
@@ -75,7 +76,7 @@
       "ControlTimesyncFreqHz": 0.0
     },
     "CurrentLimits": {
-      "StatorCurrentLimit": 120.0,
+      "StatorCurrentLimit": 80.0,
       "StatorCurrentLimitEnable": true,
       "SupplyCurrentLimit": 70.0,
       "SupplyCurrentLimitEnable": true,

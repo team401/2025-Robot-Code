@@ -2,6 +2,7 @@ package frc.robot.subsystems.scoring;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANrangeConfiguration;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -67,6 +68,26 @@ public class ClawIOTalonFX implements ClawIO {
   public void updateInputs(ClawInputs inputs) {
     inputs.algaeDetected = isAlgaeDetected();
     inputs.coralDetected = isCoralDetected();
+
+    inputs.algaeSignalStrength = algaeRange.getSignalStrength().getValueAsDouble();
+    inputs.algaeDistance.mut_replace(algaeRange.getDistance().getValue());
+
+    inputs.algaeRangeConnected =
+        algaeRange.isConnected()
+            && StatusSignal.isAllGood(
+                algaeRange.getIsDetected(),
+                algaeRange.getSignalStrength(),
+                algaeRange.getDistance());
+
+    inputs.coralSignalStrength = coralRange.getSignalStrength().getValueAsDouble();
+    inputs.coralDistance.mut_replace(coralRange.getDistance().getValue());
+
+    inputs.coralRangeConnected =
+        coralRange.isConnected()
+            && StatusSignal.isAllGood(
+                coralRange.getIsDetected(),
+                coralRange.getSignalStrength(),
+                coralRange.getDistance());
 
     inputs.clawMotorPos.mut_replace(rollerMotor.getPosition().getValue());
 
