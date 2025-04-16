@@ -3,6 +3,7 @@ package frc.robot.subsystems.scoring.states;
 import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
+import frc.robot.InitBindings;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
@@ -28,6 +29,8 @@ public class ScoreState implements PeriodicStateInterface {
       // Force the net setpoint only in score since the "warmup" for the net stays low to use
       // elevator to shoot algae upward
       setpoint = JsonConstants.scoringSetpoints.net;
+    } else if (scoringSubsystem.getGamePiece() == GamePiece.Algae) {
+      setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getAlgaeScoreTarget());
     } else {
       setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getCoralTarget());
     }
@@ -66,7 +69,12 @@ public class ScoreState implements PeriodicStateInterface {
         }
 
         if (!scoringSubsystem.isAlgaeDetected()) {
-          scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
+          if (scoringSubsystem.getAlgaeScoreTarget() == FieldTarget.Processor
+              && !InitBindings.isWarmupPressed()) {
+            scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
+          } else if (scoringSubsystem.getAlgaeScoreTarget() != FieldTarget.Processor) {
+            scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
+          }
         }
         break;
     }

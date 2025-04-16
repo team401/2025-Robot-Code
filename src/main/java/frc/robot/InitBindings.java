@@ -215,7 +215,8 @@ public final class InitBindings {
                     case Mixed:
                       // Start auto align if in mixed autonomy
                       if (ScoringSubsystem.getInstance() != null
-                          && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+                          && ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral
+                          && DriverStation.isAutonomous()) {
                         drive.setGoToIntake(true);
                         drive.fireTrigger(DriveTrigger.BeginOTF);
                       }
@@ -382,6 +383,8 @@ public final class InitBindings {
                       && ScoringSubsystem.getInstance().getAlgaeScoreTarget()
                           == FieldTarget.Processor) {
                     ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.WarmupReady);
+                  } else if (ScoringSubsystem.getInstance().getGamePiece() == GamePiece.Coral) {
+                    ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.WarmupReady);
                   }
                 }));
   }
@@ -449,6 +452,10 @@ public final class InitBindings {
 
   public static boolean isManualScorePressed() {
     return rightJoystick.top().getAsBoolean();
+  }
+
+  public static boolean isWarmupPressed() {
+    return rightJoystick.trigger().getAsBoolean();
   }
 
   public static boolean isIntakeHeld() {

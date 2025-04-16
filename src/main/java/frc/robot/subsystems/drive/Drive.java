@@ -45,6 +45,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.TestModeManager;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
+import frc.robot.constants.ModeConstants.Mode;
 import frc.robot.subsystems.drive.states.IdleState;
 import frc.robot.subsystems.drive.states.JoystickDrive;
 import frc.robot.subsystems.drive.states.LinearDriveState;
@@ -399,12 +400,23 @@ public class Drive implements DriveTemplate {
   @Override
   public void periodic() {
     // Manually cancel go to intake if we have a gamepiece
-    if (ScoringSubsystem.getInstance() != null) {
-      if (goToIntake && ScoringSubsystem.getInstance().isCoralDetected()) {
-        setGoToIntake(false);
-      } else if (goToIntake && ScoringSubsystem.getInstance().isAlgaeDetected()) {
-        setGoToIntake(false);
-      }
+    if (goToIntake
+        && (ScoringSubsystem.getInstance() == null
+            || ScoringSubsystem.getInstance().isCoralDetected())) {
+      setGoToIntake(false);
+    } else if (goToIntake
+        && (ScoringSubsystem.getInstance() == null
+            || ScoringSubsystem.getInstance().isAlgaeDetected())) {
+      setGoToIntake(false);
+    } else if (goToIntake
+        && ModeConstants.currentMode == Mode.REAL
+        && this.getPose()
+                .getTranslation()
+                .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation())
+            < JsonConstants.drivetrainConstants.teleopOTFIntakeThresholdMeters
+        && DriverStation.isTeleop()) {
+      // setGoToIntake(false);
+      this.fireTrigger(DriveTrigger.ManualJoysticks);
     }
 
     odometryLock.lock(); // Prevents odometry updates while reading data
@@ -777,7 +789,12 @@ public class Drive implements DriveTemplate {
       return;
     }
 
-    if (isAlgae && reefAlgaeLocations[(int) desiredIndex] != intakeLocation) {
+    if (isAlgae
+        && ((int) desiredIndex >= 6
+            || reefAlgaeLocations[(int) desiredIndex % 6] != intakeLocation)) {
+      if (desiredIndex >= 6) {
+        desiredIndex = 0; // No idea why this is greater than 6 but it needs to not explode
+      }
       this.setDesiredIntakeLocation(reefAlgaeLocations[(int) desiredIndex]);
       if (isDriveOTF()) {
         this.fireTrigger(DriveTrigger.ManualJoysticks);

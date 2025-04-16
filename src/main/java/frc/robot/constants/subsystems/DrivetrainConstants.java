@@ -106,6 +106,9 @@ public class DrivetrainConstants {
   public final Double otfPoseDistanceLimit = 0.1;
   public final Double otfPoseEndingVelocity = 0.5;
 
+  /** When within this distance of the OTF pose in teleop, drive will not OTF to intake */
+  public final Double teleopOTFIntakeThresholdMeters = 1.0;
+
   /**
    * if otf sees the correct tag with an along track and cross track under these thresholds, it will
    * go to lineup
