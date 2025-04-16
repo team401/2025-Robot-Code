@@ -251,6 +251,14 @@ public class LinearDriveState implements PeriodicStateInterface {
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueAutoLineTranslation,
                 JsonConstants.blueFieldLocations.blueAutoLineRotation);
+      case NetScore:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redNetScoreTranslation,
+                JsonConstants.redFieldLocations.redNetScoreRotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueNetScoreTranslation,
+                JsonConstants.blueFieldLocations.blueNetScoreRotation);
       default:
         System.out.println("WARNING: Unknown field location " + driveInput.getDesiredLocation());
         return null;

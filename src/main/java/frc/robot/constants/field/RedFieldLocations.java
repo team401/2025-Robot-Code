@@ -25,6 +25,9 @@ public class RedFieldLocations {
   public Translation2d redAutoLineTranslation = new Translation2d(10.5, 4.1);
   public Rotation2d redAutoLineRotation = new Rotation2d(Math.toRadians(0));
 
+  public Translation2d redNetScoreTranslation = new Translation2d(10.372, 2.947);
+  public Rotation2d redNetScoreRotation = new Rotation2d(Math.toRadians(0));
+
   public Translation2d redReefOTF0Translation = new Translation2d(11.5, 4.1);
   public Rotation2d redReefOTF0Rotation = new Rotation2d(Math.toRadians(0));
 

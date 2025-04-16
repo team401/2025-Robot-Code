@@ -25,6 +25,9 @@ public class BlueFieldLocations {
   public Translation2d blueAutoLineTranslation = new Translation2d(7.5, 4);
   public Rotation2d blueAutoLineRotation = new Rotation2d(Math.toRadians(-180));
 
+  public Translation2d blueNetScoreTranslation = new Translation2d(7.253, 5.021);
+  public Rotation2d blueNetScoreRotation = new Rotation2d(Math.toRadians(-180));
+
   public Translation2d blueReefOTF0Translation = new Translation2d(6.56, 4);
   public Rotation2d blueReefOTF0Rotation = new Rotation2d(Math.toRadians(-180));
 

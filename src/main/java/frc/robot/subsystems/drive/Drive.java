@@ -154,6 +154,7 @@ public class Drive implements DriveTemplate {
     CoralStationLeft,
     CoralStationRight,
     AutoLine,
+    NetScore,
   }
 
   public static final DesiredLocation[] reefCoralLocations = {
@@ -666,7 +667,8 @@ public class Drive implements DriveTemplate {
         !(desiredLocation == DesiredLocation.CoralStationLeft
                 || desiredLocation == DesiredLocation.CoralStationRight
                 || desiredLocation == DesiredLocation.Processor
-                || desiredLocation == DesiredLocation.AutoLine)
+                || desiredLocation == DesiredLocation.AutoLine
+                || desiredLocation == DesiredLocation.NetScore)
             && !goToIntake;
     boolean isAlgaeReefTarget = isLocationAlgaeIntake(intakeLocation) && goToIntake;
     return isCoralReefTarget || isAlgaeReefTarget;
@@ -709,13 +711,6 @@ public class Drive implements DriveTemplate {
     }
 
     if (location == DesiredLocation.AutoLine) {
-      System.out.println("IT GOT SET");
-      System.out.println("IT GOT SET");
-      System.out.println("IT GOT SET");
-      System.out.println("IT GOT SET");
-      System.out.println("IT GOT SET");
-      System.out.println("IT GOT SET");
-      System.out.println("IT GOT SET");
       this.desiredLocation = location;
     }
   }

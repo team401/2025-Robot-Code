@@ -10,8 +10,11 @@ import org.littletonrobotics.junction.Logger;
 public class AutoDriveToLine extends Command {
   private Drive drive;
 
-  public AutoDriveToLine(Drive drive) {
+  private DesiredLocation desiredLocation;
+
+  public AutoDriveToLine(Drive drive, DesiredLocation desiredLocation) {
     this.drive = drive;
+    this.desiredLocation = desiredLocation;
     // we dont want to require subsystems (it prevents drive otf from running)
   }
 
@@ -20,8 +23,7 @@ public class AutoDriveToLine extends Command {
       drive.setDriveLinedUp(false);
       drive.setGoToIntake(false);
       drive.setShouldLinearDriveSlowly(true);
-      drive.setDesiredLocation(DesiredLocation.AutoLine);
-      System.out.println("SET IT TO AUTOLINE");
+      drive.setDesiredLocation(desiredLocation);
       drive.fireTrigger(DriveTrigger.BeginLinear);
     }
   }
@@ -41,7 +43,9 @@ public class AutoDriveToLine extends Command {
    */
   public boolean isReadyForNextAction() {
     if (drive != null) {
-      Logger.recordOutput("AutoScore/driveFinished", drive.isDriveAlignmentFinished());
+      Logger.recordOutput("AutoScore/driveFinished", drive.isDriveCloseToFinalLineupPose());
+    } else {
+      Logger.recordOutput("AutoScore/driveFinished", true);
     }
 
     return (drive == null || drive.isDriveCloseToFinalLineupPose());

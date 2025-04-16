@@ -178,6 +178,14 @@ public class OTFState implements PeriodicStateInterface {
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueAutoLineTranslation,
                 JsonConstants.blueFieldLocations.blueAutoLineRotation);
+      case NetScore:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redNetScoreTranslation,
+                JsonConstants.redFieldLocations.redNetScoreRotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueNetScoreTranslation,
+                JsonConstants.blueFieldLocations.blueNetScoreRotation);
       default:
         return null;
     }
