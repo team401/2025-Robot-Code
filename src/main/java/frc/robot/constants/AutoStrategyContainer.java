@@ -17,7 +17,7 @@ public class AutoStrategyContainer {
     Intake,
     Score,
     IntakeAlgae,
-    DriveToLine,
+    DriveToLocation,
     NetScore
   };
 

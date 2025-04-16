@@ -134,13 +134,20 @@ public class LinearDriveState implements PeriodicStateInterface {
                 JsonConstants.blueFieldLocations.blueReefOTF0Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF0Rotation);
       case Reef1:
-      case Algae0:
         return driveInput.isAllianceRed()
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF1Translation,
                 JsonConstants.redFieldLocations.redReefOTF1Rotation)
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueReefOTF1Translation,
+                JsonConstants.blueFieldLocations.blueReefOTF1Rotation);
+      case Algae0:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redAlgaeOTF0Translation,
+                JsonConstants.redFieldLocations.redReefOTF1Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueAlgaeOTF0Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF1Rotation);
       case Reef2:
         return driveInput.isAllianceRed()

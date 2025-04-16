@@ -10,7 +10,7 @@ import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.strategies.AutoDriveToLine;
+import frc.robot.commands.strategies.AutoDriveToLocation;
 import frc.robot.commands.strategies.AutoIntake;
 import frc.robot.commands.strategies.AutoIntakeBargeAlgae;
 import frc.robot.commands.strategies.AutoNetScore;
@@ -194,23 +194,32 @@ public class StrategyManager {
           new Action(ActionType.Score, GamePiece.Coral, DesiredLocation.Reef0, FieldTarget.L4));
       this.addAction(
           new Action(
-              ActionType.DriveToLine, GamePiece.Algae, DesiredLocation.AutoLine, FieldTarget.L2));
+              ActionType.DriveToLocation,
+              GamePiece.Algae,
+              DesiredLocation.AutoLine,
+              FieldTarget.L2));
       this.addAction(
           new Action(
               ActionType.IntakeAlgae, GamePiece.Algae, DesiredLocation.Algae0, FieldTarget.L2));
       this.addAction(
           new Action(
-              ActionType.DriveToLine, GamePiece.Algae, DesiredLocation.NetScore, FieldTarget.L2));
+              ActionType.DriveToLocation,
+              GamePiece.Algae,
+              DesiredLocation.NetScore,
+              FieldTarget.L2));
       this.addAction(
           new Action(
               ActionType.NetScore, GamePiece.Algae, DesiredLocation.NetScore, FieldTarget.Net));
       this.addAction( // Drive back to the auto line point so that we're centered on the line before
           // trying to drive into reef
           new Action(
-              ActionType.DriveToLine, GamePiece.Algae, DesiredLocation.AutoLine, FieldTarget.L2));
+              ActionType.DriveToLocation,
+              GamePiece.Algae,
+              DesiredLocation.AutoLine,
+              FieldTarget.L2));
       this.addAction( // Drive into reef to get the move points again
           new Action(
-              ActionType.IntakeAlgae, GamePiece.Algae, DesiredLocation.Algae0, FieldTarget.L2));
+              ActionType.DriveToLocation, GamePiece.Algae, DesiredLocation.Algae0, FieldTarget.L2));
 
       return;
     }
@@ -258,8 +267,8 @@ public class StrategyManager {
         default:
           return new AutoScore(drive, scoringSubsystem, action.location(), action.scoringTarget());
       }
-    } else if (action.type() == ActionType.DriveToLine) {
-      return new AutoDriveToLine(drive, action.location());
+    } else if (action.type() == ActionType.DriveToLocation) {
+      return new AutoDriveToLocation(drive, action.location(), true);
     } else if (action.type() == ActionType.IntakeAlgae) {
       System.out.println("Generated IntakeAlgae action command with location " + action.location());
       return new AutoIntakeBargeAlgae(drive, scoringSubsystem, DesiredLocation.Algae0);

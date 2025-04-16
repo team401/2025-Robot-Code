@@ -6,15 +6,19 @@ import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.drive.Drive.DriveTrigger;
 import org.littletonrobotics.junction.Logger;
 
-/** This command slowly drives to the auto line */
-public class AutoDriveToLine extends Command {
+/** This command linear-drives to a specified DesiredLocation */
+public class AutoDriveToLocation extends Command {
   private Drive drive;
 
-  private DesiredLocation desiredLocation;
+  private final DesiredLocation desiredLocation;
+  private final boolean shouldLinearDriveSlowly;
 
-  public AutoDriveToLine(Drive drive, DesiredLocation desiredLocation) {
+  public AutoDriveToLocation(
+      Drive drive, DesiredLocation desiredLocation, boolean shouldLinearDriveSlowly) {
     this.drive = drive;
     this.desiredLocation = desiredLocation;
+
+    this.shouldLinearDriveSlowly = shouldLinearDriveSlowly;
     // we dont want to require subsystems (it prevents drive otf from running)
   }
 
@@ -22,7 +26,7 @@ public class AutoDriveToLine extends Command {
     if (drive != null) {
       drive.setDriveLinedUp(false);
       drive.setGoToIntake(false);
-      drive.setShouldLinearDriveSlowly(true);
+      drive.setShouldLinearDriveSlowly(shouldLinearDriveSlowly);
       drive.setDesiredLocation(desiredLocation);
       drive.fireTrigger(DriveTrigger.BeginLinear);
     }
