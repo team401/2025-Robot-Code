@@ -187,6 +187,7 @@ public class StrategyManager {
   public void addActionsFromAutoStrategy(AutoStrategy strategy) {
     for (Action action : strategy.actions) {
       this.addAction(action);
+      System.out.println(action);
     }
   }
 

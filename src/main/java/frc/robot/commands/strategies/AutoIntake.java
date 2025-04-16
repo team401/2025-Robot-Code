@@ -38,11 +38,12 @@ public class AutoIntake extends Command {
       if (gamePiece == GamePiece.Coral) {
         drive.setDesiredIntakeLocation(intakeLocation);
         drive.setGoToIntake(true);
+        drive.fireTrigger(DriveTrigger.BeginOTF);
       } else {
         drive.setDesiredLocation(intakeLocation);
         drive.setGoToIntake(false);
+        drive.fireTrigger(DriveTrigger.BeginLinear);
       }
-      drive.fireTrigger(DriveTrigger.BeginOTF);
     }
 
     if (scoringSubsystem != null) {

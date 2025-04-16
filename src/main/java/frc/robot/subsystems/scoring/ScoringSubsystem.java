@@ -681,6 +681,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     Logger.recordOutput("scoring/algaeCurrentDetected", algaeCurrentDetected);
     Logger.recordOutput("scoring/state", stateMachine.getCurrentState());
     Logger.recordOutput("scoring/isDriveLinedUp", isDriveLinedUpSupplier.getAsBoolean());
+    Logger.recordOutput("scoring/currentTarget", currentTarget);
   }
 
   /** This method must be called by RobotContainer, as it does not run automatically! */
