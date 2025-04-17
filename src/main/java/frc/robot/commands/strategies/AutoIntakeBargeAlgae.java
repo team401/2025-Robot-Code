@@ -52,7 +52,7 @@ public class AutoIntakeBargeAlgae extends Command {
     if (drive != null) {
       drive.fireTrigger(DriveTrigger.CancelLinear);
       drive.setShouldLinearDriveSlowly(false);
-      System.out.println("AutoScore canceled lineup!");
+      System.out.println("AutoIntakeBargeAlgae canceled lineup!");
     }
   }
 

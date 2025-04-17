@@ -347,6 +347,7 @@ public class StrategyManager {
     if (currentCommand == null || currentCommand.isFinished()) {
       if (currentCommand != null) {
         System.out.println(currentCommand.getName() + " was finished.");
+        currentCommand.cancel();
       }
       currentAction = getNextAction();
       currentCommand = getCommandFromAction(currentAction);

@@ -637,10 +637,16 @@ public class Drive implements DriveTemplate {
         "Drive/distanceToLineupNewMethod",
         this.getPose()
             .getTranslation()
-            .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation()));
+            .getDistance(
+                DesiredLocationUtil.findGoalPoseFromDesiredLocation(
+                        this.getDesiredLocation(), this.isAllianceRed())
+                    .getTranslation()));
     return this.getPose()
             .getTranslation()
-            .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation())
+            .getDistance(
+                DesiredLocationUtil.findGoalPoseFromDesiredLocation(
+                        this.getDesiredLocation(), this.isAllianceRed())
+                    .getTranslation())
         < JsonConstants.drivetrainConstants.otfPoseDistanceLimit;
   }
 
