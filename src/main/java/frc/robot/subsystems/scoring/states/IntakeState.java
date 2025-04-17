@@ -66,6 +66,7 @@ public class IntakeState implements PeriodicStateInterface {
 
   // @Override
   public void periodic() {
+    Logger.recordOutput("enteredIntakeState", "HOLY RIZZ BRUH");
     if (!DriverStation.isEnabled()) {
       homingTimer.restart();
       return;

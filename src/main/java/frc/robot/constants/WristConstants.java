@@ -117,6 +117,8 @@ public class WristConstants {
   /** How close the wrist must be to its goal to spin the rollers in net shot */
   public final Angle netShotRollerWristEpsilon = Rotations.of(0.05);
 
+  public final Angle maxReefBaseWristDownCollisionAngle = Rotations.of(0.0);
+
   public static final class Sim {
     @JSONExclude
     public static final JSONSync<WristConstants.Sim> synced =

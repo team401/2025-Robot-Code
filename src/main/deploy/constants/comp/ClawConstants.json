@@ -65,12 +65,12 @@
     "value": -4.0,
     "unit": "Volt"
   },
-  "algaeCurrentDetectionTimeRising": {
+  "algaeDetectionTimeRising": {
     "value": 0.5,
     "unit": "Second"
   },
-  "algaeCurrentDetectionTimeFalling": {
-    "value": 2.0,
+  "algaeDetectionTimeFalling": {
+    "value": 0.0,
     "unit": "Second"
   }
 }
