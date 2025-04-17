@@ -1,7 +1,5 @@
 package frc.robot.commands.strategies;
 
-import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;

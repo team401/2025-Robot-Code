@@ -266,9 +266,15 @@ public class ScoringSubsystem extends MonitoredSubsystem {
             ScoringTrigger.BeginIntake,
             ScoringState.Intake,
             () -> !(isCoralDetected() || isAlgaeDetected()))
-        .permitIf(ScoringTrigger.StartEarlyWarmup, ScoringState.Warmup, () -> canFarWarmup())
-        .permitIf(ScoringTrigger.StartFarWarmup, ScoringState.FarWarmup, () -> canFarWarmup())
-        .permit(ScoringTrigger.StartWarmup, ScoringState.Warmup)
+        .permitIf(
+            ScoringTrigger.StartEarlyWarmup,
+            ScoringState.Warmup,
+            () -> canFarWarmup() && hasCurrentPiece())
+        .permitIf(
+            ScoringTrigger.StartFarWarmup,
+            ScoringState.FarWarmup,
+            () -> canFarWarmup() && hasCurrentPiece())
+        .permitIf(ScoringTrigger.StartWarmup, ScoringState.Warmup, () -> hasCurrentPiece())
         .permitIf(ScoringTrigger.EnterTestMode, ScoringState.Tuning, isScoringTuningSupplier);
 
     stateMachineConfiguration
@@ -466,6 +472,11 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     }
   }
 
+  // Keep track of how many times per cycle setGoalSetpoint is getting called
+  private int setpointUpdatesThisCycle = 0;
+  // Hold onto an exception to print the stack trace whenever this happens!
+  private Exception lastSetpointUpdate;
+
   /**
    * Set the goal positions for elevator and wrist according to a ScoringSetpoint
    *
@@ -475,6 +486,15 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     setElevatorGoalHeight(setpoint.elevatorHeight());
     setWristGoalAngle(setpoint.wristAngle());
     Logger.recordOutput("scoring/setpoint", setpoint.name());
+    setpointUpdatesThisCycle++;
+
+    Exception newSetpointUpdate = new Exception("Multiple scoring setpoint updates in one cycle!");
+    if (setpointUpdatesThisCycle > 1 && lastSetpointUpdate != null) {
+      lastSetpointUpdate.printStackTrace();
+      newSetpointUpdate.printStackTrace();
+    }
+
+    lastSetpointUpdate = newSetpointUpdate;
   }
 
   /**
@@ -584,6 +604,17 @@ public class ScoringSubsystem extends MonitoredSubsystem {
   }
 
   /**
+   * Check whether the current game piece is held
+   *
+   * @return True if current game piece is coral and coral detected, or current game piece is algae
+   *     and algae detected
+   */
+  public boolean hasCurrentPiece() {
+    return (getGamePiece() == GamePiece.Coral && isCoralDetected())
+        || (getGamePiece() == GamePiece.Algae && isAlgaeDetected());
+  }
+
+  /**
    * Set the field target of the scoring subsystem.
    *
    * @param target The field target that scoring will aim for, e.g. L2
@@ -679,10 +710,15 @@ public class ScoringSubsystem extends MonitoredSubsystem {
 
   @Override
   public void monitoredPeriodic() {
+    Logger.recordOutput("scoring/setpointUpdatesThisCycle", setpointUpdatesThisCycle);
+    // Reset setpoint update counter every cycle
+    setpointUpdatesThisCycle = 0;
+
     if (stateMachine.getCurrentState() == ScoringState.Tuning
         && !isScoringTuningSupplier.getAsBoolean()) {
       fireTrigger(ScoringTrigger.LeaveTestMode);
     }
+    Logger.recordOutput("scoring/prePeriodicState", stateMachine.getCurrentState());
     stateMachine.periodic();
 
     if (JsonConstants.scoringFeatureFlags.runElevator) {
