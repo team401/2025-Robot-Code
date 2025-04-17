@@ -1159,4 +1159,8 @@ public class Drive implements DriveTemplate {
       poseEstimator.resetRotation(Rotation2d.kZero);
     }
   }
+
+  public boolean isLinearDriving() {
+    return stateMachine.getCurrentState() == DriveState.LinearDrive;
+  }
 }

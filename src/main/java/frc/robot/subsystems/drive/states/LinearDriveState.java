@@ -110,6 +110,9 @@ public class LinearDriveState implements PeriodicStateInterface {
     linearDriveErrorMargin = JsonConstants.drivetrainConstants.kDriveToPointFinishMargin;
 
     // drive.enableReefCenterAlignment();
+
+    System.out.println(
+        "Entered LinearDriveState with desired location " + drive.getDesiredLocation());
   }
 
   public void onExit(Transition transition) {

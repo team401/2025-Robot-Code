@@ -1,6 +1,6 @@
 package frc.robot.commands.strategies;
 
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.DesiredLocationUtil;
@@ -16,6 +16,11 @@ public class AutoDriveToLocation extends Command {
   private final DesiredLocation desiredLocation;
   private final boolean shouldLinearDriveSlowly;
 
+  // Keep track of how many times this command has been scheduled to help in debugging
+  private static int id = 0;
+
+  private int currentId = id;
+
   public AutoDriveToLocation(
       Drive drive, DesiredLocation desiredLocation, boolean shouldLinearDriveSlowly) {
     this.drive = drive;
@@ -26,23 +31,62 @@ public class AutoDriveToLocation extends Command {
   }
 
   public void initialize() {
-    System.out.println("AutoDriveToLocation initializing!");
+    currentId = id;
+    id++;
+
+    System.out.println(
+        "AutoDriveToLocation initializing! ID: "
+            + currentId
+            + " DesiredLocation: "
+            + desiredLocation);
     if (drive != null) {
       drive.setDriveLinedUp(false);
-      drive.setGoToIntake(false);
+      if (drive.isLocationScoring(desiredLocation)) {
+        drive.setGoToIntake(false);
+        drive.setDesiredLocation(desiredLocation);
+      } else {
+        drive.setGoToIntake(true);
+        drive.setDesiredIntakeLocation(desiredLocation);
+      }
       drive.setShouldLinearDriveSlowly(shouldLinearDriveSlowly);
-      drive.setDesiredLocation(desiredLocation);
       drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
       drive.fireTrigger(DriveTrigger.BeginLinear);
     }
   }
 
+  public void execute() {
+    if (drive != null && !isReadyForNextAction() && !drive.isLinearDriving()) {
+      drive.setDriveLinedUp(false);
+      if (drive.isLocationScoring(desiredLocation)) {
+        drive.setGoToIntake(false);
+        drive.setDesiredLocation(desiredLocation);
+      } else {
+        drive.setGoToIntake(true);
+        drive.setDesiredIntakeLocation(desiredLocation);
+      }
+      drive.setShouldLinearDriveSlowly(shouldLinearDriveSlowly);
+      drive.setDesiredLocation(desiredLocation);
+      drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
+      drive.fireTrigger(DriveTrigger.BeginLinear);
+
+      System.out.println("AutoDriveToLine " + currentId + " re-entered linear drive!");
+    }
+  }
+
   public void end(boolean interrupted) {
-    System.out.println("AutoDriveToLine finished! Interrupted: " + interrupted);
+    System.out.println(
+        "AutoDriveToLine ID "
+            + currentId
+            + " (DL: "
+            + desiredLocation
+            + ") finished! Interrupted: "
+            + interrupted);
     if (drive != null) {
       drive.fireTrigger(DriveTrigger.CancelLinear);
       drive.fireTrigger(DriveTrigger.CancelAutoAlignment);
       drive.setShouldLinearDriveSlowly(false);
+    } else {
+      System.out.println("AutoDriveToLine had null drive reference");
     }
   }
 
@@ -53,23 +97,32 @@ public class AutoDriveToLocation extends Command {
    */
   public boolean isReadyForNextAction() {
     if (drive == null) {
-      Logger.recordOutput("AUtoDriveToLocation/driveFinished", true);
+      Logger.recordOutput("AutoDriveToLocation/driveFinished", true);
       return true;
     }
 
-    Translation2d goalTranslation =
-        DesiredLocationUtil.findGoalPoseFromDesiredLocation(
-                drive.getDesiredLocation(), drive.isAllianceRed())
-            .getTranslation();
+    Pose2d goalPose =
+        DesiredLocationUtil.findGoalPoseFromDesiredLocation(desiredLocation, drive.isAllianceRed());
 
     // isDriveCloseToFinalLineupPose() is untrustworthy (probably due to stale state) so it's
     // necessary to compute this here
     boolean isDriveClose =
-        drive.getPose().getTranslation().getDistance(goalTranslation)
+        drive.getPose().getTranslation().getDistance(goalPose.getTranslation())
             < JsonConstants.drivetrainConstants.kDriveToPointFinishMargin;
 
-    Logger.recordOutput("AUtoDriveToLocation/driveFinished", isDriveClose);
+    Logger.recordOutput("AutoDriveToLocation/goalPose", goalPose);
+    Logger.recordOutput(
+        "AutoDriveToLocation/finishMargin",
+        JsonConstants.drivetrainConstants.kDriveToPointFinishMargin);
+    Logger.recordOutput("AutoDriveToLocation/driveFinished", isDriveClose);
 
+    if (isDriveClose) {
+      System.out.println("AutoDriveToLocation isDriveClose was true:");
+      System.out.println("ID " + currentId);
+      System.out.println("DL " + desiredLocation);
+      System.out.println("goalPose " + goalPose);
+      System.out.println("drive pose " + drive.getPose());
+    }
     return isDriveClose;
   }
 

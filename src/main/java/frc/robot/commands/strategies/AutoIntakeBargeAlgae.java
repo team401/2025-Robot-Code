@@ -19,8 +19,6 @@ public class AutoIntakeBargeAlgae extends Command {
 
   private DesiredLocation driveTarget;
 
-  private Debouncer hasAlgaeDebouncer = new Debouncer(0.5, DebounceType.kRising);
-
   public AutoIntakeBargeAlgae(
       Drive drive, ScoringSubsystem scoring, DesiredLocation driveLocation) {
     this.drive = drive;
