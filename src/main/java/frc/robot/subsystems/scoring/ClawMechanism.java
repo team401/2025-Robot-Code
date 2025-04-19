@@ -23,11 +23,7 @@ public class ClawMechanism {
 
   private Debouncer algaeRiseDebouncer =
       new Debouncer(
-          JsonConstants.clawConstants.algaeDetectionTimeRising.in(Seconds), DebounceType.kBoth);
-
-  private Debouncer algaeFallDebouncer =
-      new Debouncer(
-          JsonConstants.clawConstants.algaeDetectionTimeFalling.in(Seconds), DebounceType.kBoth);
+          JsonConstants.clawConstants.algaeDetectionTimeRising.in(Seconds), DebounceType.kRising);
 
   public ClawMechanism(ClawIO io) {
     manualTuningVolts = new LoggedTunableNumber("ClawTunables/clawManualVolts", 0.0);

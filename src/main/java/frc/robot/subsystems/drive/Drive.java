@@ -724,11 +724,7 @@ public class Drive implements DriveTemplate {
    * @param location desired location for robot to pathfind to
    */
   public void setDesiredLocation(DesiredLocation location) {
-    if (isLocationScoring(location)) {
-      this.desiredLocation = location;
-    }
-
-    if (location == DesiredLocation.AutoLine) {
+    if (isLocationScoring(location) || location == DesiredLocation.AutoLine) {
       this.desiredLocation = location;
     }
   }
