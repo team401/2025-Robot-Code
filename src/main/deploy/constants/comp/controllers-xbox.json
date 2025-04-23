@@ -8,7 +8,8 @@
     "XBOX_START": 8,
     "XBOX_LEFT_BUMPER": 5,
     "XBOX_RIGHT_BUMPER": 6,
-    "XBOX_LEFT_STICK": 10,
+    "XBOX_LEFT_STICK": 9,
+    "XBOX_RIGHT_STICK": 10,
     "JOYSTICK_TRIGGER": 1,
     "JOYSTICK_TOP": 2,
     "JOYSTICK_TOP_LEFT": 3,
@@ -26,7 +27,41 @@
     {
       "port": 0,
       "type": "xbox",
-      "buttons": [],
+      "buttons": [
+        {
+          "command": "intake",
+          "button": "XBOX_LEFT_BUMPER"
+        },
+        {
+          "command": "OTF",
+          "button": "XBOX_RIGHT_BUMPER"
+        },
+        {
+          "command": "climb",
+          "button": "XBOX_B"
+        },
+        {
+          "command": "cancel_climb",
+          "button": "XBOX_A"
+        },
+
+        {
+          "command": "home_ramp",
+          "button": "XBOX_LEFT_STICK"
+        },
+        {
+          "command": "seed_rotation",
+          "button": "XBOX_RIGHT_BUMPER"
+        },
+        {
+          "command": "sidestep",
+          "button": "XBOX_Y"
+        },
+        {
+          "command": "cancel_climb",
+          "button": "XBOX_A"
+        }
+      ],
       "axes": [
         {
           "command": "driveX",
