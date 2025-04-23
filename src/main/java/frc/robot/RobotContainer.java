@@ -33,6 +33,7 @@ import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.led.LED;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import java.io.File;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -214,7 +215,11 @@ public class RobotContainer {
                   return drive.isDriveAlignmentFinished() || InitBindings.isManualScorePressed();
                 case Full:
                 default:
-                  return drive.isDriveAlignmentFinished();
+                  if (scoringSubsystem.getGamePiece() == GamePiece.Algae) {
+                    return drive.isDriveCloseToFinalLineupPose();
+                  } else {
+                    return drive.isDriveAlignmentFinished();
+                  }
               }
             });
         scoringSubsystem.setReefDistanceSupplier(

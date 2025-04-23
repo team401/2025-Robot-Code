@@ -154,6 +154,8 @@ public class Drive implements DriveTemplate {
     Processor,
     CoralStationLeft,
     CoralStationRight,
+    AutoLine,
+    NetScore,
   }
 
   public static final DesiredLocation[] reefCoralLocations = {
@@ -635,10 +637,16 @@ public class Drive implements DriveTemplate {
         "Drive/distanceToLineupNewMethod",
         this.getPose()
             .getTranslation()
-            .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation()));
+            .getDistance(
+                DesiredLocationUtil.findGoalPoseFromDesiredLocation(
+                        this.getDesiredLocation(), this.isAllianceRed())
+                    .getTranslation()));
     return this.getPose()
             .getTranslation()
-            .getDistance(OTFState.findOTFPoseFromDesiredLocation(this).getTranslation())
+            .getDistance(
+                DesiredLocationUtil.findGoalPoseFromDesiredLocation(
+                        this.getDesiredLocation(), this.isAllianceRed())
+                    .getTranslation())
         < JsonConstants.drivetrainConstants.otfPoseDistanceLimit;
   }
 
@@ -676,7 +684,9 @@ public class Drive implements DriveTemplate {
     boolean isCoralReefTarget =
         !(desiredLocation == DesiredLocation.CoralStationLeft
                 || desiredLocation == DesiredLocation.CoralStationRight
-                || desiredLocation == DesiredLocation.Processor)
+                || desiredLocation == DesiredLocation.Processor
+                || desiredLocation == DesiredLocation.AutoLine
+                || desiredLocation == DesiredLocation.NetScore)
             && !goToIntake;
     boolean isAlgaeReefTarget = isLocationAlgaeIntake(intakeLocation) && goToIntake;
     return isCoralReefTarget || isAlgaeReefTarget;
@@ -714,7 +724,7 @@ public class Drive implements DriveTemplate {
    * @param location desired location for robot to pathfind to
    */
   public void setDesiredLocation(DesiredLocation location) {
-    if (isLocationScoring(location)) {
+    if (isLocationScoring(location) || location == DesiredLocation.AutoLine) {
       this.desiredLocation = location;
     }
   }
@@ -776,6 +786,7 @@ public class Drive implements DriveTemplate {
 
   /** checks for update from reef location network table (SnakeScreen) run periodically in drive */
   public void updateDesiredLocationFromNetworkTables(double desiredIndex, boolean isAlgae) {
+    System.out.println("Updating desired location from network tables");
     if (desiredIndex == -1) {
       return;
     }
@@ -862,6 +873,38 @@ public class Drive implements DriveTemplate {
   @AutoLogOutput(key = "Drive/goToIntake")
   public boolean isGoingToIntake() {
     return goToIntake;
+  }
+
+  /**
+   * Should linear drive use slow, cautious gains.
+   *
+   * <p>This should be set to true when intaking algae from the reef or driving to the auto line in
+   * a barge auto
+   *
+   * <p>This value's constraints are only applied in LinearDrive onEntry
+   */
+  private boolean shouldLinearDriveSlowly = false;
+
+  /**
+   * Set shouldLinearDriveSlowly
+   *
+   * <p>This should be set to true when intaking algae from the reef or driving to the auto line in
+   * a barge auto
+   *
+   * <p>This value's constraints are only applied in LinearDrive onEntry
+   */
+  public void setShouldLinearDriveSlowly(boolean shouldLinearDriveSlowly) {
+    this.shouldLinearDriveSlowly = shouldLinearDriveSlowly;
+  }
+
+  /**
+   * Is shouldLinearDriveSlowly currently true
+   *
+   * <p>This should be set to true when intaking algae from the reef or driving to the auto line in
+   * a barge auto
+   */
+  public boolean shouldLinearDriveSlowly() {
+    return shouldLinearDriveSlowly;
   }
 
   /**
@@ -1111,5 +1154,9 @@ public class Drive implements DriveTemplate {
     } else {
       poseEstimator.resetRotation(Rotation2d.kZero);
     }
+  }
+
+  public boolean isLinearDriving() {
+    return stateMachine.getCurrentState() == DriveState.LinearDrive;
   }
 }
