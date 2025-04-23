@@ -44,7 +44,6 @@
           "command": "cancel_climb",
           "button": "XBOX_A"
         },
-
         {
           "command": "home_ramp",
           "button": "XBOX_LEFT_STICK"
@@ -55,7 +54,7 @@
         },
         {
           "command": "sidestep",
-          "button": "XBOX_Y"
+          "button": "XBOX_X"
         },
         {
           "command": "cancel_climb",
