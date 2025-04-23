@@ -10,7 +10,10 @@ import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.strategies.AutoDriveToLocation;
 import frc.robot.commands.strategies.AutoIntake;
+import frc.robot.commands.strategies.AutoIntakeBargeAlgae;
+import frc.robot.commands.strategies.AutoNetScore;
 import frc.robot.commands.strategies.AutoScore;
 import frc.robot.constants.AutoStrategy;
 import frc.robot.constants.AutoStrategyContainer.Action;
@@ -219,6 +222,13 @@ public class StrategyManager {
           return new AutoScore(
               drive, scoringSubsystem, action.piece(), action.location(), action.scoringTarget());
       }
+    } else if (action.type() == ActionType.DriveToLocation) {
+      return new AutoDriveToLocation(drive, action.location(), true);
+    } else if (action.type() == ActionType.IntakeAlgae) {
+      System.out.println("Generated IntakeAlgae action command with location " + action.location());
+      return new AutoIntakeBargeAlgae(drive, scoringSubsystem, DesiredLocation.Algae0);
+    } else if (action.type() == ActionType.NetScore) {
+      return new AutoNetScore(scoringSubsystem);
     } else {
       return null;
     }
@@ -292,6 +302,7 @@ public class StrategyManager {
     if (currentCommand == null || currentCommand.isFinished()) {
       if (currentCommand != null) {
         System.out.println(currentCommand.getName() + " was finished.");
+        currentCommand.cancel();
       }
       currentAction = getNextAction();
       currentCommand = getCommandFromAction(currentAction);
@@ -309,7 +320,9 @@ public class StrategyManager {
     this.logActions();
 
     // send and receive from SnakeScreen
-    this.updateScoringLocationsFromSnakeScreen();
+    if (!DriverStation.isAutonomous()) {
+      this.updateScoringLocationsFromSnakeScreen();
+    }
     this.publishCoralAndAlgae();
   }
 

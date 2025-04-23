@@ -118,6 +118,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   private enum StateAfterInit {
     Idle,
+    EarlyWarmup,
     Warmup,
     FarWarmup
   }
@@ -125,9 +126,6 @@ public class ScoringSubsystem extends MonitoredSubsystem {
   private StateAfterInit warmupStateAfterInit = StateAfterInit.Idle;
 
   private BooleanSupplier isDriveLinedUpSupplier;
-
-  /** Whether we detected an algae using current bc canrange dead */
-  private boolean algaeCurrentDetected = false;
 
   public enum FieldTarget {
     L1,
@@ -184,6 +182,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     CancelIntake,
     DoneIntaking,
     StartWarmup, // drive automatically enters warmup when lineup begins
+    StartEarlyWarmup, // drive automatically enters warmup when a certain distance away from OTF
+    // target (after FarWarmup) ONLY FOR CORAL
     StartFarWarmup, // Start a "far warmup" when drive is a certain distance from it's OTF target
     WarmupReady,
     CancelWarmup, // Warmup button was released, go back to idle
@@ -241,6 +241,13 @@ public class ScoringSubsystem extends MonitoredSubsystem {
                     && warmupStateAfterInit == StateAfterInit.Warmup)
         .permitIf(
             ScoringTrigger.Seeded,
+            ScoringState.Warmup,
+            () ->
+                !isScoringTuningSupplier.getAsBoolean()
+                    && warmupStateAfterInit == StateAfterInit.EarlyWarmup
+                    && canFarWarmup())
+        .permitIf(
+            ScoringTrigger.Seeded,
             ScoringState.FarWarmup,
             () ->
                 !isScoringTuningSupplier.getAsBoolean()
@@ -259,8 +266,15 @@ public class ScoringSubsystem extends MonitoredSubsystem {
             ScoringTrigger.BeginIntake,
             ScoringState.Intake,
             () -> !(isCoralDetected() || isAlgaeDetected()))
-        .permitIf(ScoringTrigger.StartFarWarmup, ScoringState.FarWarmup, () -> canFarWarmup())
-        .permit(ScoringTrigger.StartWarmup, ScoringState.Warmup)
+        .permitIf(
+            ScoringTrigger.StartEarlyWarmup,
+            ScoringState.Warmup,
+            () -> canFarWarmup() && hasCurrentPiece())
+        .permitIf(
+            ScoringTrigger.StartFarWarmup,
+            ScoringState.FarWarmup,
+            () -> canFarWarmup() && hasCurrentPiece())
+        .permitIf(ScoringTrigger.StartWarmup, ScoringState.Warmup, () -> hasCurrentPiece())
         .permitIf(ScoringTrigger.EnterTestMode, ScoringState.Tuning, isScoringTuningSupplier);
 
     stateMachineConfiguration
@@ -365,6 +379,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
 
     if (stateMachine.getCurrentState() == ScoringState.Init) {
       switch (trigger) {
+        case StartEarlyWarmup:
+          warmupStateAfterInit = StateAfterInit.EarlyWarmup;
         case StartWarmup:
           warmupStateAfterInit = StateAfterInit.Warmup;
           break;
@@ -375,6 +391,10 @@ public class ScoringSubsystem extends MonitoredSubsystem {
           break;
       }
     }
+  }
+
+  public ScoringState getCurrentState() {
+    return stateMachine.getCurrentState();
   }
 
   /** sets brake mode of relevant motors */
@@ -452,6 +472,11 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     }
   }
 
+  // Keep track of how many times per cycle setGoalSetpoint is getting called
+  private int setpointUpdatesThisCycle = 0;
+  // Hold onto an exception to print the stack trace whenever this happens!
+  private Exception lastSetpointUpdate;
+
   /**
    * Set the goal positions for elevator and wrist according to a ScoringSetpoint
    *
@@ -461,6 +486,15 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     setElevatorGoalHeight(setpoint.elevatorHeight());
     setWristGoalAngle(setpoint.wristAngle());
     Logger.recordOutput("scoring/setpoint", setpoint.name());
+    setpointUpdatesThisCycle++;
+
+    Exception newSetpointUpdate = new Exception("Multiple scoring setpoint updates in one cycle!");
+    if (setpointUpdatesThisCycle > 1 && lastSetpointUpdate != null) {
+      lastSetpointUpdate.printStackTrace();
+      newSetpointUpdate.printStackTrace();
+    }
+
+    lastSetpointUpdate = newSetpointUpdate;
   }
 
   /**
@@ -563,10 +597,21 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   public boolean isAlgaeDetected() {
     if (JsonConstants.scoringFeatureFlags.runClaw) {
-      return clawMechanism.isAlgaeDetected() || algaeCurrentDetected;
+      return clawMechanism.isAlgaeDetected();
     } else {
       return false;
     }
+  }
+
+  /**
+   * Check whether the current game piece is held
+   *
+   * @return True if current game piece is coral and coral detected, or current game piece is algae
+   *     and algae detected
+   */
+  public boolean hasCurrentPiece() {
+    return (getGamePiece() == GamePiece.Coral && isCoralDetected())
+        || (getGamePiece() == GamePiece.Algae && isAlgaeDetected());
   }
 
   /**
@@ -595,6 +640,16 @@ public class ScoringSubsystem extends MonitoredSubsystem {
 
   public FieldTarget getAlgaeScoreTarget() {
     return currentAlgaeScoreTarget;
+  }
+
+  /**
+   * Update the algae intake target, should be used in auto since this is done automatically in
+   * teleop
+   *
+   * @param algaeIntakeTarget new algae intake target
+   */
+  public void setAlgaeIntakeTarget(FieldTarget algaeIntakeTarget) {
+    currentAlgaeIntakeTarget = algaeIntakeTarget;
   }
 
   public FieldTarget getAlgaeIntakeTarget() {
@@ -655,10 +710,15 @@ public class ScoringSubsystem extends MonitoredSubsystem {
 
   @Override
   public void monitoredPeriodic() {
+    Logger.recordOutput("scoring/setpointUpdatesThisCycle", setpointUpdatesThisCycle);
+    // Reset setpoint update counter every cycle
+    setpointUpdatesThisCycle = 0;
+
     if (stateMachine.getCurrentState() == ScoringState.Tuning
         && !isScoringTuningSupplier.getAsBoolean()) {
       fireTrigger(ScoringTrigger.LeaveTestMode);
     }
+    Logger.recordOutput("scoring/prePeriodicState", stateMachine.getCurrentState());
     stateMachine.periodic();
 
     if (JsonConstants.scoringFeatureFlags.runElevator) {
@@ -678,7 +738,6 @@ public class ScoringSubsystem extends MonitoredSubsystem {
       determineProtectionClamps();
     }
 
-    Logger.recordOutput("scoring/algaeCurrentDetected", algaeCurrentDetected);
     Logger.recordOutput("scoring/state", stateMachine.getCurrentState());
     Logger.recordOutput("scoring/isDriveLinedUp", isDriveLinedUpSupplier.getAsBoolean());
     Logger.recordOutput("scoring/currentTarget", currentTarget);
@@ -806,12 +865,23 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     boolean wristInToPassReef = false;
     boolean elevatorBelowReefLevel = false;
     boolean elevatorAboveReefLevel = false;
+    boolean elevatorUpToAvoidReefBaseAlgae = false;
 
     Distance reefDistance = reefDistanceSupplier.get();
     Logger.recordOutput("scoring/reefDistanceSupplier", reefDistance);
     if (reefDistance.lt(JsonConstants.wristConstants.closeToReefThreshold)
         && !DriverStation.isTest()) {
       closeToReef = true;
+
+      // If we're close to the reef and the wrist is down, keep the elevator up
+      if (wristAngle.lte(JsonConstants.wristConstants.maxReefBaseWristDownCollisionAngle)) {
+        elevatorUpToAvoidReefBaseAlgae = true;
+        elevatorMinHeight.mut_replace(
+            (Distance)
+                Measure.max(
+                    elevatorMinHeight,
+                    JsonConstants.elevatorConstants.minWristDownReefBaseSafeHeight));
+      }
 
       if (elevatorHeight.lte(JsonConstants.elevatorConstants.minReefSafeHeight)
           && currentPiece != GamePiece.Algae) {
@@ -821,7 +891,9 @@ public class ScoringSubsystem extends MonitoredSubsystem {
             (Angle) Measure.max(wristMinAngle, JsonConstants.wristConstants.minReefSafeAngle));
       }
 
-      if (ReefAvoidanceHelper.willPassReefLevel(elevatorHeight, elevatorGoalHeight)) {
+      if (getGamePiece() == GamePiece.Coral
+          && ReefAvoidanceHelper.willPassReefLevel(elevatorHeight, elevatorGoalHeight)) {
+        // Don't run this protection when holding an algae
         wristInToPassReef = true;
         // If we will pass a reef level, clamp the wrist to be in a safe position to pass the reef
         wristMinAngle.mut_replace(
@@ -907,6 +979,8 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     Logger.recordOutput("scoring/clamps/elevatorAboveReefLevel", elevatorAboveReefLevel);
     Logger.recordOutput("scoring/clamps/wristDownForAlgae", wristDownForAlgae);
     Logger.recordOutput("scoring/clamps/canWristHitCrossbar", canWristHitCrossbar);
+    Logger.recordOutput(
+        "scoring/clamps/elevatorUpToAvoidReefBaseAlgae", elevatorUpToAvoidReefBaseAlgae);
 
     elevatorMechanism.setAllowedRangeOfMotion(elevatorMinHeight, elevatorMaxHeight);
     wristMechanism.setAllowedRangeOfMotion(wristMinAngle, wristMaxAngle);
@@ -931,17 +1005,5 @@ public class ScoringSubsystem extends MonitoredSubsystem {
    */
   public static ScoringSubsystem getInstance() {
     return instance;
-  }
-
-  public boolean isAlgaeCurrentDetected() {
-    if (clawMechanism != null) {
-      return clawMechanism.isAlgaeCurrentDetected();
-    }
-
-    return false;
-  }
-
-  public void setAlgaeCurrentDetected(boolean detected) {
-    algaeCurrentDetected = detected;
   }
 }

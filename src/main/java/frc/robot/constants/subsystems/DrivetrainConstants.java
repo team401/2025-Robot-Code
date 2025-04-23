@@ -106,6 +106,9 @@ public class DrivetrainConstants {
   public final Double otfPoseDistanceLimit = 0.1;
   public final Double otfPoseEndingVelocity = 0.5;
 
+  /** When within this distance of the OTF pose in teleop, drive will not OTF to intake */
+  public final Double teleopOTFIntakeThresholdMeters = 1.0;
+
   /**
    * if otf sees the correct tag with an along track and cross track under these thresholds, it will
    * go to lineup
@@ -252,6 +255,9 @@ public class DrivetrainConstants {
   public final Double kPositionTolerance = 0.25;
   public final Double kVelocityTolerance = 0.1;
 
+  public final Double kDriveTranslationMaxVelocitySlow = 1.5;
+  public final Double kDriveTranslationMaxAccelerationSlow = 1.0;
+
   public final Double kDriveToPointHeadingP = 10.0;
   public final Double kDriveToPointHeadingI = 0.0;
   public final Double kDriveToPointHeadingD = 0.0;
@@ -263,6 +269,10 @@ public class DrivetrainConstants {
   public final Double kDriveToPointEndVelocity = 0.5;
   public final Double kDriveToPointPhase2Distance = 1.0;
   public final Double kDriveToPointPhase2Angle = Math.toRadians(45.0);
+
+  /** How far away, in meters, Linear Drive should exit */
+  public final Double kDriveToPointFinishMargin = 0.25;
+
   public final Double lineupErrorMargin = 0.05;
 
   /**

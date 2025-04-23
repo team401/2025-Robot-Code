@@ -3,6 +3,7 @@ package frc.robot.subsystems.scoring.states;
 import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
+import frc.robot.InitBindings;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ScoringSetpoints;
 import frc.robot.constants.ScoringSetpoints.ScoringSetpoint;
@@ -28,6 +29,8 @@ public class ScoreState implements PeriodicStateInterface {
       // Force the net setpoint only in score since the "warmup" for the net stays low to use
       // elevator to shoot algae upward
       setpoint = JsonConstants.scoringSetpoints.net;
+    } else if (scoringSubsystem.getGamePiece() == GamePiece.Algae) {
+      setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getAlgaeScoreTarget());
     } else {
       setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getCoralTarget());
     }
@@ -43,6 +46,7 @@ public class ScoreState implements PeriodicStateInterface {
         } else {
           scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.coralScoreVoltage);
         }
+
         if (!scoringSubsystem.isCoralDetected()) {
           scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
         }
@@ -51,10 +55,10 @@ public class ScoreState implements PeriodicStateInterface {
         if (scoringSubsystem.getAlgaeScoreTarget() == FieldTarget.Net) {
           // Only run claw rollers when elevator is at setpoint
           if (scoringSubsystem
-              .getElevatorHeight()
+              .getWristAngle()
               .isNear(
-                  JsonConstants.scoringSetpoints.net.elevatorHeight(),
-                  JsonConstants.elevatorConstants.elevatorSetpointEpsilon)) {
+                  JsonConstants.scoringSetpoints.net.wristAngle(),
+                  JsonConstants.wristConstants.netShotRollerWristEpsilon)) {
             scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
           } else {
             scoringSubsystem.setClawRollerVoltage(Volts.zero());
@@ -64,12 +68,13 @@ public class ScoreState implements PeriodicStateInterface {
           scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
         }
 
-        if (JsonConstants.scoringFeatureFlags.runClaw) {
-          scoringSubsystem.setAlgaeCurrentDetected(scoringSubsystem.isAlgaeCurrentDetected());
-        }
-
         if (!scoringSubsystem.isAlgaeDetected()) {
-          scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
+          if (scoringSubsystem.getAlgaeScoreTarget() == FieldTarget.Processor
+              && !InitBindings.isWarmupPressed()) {
+            scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
+          } else if (scoringSubsystem.getAlgaeScoreTarget() != FieldTarget.Processor) {
+            scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
+          }
         }
         break;
     }

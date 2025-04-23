@@ -1,0 +1,29 @@
+{
+    "actions": [
+      {
+        "type": "Score",
+        "piece": "Coral",
+        "location": "Reef0",
+        "level": "L4"
+      },
+      {
+        "type": "IntakeAlgae",
+        "piece": "Algae",
+        "location": "Algae0",
+        "level": "L1"
+      },
+      {
+        "type": "NetScore",
+        "piece": "Algae",
+        "location": "Net",
+        "level": "L4"
+      },
+      {
+        "type": "Intake",
+        "piece": "Coral",
+        "location": "CoralStationRight",
+        "level": null
+      }
+    ]
+  }
+  

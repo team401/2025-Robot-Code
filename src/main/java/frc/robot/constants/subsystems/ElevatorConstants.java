@@ -186,12 +186,17 @@ public final class ElevatorConstants {
   /** Minimum height the elevator can be at with the wrist out without hitting the reef base */
   public final Distance minReefSafeHeight = Meters.of(0.6);
 
+  public final Distance minWristDownReefBaseSafeHeight = Meters.of(0.55);
+
   public final Distance L4MinHeightAbove = Meters.of(1.74);
 
   public final Distance L2MaxHeightBelow = Meters.of(0.16);
 
   /** When within this distance, the elevator is considered "at its setpoint" */
   public final Distance elevatorSetpointEpsilon = Meters.of(0.05);
+
+  /** When within this distance, spin the rollers during net pop shot */
+  public final Distance netScoreSetpointEpsilon = Meters.of(0.25);
 
   /**
    * How high elevator must go before we can swing the algae up into the robot without getting stuck

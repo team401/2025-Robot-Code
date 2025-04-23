@@ -66,6 +66,7 @@ public class IntakeState implements PeriodicStateInterface {
 
   // @Override
   public void periodic() {
+    Logger.recordOutput("enteredIntakeState", "HOLY RIZZ BRUH");
     if (!DriverStation.isEnabled()) {
       homingTimer.restart();
       return;
@@ -150,15 +151,9 @@ public class IntakeState implements PeriodicStateInterface {
         }
         break;
       case Algae:
-        boolean algaeCurrentDetected = scoringSubsystem.isAlgaeCurrentDetected();
-
-        if (scoringSubsystem.isAlgaeDetected() || algaeCurrentDetected) {
+        if (scoringSubsystem.isAlgaeDetected()) {
           scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeIdleVoltage);
           scoringSubsystem.fireTrigger(ScoringTrigger.DoneIntaking);
-
-          if (algaeCurrentDetected) {
-            scoringSubsystem.setAlgaeCurrentDetected(true);
-          }
         }
         break;
     }

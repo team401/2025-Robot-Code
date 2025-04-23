@@ -48,19 +48,24 @@ public class WarmupState implements PeriodicStateInterface {
     ScoringSetpoint setpoint;
     if (scoringSubsystem.getGamePiece() == GamePiece.Coral) {
       setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getCoralTarget());
+
+      if (!scoringSubsystem.isCoralDetected()) {
+        scoringSubsystem.fireTrigger(ScoringTrigger.ReturnToIdle);
+      }
     } else {
       setpoint = ScoringSetpoints.getWarmupSetpoint(scoringSubsystem.getAlgaeScoreTarget());
+
+      if (!scoringSubsystem.isAlgaeDetected()) {
+        scoringSubsystem.fireTrigger(ScoringTrigger.ReturnToIdle);
+      }
     }
 
     scoringSubsystem.setGoalSetpoint(setpoint);
-    scoringSubsystem.setClawRollerVoltage(Volts.zero());
 
-    if (JsonConstants.scoringFeatureFlags.runClaw) {
-      scoringSubsystem.setAlgaeCurrentDetected(scoringSubsystem.isAlgaeCurrentDetected());
-    }
-
-    if (!(scoringSubsystem.isAlgaeDetected() || scoringSubsystem.isCoralDetected())) {
-      scoringSubsystem.fireTrigger(ScoringTrigger.ReturnToIdle);
+    if (scoringSubsystem.getGamePiece() == GamePiece.Algae) {
+      scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeIdleVoltage);
+    } else {
+      scoringSubsystem.setClawRollerVoltage(Volts.zero());
     }
 
     boolean elevatorAtSetpoint =

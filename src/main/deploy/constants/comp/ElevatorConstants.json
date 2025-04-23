@@ -86,6 +86,10 @@
     "value": 0.05,
     "unit": "Meter"
   },
+  "netScoreSetpointEpsilon": {
+    "value": 0.25,
+    "unit": "Meter"
+  },
   "maxElevatorSetpointVelocityMetersPerSecond": 0.01,
   "minAlgaeInHeight": {
     "value": 1.7,
