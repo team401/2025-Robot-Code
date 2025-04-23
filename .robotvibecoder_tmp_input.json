@@ -1,0 +1,1 @@
+{"package":"subsystems.climb","name":"DeepClimber","kind":"Arm","canbus":"canivore","motors":["winchMotor","clawMotor"],"lead_motor":"winchMotor","encoder":"climberEncoder"}
