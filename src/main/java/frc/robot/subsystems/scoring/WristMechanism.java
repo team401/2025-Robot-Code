@@ -52,31 +52,31 @@ public class WristMechanism {
 
   public WristMechanism(WristIO io) {
     wristkP =
-        new LoggedTunableNumber("WristTunables/wristkP", JsonConstants.wristConstants.wristKP);
+        new LoggedTunableNumber("WristTunables/wristkP", JsonConstants.wristConstants.wristkP);
     wristkI =
-        new LoggedTunableNumber("WristTunables/wristkI", JsonConstants.wristConstants.wristKI);
+        new LoggedTunableNumber("WristTunables/wristkI", JsonConstants.wristConstants.wristkI);
     wristkD =
-        new LoggedTunableNumber("WristTunables/wristkD", JsonConstants.wristConstants.wristKD);
+        new LoggedTunableNumber("WristTunables/wristkD", JsonConstants.wristConstants.wristkD);
 
     wristkS =
-        new LoggedTunableNumber("WristTunables/wristkS", JsonConstants.wristConstants.wristKS);
+        new LoggedTunableNumber("WristTunables/wristkS", JsonConstants.wristConstants.wristkS);
     wristkV =
-        new LoggedTunableNumber("WristTunables/wristkV", JsonConstants.wristConstants.wristKV);
+        new LoggedTunableNumber("WristTunables/wristkV", JsonConstants.wristConstants.wristkV);
     wristkA =
-        new LoggedTunableNumber("WristTunables/wristkA", JsonConstants.wristConstants.wristKA);
+        new LoggedTunableNumber("WristTunables/wristkA", JsonConstants.wristConstants.wristkA);
     wristkG =
-        new LoggedTunableNumber("WristTunables/wristkG", JsonConstants.wristConstants.wristKG);
+        new LoggedTunableNumber("WristTunables/wristkG", JsonConstants.wristConstants.wristkG);
 
     wristCruiseVelocity =
         new LoggedTunableNumber(
             "WristTunables/wristCruiseVelocity",
-            JsonConstants.wristConstants.wristMotionMagicCruiseVelocityRotationsPerSecond);
+            JsonConstants.wristConstants.wristAngularCruiseVelocityRotationsPerSecond);
     wristExpokV =
         new LoggedTunableNumber(
-            "WristTunables/wristExpokV", JsonConstants.wristConstants.wristMotionMagicExpo_kV);
+            "WristTunables/wristExpokV", JsonConstants.wristConstants.wristExpo_kV_raw);
     wristExpokA =
         new LoggedTunableNumber(
-            "WristTunables/wristExpokA", JsonConstants.wristConstants.wristMotionMagicExpo_kA);
+            "WristTunables/wristExpokA", JsonConstants.wristConstants.wristExpo_kV_raw);
 
     wristTuningSetpointRotations =
         new LoggedTunableNumber("WristTunables/wristTuningSetpointRotations", 0.0);
@@ -258,7 +258,7 @@ public class WristMechanism {
    * @return
    */
   public Angle getWristAngle() {
-    return inputs.wristPosition;
+    return inputs.wristEncoderPos;
   }
 
   /**
@@ -279,7 +279,7 @@ public class WristMechanism {
    * @return True if connected, false if disconnected
    */
   public boolean isWristEncoderConnected() {
-    return inputs.isWristEncoderConnected;
+    return inputs.wristEncoderConnected;
   }
 
   /**

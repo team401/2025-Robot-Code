@@ -1,0 +1,11 @@
+{
+  "package": "subsystems.scoring",
+  "name": "Wrist",
+  "kind": "Arm",
+  "canbus": "canivore",
+  "motors": [
+    "wristMotor"
+  ],
+  "lead_motor": "wristMotor",
+  "encoder": "wristEncoder"
+}

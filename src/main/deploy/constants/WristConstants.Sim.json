@@ -1,4 +1,6 @@
 {
+  "positionStdDev": 0.0,
+  "velocityStdDev": 0.0,
   "wristMomentOfInertiaKgM2": 0.0672304487,
   "wristArmLength": {
     "value": 0.5,
@@ -9,11 +11,11 @@
     "unit": "Radian"
   },
   "wristMaxAngle": {
-    "value": 2.00,
+    "value": 2.0,
     "unit": "Radian"
   },
   "wristStartingAngle": {
     "value": 0.0,
-    "unit": "Rotation"
+    "unit": "Radian"
   }
 }

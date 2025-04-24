@@ -15,36 +15,36 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import frc.robot.constants.JsonConstants;
 import frc.robot.constants.SimConstants;
+import frc.robot.constants.WristConstants;
 import org.littletonrobotics.junction.Logger;
 
 public class WristIOSim extends WristIOTalonFX {
-  CANcoderSimState wristCANcoderSimState = wristCANcoder.getSimState();
+  CANcoderSimState wristEncoderSimState = wristEncoder.getSimState();
 
   TalonFXSimState wristMotorSimState = wristMotor.getSimState();
 
   private final SingleJointedArmSim wristSim =
       new SingleJointedArmSim(
           DCMotor.getKrakenX60Foc(1),
-          JsonConstants.wristConstants.wristReduction,
-          JsonConstants.wristConstantsSim.wristMomentOfInertia.in(KilogramSquareMeters),
-          JsonConstants.wristConstantsSim.wristArmLength.in(Meters),
-          JsonConstants.wristConstantsSim.wristMinAngle.in(Radians),
-          JsonConstants.wristConstantsSim.wristMaxAngle.in(Radians),
+          WristConstants.synced.getObject().wristReduction,
+          WristConstants.Sim.synced.getObject().wristMomentOfInertia.in(KilogramSquareMeters),
+          WristConstants.Sim.synced.getObject().wristArmLength.in(Meters),
+          WristConstants.Sim.synced.getObject().wristMinAngle.in(Radians),
+          WristConstants.Sim.synced.getObject().wristMaxAngle.in(Radians),
           true,
-          JsonConstants.wristConstantsSim.wristStartingAngle.in(Radians));
+          WristConstants.Sim.synced.getObject().wristStartingAngle.in(Radians));
+
+  MutAngle lastWristAngle = Radians.mutable(0.0);
 
   public WristIOSim() {
     super();
 
-    wristCANcoderSimState.Orientation = ChassisReference.Clockwise_Positive;
+    wristEncoderSimState.Orientation = ChassisReference.Clockwise_Positive;
 
     // Initialize sim state so that the first periodic runs with accurate data
     updateSimState();
   }
-
-  MutAngle lastWristAngle = Radians.mutable(0.0);
 
   private void updateSimState() {
     Angle wristAngle = Radians.of(wristSim.getAngleRads());
@@ -53,17 +53,16 @@ public class WristIOSim extends WristIOTalonFX {
     Angle diffAngle = wristAngle.minus(lastWristAngle);
     lastWristAngle.mut_replace(wristAngle);
 
-    // 1:1 ratio of wrist to CANcoder makes this math very easy
-    wristCANcoderSimState.setRawPosition(
+    // 1:1 ratio of Wrist to CANcoder makes this math very easy
+    wristEncoderSimState.setRawPosition(
         wristAngle.minus(
-            JsonConstants.wristConstants
-                .wristCANcoderMagnetOffset)); // Subtract the magnet offset since it's 0 in sim
-    wristCANcoderSimState.setVelocity(wristVelocity);
+            WristConstants.synced.getObject()
+                .wristEncoderMagnetOffset)); // Subtract the magnet offset since it's 0 in sim
+    wristEncoderSimState.setVelocity(wristVelocity);
 
-    Angle rotorDiffAngle = diffAngle.times(JsonConstants.wristConstants.wristReduction);
+    Angle rotorDiffAngle = diffAngle.times(WristConstants.synced.getObject().wristReduction);
     AngularVelocity rotorVelocity =
-        wristVelocity.times(JsonConstants.wristConstants.wristReduction);
-
+        wristVelocity.times(WristConstants.synced.getObject().wristReduction);
     wristMotorSimState.addRotorPosition(rotorDiffAngle);
     wristMotorSimState.setRotorVelocity(rotorVelocity);
     wristMotorSimState.setSupplyVoltage(RobotController.getBatteryVoltage());
@@ -71,13 +70,13 @@ public class WristIOSim extends WristIOTalonFX {
     wristSim.setInputVoltage(wristMotorSimState.getMotorVoltage());
 
     Logger.recordOutput("wristSim/position", wristAngle.in(Radians));
+
+    wristSim.update(SimConstants.simDeltaTime.in(Seconds));
   }
 
   @Override
   public void updateInputs(WristInputs inputs) {
     updateSimState();
-
-    wristSim.update(SimConstants.simDeltaTime.in(Seconds));
 
     super.updateInputs(inputs);
   }
