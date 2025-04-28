@@ -57,6 +57,30 @@
     {
       "type": "DriveToLocation",
       "piece": "Algae",
+      "location": "AutoLine",
+      "scoringTarget": "L2"
+    },
+    {
+      "type": "IntakeAlgae",
+      "piece": "Algae",
+      "location": "Algae2",
+      "scoringTarget": "L2"
+    },
+    {
+      "type": "DriveToLocation",
+      "piece": "Algae",
+      "location": "NetScore",
+      "scoringTarget": "L2"
+    },
+    {
+      "type": "NetScore",
+      "piece": "Algae",
+      "location": "Net",
+      "scoringTarget": "Net"
+    },
+    {
+      "type": "DriveToLocation",
+      "piece": "Algae",
       "location": "NetScore",
       "scoringTarget": "L2"
     },
