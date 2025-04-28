@@ -1,15 +1,52 @@
 {
-  "scoringLocations": [
-    "Reef11",
-    "Reef8",
-    "Reef9",
-    "Reef7"
-  ],
-  "scoringLevels": [
-    "L4",
-    "L4",
-    "L4",
-    "L4"
-  ],
-  "intakeLocation": "CoralStationLeft"
+  "actions": [
+    {
+      "type": "Score",
+      "piece": "Coral",
+      "location": "Reef11",
+      "scoringTarget": "L4"
+    },
+    {
+      "type": "Intake",
+      "piece": "Coral",
+      "location": "CoralStationLeft",
+      "scoringTarget": "L2"
+    },
+    {
+      "type": "Score",
+      "piece": "Coral",
+      "location": "Reef8",
+      "scoringTarget": "L4"
+    },
+    {
+      "type": "Intake",
+      "piece": "Coral",
+      "location": "CoralStationLeft",
+      "scoringTarget": "L2"
+    },
+    {
+      "type": "Score",
+      "piece": "Coral",
+      "location": "Reef9",
+      "scoringTarget": "L4"
+    },
+    {
+      "type": "Intake",
+      "piece": "Coral",
+      "location": "CoralStationLeft",
+      "scoringTarget": "L2"
+    },
+    {
+      "type": "Score",
+      "piece": "Coral",
+      "location": "Reef7",
+      "scoringTarget": "L4"
+    },
+    {
+      "type": "Intake",
+      "piece": "Coral",
+      "location": "CoralStationLeft",
+      "scoringTarget": "L2"
+    }
+  ]
 }

@@ -188,56 +188,9 @@ public class StrategyManager {
    * @param strategy AutoStrategy defined in java and json
    */
   public void addActionsFromAutoStrategy(AutoStrategy strategy) {
-    if (strategy.isBargeAuto) {
-      // Barge auto replaces auto with a hardcoded barge auto
-      this.addAction(
-          new Action(ActionType.Score, GamePiece.Coral, DesiredLocation.Reef0, FieldTarget.L4));
-      this.addAction(
-          new Action(
-              ActionType.DriveToLocation,
-              GamePiece.Algae,
-              DesiredLocation.AutoLine,
-              FieldTarget.L2));
-      this.addAction(
-          new Action(
-              ActionType.IntakeAlgae, GamePiece.Algae, DesiredLocation.Algae0, FieldTarget.L2));
-      this.addAction(
-          new Action(
-              ActionType.DriveToLocation,
-              GamePiece.Algae,
-              DesiredLocation.NetScore,
-              FieldTarget.L2));
-      this.addAction(
-          new Action(
-              ActionType.NetScore, GamePiece.Algae, DesiredLocation.NetScore, FieldTarget.Net));
-      this.addAction( // Drive back to the auto line point so that we're centered on the line before
-          // trying to drive into reef
-          new Action(
-              ActionType.DriveToLocation,
-              GamePiece.Algae,
-              DesiredLocation.AutoLine,
-              FieldTarget.L2));
-      this.addAction( // Drive into reef to get the move points again
-          new Action(
-              ActionType.DriveToLocation, GamePiece.Algae, DesiredLocation.Algae0, FieldTarget.L2));
-
-      return;
-    }
-
-    for (int i = 0; i < strategy.scoringLocations.size(); i++) {
-      FieldTarget scoringLevel =
-          strategy.scoringLevels.size() > i ? strategy.scoringLevels.get(i) : FieldTarget.L1;
-      // add scoring
-      this.addAction(
-          new Action(
-              ActionType.Score, GamePiece.Coral, strategy.scoringLocations.get(i), scoringLevel));
-
-      if (!(i == strategy.scoringLocations.size() - 1 && !strategy.intakeAfterLastScore)) {
-        // intake after each score, only if it is not the last scoring location and the auto isn't
-        // configured to not intake after last score
-        this.addAction(
-            new Action(ActionType.Intake, GamePiece.Coral, strategy.intakeLocation, null));
-      }
+    for (Action action : strategy.actions) {
+      this.addAction(action);
+      System.out.println(action);
     }
   }
 
@@ -257,7 +210,8 @@ public class StrategyManager {
         case Mixed:
         case Manual:
         default:
-          return new AutoIntake(drive, scoringSubsystem, action.location(), action.scoringTarget());
+          return new AutoIntake(
+              drive, scoringSubsystem, action.piece(), action.location(), action.scoringTarget());
       }
     } else if (action.type() == ActionType.Score) {
       switch (this.autonomyMode) {
@@ -265,7 +219,8 @@ public class StrategyManager {
         case Mixed:
         case Manual:
         default:
-          return new AutoScore(drive, scoringSubsystem, action.location(), action.scoringTarget());
+          return new AutoScore(
+              drive, scoringSubsystem, action.piece(), action.location(), action.scoringTarget());
       }
     } else if (action.type() == ActionType.DriveToLocation) {
       return new AutoDriveToLocation(drive, action.location(), true);

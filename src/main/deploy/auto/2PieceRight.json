@@ -1,11 +1,22 @@
 {
-  "scoringLocations": [
-    "Reef3",
-    "Reef5"
-  ],
-  "scoringLevels": [
-    "L4",
-    "L4"
-  ],
-  "intakeLocation": "CoralStationRight"
+  "actions": [
+    {
+      "type": "Score",
+      "piece": "Coral",
+      "location": "Reef3",
+      "scoringTarget": "L4"
+    },
+    {
+      "type": "Intake",
+      "piece": "Coral",
+      "location": "CoralStationRight",
+      "scoringTarget": "L2"
+    },
+    {
+      "type": "Score",
+      "piece": "Coral",
+      "location": "Reef5",
+      "scoringTarget": "L4"
+    }
+  ]
 }

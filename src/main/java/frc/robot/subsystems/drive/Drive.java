@@ -188,7 +188,9 @@ public class Drive implements DriveTemplate {
     DesiredLocation.Reef11,
     DesiredLocation.Processor,
     DesiredLocation.CoralStationLeft,
-    DesiredLocation.CoralStationRight
+    DesiredLocation.CoralStationRight,
+    DesiredLocation.AutoLine,
+    DesiredLocation.NetScore
   };
 
   public static final DesiredLocation[] reefAlgaeLocations = {

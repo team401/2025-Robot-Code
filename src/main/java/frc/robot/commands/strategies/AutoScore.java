@@ -20,12 +20,19 @@ public class AutoScore extends Command {
   @AutoLogOutput(key = "AutoScore/target")
   private FieldTarget currentFieldTarget;
 
+  private GamePiece gamePiece;
+
   public AutoScore(
-      Drive drive, ScoringSubsystem scoring, DesiredLocation scoringLocation, FieldTarget target) {
+      Drive drive,
+      ScoringSubsystem scoring,
+      GamePiece piece,
+      DesiredLocation scoringLocation,
+      FieldTarget target) {
     this.drive = drive;
     this.scoringSubsystem = scoring;
     this.currentScoringLocation = scoringLocation;
     this.currentFieldTarget = target;
+    this.gamePiece = piece;
     // we dont want to require subsystems (it prevents drive otf from running)
   }
 
@@ -38,7 +45,7 @@ public class AutoScore extends Command {
     }
 
     if (scoringSubsystem != null) {
-      scoringSubsystem.setGamePiece(GamePiece.Coral);
+      scoringSubsystem.setGamePiece(gamePiece);
       scoringSubsystem.setTarget(currentFieldTarget);
     }
   }

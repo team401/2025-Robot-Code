@@ -1,10 +1,10 @@
 {
-  "scoringLocations": [
-    "Reef0"
-  ],
-  "scoringLevels": [
-    "L4"
-  ],
-  "intakeLocation": "CoralStationRight",
-  "intakeAfterLastScore": false
+  "actions": [
+    {
+      "type": "Score",
+      "piece": "Coral",
+      "location": "Reef0",
+      "scoringTarget": "L4"
+    }
+  ]
 }
