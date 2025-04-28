@@ -13,7 +13,6 @@ import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
@@ -57,8 +56,7 @@ public class WristIOTalonFX implements WristIO {
   private StatusSignal<Current> wristMotorStatorCurrent;
 
   // Reuse the same motion magic request to avoid garbage collector having to clean them up.
-  MotionMagicExpoVoltage motionMagicExpoVoltage =
-      new MotionMagicExpoVoltage(0.0);
+  MotionMagicExpoVoltage motionMagicExpoVoltage = new MotionMagicExpoVoltage(0.0);
   VoltageOut voltageOut = new VoltageOut(0.0);
   TorqueCurrentFOC currentOut = new TorqueCurrentFOC(0.0);
 
@@ -70,8 +68,7 @@ public class WristIOTalonFX implements WristIO {
 
     CANcoderConfiguration cancoderConfiguration = new CANcoderConfiguration();
     cancoderConfiguration.MagnetSensor.withAbsoluteSensorDiscontinuityPoint(
-      WristConstants.synced.getObject().wristEncoderAbsoluteSensorDiscontinuityPoint;
-    );
+        WristConstants.synced.getObject().wristEncoderAbsoluteSensorDiscontinuityPoint);
 
     // Update with large CANcoder direction and apply
     cancoderConfiguration.MagnetSensor.SensorDirection =
@@ -106,7 +103,7 @@ public class WristIOTalonFX implements WristIO {
                         WristConstants.synced.getObject().wristEncoderToMechanismRatio)
                     .withRotorToSensorRatio(
                         WristConstants.synced.getObject().rotorToWristEncoderRatio))
-            .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast))
+            .withMotorOutput(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimitEnable(true)
@@ -115,13 +112,14 @@ public class WristIOTalonFX implements WristIO {
             .withSlot0(
                 new Slot0Configs()
                     .withGravityType(GravityTypeValue.Arm_Cosine)
-                    .withKS(WristConstants.synced.getObject().wristkS)
-                    .withKV(WristConstants.synced.getObject().wristkV)
-                    .withKA(WristConstants.synced.getObject().wristkA)
-                    .withKG(WristConstants.synced.getObject().wristkG)
-                    .withKP(WristConstants.synced.getObject().wristkP)
-                    .withKI(WristConstants.synced.getObject().wristkI)
-                    .withKD(WristConstants.synced.getObject().wristkD))
+                    .withKS(WristConstants.synced.getObject().wristKP)
+                    .withKV(WristConstants.synced.getObject().wristKV)
+                    .withKA(WristConstants.synced.getObject().wristKA)
+                    .withKG(WristConstants.synced.getObject().wristKG)
+                    .withKP(WristConstants.synced.getObject().wristKP)
+                    .withKI(WristConstants.synced.getObject().wristKI)
+                    .withKD(WristConstants.synced.getObject().wristKD)
+                    .withGravityType(GravityTypeValue.Arm_Cosine))
             .withMotionMagic(
                 new MotionMagicConfigs()
                     .withMotionMagicCruiseVelocity(

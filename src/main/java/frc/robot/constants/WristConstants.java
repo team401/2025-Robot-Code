@@ -7,7 +7,6 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Rotations;
 
-import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import coppercore.parameter_tools.json.JSONExclude;
@@ -38,13 +37,13 @@ public class WristConstants {
    * <p>see talonFX docs:
    * https://api.ctr-electronics.com/phoenix6/latest/java/com/ctre/phoenix6/configs/FeedbackConfigs.html#SensorToMechanismRatio
    */
-  public final Double sensorToMechanismRatio = 1.0;
+  public final Double wristEncoderToMechanismRatio = 1.0;
 
   public final Double wristReduction = 20.0;
 
-  @JSONExclude public final Double rotorToSensorRatio = wristReduction;
+  public final Double rotorToWristEncoderRatio = 20.0;
 
-  public final InvertedValue wristEncoderDirection = InvertedValue.Clockwise_Positive;
+  public final SensorDirectionValue wristEncoderDirection = SensorDirectionValue.Clockwise_Positive;
 
   public final NeutralModeValue wristNeutralModeValue = NeutralModeValue.Brake;
 
@@ -64,10 +63,10 @@ public class WristConstants {
   public final Double wristKD = 0.5;
 
   // This value is a a Double because RotationsPerSecond doesn't serialize properly with JSONSync
-  public final Double wristMotionMagicCruiseVelocityRotationsPerSecond = 3.0;
+  public final Double wristAngularCruiseVelocityRotationsPerSecond = 3.0;
 
-  public final Double wristMotionMagicExpo_kA = 0.4;
-  public final Double wristMotionMagicExpo_kV = 0.1;
+  public final Double wristExpo_kA_raw = 0.4;
+  public final Double wristExpo_kV_raw = 0.1;
 
   public final Angle wristEncoderAbsoluteSensorDiscontinuityPoint = Rotations.of(0.5);
   public final Angle wristEncoderMagnetOffset = Rotations.of(-0.315185546875);

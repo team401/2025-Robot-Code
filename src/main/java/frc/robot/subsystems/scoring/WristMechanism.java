@@ -34,14 +34,14 @@ public class WristMechanism {
   MutAngle minAngle = JsonConstants.wristConstants.wristMinMinAngle.mutableCopy();
   MutAngle maxAngle = JsonConstants.wristConstants.wristMaxMaxAngle.mutableCopy();
 
-  LoggedTunableNumber wristkP;
-  LoggedTunableNumber wristkI;
-  LoggedTunableNumber wristkD;
+  LoggedTunableNumber wristKP;
+  LoggedTunableNumber wristKI;
+  LoggedTunableNumber wristKD;
 
-  LoggedTunableNumber wristkS;
-  LoggedTunableNumber wristkV;
-  LoggedTunableNumber wristkA;
-  LoggedTunableNumber wristkG;
+  LoggedTunableNumber wristKS;
+  LoggedTunableNumber wristKV;
+  LoggedTunableNumber wristKA;
+  LoggedTunableNumber wristKG;
 
   LoggedTunableNumber wristCruiseVelocity;
   LoggedTunableNumber wristExpokV;
@@ -51,21 +51,21 @@ public class WristMechanism {
   LoggedTunableNumber wristTuningOverrideVolts;
 
   public WristMechanism(WristIO io) {
-    wristkP =
-        new LoggedTunableNumber("WristTunables/wristkP", JsonConstants.wristConstants.wristkP);
-    wristkI =
-        new LoggedTunableNumber("WristTunables/wristkI", JsonConstants.wristConstants.wristkI);
-    wristkD =
-        new LoggedTunableNumber("WristTunables/wristkD", JsonConstants.wristConstants.wristkD);
+    wristKP =
+        new LoggedTunableNumber("WristTunables/wristKP", JsonConstants.wristConstants.wristKP);
+    wristKI =
+        new LoggedTunableNumber("WristTunables/wristKI", JsonConstants.wristConstants.wristKI);
+    wristKD =
+        new LoggedTunableNumber("WristTunables/wristKD", JsonConstants.wristConstants.wristKD);
 
-    wristkS =
-        new LoggedTunableNumber("WristTunables/wristkS", JsonConstants.wristConstants.wristkS);
-    wristkV =
-        new LoggedTunableNumber("WristTunables/wristkV", JsonConstants.wristConstants.wristkV);
-    wristkA =
-        new LoggedTunableNumber("WristTunables/wristkA", JsonConstants.wristConstants.wristkA);
-    wristkG =
-        new LoggedTunableNumber("WristTunables/wristkG", JsonConstants.wristConstants.wristkG);
+    wristKS =
+        new LoggedTunableNumber("WristTunables/wristKS", JsonConstants.wristConstants.wristKS);
+    wristKV =
+        new LoggedTunableNumber("WristTunables/wristKV", JsonConstants.wristConstants.wristKV);
+    wristKA =
+        new LoggedTunableNumber("WristTunables/wristKA", JsonConstants.wristConstants.wristKA);
+    wristKG =
+        new LoggedTunableNumber("WristTunables/wristKG", JsonConstants.wristConstants.wristKG);
 
     wristCruiseVelocity =
         new LoggedTunableNumber(
@@ -115,19 +115,19 @@ public class WristMechanism {
             (pid) -> {
               io.setPID(pid[0], pid[1], pid[2]);
             },
-            wristkP,
-            wristkI,
-            wristkD);
+            wristKP,
+            wristKI,
+            wristKD);
 
         LoggedTunableNumber.ifChanged(
             hashCode(),
             (ff) -> {
               io.setFF(ff[0], ff[1], ff[2], ff[3]);
             },
-            wristkS,
-            wristkV,
-            wristkA,
-            wristkG);
+            wristKS,
+            wristKV,
+            wristKA,
+            wristKG);
 
         LoggedTunableNumber.ifChanged(
             hashCode(),

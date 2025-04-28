@@ -12,8 +12,6 @@ public class JsonConstants {
     EnvironmentHandler.getEnvironmentHandler(
         Filesystem.getDeployDirectory().toPath().resolve("constants/config.json").toString());
     // Don't save DrivetrainConstants.java, change the json's manually
-    WristConstants.synced.saveData();
-    WristConstants.Sim.synced.saveData();
     DrivetrainConstants.synced.loadData();
     ElevatorConstants.synced.loadData();
     ElevatorConstants.Sim.synced.loadData();
