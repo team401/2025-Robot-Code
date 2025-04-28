@@ -7,22 +7,40 @@
       "level": "L4"
     },
     {
+      "type": "DriveToLocation",
+      "piece": "Algae",
+      "location": "AutoLine",
+      "level": "L2"
+    },
+    {
       "type": "IntakeAlgae",
       "piece": "Algae",
       "location": "Algae0",
-      "level": "L1"
+      "level": "L2"
+    },
+    {
+      "type": "DriveToLocation",
+      "piece": "Algae",
+      "location": "NetScore",
+      "level": "L2"
     },
     {
       "type": "NetScore",
       "piece": "Algae",
       "location": "Net",
-      "level": "L4"
+      "level": "Net"
+    },    
+    {
+      "type": "DriveToLocation",
+      "piece": "Algae",
+      "location": "NetScore",
+      "level": "L2"
     },
     {
-      "type": "Intake",
-      "piece": "Coral",
-      "location": "CoralStationRight",
-      "level": null
+      "type": "DriveToLocation",
+      "piece": "Algae",
+      "location": "Algae0",
+      "level": "L2"
     }
   ]
 }
