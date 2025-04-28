@@ -1,0 +1,83 @@
+{
+  "buttonShorthands": {
+    "XBOX_A": 1,
+    "XBOX_B": 2,
+    "XBOX_X": 3,
+    "XBOX_Y": 4,
+    "XBOX_BACK": 7,
+    "XBOX_START": 8,
+    "XBOX_LEFT_BUMPER": 5,
+    "XBOX_RIGHT_BUMPER": 6,
+    "XBOX_LEFT_STICK": 9,
+    "XBOX_RIGHT_STICK": 10,
+    "JOYSTICK_TRIGGER": 1,
+    "JOYSTICK_TOP": 2,
+    "JOYSTICK_TOP_LEFT": 3,
+    "JOYSTICK_TOP_RIGHT": 4
+  },
+  "axesShorthands": {
+    "XBOX_LEFT_X": 0,
+    "XBOX_LEFT_Y": 1,
+    "XBOX_RIGHT_X": 4,
+    "XBOX_RIGHT_Y": 5,
+    "JOYSTICK_X": 0,
+    "JOYSTICK_Y": 1
+  },
+  "controllers": [
+    {
+      "port": 0,
+      "type": "xbox",
+      "buttons": [
+        {
+          "command": "intake",
+          "button": "XBOX_LEFT_BUMPER"
+        },
+        {
+          "command": "OTF",
+          "button": "XBOX_RIGHT_BUMPER"
+        },
+        {
+          "command": "climb",
+          "button": "XBOX_B"
+        },
+        {
+          "command": "cancel_climb",
+          "button": "XBOX_A"
+        },
+        {
+          "command": "home_ramp",
+          "button": "XBOX_LEFT_STICK"
+        },
+        {
+          "command": "seed_rotation",
+          "button": "XBOX_RIGHT_BUMPER"
+        },
+        {
+          "command": "sidestep",
+          "button": "XBOX_X"
+        },
+        {
+          "command": "cancel_climb",
+          "button": "XBOX_A"
+        }
+      ],
+      "axes": [
+        {
+          "command": "driveX",
+          "axis": "XBOX_LEFT_X",
+          "negate": false
+        },
+        {
+          "command": "driveY",
+          "axis": "XBOX_LEFT_Y",
+          "negate": false
+        },
+        {
+          "command": "driveRotation",
+          "axis": "XBOX_RIGHT_X",
+          "negate": false
+        }
+      ]
+    }
+  ]
+}
