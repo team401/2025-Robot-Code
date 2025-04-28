@@ -14,6 +14,7 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -56,8 +57,8 @@ public class WristIOTalonFX implements WristIO {
   private StatusSignal<Current> wristMotorStatorCurrent;
 
   // Reuse the same motion magic request to avoid garbage collector having to clean them up.
-  MotionMagicExpoTorqueCurrentFOC motionMagicExpoTorqueCurrentFOC =
-      new MotionMagicExpoTorqueCurrentFOC(0.0);
+  MotionMagicExpoVoltage motionMagicExpoVoltage =
+      new MotionMagicExpoVoltage(0.0);
   VoltageOut voltageOut = new VoltageOut(0.0);
   TorqueCurrentFOC currentOut = new TorqueCurrentFOC(0.0);
 
@@ -65,11 +66,12 @@ public class WristIOTalonFX implements WristIO {
     // Initialize TalonFXs  and CANcoders with their correct IDs
     wristMotor = new TalonFX(WristConstants.synced.getObject().wristMotorId, "canivore");
 
-    wristEncoder = new CANcoder(WristConstants.synced.getObject().wristEncoderID, "canivore");
+    wristEncoder = new CANcoder(WristConstants.synced.getObject().wristEncoderId, "canivore");
 
     CANcoderConfiguration cancoderConfiguration = new CANcoderConfiguration();
-    cancoderConfiguration.MagnetSensor.AbsoluteSensorDiscontinuityPoint =
-        WristConstants.synced.getObject().wristEncoderDiscontinuityPoint;
+    cancoderConfiguration.MagnetSensor.withAbsoluteSensorDiscontinuityPoint(
+      WristConstants.synced.getObject().wristEncoderAbsoluteSensorDiscontinuityPoint;
+    );
 
     // Update with large CANcoder direction and apply
     cancoderConfiguration.MagnetSensor.SensorDirection =
@@ -162,7 +164,7 @@ public class WristIOTalonFX implements WristIO {
     outputs.motorsDisabled = motorDisabled;
     outputs.outputMode = outputMode;
 
-    motionMagicExpoTorqueCurrentFOC.withPosition(wristEncoderGoalAngle);
+    motionMagicExpoVoltage.withPosition(wristEncoderGoalAngle);
 
     if (motorDisabled) {
       wristMotor.setControl(voltageOut.withOutput(0.0));
@@ -170,7 +172,7 @@ public class WristIOTalonFX implements WristIO {
     } else {
       switch (outputMode) {
         case ClosedLoop:
-          wristMotor.setControl(motionMagicExpoTorqueCurrentFOC);
+          wristMotor.setControl(motionMagicExpoVoltage);
 
           wristEncoderSetpointPosition.mut_setMagnitude(
               (wristMotor.getClosedLoopReference().getValue()));
