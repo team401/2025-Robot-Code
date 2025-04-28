@@ -62,9 +62,9 @@ public class ClawConstants {
 
   public final Current algaeDetectionCurrent = Amps.of(10.0);
 
-  public final Time algaeCurrentDetectionTimeRising = Seconds.of(0.5);
+  public final Time algaeDetectionTimeRising = Seconds.of(0.5);
 
-  public final Time algaeCurrentDetectionTimeFalling = Seconds.of(2.0);
+  public final Time algaeDetectionTimeFalling = Seconds.of(0.0);
 
   public static final class Sim {
     @JSONExclude

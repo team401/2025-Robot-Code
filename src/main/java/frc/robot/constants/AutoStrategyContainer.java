@@ -15,7 +15,10 @@ public class AutoStrategyContainer {
 
   public enum ActionType {
     Intake,
-    Score
+    Score,
+    IntakeAlgae,
+    DriveToLocation,
+    NetScore
   };
 
   public static record Action(

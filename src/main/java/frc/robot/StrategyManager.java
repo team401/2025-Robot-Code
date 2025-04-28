@@ -10,7 +10,10 @@ import edu.wpi.first.networktables.StringSubscriber;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.strategies.AutoDriveToLocation;
 import frc.robot.commands.strategies.AutoIntake;
+import frc.robot.commands.strategies.AutoIntakeBargeAlgae;
+import frc.robot.commands.strategies.AutoNetScore;
 import frc.robot.commands.strategies.AutoScore;
 import frc.robot.constants.AutoStrategy;
 import frc.robot.constants.AutoStrategyContainer.Action;
@@ -185,6 +188,42 @@ public class StrategyManager {
    * @param strategy AutoStrategy defined in java and json
    */
   public void addActionsFromAutoStrategy(AutoStrategy strategy) {
+    if (strategy.isBargeAuto) {
+      // Barge auto replaces auto with a hardcoded barge auto
+      this.addAction(
+          new Action(ActionType.Score, GamePiece.Coral, DesiredLocation.Reef0, FieldTarget.L4));
+      this.addAction(
+          new Action(
+              ActionType.DriveToLocation,
+              GamePiece.Algae,
+              DesiredLocation.AutoLine,
+              FieldTarget.L2));
+      this.addAction(
+          new Action(
+              ActionType.IntakeAlgae, GamePiece.Algae, DesiredLocation.Algae0, FieldTarget.L2));
+      this.addAction(
+          new Action(
+              ActionType.DriveToLocation,
+              GamePiece.Algae,
+              DesiredLocation.NetScore,
+              FieldTarget.L2));
+      this.addAction(
+          new Action(
+              ActionType.NetScore, GamePiece.Algae, DesiredLocation.NetScore, FieldTarget.Net));
+      this.addAction( // Drive back to the auto line point so that we're centered on the line before
+          // trying to drive into reef
+          new Action(
+              ActionType.DriveToLocation,
+              GamePiece.Algae,
+              DesiredLocation.AutoLine,
+              FieldTarget.L2));
+      this.addAction( // Drive into reef to get the move points again
+          new Action(
+              ActionType.DriveToLocation, GamePiece.Algae, DesiredLocation.Algae0, FieldTarget.L2));
+
+      return;
+    }
+
     for (int i = 0; i < strategy.scoringLocations.size(); i++) {
       FieldTarget scoringLevel =
           strategy.scoringLevels.size() > i ? strategy.scoringLevels.get(i) : FieldTarget.L1;
@@ -228,6 +267,13 @@ public class StrategyManager {
         default:
           return new AutoScore(drive, scoringSubsystem, action.location(), action.scoringTarget());
       }
+    } else if (action.type() == ActionType.DriveToLocation) {
+      return new AutoDriveToLocation(drive, action.location(), true);
+    } else if (action.type() == ActionType.IntakeAlgae) {
+      System.out.println("Generated IntakeAlgae action command with location " + action.location());
+      return new AutoIntakeBargeAlgae(drive, scoringSubsystem, DesiredLocation.Algae0);
+    } else if (action.type() == ActionType.NetScore) {
+      return new AutoNetScore(scoringSubsystem);
     } else {
       return null;
     }
@@ -301,6 +347,7 @@ public class StrategyManager {
     if (currentCommand == null || currentCommand.isFinished()) {
       if (currentCommand != null) {
         System.out.println(currentCommand.getName() + " was finished.");
+        currentCommand.cancel();
       }
       currentAction = getNextAction();
       currentCommand = getCommandFromAction(currentAction);
@@ -318,7 +365,9 @@ public class StrategyManager {
     this.logActions();
 
     // send and receive from SnakeScreen
-    this.updateScoringLocationsFromSnakeScreen();
+    if (!DriverStation.isAutonomous()) {
+      this.updateScoringLocationsFromSnakeScreen();
+    }
     this.publishCoralAndAlgae();
   }
 

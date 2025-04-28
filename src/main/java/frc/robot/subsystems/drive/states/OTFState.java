@@ -170,6 +170,22 @@ public class OTFState implements PeriodicStateInterface {
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueCoralStationLeftTranslation,
                 JsonConstants.blueFieldLocations.blueCoralStationLeftRotation);
+      case AutoLine:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redAutoLineTranslation,
+                JsonConstants.redFieldLocations.redAutoLineRotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueAutoLineTranslation,
+                JsonConstants.blueFieldLocations.blueAutoLineRotation);
+      case NetScore:
+        return driveInput.isAllianceRed()
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redNetScoreTranslation,
+                JsonConstants.redFieldLocations.redNetScoreRotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueNetScoreTranslation,
+                JsonConstants.blueFieldLocations.blueNetScoreRotation);
       default:
         return null;
     }
@@ -223,7 +239,7 @@ public class OTFState implements PeriodicStateInterface {
     // }
 
     if (drive.isDriveCloseForWarmup() && ScoringSubsystem.getInstance() != null) {
-      ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartWarmup);
+      ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartEarlyWarmup);
     } else if (drive.isDriveCloseForFarWarmup() && ScoringSubsystem.getInstance() != null) {
       ScoringSubsystem.getInstance().fireTrigger(ScoringTrigger.StartFarWarmup);
     }

@@ -1,0 +1,11 @@
+{
+  "scoringLocations": [
+    "Reef0"
+  ],
+  "scoringLevels": [
+    "L4"
+  ],
+  "intakeLocation": "CoralStationRight",
+  "intakeAfterLastScore": false,
+  "isBargeAuto": true
+}

@@ -17,6 +17,10 @@
     "x": 11.410,
     "y": 4.295
   },
+  "redAlgaeOTF0Translation": {
+    "x": 11.94,
+    "y": 3.96
+  },
   "redReefOTF1Rotation": {
     "radians": 0.0
   },
@@ -134,5 +138,12 @@
   "coralAlgaeStackRightBottomCorner": {
     "x": 16.45,
     "y": 6.1
+  },
+  "redNetScoreTranslation": {
+    "x": 9.15,
+    "y": 3.07
+  },
+  "redNetScoreRotation": {
+    "radians": 0.0
   }
 }
