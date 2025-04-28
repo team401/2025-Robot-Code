@@ -3,9 +3,7 @@ package frc.robot.subsystems.scoring.states;
 import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
-import coppercore.controls.state_machine.transition.Transition;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
+import frc.robot.InitBindings;
 import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.FieldTarget;
@@ -13,8 +11,7 @@ import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 
 public class AlgaeScoreState implements PeriodicStateInterface {
   private final ScoringSubsystem scoringSubsystem;
-
-  private boolean hasAlgae;
+  private boolean flickLaunched = false;
 
   public AlgaeScoreState(ScoringSubsystem scoringSubsystem) {
     this.scoringSubsystem = scoringSubsystem;
@@ -22,34 +19,47 @@ public class AlgaeScoreState implements PeriodicStateInterface {
 
   @Override
   public void periodic() {
-    hasAlgae = scoringSubsystem.isAlgaeDetected();
-
-    if (!hasAlgae) {
-      //leave the state when there is no algae
+    if (!scoringSubsystem.isAlgaeDetected()) {
       scoringSubsystem.fireTrigger(ScoringTrigger.ReturnToIdle);
       return;
     }
 
-    // Set the goal to the Net setpoint
-    var setpoint = JsonConstants.scoringSetpoints.net;
-    scoringSubsystem.setGoalSetpoint(setpoint);
+    FieldTarget target = scoringSubsystem.getAlgaeScoreTarget();
 
-    // Get current elevator height and wrist angle
-    Distance elevatorHeight = scoringSubsystem.getElevatorHeight();
-    Angle wristAngle = scoringSubsystem.getWristAngle(); // assuming same units
+    if (target == FieldTarget.Net) {
+  
+      scoringSubsystem.setElevatorGoalHeight(JsonConstants.scoringSetpoints.net.elevatorHeight());
 
-    // Move wrist when elevator is above a threshold
-    if (elevatorHeight.baseUnitMagnitude() > JsonConstants.elevatorConstants.wristFlipHeightThreshold.baseUnitMagnitude()) {
-      scoringSubsystem.setWristGoalAngle(setpoint.wristAngle());
+      if (!flickLaunched
+          && scoringSubsystem
+              .getElevatorHeight()
+              .isNear(
+                  JsonConstants.scoringSetpoints.net.elevatorHeight(),
+                  JsonConstants.elevatorConstants.netScoreSetpointEpsilon)) {
+        if (scoringSubsystem
+            .getWristAngle()
+            .isNear(
+                JsonConstants.scoringSetpoints.netWarmup.wristAngle(),
+                JsonConstants.wristConstants.netShotRollerWristEpsilon)) {
+          scoringSubsystem.setWristGoalAngle(JsonConstants.scoringSetpoints.net.wristAngle());
+          scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
+          flickLaunched = true;
+        } else {
+          scoringSubsystem.setClawRollerVoltage(Volts.zero());
+        }
+      }
+    } else {
+      
+      scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
     }
 
-    // Spin rollers when wrist is near target
-    if (scoringSubsystem
-            .getWristAngle()
-            .isNear(setpoint.wristAngle(), JsonConstants.wristConstants.netShotRollerWristEpsilon)) {
-      scoringSubsystem.setClawRollerVoltage(JsonConstants.clawConstants.algaeScoreVoltage);
-    } else {
-      scoringSubsystem.setClawRollerVoltage(Volts.zero());
+  
+    if (!scoringSubsystem.isAlgaeDetected()) {
+      if (target == FieldTarget.Processor && !InitBindings.isWarmupPressed()) {
+        scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
+      } else if (target != FieldTarget.Processor) {
+        scoringSubsystem.fireTrigger(ScoringTrigger.ScoredPiece);
+      }
     }
   }
 }

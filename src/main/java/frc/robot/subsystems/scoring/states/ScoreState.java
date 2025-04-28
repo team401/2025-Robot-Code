@@ -13,14 +13,23 @@ import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import frc.robot.subsystems.scoring.ScoringSubsystem.ScoringTrigger;
 
 public class ScoreState implements PeriodicStateInterface {
-  private ScoringSubsystem scoringSubsystem;
+  private final ScoringSubsystem scoringSubsystem;
+  private final AlgaeScoreState algaeScoreState;
 
   public ScoreState(ScoringSubsystem scoringSubsystem) {
     this.scoringSubsystem = scoringSubsystem;
+    this.algaeScoreState = new AlgaeScoreState(scoringSubsystem); // Initialize the AlgaeScoreState
   }
 
   @Override
   public void periodic() {
+    // Delegate to AlgaeScoreState if we're scoring Algae into the net
+    if (scoringSubsystem.getGamePiece() == GamePiece.Algae
+        && scoringSubsystem.getAlgaeScoreTarget() == FieldTarget.Net) {
+      algaeScoreState.periodic(); // Delegate periodic updates to AlgaeScoreState
+      return; // Exit to prevent further execution of ScoreState logic
+    }
+
     ScoringSetpoint setpoint;
 
     // Only warmup like normal when we aren't doing algae in the net
