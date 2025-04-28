@@ -4,43 +4,43 @@
       "type": "Score",
       "piece": "Coral",
       "location": "Reef0",
-      "level": "L4"
+      "scoringTarget": "L4"
     },
     {
       "type": "DriveToLocation",
       "piece": "Algae",
       "location": "AutoLine",
-      "level": "L2"
+      "scoringTarget": "L2"
     },
     {
       "type": "IntakeAlgae",
       "piece": "Algae",
       "location": "Algae0",
-      "level": "L2"
+      "scoringTarget": "L2"
     },
     {
       "type": "DriveToLocation",
       "piece": "Algae",
       "location": "NetScore",
-      "level": "L2"
+      "scoringTarget": "L2"
     },
     {
       "type": "NetScore",
       "piece": "Algae",
       "location": "Net",
-      "level": "Net"
-    },    
+      "scoringTarget": "Net"
+    },
     {
       "type": "DriveToLocation",
       "piece": "Algae",
       "location": "NetScore",
-      "level": "L2"
+      "scoringTarget": "L2"
     },
     {
       "type": "DriveToLocation",
       "piece": "Algae",
       "location": "Algae0",
-      "level": "L2"
+      "scoringTarget": "L2"
     }
   ]
 }
