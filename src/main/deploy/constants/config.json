@@ -1,5 +1,5 @@
 {
-  "environment": "comp",
+  "environment": "demo",
   "defaults": "comp",
   "environments": [
     {
@@ -52,6 +52,14 @@
       "filepath": "test_ramp",
       "files": [
         "RampConstants.json"
+      ]
+    },
+    {
+      "name": "demo",
+      "filepath": "demo",
+      "files": [
+        "DrivetrainConstants.json",
+        "OperatorConstants.json"
       ]
     }
   ]
