@@ -16,6 +16,7 @@ public class AutoIntakeBargeAlgae extends Command {
   private ScoringSubsystem scoringSubsystem;
 
   private DesiredLocation driveTarget;
+  private FieldTarget scoringTarget;
 
   public AutoIntakeBargeAlgae(
       Drive drive, ScoringSubsystem scoring, DesiredLocation driveLocation) {

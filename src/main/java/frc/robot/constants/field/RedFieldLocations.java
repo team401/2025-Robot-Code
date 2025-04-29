@@ -48,6 +48,8 @@ public class RedFieldLocations {
   public Translation2d redReefOTF5Translation = new Translation2d(14, 5.5);
   public Rotation2d redReefOTF5Rotation = new Rotation2d(Math.toRadians(-120));
 
+  public Translation2d redAlgae5OTFTranslation = new Translation2d(12.339, 2.76);
+
   public Translation2d redReefOTF6Translation = new Translation2d(14.7, 4);
   public Rotation2d redReefOTF6Rotation = new Rotation2d(Math.toRadians(180));
 

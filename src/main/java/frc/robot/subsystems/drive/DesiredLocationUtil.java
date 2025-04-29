@@ -115,7 +115,7 @@ public class DesiredLocationUtil {
       case Algae5:
         return isAllianceRed
             ? new Pose2d(
-                JsonConstants.redFieldLocations.redReefOTF11Translation,
+                JsonConstants.redFieldLocations.redAlgae5OTFTranslation,
                 JsonConstants.redFieldLocations.redReefOTF11Rotation)
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueReefOTF11Translation,
