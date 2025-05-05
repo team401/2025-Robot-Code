@@ -30,8 +30,12 @@ public class DrivetrainConstants {
 
   // SetGoalSpeed Constants
 
-  public final Double maxLinearSpeed = 6.0;
-  public final Double maxAngularSpeed = Math.PI * 2;
+  public final Double maxLinearSpeedComp = 6.0;
+  public final Double maxLinearSpeedAmateur = 2.5;
+  public final Double maxLinearSpeedChild = 0.3;
+  public final Double maxAngularSpeedChild = Math.PI / 1.5;
+  public final Double maxAngularSpeedAmateur = Math.PI;
+  public final Double maxAngularSpeedComp = Math.PI * 2;
   public final Double joystickDeadband = 0.17;
 
   // AlignToTarget Constants

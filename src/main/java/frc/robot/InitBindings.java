@@ -66,17 +66,15 @@ public final class InitBindings {
   }
 
   public static void initDriveBindings(Drive drive, StrategyManager strategyManager) {
-    // Default command, normal field-relative drive
-    drive.setDefaultCommand(
+    StrategyManager.driveCommand =
         new DriveWithJoysticks(
-            drive, // type: DriveTemplate
+            drive,
             () -> getAxis("driveX").getAsDouble(),
             () -> getAxis("driveY").getAsDouble(),
             () -> getAxis("driveRotation").getAsDouble(),
-            JsonConstants.drivetrainConstants.maxLinearSpeed, // type: double (m/s)
-            JsonConstants.drivetrainConstants.maxAngularSpeed, // type: double (rad/s)
-            JsonConstants.drivetrainConstants.joystickDeadband // type: double
-            ));
+            JsonConstants.drivetrainConstants.maxLinearSpeedComp,
+            JsonConstants.drivetrainConstants.maxAngularSpeedComp,
+            JsonConstants.drivetrainConstants.joystickDeadband);
 
     // hold right joystick trigger down to have drive go to desired location
     getButton("OTF")
@@ -278,6 +276,7 @@ public final class InitBindings {
                   }
                 },
                 drive));
+    drive.setDefaultCommand(StrategyManager.driveCommand);
   }
 
   public static void initRampBindings(RampSubsystem rampSubsystem) {
