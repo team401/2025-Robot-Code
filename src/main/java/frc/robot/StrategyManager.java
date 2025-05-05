@@ -1,5 +1,6 @@
 package frc.robot;
 
+import coppercore.wpilib_interface.DriveWithJoysticks;
 import edu.wpi.first.networktables.BooleanPublisher;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.DoubleSubscriber;
@@ -46,6 +47,7 @@ public class StrategyManager {
   private Action currentAction = null;
   private double currentMaxLinearSpeeds = JsonConstants.drivetrainConstants.maxLinearSpeedComp;
   private double currentMaxAngularSpeeds = JsonConstants.drivetrainConstants.maxAngularSpeedComp;
+  public static DriveWithJoysticks driveCommand;
 
   private NetworkTableInstance inst = NetworkTableInstance.getDefault();
   private NetworkTable table = inst.getTable("");
@@ -432,6 +434,8 @@ public class StrategyManager {
       default:
         break;
     }
+
+    setMaxSpeed();
   }
 
   public void setMaxSpeed() {
@@ -448,7 +452,10 @@ public class StrategyManager {
       currentMaxLinearSpeeds = JsonConstants.drivetrainConstants.maxLinearSpeedComp;
       currentMaxAngularSpeeds = JsonConstants.drivetrainConstants.maxAngularSpeedComp;
     }
-    return currentMaxLinearSpeeds;
+
+    if (driveCommand != null) {
+      driveCommand.setMaxSpeeds(currentMaxLinearSpeeds, currentMaxAngularSpeeds);
+    }
   }
 
   /**

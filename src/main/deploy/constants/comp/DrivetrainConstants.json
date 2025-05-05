@@ -1,6 +1,10 @@
 {
-  "maxLinearSpeed": 6.0,
-  "maxAngularSpeed": 6.283185307179586,
+  "maxLinearSpeedComp": 6.0,
+  "maxAngularSpeedComp": 6.283185307179586,
+  "maxLinearSpeedAmateur": 3.0,
+  "maxAngularSpeedAmateur": 6.283185307179586,
+  "maxLinearSpeedChild": 0.5,
+  "maxAngularSpeedChild": 6.283185307179586,
   "joystickDeadband": 0.17,
   "maxRotationAlignVelocity": 3.5,
   "maxRotationAlignAcceleration": 3.5,

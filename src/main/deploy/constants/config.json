@@ -1,5 +1,5 @@
 {
-  "environment": "demo",
+  "environment": "comp",
   "defaults": "comp",
   "environments": [
     {
