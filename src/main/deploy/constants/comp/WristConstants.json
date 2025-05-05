@@ -4,7 +4,7 @@
   "wristEncoderToMechanismRatio": 1.0,
   "wristReduction": 20.0,
   "rotorToWristEncoderRatio": 20.0,
-  "wristMotorInvertedValue": "Clockwise_Positive",
+  "wristEncoderDirection": "Clockwise_Positive",
   "wristNeutralModeValue": "Brake",
   "wristSupplyCurrentLimit": {
     "value": 40.0,
@@ -25,9 +25,9 @@
   "wristKP": 25.0,
   "wristKI": 1.0,
   "wristKD": 0.0,
-  "wristMotionMagicCruiseVelocityRotationsPerSecond": 3.0,
-  "wristMotionMagicExpo_kA": 0.4,
-  "wristMotionMagicExpo_kV": 0.1,
+  "wristAngularCruiseVelocityRotationsPerSecond": 3.0,
+  "wristExpo_kA_raw": 0.4,
+  "wristExpo_kV_raw": 0.1,
   "wristEncoderAbsoluteSensorDiscontinuityPoint": {
     "value": 0.5,
     "unit": "Rotation"
@@ -61,14 +61,26 @@
     "value": 5.0,
     "unit": "Degree"
   },
-  "netShotRollerWristEpsilon": {
-    "value": 45.0,
-    "unit": "Degree"
-  },
   "maxWristSetpointVelocityRotationsPerSecond": 0.008333,
   "wristStableDebounceTimeSeconds": 0.1,
   "algaeUnderCrossbarAngle": {
     "value": -0.105,
     "unit": "Radian"
+  },
+  "crossbarTopCollisionAngle": {
+    "value": 0.32,
+    "unit": "Rotation"
+  },
+  "crossbarBottomCollisionAngle": {
+    "value": 0.32,
+    "unit": "Rotation"
+  },
+  "netShotRollerWristEpsilon": {
+    "value": 45.0,
+    "unit": "Degree"
+  },
+  "maxReefBaseWristDownCollisionAngle": {
+    "value": 0.0,
+    "unit": "Rotation"
   }
 }

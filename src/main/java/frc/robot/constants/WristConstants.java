@@ -60,7 +60,7 @@ public class WristConstants {
 
   public final Double wristKP = 25.0;
   public final Double wristKI = 1.0;
-  public final Double wristKD = 0.5;
+  public final Double wristKD = 0.0;
 
   // This value is a a Double because RotationsPerSecond doesn't serialize properly with JSONSync
   public final Double wristAngularCruiseVelocityRotationsPerSecond = 3.0;
@@ -69,7 +69,7 @@ public class WristConstants {
   public final Double wristExpo_kV_raw = 0.1;
 
   public final Angle wristEncoderAbsoluteSensorDiscontinuityPoint = Rotations.of(0.5);
-  public final Angle wristEncoderMagnetOffset = Rotations.of(-0.315185546875);
+  public final Angle wristEncoderMagnetOffset = Rotations.of(0.190185546875);
   public final SensorDirectionValue wristEncoderSensorDirection =
       SensorDirectionValue.Clockwise_Positive;
 
@@ -85,7 +85,7 @@ public class WristConstants {
   public final Angle minElevatorDownSafeAngle = Radians.of(-0.503); // TODO: Confirm
 
   /** The minimum angle the wrist can be at without hitting the reef when very close to the reef */
-  public final Angle minReefSafeAngle = Rotations.of(0.3);
+  public final Angle minReefSafeAngle = Radians.of(1.56);
 
   /**
    * When less than this distance from the center of the reef, the claw can collide with it the reef
@@ -103,7 +103,7 @@ public class WristConstants {
   public final Double maxWristSetpointVelocityRotationsPerSecond =
       0.008333; // 3 degrees per second = 1 / 120 rotations = 0.008333...
 
-  public final Double wristStableDebounceTimeSeconds = 0.5;
+  public final Double wristStableDebounceTimeSeconds = 0.1;
 
   public final Angle algaeUnderCrossbarAngle = Radians.of(-0.105);
 
@@ -114,7 +114,7 @@ public class WristConstants {
   public final Angle crossbarBottomCollisionAngle = Rotations.of(0.32);
 
   /** How close the wrist must be to its goal to spin the rollers in net shot */
-  public final Angle netShotRollerWristEpsilon = Rotations.of(0.05);
+  public final Angle netShotRollerWristEpsilon = Degrees.of(45.0);
 
   public final Angle maxReefBaseWristDownCollisionAngle = Rotations.of(0.0);
 
