@@ -73,8 +73,8 @@ public final class InitBindings {
             () -> getAxis("driveX").getAsDouble(),
             () -> getAxis("driveY").getAsDouble(),
             () -> getAxis("driveRotation").getAsDouble(),
-            JsonConstants.drivetrainConstants.maxLinearSpeed, // type: double (m/s)
-            JsonConstants.drivetrainConstants.maxAngularSpeed, // type: double (rad/s)
+            JsonConstants.drivetrainConstants.maxLinearSpeedComp, // type: double (m/s)
+            JsonConstants.drivetrainConstants.maxAngularSpeedComp, // type: double (rad/s)
             JsonConstants.drivetrainConstants.joystickDeadband // type: double
             ));
 

@@ -18,6 +18,7 @@ import frc.robot.commands.strategies.AutoScore;
 import frc.robot.constants.AutoStrategy;
 import frc.robot.constants.AutoStrategyContainer.Action;
 import frc.robot.constants.AutoStrategyContainer.ActionType;
+import frc.robot.constants.JsonConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.Drive.DesiredLocation;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
@@ -43,6 +44,8 @@ public class StrategyManager {
   private ScoringSubsystem scoringSubsystem;
   private AutonomyMode autonomyMode = AutonomyMode.Full;
   private Action currentAction = null;
+  private double currentMaxLinearSpeeds = JsonConstants.drivetrainConstants.maxLinearSpeedComp;
+  private double currentMaxAngularSpeeds = JsonConstants.drivetrainConstants.maxAngularSpeedComp;
 
   private NetworkTableInstance inst = NetworkTableInstance.getDefault();
   private NetworkTable table = inst.getTable("");
@@ -57,7 +60,7 @@ public class StrategyManager {
   private StringSubscriber autonomySelector =
       table.getStringTopic("autonomyLevel").subscribe("mid");
   private StringSubscriber gamePieceSelector = table.getStringTopic("gpMode").subscribe("-1");
-
+  private StringSubscriber speedModeSelector = table.getStringTopic("speedMode").subscribe("pro");
   private StringPublisher autonomyPublisher = table.getStringTopic("autonomyLevel").publish();
   private DoublePublisher reefLocationPublisher = table.getDoubleTopic("reefTarget").publish();
   private DoublePublisher intakeLocationPublisher = table.getDoubleTopic("stationTarget").publish();
@@ -299,6 +302,7 @@ public class StrategyManager {
   }
 
   public void periodic() {
+
     if (currentCommand == null || currentCommand.isFinished()) {
       if (currentCommand != null) {
         System.out.println(currentCommand.getName() + " was finished.");
@@ -392,6 +396,8 @@ public class StrategyManager {
     }
 
     if (drive != null) {
+      // speed modes
+
       // publish default reef location
       int reefLocation = drive.getDesiredLocationIndex();
       if (gamePieceSelector.get().equalsIgnoreCase("algae")) {
@@ -426,6 +432,23 @@ public class StrategyManager {
       default:
         break;
     }
+  }
+
+  public void setMaxSpeed() {
+    if (speedModeSelector.get().equalsIgnoreCase("pro")) {
+      currentMaxLinearSpeeds = JsonConstants.drivetrainConstants.maxLinearSpeedComp;
+      currentMaxAngularSpeeds = JsonConstants.drivetrainConstants.maxAngularSpeedComp;
+    } else if (speedModeSelector.get().equalsIgnoreCase("amateur")) {
+      currentMaxLinearSpeeds = JsonConstants.drivetrainConstants.maxLinearSpeedAmateur;
+      currentMaxAngularSpeeds = JsonConstants.drivetrainConstants.maxAngularSpeedAmateur;
+    } else if (speedModeSelector.get().equalsIgnoreCase("child")) {
+      currentMaxLinearSpeeds = JsonConstants.drivetrainConstants.maxLinearSpeedChild;
+      currentMaxAngularSpeeds = JsonConstants.drivetrainConstants.maxAngularSpeedChild;
+    } else {
+      currentMaxLinearSpeeds = JsonConstants.drivetrainConstants.maxLinearSpeedComp;
+      currentMaxAngularSpeeds = JsonConstants.drivetrainConstants.maxAngularSpeedComp;
+    }
+    return currentMaxLinearSpeeds;
   }
 
   /**
