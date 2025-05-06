@@ -44,13 +44,20 @@ public class DesiredLocationUtil {
                 JsonConstants.blueFieldLocations.blueReefOTF2Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF2Rotation);
       case Reef3:
-      case Algae1:
         return isAllianceRed
             ? new Pose2d(
                 JsonConstants.redFieldLocations.redReefOTF3Translation,
                 JsonConstants.redFieldLocations.redReefOTF3Rotation)
             : new Pose2d(
                 JsonConstants.blueFieldLocations.blueReefOTF3Translation,
+                JsonConstants.blueFieldLocations.blueReefOTF3Rotation);
+      case Algae1:
+        return isAllianceRed
+            ? new Pose2d(
+                JsonConstants.redFieldLocations.redAlgaeOTF1Translation,
+                JsonConstants.redFieldLocations.redReefOTF3Rotation)
+            : new Pose2d(
+                JsonConstants.blueFieldLocations.blueAlgaeOTF1Translation,
                 JsonConstants.blueFieldLocations.blueReefOTF3Rotation);
       case Reef4:
         return isAllianceRed

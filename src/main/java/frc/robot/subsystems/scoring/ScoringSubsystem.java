@@ -860,6 +860,7 @@ public class ScoringSubsystem extends MonitoredSubsystem {
     Logger.recordOutput("scoring/clamps/elevatorAboveClaw", elevatorAboveClaw);
 
     boolean closeToReef = false;
+    boolean closeToReefUpperAlgae = false;
     boolean wristInToAvoidReefBase = false;
     boolean elevatorUpToAvoidReefBase = false;
     boolean wristInToPassReef = false;
@@ -927,6 +928,14 @@ public class ScoringSubsystem extends MonitoredSubsystem {
                         ReefAvoidanceHelper.getCollisionHeight(
                             elevatorHeight, elevatorGoalHeight)));
           }
+        }
+      } else if (getGamePiece() == GamePiece.Algae) {
+        if (elevatorHeight.in(Meters) > JsonConstants.elevatorConstants.L3MinHeightAbove.in(Meters)
+            && wristAngle.lte(JsonConstants.wristConstants.maxReefBaseWristDownCollisionAngle)) {
+          elevatorMinHeight.mut_replace(
+              (Distance)
+                  Measure.max(
+                      elevatorMinHeight, JsonConstants.scoringSetpoints.L3algae.elevatorHeight()));
         }
       }
     }

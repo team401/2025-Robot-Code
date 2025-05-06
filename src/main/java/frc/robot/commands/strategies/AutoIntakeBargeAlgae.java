@@ -19,10 +19,14 @@ public class AutoIntakeBargeAlgae extends Command {
   private FieldTarget scoringTarget;
 
   public AutoIntakeBargeAlgae(
-      Drive drive, ScoringSubsystem scoring, DesiredLocation driveLocation) {
+      Drive drive,
+      ScoringSubsystem scoring,
+      DesiredLocation driveLocation,
+      FieldTarget scoringTarget) {
     this.drive = drive;
     this.scoringSubsystem = scoring;
     this.driveTarget = driveLocation;
+    this.scoringTarget = scoringTarget;
     // we dont want to require subsystems (it prevents drive otf from running)
   }
 
@@ -38,8 +42,8 @@ public class AutoIntakeBargeAlgae extends Command {
 
     if (scoringSubsystem != null) {
       scoringSubsystem.setGamePiece(GamePiece.Algae);
-      scoringSubsystem.setAlgaeIntakeTarget(FieldTarget.L2);
-      scoringSubsystem.setTarget(FieldTarget.L2);
+      scoringSubsystem.setAlgaeIntakeTarget(scoringTarget);
+      scoringSubsystem.setTarget(scoringTarget);
       scoringSubsystem.fireTrigger(ScoringTrigger.CancelWarmup);
       scoringSubsystem.fireTrigger(ScoringTrigger.BeginIntake);
     }

@@ -2,7 +2,6 @@ package frc.robot.subsystems.drive.states;
 
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -58,8 +57,12 @@ public class LinearDriveState implements PeriodicStateInterface {
           new TrapezoidProfile.Constraints(
               kDriveTranslationMaxVelocity, kDriveTranslationMaxAcceleration));
 
-  private PIDController headingController =
-      new PIDController(kDriveToPointHeadingP, kDriveToPointHeadingI, kDriveToPointHeadingD);
+  private ProfiledPIDController headingController =
+      new ProfiledPIDController(
+          kDriveToPointHeadingP,
+          kDriveToPointHeadingI,
+          kDriveToPointHeadingD,
+          new TrapezoidProfile.Constraints(kDriveHeadingMaxVelocity, kDriveHeadingMaxAcceleration));
 
   public LinearDriveState(Drive drive) {
     this.drive = drive;
@@ -98,12 +101,14 @@ public class LinearDriveState implements PeriodicStateInterface {
     driveController.reset(new State(distanceToGoal, 0.0));
 
     headingController =
-        new PIDController(
+        new ProfiledPIDController(
             JsonConstants.drivetrainConstants.kDriveToPointHeadingP,
             JsonConstants.drivetrainConstants.kDriveToPointHeadingI,
-            JsonConstants.drivetrainConstants.kDriveToPointHeadingD);
+            JsonConstants.drivetrainConstants.kDriveToPointHeadingD,
+            new TrapezoidProfile.Constraints(
+                kDriveHeadingMaxVelocity, kDriveHeadingMaxAcceleration));
 
-    headingController.reset();
+    headingController.reset(new State(currentPose.getRotation().getRadians(), 0.0));
     headingController.enableContinuousInput(-Math.PI, Math.PI);
 
     // Using the lineup margin as the linear drive margin is totally wrong:
