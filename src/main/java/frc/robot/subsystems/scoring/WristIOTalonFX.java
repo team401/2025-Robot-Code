@@ -201,6 +201,7 @@ public class WristIOTalonFX implements WristIO {
   @Override
   public void setWristEncoderGoalPos(Angle goalPos) {
     wristEncoderGoalAngle.mut_replace(goalPos);
+    Logger.recordOutput("wrist/wristEncoderGoalAngle", wristEncoderGoalAngle);
   }
 
   @Override

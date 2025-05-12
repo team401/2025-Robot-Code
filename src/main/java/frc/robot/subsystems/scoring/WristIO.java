@@ -118,12 +118,6 @@ public interface WristIO {
    */
   public void setOverrideVoltage(Voltage volts);
 
-  /**
-   * Set the static current (because of FOC) that will be applied when the Wrist is in Current
-   * output mode.
-   */
-  public default void setWristGoalPos(Angle goalPos) {}
-
   public void setOverrideCurrent(Current current);
 
   /**

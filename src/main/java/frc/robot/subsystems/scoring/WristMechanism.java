@@ -166,7 +166,7 @@ public class WristMechanism {
   public void sendGoalAngleToIO() {
     updateClampedGoalAngle();
 
-    io.setWristGoalPos(clampedGoalAngle);
+    io.setWristEncoderGoalPos(clampedGoalAngle);
   }
 
   /**
