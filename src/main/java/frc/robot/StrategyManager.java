@@ -226,7 +226,8 @@ public class StrategyManager {
       return new AutoDriveToLocation(drive, action.location(), true);
     } else if (action.type() == ActionType.IntakeAlgae) {
       System.out.println("Generated IntakeAlgae action command with location " + action.location());
-      return new AutoIntakeBargeAlgae(drive, scoringSubsystem, DesiredLocation.Algae0);
+      return new AutoIntakeBargeAlgae(
+          drive, scoringSubsystem, action.location(), action.scoringTarget());
     } else if (action.type() == ActionType.NetScore) {
       return new AutoNetScore(scoringSubsystem);
     } else {

@@ -190,6 +190,8 @@ public final class ElevatorConstants {
 
   public final Distance L4MinHeightAbove = Meters.of(1.74);
 
+  public final Distance L3MinHeightAbove = Meters.of(0.9);
+
   public final Distance L2MaxHeightBelow = Meters.of(0.16);
 
   /** When within this distance, the elevator is considered "at its setpoint" */

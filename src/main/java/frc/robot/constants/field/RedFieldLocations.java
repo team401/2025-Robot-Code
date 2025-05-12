@@ -36,6 +36,8 @@ public class RedFieldLocations {
   public Translation2d redReefOTF1Translation = new Translation2d(11.5, 4.1);
   public Rotation2d redReefOTF1Rotation = new Rotation2d(Math.toRadians(0));
 
+  public Translation2d redAlgaeOTF1Translation = new Translation2d(12.39, 5.17);
+
   public Translation2d redReefOTF2Translation = new Translation2d(12.2, 5.3);
   public Rotation2d redReefOTF2Rotation = new Rotation2d(Math.toRadians(-60));
 
@@ -47,6 +49,8 @@ public class RedFieldLocations {
 
   public Translation2d redReefOTF5Translation = new Translation2d(14, 5.5);
   public Rotation2d redReefOTF5Rotation = new Rotation2d(Math.toRadians(-120));
+
+  public Translation2d redAlgae5OTFTranslation = new Translation2d(12.5, 2.86);
 
   public Translation2d redReefOTF6Translation = new Translation2d(14.7, 4);
   public Rotation2d redReefOTF6Rotation = new Rotation2d(Math.toRadians(180));
@@ -74,7 +78,7 @@ public class RedFieldLocations {
   public Translation2d redReef2Translation = new Translation2d(12.519, 4.621);
   public Translation2d redReef3Translation = new Translation2d(12.811, 4.817);
 
-  public Translation2d redAlgae1Translation = new Translation2d(12.27, 4.611);
+  public Translation2d redAlgae1Translation = new Translation2d(12.32, 5.17);
 
   public Translation2d redReef4Translation = new Translation2d(13.305, 4.794);
   public Translation2d redReef5Translation = new Translation2d(13.605, 4.632);
@@ -94,7 +98,7 @@ public class RedFieldLocations {
   public Translation2d redReef10Translation = new Translation2d(12.837, 3.256);
   public Translation2d redReef11Translation = new Translation2d(12.546, 3.428);
 
-  public Translation2d redAlgae5Translation = new Translation2d(12.714, 3.425);
+  public Translation2d redAlgae5Translation = new Translation2d(12.65, 2.75);
 
   public Translation2d redCoralStationRightTranslation = new Translation2d(16.3, 7);
   public Rotation2d redCoralStationRightRotation = new Rotation2d(Units.degreesToRadians(-120));
@@ -102,7 +106,7 @@ public class RedFieldLocations {
   public Translation2d redCoralStationLeftTranslation = new Translation2d(16.3, 1);
   public Rotation2d redCoralStationLeftRotation = new Rotation2d(Units.degreesToRadians(120));
 
-  public Translation2d redNetTranslation = new Translation2d(10.319, 2.768);
+  public Translation2d redNetTranslation = new Translation2d(10.35, 2.768);
   public Rotation2d redNetRotation = new Rotation2d(Math.PI);
 
   // left stacck center (16.2, 2.2)
