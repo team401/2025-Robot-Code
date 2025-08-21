@@ -2,15 +2,16 @@
 
 Competition code for Team 401's 2025 Robot, Hydrus.
 
-- [2025 Robot Code](#2025-robot-code)
-  - [Using the Simulator](#using-the-simulator)
-    - [Installing dependecies](#installing-dependecies)
-    - [Setting up AdvantageScope custom assets folder](#setting-up-advantagescope-custom-assets-folder)
-    - [Launching sim and viewing robot position](#launching-sim-and-viewing-robot-position)
+<!-- omit from toc -->
+## Table of Contents
+- [Using the Simulator](#using-the-simulator)
+  - [Installing dependencies](#installing-dependencies)
+  - [Setting up AdvantageScope custom assets folder](#setting-up-advantagescope-custom-assets-folder)
+  - [Launching sim and viewing robot position](#launching-sim-and-viewing-robot-position)
 
 ## Using the Simulator
 
-### Installing dependecies
+### Installing dependencies
 
 - Install WPILib 2025.3.1 as described [in Zero-to-Robot](https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/index.html).
 - Clone this repository:
