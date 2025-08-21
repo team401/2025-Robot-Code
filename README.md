@@ -74,7 +74,12 @@ git clone https://github.com/team401/2025-Robot-Code
   - If `Robot 2025` isn't an option, wait a few seconds to make sure all models have loaded, and then make sure you've [set up your custom assets folder](#setting-up-advantagescope-custom-assets-folder) correctly.
 - Next, scroll in the sidebar back up to the search bar. This time, search for `componentPositions`. Select `NT:/AdvantageKit/RealOutputs/componentPositions`. Drag `componentPositions` from the sidebar **on top of** `Robot 2025` in the Poses pane at the bottom of the screen. This will tell AdvantageScope to use the list of poses logged under `componentPositions` to position the elements from the robot's 3D model.
 - To verify that everything is working, navigate back to Glass, enable `Autonomous` under **`Robot State`**, and then quickly switch back to AdvantageScope. The robot should drive toward the reef and extend its elevator upward. Lineup is unreliable in sim, so it might not succeed in scoring the first time. Restarting sim or disabling and re-enabling auto can let it try again.
+- This setup will be preserved by AdvantageScope every time you reopen the app unless you close the tab.
 
 ### Driving the robot, running autos, and scoring in sim
 
-To be able to intake pieces, we use Elastic Dashboard. You can launch it just like AdvantageScope, from WPILib VSCode.
+To easily send and read values from Network Tables, we use Elastic Dashboard. You can launch it just like AdvantageScope, from WPILib VSCode. You can also use AdvantageScope, if you click on the slider icon right next to the search bar, although this UI doesn't let you pin values or create a layout.
+
+- Launch the simulator and open AdvantageScope with a 3D sim window as described in [the previous section](#launching-sim-and-viewing-robot-position).
+- Find the `System Joysticks` and `Joysticks` windows in the Sim GUI. Drag `Keyboard 0` from `System Joysticks` to `Joystick[0]` in `Joysticks` and `Keyboard 1` to `Joystick[1]`. If you have access to real joysticks, you can use these instead.
+- If you enable teleop in sim, you should be able to drive around with W, A, S, and D for translation and J and L for rotation.
