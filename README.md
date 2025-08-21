@@ -13,6 +13,7 @@ Competition code for Team 401's 2025 Robot, Hydrus.
   - [Installing dependencies](#installing-dependencies)
   - [Setting up AdvantageScope custom assets folder](#setting-up-advantagescope-custom-assets-folder)
   - [Launching sim and viewing robot position](#launching-sim-and-viewing-robot-position)
+  - [Driving the robot, running autos, and scoring in sim](#driving-the-robot-running-autos-and-scoring-in-sim)
 
 ## Project Features
 
@@ -73,3 +74,7 @@ git clone https://github.com/team401/2025-Robot-Code
   - If `Robot 2025` isn't an option, wait a few seconds to make sure all models have loaded, and then make sure you've [set up your custom assets folder](#setting-up-advantagescope-custom-assets-folder) correctly.
 - Next, scroll in the sidebar back up to the search bar. This time, search for `componentPositions`. Select `NT:/AdvantageKit/RealOutputs/componentPositions`. Drag `componentPositions` from the sidebar **on top of** `Robot 2025` in the Poses pane at the bottom of the screen. This will tell AdvantageScope to use the list of poses logged under `componentPositions` to position the elements from the robot's 3D model.
 - To verify that everything is working, navigate back to Glass, enable `Autonomous` under **`Robot State`**, and then quickly switch back to AdvantageScope. The robot should drive toward the reef and extend its elevator upward. Lineup is unreliable in sim, so it might not succeed in scoring the first time. Restarting sim or disabling and re-enabling auto can let it try again.
+
+### Driving the robot, running autos, and scoring in sim
+
+To be able to intake pieces, we use Elastic Dashboard. You can launch it just like AdvantageScope, from WPILib VSCode.
