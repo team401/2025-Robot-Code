@@ -6,7 +6,9 @@ Competition code for Team 401's 2025 Robot, Hydrus.
 ## Table of Contents
 - [Project Features](#project-features)
   - [JSON Constants](#json-constants)
-  - [Strategy Manager/JSON Autos](#strategy-managerjson-autos)
+  - [Strategy Manager](#strategy-manager)
+    - [JSON Autos](#json-autos)
+    - [Smart Autonomy \& Autonomy Levels](#smart-autonomy--autonomy-levels)
 - [Using the Simulator](#using-the-simulator)
   - [Installing dependencies](#installing-dependencies)
   - [Setting up AdvantageScope custom assets folder](#setting-up-advantagescope-custom-assets-folder)
@@ -22,9 +24,27 @@ We use [JsonConstants.java](https://github.com/team401/2025-Robot-Code/blob/main
 
 We also make use of CopperCore's Environment Handler with [config.json](https://github.com/team401/2025-Robot-Code/blob/main/src/main/deploy/constants/config.json), allowing us to specify different sets of constants for different environments. This enabled identical code to run on multiple different test platforms, allowing us to integrate our drivetrain code and individual subsystems on a test drivebase and HITL testing rig before our competition robot even existed.
 
-### Strategy Manager/JSON Autos
+### Strategy Manager
 
-Our custom [Strategy Manager](https://github.com/team401/2025-Robot-Code/blob/main/src/main/java/frc/robot/StrategyManager.java) served to coordinate all of our robot's actions via Network Tables and using a custom loader through JSONSync that enabled us to write our autos using JSON. JSONSync parsed autos [such as this one](https://github.com/team401/2025-Robot-Code/blob/main/src/main/deploy/auto/4PieceRight.json) and automatically generated a sequence of "Actions." It would then queue these actions, generating a command from each action as it was reached and handling the scheduling and cancelling of commands. Using JSON to store autos allowed us to modify autos without re-compiling, and enabled us to create autos declaratively rather than creating command sequences in code.
+Our custom [Strategy Manager](https://github.com/team401/2025-Robot-Code/blob/main/src/main/java/frc/robot/StrategyManager.java) coordinated of our robot's actions using JSONSync and handled operator controls through Network Tables.
+
+In autonomous, it acts as an action loader and queuer, handling the sequencing of our auto routines.
+
+In teleop, it handles interfacing with our custom operator interface, [SnakeScreen](https://github.com/team401/SnakeScreen).
+
+#### JSON Autos
+
+StrategyManager used JSONSync to load & parse autos [such as this one](https://github.com/team401/2025-Robot-Code/blob/main/src/main/deploy/auto/4PieceRight.json) and automatically generate a sequence of "Actions." It would then queue these actions, generating a command from each action as it was reached and handling the scheduling and cancelling of commands. Using JSON to store autos allowed us to modify autos without re-compiling, and enabled us to create autos declaratively rather than creating command sequences in code.
+
+#### Smart Autonomy & Autonomy Levels
+
+StrategyManager was also in charge of managing the current autonomy level of the robot. A challenge we faced last season was being able to fully utilize odometry and vision for localization, while still remaining functional when vision and odometry failed. Our solution to this in the 2025 season was to have multiple levels of autonomy:
+
+During teleop, our default state was `Smart` autonomy. This was also referred to as "mixed auto." The driver had full control over driving the robot, and synchronously controlled actions (e.g. pushing a button to start intaking). The operator configured the current game piece, and the current field target (e.g. setting Coral and L4 to score coral on the reef). When the driver pulled the trigger to score, the robot would automatically pick the nearest reef pole based on global odometry. It would then drive itself to about a meter away from that face of the reef using our [Linear Drive State](https://github.com/team401/2025-Robot-Code/blob/78548d16519e17e819c804a9da722a5ba1254a08/src/main/java/frc/robot/subsystems/drive/states/LinearDriveState.java). After getting close enough to the AprilTag on the correct face of the reef, the drivetrain would transition to [Single Tag Lineup mode](https://github.com/team401/2025-Robot-Code/blob/main/src/main/java/frc/robot/subsystems/drive/states/LinearDriveState.java), using single camera measurements with the individual tag to line up very precisely.
+
+We also had `Manual` (also called "low") autonomy. This mode exists in case vision becomes unreliable or our coprocessor dies/loses connection. In this mode, the driver can pull the score trigger to warm up, then manually line up with the reef pole (or the barge/processor) and push a button to score the game piece.
+
+During auto, our autonomy level was locked to `High`, also called "Full Auto." In this mode, the robot automatically executed actions back to back based on an auto strategy outlined in a JSON file. Scoring behaved identically as in `Smart` autonomy, except that the scoring locations were manually determined by the contents of the auto file rather than picking the closest reef pole. We used a wrapper around PathPlanner's On-the-Fly pathfinding to integrate it as a state in our existing drivetrain state machine. This allowed the robot to generate paths back to the coral stations by itself in auto, removing the need for predefined paths.
 
 ## Using the Simulator
 
