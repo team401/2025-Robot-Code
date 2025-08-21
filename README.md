@@ -4,10 +4,27 @@ Competition code for Team 401's 2025 Robot, Hydrus.
 
 <!-- omit from toc -->
 ## Table of Contents
+- [Project Features](#project-features)
+  - [JSON Constants](#json-constants)
+  - [Strategy Manager/JSON Autos](#strategy-managerjson-autos)
 - [Using the Simulator](#using-the-simulator)
   - [Installing dependencies](#installing-dependencies)
   - [Setting up AdvantageScope custom assets folder](#setting-up-advantagescope-custom-assets-folder)
   - [Launching sim and viewing robot position](#launching-sim-and-viewing-robot-position)
+
+## Project Features
+
+### JSON Constants
+
+All constants are loaded using CopperCore's JSON Sync feature, allowing us to quickly update constants without recompiling code. This can save 30-60 seconds per deploy, which adds up to hours over the course of a season.
+
+We use [JsonConstants.java](https://github.com/team401/2025-Robot-Code/blob/main/src/main/java/frc/robot/constants/JsonConstants.java) to handle loading of constants and aliasing the loaded files to easily usable paths.
+
+We also make use of CopperCore's Environment Handler with [config.json](https://github.com/team401/2025-Robot-Code/blob/main/src/main/deploy/constants/config.json), allowing us to specify different sets of constants for different environments. This enabled identical code to run on multiple different test platforms, allowing us to integrate our drivetrain code and individual subsystems on a test drivebase and HITL testing rig before our competition robot even existed.
+
+### Strategy Manager/JSON Autos
+
+Our custom [Strategy Manager](https://github.com/team401/2025-Robot-Code/blob/main/src/main/java/frc/robot/StrategyManager.java) served to coordinate all of our robot's actions via Network Tables and using a custom loader through JSONSync that enabled us to write our autos using JSON. JSONSync parsed autos [such as this one](https://github.com/team401/2025-Robot-Code/blob/main/src/main/deploy/auto/4PieceRight.json) and automatically generated a sequence of "Actions." It would then queue these actions, generating a command from each action as it was reached and handling the scheduling and cancelling of commands. Using JSON to store autos allowed us to modify autos without re-compiling, and enabled us to create autos declaratively rather than creating command sequences in code.
 
 ## Using the Simulator
 
