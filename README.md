@@ -97,6 +97,7 @@ To easily send and read values from Network Tables, we use Elastic Dashboard. Yo
 Our sim uses a network tables subscriber attached to `NT:/SmartDashboard/clawSim/coralAvailable` to determine whether or not the robot can currently intake coral. This is a sub-optimal solution, but it was written before the drivetrain sim was usable and it has survived until now.
 
 - To manage intaking in sim, open Elastic while the sim is running.
+- The first time you open Elastic, you'll need to configure the Team Number and IP address. Click `Settings` at the top of the window. Type in `401` as the Team Number and set `IP Address Mode` to `localhost`. `localhost` is for sim, and `Team Number`/ `robotRIO mDNS` are for connecting to a real robot. These settings will save, so you don't have to set them every time.
 - Right click anywhere in the grid and select `+ Add widget`.
 - Search for `hasCoral` and drag it into the grid. It should display as a red box. This will turn green when the logged value is `true`. Note that this value is only accurate when the robot is enabled.
 - Next, search for `coralAvailable`. You'll have to expand the dropdowns by clicking on the `▶`. Drag `coralAvailable` onto the grid next to `hasCoral`. Right click the `coralAvailable` widget and select `Show As` > `Toggle Switch`. This will allow you to control when the robot can intake coral.
