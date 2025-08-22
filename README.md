@@ -16,6 +16,7 @@ Competition code for Team 401's 2025 Robot, Hydrus.
   - [Driving the robot and scoring](#driving-the-robot-and-scoring)
   - [Intaking](#intaking)
   - [Testing Autos](#testing-autos)
+  - [Using SnakeScreen](#using-snakescreen)
 
 ## Project Features
 
@@ -114,3 +115,19 @@ Simulation of autos isn't perfect. Our robot is much more reliable in real life 
 - Whenever the robot drives to the intake station, toggle `coralAvailable` to true in Elastic to allow it to intake. The auto should continue as normal after it's done intaking. You can also leave `coralAvailable` on true for the entire auto, which will result in quicker cycle times, at the expense of some realism.
 
 For autos that involve algae (e.g. `1x3Barge1`), you'll need to add `hasAlgae` and `algaeAvailable` to Elastic in addition to the fields for coral. Set `algaeAvailable` to true when the claw would be pressed against an algae on the reef.
+
+### Using SnakeScreen
+
+To use more advanced features, such as scoring on different levels of the reef or interacting with algae, you'll need to install our operator console, SnakeScreen. SnakeScreen can be downloaded from its [releases page](https://github.com/team401/SnakeScreen/releases).
+
+- Launch the Sim GUI and SnakeScreen. The UI scaling of SnakeScreen may not fit right on your screen. To remedy this, zoom in or out using [`Ctrl` + `-`] or [`Ctrl`+`Shift` + `=`] (`Ctrl` + `+`), or by selecting `View` > `Zoom In`/`Out` in the top bar.
+- To configure SnakeScreen to connect to the sim, open the settings menu by clicking the gear in the bottom right. Select `SIM`. This will attempt to connect SnakeScreen to `localhost`.
+- To use SnakeScreen, enable teleop. Here are the options available:
+  - Use the switch labelled `A <=> C` to select algae or coral mode.
+  - The switch labeled `🚫 <=> 🧠` allows you to toggle between Manual and Smart autonomy.
+  - The set of buttons on the left (`NET` vs. `PROC` and `⬆️ REEF` vs. `⬇️ REEF`) let you configure algae mode. You can select whether the algae will be scored into the net or the processor, and whether it will be picked up from high on the reef (L3) or low on the reef (L2).
+
+    Note that in algae mode, there is no automatic driving, even in Smart autonomy. You'll have to drive the robot yourself.
+
+  - The stack of buttons for `LEVEL 1` - `LEVEL 4` lets you select the coral scoring height.
+- SnakeScreen also reflects the state of the robot in autonomous. This means that hasCoral and hasAlgae should remain accurate, and it will reflect the current scoring target/reef height.
