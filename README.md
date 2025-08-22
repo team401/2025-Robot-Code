@@ -9,6 +9,9 @@ Competition code for Team 401's 2025 Robot, Hydrus.
   - [Strategy Manager](#strategy-manager)
     - [JSON Autos](#json-autos)
     - [Smart Autonomy \& Autonomy Levels](#smart-autonomy--autonomy-levels)
+- [Project Structure](#project-structure)
+  - [Top Level](#top-level)
+  - [Subsystems](#subsystems)
 - [Using the Simulator](#using-the-simulator)
   - [Installing dependencies](#installing-dependencies)
   - [Setting up AdvantageScope custom assets folder](#setting-up-advantagescope-custom-assets-folder)
@@ -49,6 +52,76 @@ During teleop, our default state was `Smart` autonomy. This was also referred to
 We also had `Manual` (also called "low") autonomy. This mode exists in case vision becomes unreliable or our coprocessor dies/loses connection. In this mode, the driver can pull the score trigger to warm up, then manually line up with the reef pole (or the barge/processor) and push a button to score the game piece.
 
 During auto, our autonomy level was locked to `High`, also called "Full Auto." In this mode, the robot automatically executed actions back to back based on an auto strategy outlined in a JSON file. Scoring behaved identically as in `Smart` autonomy, except that the scoring locations were manually determined by the contents of the auto file rather than picking the closest reef pole. We used a wrapper around PathPlanner's On-the-Fly pathfinding to integrate it as a state in our existing drivetrain state machine. This allowed the robot to generate paths back to the coral stations by itself in auto, removing the need for predefined paths.
+
+## Project Structure
+
+The project is split up as follows:
+
+### Top Level
+
+- Strategy Manager
+
+  Loads autos, manages operator interface in teleop. In auto, robot actions are coordinated by commands located in `commands/strategies`.
+
+- RobotContainer
+
+  Handles instantiating robot and setting suppliers. Uses:
+
+  - InitSubsystems
+
+    Handles the instantiation of subsystems and creation of IO instances. Suppliers are set after all subsystems are created to provide values that one subsystem depends on from another subsystem.
+
+  - InitBindings
+
+    Binds driver controls to functions. In teleop, robot actions are coordinated by a combination of suppliers between the subsystems and the functions in the button bindings. For instance, pressing the score button will:
+
+    - Pick the nearest location and set that as the drive target
+    - Put the drivetrain into LinearDrive state to drive to the nearest reef pole
+    - Tell scoring to warmup (score height is already set because it is constantly updated from SnakeScreen)
+    - Once drive is done driving near the pole, it automatically transitions to lineup state
+    - Once scoring is warmed up, it waits for a supplier from drive to tell it that it has lined up before automatically transitioning to score.
+
+- Independent State Machines
+
+  Subsystems have their own state machines. Each subsystem behaves as a semi-autonomous system, automatically transitioning between actions and using suppliers provided by other subsystems for actions that are blocked (e.g. the claw waiting for drive to lineup before scoring).
+
+### Subsystems
+
+- Drive
+
+  Based on AdvantageKit's swerve drive template. This drivetrain uses a state machine
+
+- Ramp
+
+  The Ramp/Intake has the ability to pivot up over the elevator during endgame to allow space for a deep cage to attach to the climber. The ramp also featured an extending mechanism which was triggered by the ramp slamming down. To activate this, the ramp would raise itself up at the start of auto and then jolt back downward to extend the extra ramp mechanism.
+
+- Scoring
+
+  The entire superstructure of the robot, which shares one state machine.
+
+  ScoringSubsystem also checks the positions of its 3 mechanisms to make sure that nothing collides. Protection clamps are a state function: for any given set of input positions and goal positions, the resulting clamps will be the same. This is done to make debugging clamping issues as simple as possible, without having to worry about any "state" in the clamp system.
+
+  To prevent code from becoming cluttered and to promote separation of responsibilities, this subsystem is logically separated in code into its 3 component mechanisms:
+
+  - Elevator
+
+    Motion Magic Expo Torque Current FOC controlled elevator. ElevatorMechanism handles enforcing protection clamps, and conversion of target position and position inputs between encoder rotations and elevator height for more intuitive setpoints.
+
+  - Wrist
+
+    Handles enforcement of clamps and interaction with the IO interface.
+
+  - Claw
+
+    Reads signals from CANranges and handles debouncing the signals before reporting them to the ScoringSubsystem. Also handles running claw rollers and briefly contained code for current-based algae detection.
+
+- Climb
+
+  The climber uses a winch mechanism to control a single jointed arm with a hook attached to then end. It uses a PID controller with a CANcoder mounted in the base of the arm.
+
+- LED
+
+  Our LEDs had their own subsystem to convey various parts of robot state (e.g. whether or not the robot has a game piece) via suppliers provided by each subsytsem.
 
 ## Using the Simulator
 
