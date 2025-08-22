@@ -13,7 +13,9 @@ Competition code for Team 401's 2025 Robot, Hydrus.
   - [Installing dependencies](#installing-dependencies)
   - [Setting up AdvantageScope custom assets folder](#setting-up-advantagescope-custom-assets-folder)
   - [Launching sim and viewing robot position](#launching-sim-and-viewing-robot-position)
-  - [Driving the robot, running autos, and scoring in sim](#driving-the-robot-running-autos-and-scoring-in-sim)
+  - [Driving the robot and scoring](#driving-the-robot-and-scoring)
+  - [Intaking](#intaking)
+  - [Testing Autos](#testing-autos)
 
 ## Project Features
 
@@ -66,6 +68,9 @@ git clone https://github.com/team401/2025-Robot-Code
   - **Make sure you choose `advantagescope_configs` and not `Robot_401_2025`.** An easy way to do this is, when the file picker window opens to choose your custom assets folder, remain in `2025-Robot-Code`, click on `advantagescope_configs`, and then press `Ok`. If you select the inner folder, the robot model won't be detected by AdvantageScope.
 
 ### Launching sim and viewing robot position
+
+**If certain menus aren't visible in your Sim GUI, select `Workspace` > `Reset` in the top menu bar and your layout should be restored. Sometimes windows can be moved off screen and rendered inaccessible.**
+
 - Open the project in WPILib VSCode
 - Press Ctrl+Shift+P and type "Simulate Robot Code" to run the sim. When prompted, select "Sim GUI". This will launch Glass, the WPILib simulator application.
 - Open AdvantageScope. Open a `3D Field` tab by clicking the `+` in the top right and picking `3D Field`, or pressing `Alt+3`.
@@ -76,10 +81,35 @@ git clone https://github.com/team401/2025-Robot-Code
 - To verify that everything is working, navigate back to Glass, enable `Autonomous` under **`Robot State`**, and then quickly switch back to AdvantageScope. The robot should drive toward the reef and extend its elevator upward. Lineup is unreliable in sim, so it might not succeed in scoring the first time. Restarting sim or disabling and re-enabling auto can let it try again.
 - This setup will be preserved by AdvantageScope every time you reopen the app unless you close the tab.
 
-### Driving the robot, running autos, and scoring in sim
-
-To easily send and read values from Network Tables, we use Elastic Dashboard. You can launch it just like AdvantageScope, from WPILib VSCode. You can also use AdvantageScope, if you click on the slider icon right next to the search bar, although this UI doesn't let you pin values or create a layout.
+### Driving the robot and scoring
 
 - Launch the simulator and open AdvantageScope with a 3D sim window as described in [the previous section](#launching-sim-and-viewing-robot-position).
 - Find the `System Joysticks` and `Joysticks` windows in the Sim GUI. Drag `Keyboard 0` from `System Joysticks` to `Joystick[0]` in `Joysticks` and `Keyboard 1` to `Joystick[1]`. If you have access to real joysticks, you can use these instead.
-- If you enable teleop in sim, you should be able to drive around with W, A, S, and D for translation and J and L for rotation.
+- If you enable teleop, you should be able to drive around with W, A, S, and D for translation and J and L for rotation.
+- Once you can drive, you can set up keybinds for the intake and score triggers. Intake and score are mapped to the left joystick trigger and right joystick trigger, respectively. According to the [WPILib docs](https://docs.wpilib.org/en/stable/docs/software/basic-programming/joystick.html#joystick-class), the triggers are Button 1.
+- To check your keybindings, select `DS` in the top menu and then click on `Joystick 0` and `Joystick 1` to display their menus. Make sure button 1 is bound to something for each joystick (it will probably be `z` for joystick 0 and `m` for joystick 1).
+- Now, enable teleop again. Press and hold Button 1 for Joystick 1 (probably `m`) and you should see the robot drive to the nearest reef pole and score. Note that lineup is poorly simulated and it may jitter a lot or miss and not score.
+
+### Intaking
+
+To easily send and read values from Network Tables, we use Elastic Dashboard. You can launch it just like AdvantageScope, from WPILib VSCode. You can also use AdvantageScope, if you click on the slider icon right next to the search bar, although this UI doesn't let you pin values or create a layout.
+
+Our sim uses a network tables subscriber attached to `NT:/SmartDashboard/clawSim/coralAvailable` to determine whether or not the robot can currently intake coral. This is a sub-optimal solution, but it was written before the drivetrain sim was usable and it has survived until now.
+
+- To manage intaking in sim, open Elastic while the sim is running.
+- Right click anywhere in the grid and select `+ Add widget`.
+- Search for `hasCoral` and drag it into the grid. It should display as a red box. This will turn green when the logged value is `true`. Note that this value is only accurate when the robot is enabled.
+- Next, search for `coralAvailable`. You'll have to expand the dropdowns by clicking on the `▶`. Drag `coralAvailable` onto the grid next to `hasCoral`. Right click the `coralAvailable` widget and select `Show As` > `Toggle Switch`. This will allow you to control when the robot can intake coral.
+- Arranging your windows so that you can see Elastic, Sim GUI, and AdvantageScope will make the next steps much easier. You can make your Elastic window quite small, as it only needs to show two values. If you move the widgets to the top left of the grid, they won't be cut off when downsizing the Elastic window.
+- Now, if you toggle `coralAvailable` to on/true and switch your focus back to the Sim GUI, you should be able to press Button 1 on Joystick 0 (probably `z`) to run the intake. While holding the button, you should see the elevator dip very low to its intake setpoint, and after 1-2 seconds `hasCoral` should become true.
+
+### Testing Autos
+
+Simulation of autos isn't perfect. Our robot is much more reliable in real life than in sim, as many of our gains have been tuned to be accurate to real life and we haven't gone back to re-tune the physics of the sim to reflect these changes. However, by running autos multiple times, sim is still very useful for testing and debugging logic in auto without access to a physical robot.
+
+- Navigate back to Elastic. Add a new widget by searching for "auto chooser". This widget is how we select what auto routine will be run when enabling autonomous. The process for choosing an auto with elastic is identical between the sim and real life.
+- Select `4PieceRight` from the auto chooser dropdown. Drive the robot so that it's somewhere in between the barge and the reef, or restart sim to reset its position. Note that if you restart the sim, you will have to re-choose the auto.
+- Now, if you disable the robot and enable autonomous from the Sim GUI, you should see the robot drive to the reef and attempt to score. If it drives too far to the sides of the reef with the elevator still up, it's failed to line up due to poor sim physics. Disabling and re-enabling auto should fix it, although you may have to try it multiple times.
+- Whenever the robot drives to the intake station, toggle `coralAvailable` to true in Elastic to allow it to intake. The auto should continue as normal after it's done intaking. You can also leave `coralAvailable` on true for the entire auto, which will result in quicker cycle times, at the expense of some realism.
+
+For autos that involve algae (e.g. `1x3Barge1`), you'll need to add `hasAlgae` and `algaeAvailable` to Elastic in addition to the fields for coral. Set `algaeAvailable` to true when the claw would be pressed against an algae on the reef.
