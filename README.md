@@ -31,6 +31,13 @@ We use [JsonConstants.java](https://github.com/team401/2025-Robot-Code/blob/main
 
 We also make use of CopperCore's Environment Handler with [config.json](https://github.com/team401/2025-Robot-Code/blob/main/src/main/deploy/constants/config.json), allowing us to specify different sets of constants for different environments. This enabled identical code to run on multiple different test platforms, allowing us to integrate our drivetrain code and individual subsystems on a test drivebase and HITL testing rig before our competition robot even existed.
 
+This project has the following environments:
+
+- `comp`: This is environment contains gains for the competition robot.
+- `hitl`: HITL stands for Hardware-In-The-Loop. Last season, we struggled with integration because we hadn't let our code interact with hardware enough prior to getting the final robot. This meant that we didn't see a lot of problems early enough, and had to work much faster to solve them all very quickly. To combat this, we used a test setup that we called "The HITL rig." It was a piece of plywood, with a RoboRIO, a PDH, a breaker, and a radio. Whenever a prototype of a subsystem was completed, we would wire it to the HITL board and try to integrate its code in isolation. This allowed us to fix bugs that only appeared in hardware, as well as iterating on our sensor placements and code design for the claw/indexer before the claw was made out of the final materials. It also meant that, when we did receive the completed robot, we could focus more on making the systems work together rather than having to tune every single system on the robot individually one after another.
+- `test_drivebase`: This environment contained gains for the test drivebase. This was a wooden chassis with slightly different dimensions that we used to integrate the drivetrain. While the rest of the robot was being designed, programmed, and fabricated, we were able to use this test drivebase to run autos and tune our single-tag lineup system so that it only needed to have its gains updated to run on the competition robot.
+- `test_ramp`: This environment was briefly used to initially test the ramp.
+
 ### Strategy Manager
 
 Our custom [Strategy Manager](https://github.com/team401/2025-Robot-Code/blob/main/src/main/java/frc/robot/StrategyManager.java) coordinated of our robot's actions using JSONSync and handled operator controls through Network Tables.
@@ -152,6 +159,8 @@ git clone https://github.com/team401/2025-Robot-Code
 - Click and drag the `Robot` field from the sidebar to the bottom of the screen under **`Poses`**. Right click on the entry it creates, and select `Robot 2025` to use Hydrus's CAD model.
   - If `Robot 2025` isn't an option, wait a few seconds to make sure all models have loaded, and then make sure you've [set up your custom assets folder](#setting-up-advantagescope-custom-assets-folder) correctly.
 - Next, scroll in the sidebar back up to the search bar. This time, search for `componentPositions`. Select `NT:/AdvantageKit/RealOutputs/componentPositions`. Drag `componentPositions` from the sidebar **on top of** `Robot 2025` in the Poses pane at the bottom of the screen. This will tell AdvantageScope to use the list of poses logged under `componentPositions` to position the elements from the robot's 3D model.
+
+  If `componentPositions` shows up as a new robot, a ghost, or a game piece, it has been added as its own set of poses. Try dragging it from the sidebar again, but this time slightly higher, so that it is placed directly inside of the original `Robot` field. If done correctly, `componentPositions` should be indented slightly under the text of the `Robot` entry in the list.
 - To verify that everything is working, navigate back to Glass, enable `Autonomous` under **`Robot State`**, and then quickly switch back to AdvantageScope. The robot should drive toward the reef and extend its elevator upward. Lineup is unreliable in sim, so it might not succeed in scoring the first time. Restarting sim or disabling and re-enabling auto can let it try again.
 - This setup will be preserved by AdvantageScope every time you reopen the app unless you close the tab.
 
