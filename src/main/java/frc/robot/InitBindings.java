@@ -70,9 +70,9 @@ public final class InitBindings {
     drive.setDefaultCommand(
         new DriveWithJoysticks(
             drive, // type: DriveTemplate
-            () -> getAxis("driveX").getAsDouble(),
-            () -> getAxis("driveY").getAsDouble(),
-            () -> getAxis("driveRotation").getAsDouble(),
+            () -> -getAxis("driveX").getAsDouble(),
+            () -> -getAxis("driveY").getAsDouble(),
+            () -> -getAxis("driveRotation").getAsDouble(),
             JsonConstants.drivetrainConstants.maxLinearSpeed, // type: double (m/s)
             JsonConstants.drivetrainConstants.maxAngularSpeed, // type: double (rad/s)
             JsonConstants.drivetrainConstants.joystickDeadband // type: double
