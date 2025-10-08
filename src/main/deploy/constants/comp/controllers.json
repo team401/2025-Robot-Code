@@ -83,7 +83,7 @@
         {
           "command": "driveRotation",
           "axis": "JOYSTICK_X",
-          "negate": false
+          "negate": true
         }
       ]
     },
