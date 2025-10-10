@@ -337,13 +337,23 @@ public class LineupState implements PeriodicStateInterface {
             ? 0
             : JsonConstants.visionConstants.FrontLeftTransform.getY()
                 - JsonConstants.visionConstants.FrontRightTransform.getY();
+
+    double alongTrackOffset;
+    if (otherCameraIndex == 0) {
+      // 0 for Front Left
+      alongTrackOffset = JsonConstants.drivetrainConstants.driveAlongTrackFrontLeftOffset;
+    } else {
+      // 1 for Front Right
+      alongTrackOffset = JsonConstants.drivetrainConstants.driveAlongTrackFrontRightOffset;
+    }
+
     DistanceToTag observationOtherCamera =
         alignmentSupplier.get(
             tagId,
             otherCameraIndex,
             ReefLineupUtil.getCrossTrackOffset(otherCameraIndex)
                 + (signOfError * offsetErrorCorrection),
-            JsonConstants.drivetrainConstants.driveAlongTrackOffset);
+            alongTrackOffset);
     return observationOtherCamera;
   }
 
@@ -392,12 +402,18 @@ public class LineupState implements PeriodicStateInterface {
       return;
     }
 
+    double alongTrackOffset;
+    if (cameraIndex == 0) {
+      // 0 for Front Left
+      alongTrackOffset = JsonConstants.drivetrainConstants.driveAlongTrackFrontLeftOffset;
+    } else {
+      // 1 for Front Right
+      alongTrackOffset = JsonConstants.drivetrainConstants.driveAlongTrackFrontRightOffset;
+    }
+
     DistanceToTag observation =
         alignmentSupplier.get(
-            tagId,
-            cameraIndex,
-            ReefLineupUtil.getCrossTrackOffset(cameraIndex),
-            JsonConstants.drivetrainConstants.driveAlongTrackOffset);
+            tagId, cameraIndex, ReefLineupUtil.getCrossTrackOffset(cameraIndex), alongTrackOffset);
 
     DistanceToTag otherCameraObs = tryOtherCamera(alignmentSupplier, tagId, cameraIndex);
 
