@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drive.states;
 
+import static edu.wpi.first.units.Units.Radians;
+
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
 import coppercore.parameter_tools.LoggedTunableNumber;
@@ -11,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.StrategyManager;
 import frc.robot.StrategyManager.AutonomyMode;
@@ -476,9 +479,20 @@ public class LineupState implements PeriodicStateInterface {
               * getAlongTrackVelocityReductionFactor(observation.crossTrackDistance())
               * getAlongTrackVelocity(observation.alongTrackDistance()); // Maybe use filtered?
       double vy = driveCrossTrackLineupController.calculate(observation.crossTrackDistance());
+
+      Angle headingOffset;
+      if (cameraIndex == 0) {
+        // 0 for Front Left
+        headingOffset = JsonConstants.drivetrainConstants.driveLineupHeadingFrontLeftOffset;
+      } else {
+        // 1 for Front Right
+        headingOffset = JsonConstants.drivetrainConstants.driveLineupHeadingFrontRightOffset;
+      }
+
       double omega =
           rotationController.calculate(
-              drive.getRotation().getRadians(), this.getRotationForReefSide().getRadians());
+              drive.getRotation().getRadians(),
+              this.getRotationForReefSide().getRadians() + headingOffset.in(Radians));
 
       if (usingOtherCamera) {
         vy = driveCrossTrackOtherCameraLineupController.calculate(observation.crossTrackDistance());

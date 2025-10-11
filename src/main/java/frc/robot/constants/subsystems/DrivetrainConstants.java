@@ -90,8 +90,8 @@ public class DrivetrainConstants {
   public final Double driveCrossTrackFrontLeftOffset = 0.0;
   public final Double driveCrossTrackFrontRightAlgaeOffset = 0.25;
   public final Double driveCrossTrackFrontLeftAlgaeOffset = 0.25;
-  public final Double driveLineupHeadingFrontRightOffsetDegrees = 0.0;
-  public final Double driveLineupHeadingFrontLeftOffsetDegrees = 0.0;
+  public final Angle driveLineupHeadingFrontRightOffset = Degrees.zero();
+  public final Angle driveLineupHeadingFrontLeftOffset = Degrees.zero();
 
   public final Double lineupMaxVelocity = 3.0;
   public final Double lineupMaxAcceleration = 1.5;

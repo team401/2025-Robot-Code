@@ -44,8 +44,14 @@
   "driveCrossTrackFrontLeftOffset": -0.03,
   "driveCrossTrackFrontRightAlgaeOffset": 0.25,
   "driveCrossTrackFrontLeftAlgaeOffset": 0.25,
-  "driveLineupHeadingFrontRightOffsetDegrees": 0.0,
-  "driveLineupHeadingFrontLeftOffsetDegrees": 0.0,
+  "driveLineupHeadingFrontRightOffset": {
+    "value": 0.0,
+    "unit": "Degree"
+  },
+  "driveLineupHeadingFrontLeftOffset": {
+    "value": 0.0,
+    "unit": "Degree"
+  },
   "lineupRotationMarginRadians": 0.05,
   "lineupAlongTrackThresholdMeters": 0.05,
   "lineupCrossTrackThresholdMeters": 0.04,
