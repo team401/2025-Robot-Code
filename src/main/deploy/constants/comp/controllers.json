@@ -53,12 +53,12 @@
         {
           "command": "driveX",
           "axis": "JOYSTICK_X",
-          "negate": false
+          "negate": true
         },
         {
           "command": "driveY",
           "axis": "JOYSTICK_Y",
-          "negate": false
+          "negate": true
         }
       ]
     },
@@ -83,7 +83,7 @@
         {
           "command": "driveRotation",
           "axis": "JOYSTICK_X",
-          "negate": false
+          "negate": true
         }
       ]
     },

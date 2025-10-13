@@ -91,15 +91,15 @@
     "radians": -2.0943951023931953
   },
   "blueCoralStationRightTranslation": {
-    "x": 1.57,
-    "y": 0.67
+    "x": 1.72,
+    "y": 0.55
   },
   "blueCoralStationRightRotation": {
     "radians": 1.0471975511965976
   },
   "blueCoralStationLeftTranslation": {
-    "x": 1.61,
-    "y": 7.44
+    "x": 1.62,
+    "y": 7.38
   },
   "blueCoralStationLeftRotation": {
     "radians": -1.0471975511965976
