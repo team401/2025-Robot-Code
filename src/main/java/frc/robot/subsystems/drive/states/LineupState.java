@@ -342,11 +342,9 @@ public class LineupState implements PeriodicStateInterface {
                 - JsonConstants.visionConstants.FrontRightTransform.getY();
 
     double alongTrackOffset;
-    if (otherCameraIndex == 0) {
-      // 0 for Front Left
+    if (otherCameraIndex == JsonConstants.visionConstants.FrontLeftCameraIndex) {
       alongTrackOffset = JsonConstants.drivetrainConstants.driveAlongTrackFrontLeftOffset;
     } else {
-      // 1 for Front Right
       alongTrackOffset = JsonConstants.drivetrainConstants.driveAlongTrackFrontRightOffset;
     }
 
@@ -406,11 +404,9 @@ public class LineupState implements PeriodicStateInterface {
     }
 
     double alongTrackOffset;
-    if (cameraIndex == 0) {
-      // 0 for Front Left
+    if (cameraIndex == JsonConstants.visionConstants.FrontLeftCameraIndex) {
       alongTrackOffset = JsonConstants.drivetrainConstants.driveAlongTrackFrontLeftOffset;
     } else {
-      // 1 for Front Right
       alongTrackOffset = JsonConstants.drivetrainConstants.driveAlongTrackFrontRightOffset;
     }
 
@@ -481,11 +477,9 @@ public class LineupState implements PeriodicStateInterface {
       double vy = driveCrossTrackLineupController.calculate(observation.crossTrackDistance());
 
       Angle headingOffset;
-      if (cameraIndex == 0) {
-        // 0 for Front Left
+      if (cameraIndex == JsonConstants.visionConstants.FrontLeftCameraIndex) {
         headingOffset = JsonConstants.drivetrainConstants.driveLineupHeadingFrontLeftOffset;
       } else {
-        // 1 for Front Right
         headingOffset = JsonConstants.drivetrainConstants.driveLineupHeadingFrontRightOffset;
       }
 
