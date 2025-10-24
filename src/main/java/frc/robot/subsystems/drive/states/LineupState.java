@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drive.states;
 
+import static edu.wpi.first.units.Units.Radians;
+
 import coppercore.controls.state_machine.state.PeriodicStateInterface;
 import coppercore.controls.state_machine.transition.Transition;
 import coppercore.parameter_tools.LoggedTunableNumber;
@@ -11,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.StrategyManager;
 import frc.robot.StrategyManager.AutonomyMode;
@@ -337,13 +340,21 @@ public class LineupState implements PeriodicStateInterface {
             ? 0
             : JsonConstants.visionConstants.FrontLeftTransform.getY()
                 - JsonConstants.visionConstants.FrontRightTransform.getY();
+
+    double alongTrackOffset;
+    if (otherCameraIndex == JsonConstants.visionConstants.FrontLeftCameraIndex) {
+      alongTrackOffset = JsonConstants.drivetrainConstants.driveAlongTrackFrontLeftOffset;
+    } else {
+      alongTrackOffset = JsonConstants.drivetrainConstants.driveAlongTrackFrontRightOffset;
+    }
+
     DistanceToTag observationOtherCamera =
         alignmentSupplier.get(
             tagId,
             otherCameraIndex,
             ReefLineupUtil.getCrossTrackOffset(otherCameraIndex)
                 + (signOfError * offsetErrorCorrection),
-            JsonConstants.drivetrainConstants.driveAlongTrackOffset);
+            alongTrackOffset);
     return observationOtherCamera;
   }
 
@@ -392,12 +403,16 @@ public class LineupState implements PeriodicStateInterface {
       return;
     }
 
+    double alongTrackOffset;
+    if (cameraIndex == JsonConstants.visionConstants.FrontLeftCameraIndex) {
+      alongTrackOffset = JsonConstants.drivetrainConstants.driveAlongTrackFrontLeftOffset;
+    } else {
+      alongTrackOffset = JsonConstants.drivetrainConstants.driveAlongTrackFrontRightOffset;
+    }
+
     DistanceToTag observation =
         alignmentSupplier.get(
-            tagId,
-            cameraIndex,
-            ReefLineupUtil.getCrossTrackOffset(cameraIndex),
-            JsonConstants.drivetrainConstants.driveAlongTrackOffset);
+            tagId, cameraIndex, ReefLineupUtil.getCrossTrackOffset(cameraIndex), alongTrackOffset);
 
     DistanceToTag otherCameraObs = tryOtherCamera(alignmentSupplier, tagId, cameraIndex);
 
@@ -460,9 +475,18 @@ public class LineupState implements PeriodicStateInterface {
               * getAlongTrackVelocityReductionFactor(observation.crossTrackDistance())
               * getAlongTrackVelocity(observation.alongTrackDistance()); // Maybe use filtered?
       double vy = driveCrossTrackLineupController.calculate(observation.crossTrackDistance());
+
+      Angle headingOffset;
+      if (cameraIndex == JsonConstants.visionConstants.FrontLeftCameraIndex) {
+        headingOffset = JsonConstants.drivetrainConstants.driveLineupHeadingFrontLeftOffset;
+      } else {
+        headingOffset = JsonConstants.drivetrainConstants.driveLineupHeadingFrontRightOffset;
+      }
+
       double omega =
           rotationController.calculate(
-              drive.getRotation().getRadians(), this.getRotationForReefSide().getRadians());
+              drive.getRotation().getRadians(),
+              this.getRotationForReefSide().getRadians() + headingOffset.in(Radians));
 
       if (usingOtherCamera) {
         vy = driveCrossTrackOtherCameraLineupController.calculate(observation.crossTrackDistance());

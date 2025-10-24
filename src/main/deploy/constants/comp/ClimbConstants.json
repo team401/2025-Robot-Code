@@ -11,7 +11,7 @@
     "value": 0.6,
     "unit": "Radian"
   },
-  "climbEncoderOffsetRotations": -0.40234375,
+  "climbEncoderOffsetRotations": -0.238037109375,
   "leadClimbMotorId": 16,
   "followerClimbMotorId": 17,
   "climbkP": 45.0,

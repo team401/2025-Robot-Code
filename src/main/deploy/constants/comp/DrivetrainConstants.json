@@ -38,11 +38,20 @@
   "driveRotationKi": 0.0,
   "driveRotationKd": 0.0,
   "driveAlongTrackMultiplier": 1,
-  "driveAlongTrackOffset": 0.24,
-  "driveCrossTrackFrontRightOffset": -0.03,
+  "driveAlongTrackFrontRightOffset": 0.25,
+  "driveAlongTrackFrontLeftOffset": 0.24,
+  "driveCrossTrackFrontRightOffset": -0.02,
   "driveCrossTrackFrontLeftOffset": -0.03,
   "driveCrossTrackFrontRightAlgaeOffset": 0.25,
   "driveCrossTrackFrontLeftAlgaeOffset": 0.25,
+  "driveLineupHeadingFrontRightOffset": {
+    "value": 0.0,
+    "unit": "Degree"
+  },
+  "driveLineupHeadingFrontLeftOffset": {
+    "value": 0.0,
+    "unit": "Degree"
+  },
   "lineupRotationMarginRadians": 0.05,
   "lineupAlongTrackThresholdMeters": 0.05,
   "lineupCrossTrackThresholdMeters": 0.04,

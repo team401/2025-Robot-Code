@@ -28,8 +28,17 @@
   "driveRotationKi": 0.0,
   "driveRotationKd": 0.0,
   "driveAlongTrackMultiplier": 1,
-  "driveAlongTrackOffset": 0.25,
+  "driveAlongTrackFrontRightOffset": 0.25,
+  "driveAlongTrackFrontLeftOffset": 0.25,
   "driveCrossTrackFrontRightOffset": 0.0,
+  "driveLineupHeadingFrontRightOffset": {
+    "value": 0.0,
+    "unit": "Degree"
+  },
+  "driveLineupHeadingFrontLeftOffset": {
+    "value": 0.0,
+    "unit": "Degree"
+  },
   "otfPoseDistanceLimit": 0.1,
   "lineupMaxVelocity": 3.0,
   "lineupMaxAcceleration": 1.5,

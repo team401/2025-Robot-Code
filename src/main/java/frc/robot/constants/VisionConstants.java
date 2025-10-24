@@ -15,7 +15,7 @@ public class VisionConstants {
           EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
           new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
 
-  public final Integer FrontLeftCameraIndex = 0;
+  public final Integer FrontLeftCameraIndex = 1;
   public final Integer FrontRightCameraIndex = 0;
   public final Transform3d FrontLeftTransform = new Transform3d();
   public final Transform3d FrontRightTransform =
