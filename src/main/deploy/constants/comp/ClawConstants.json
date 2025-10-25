@@ -30,7 +30,7 @@
   },
   "algaeMinSignalStrengthForValidMeasurement": 3000.0,
   "coralIntakeVoltage": {
-    "value": 2.5,
+    "value": 2.25,
     "unit": "Volt"
   },
   "algaeIntakeVoltage": {
