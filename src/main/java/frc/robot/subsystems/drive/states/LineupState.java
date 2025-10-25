@@ -435,6 +435,7 @@ public class LineupState implements PeriodicStateInterface {
       // unplugged)
       usingOtherCamera = true;
       driveCrossTrackLineupController.reset();
+      poseAtLastObservation = drive.getPose();
       latestObservation = otherCameraObs;
       observation = otherCameraObs;
       observationAge = 0;
