@@ -41,7 +41,7 @@
   "driveAlongTrackFrontRightOffset": 0.25,
   "driveAlongTrackFrontLeftOffset": 0.24,
   "driveCrossTrackFrontRightOffset": -0.02,
-  "driveCrossTrackFrontLeftOffset": -0.03,
+  "driveCrossTrackFrontLeftOffset": -0.02,
   "driveCrossTrackFrontRightAlgaeOffset": 0.25,
   "driveCrossTrackFrontLeftAlgaeOffset": 0.25,
   "driveLineupHeadingFrontRightOffset": {
