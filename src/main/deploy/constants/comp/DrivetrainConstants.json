@@ -22,7 +22,7 @@
   "driveAlongTrackKi": 0.0,
   "driveAlongTrackKd": 0.0,
   "driveCrossTrackKp": 5.0,
-  "driveCrossTrackKi": 0.95,
+  "driveCrossTrackKi": 0.8,
   "driveCrossTrackKd": 0.5,
   "kDriveToPointHeadingP": 10.0,
   "kDriveToPointHeadingI": 0.0,
