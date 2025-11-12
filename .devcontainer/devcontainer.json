@@ -1,10 +1,32 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/java
 {
-    "image": "mcr.microsoft.com/devcontainers/universal:4",
-    "postCreateCommand": "cd /opt && wget 'https://github.com/wpilibsuite/vscode-wpilib/releases/download/v2025.3.2/vscode-wpilib-2025.3.2.vsix'",
-    "features": { "desktop-lite": { "password": "FRC", "webPort": "6080"} },
-    "customizations": {
+	"name": "WPILib Development",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/java:1-17-bookworm",
+
+	"features": {
+		"ghcr.io/devcontainers/features/java:1": {
+			"version": "none",
+			"installMaven": "false",
+			"installGradle": "true"
+		},
+		"desktop-lite": { "password": "FRC", "webPort": "6080"}
+	},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "cd ~ && wget 'https://github.com/wpilibsuite/vscode-wpilib/releases/download/v2025.3.2/vscode-wpilib-2025.3.2.vsix'",
+
+	// configure tool-specific properties.
+	"customizations": {
       "vscode": {
-        "extensions": ["/opt/vscode-wpilib-2025.3.2.vsix","vscjava.vscode-java-pack","vscjava.vscode-gradle"]
+        "extensions": ["/home/vscode/vscode-wpilib-2025.3.2.vsix","vscjava.vscode-java-pack","vscjava.vscode-gradle"]
       }
     }
-  }
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}
