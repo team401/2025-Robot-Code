@@ -24,4 +24,6 @@ RUN cd ~ && \
     echo '[]' > /home/vscode/wpilib/2025/tools/tools.json && \
     jq '. += [{"name": "Elastic", "version": "v2026.0.0-beta-1"}]' /home/vscode/wpilib/2025/tools/tools.json > ~/tools_tmp.json && \
     mv ~/tools_tmp.json /home/vscode/wpilib/2025/tools/tools.json && \
-    sudo chmod +x /home/vscode/wpilib/2025/tools/Elastic.sh
+    sudo chmod +x /home/vscode/wpilib/2025/tools/Elastic.sh && \
+    sudo apt-get update && \
+    sudo apt-get install -y libegl1-mesa

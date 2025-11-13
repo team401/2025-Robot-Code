@@ -1,6 +1,5 @@
 {
   "name": "WPILib Development",
-  // "image": "mcr.microsoft.com/devcontainers/java:1-17-bookworm",
   "build": {
     "dockerfile": "Dockerfile"
   },
