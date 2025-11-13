@@ -1,6 +1,7 @@
 FROM mcr.microsoft.com/devcontainers/java:1-17-bookworm
 
 RUN cd ~ && \
+    echo 'Installing Elastic...' && \
     mkdir -p /home/vscode/wpilib/2025/tools/ && \
     touch /home/vscode/wpilib/2025/tools/Elastic.sh && \
     echo '#!/bin/sh' >> /home/vscode/wpilib/2025/tools/Elastic.sh && \
@@ -26,4 +27,9 @@ RUN cd ~ && \
     mv ~/tools_tmp.json /home/vscode/wpilib/2025/tools/tools.json && \
     sudo chmod +x /home/vscode/wpilib/2025/tools/Elastic.sh && \
     sudo apt-get update && \
-    sudo apt-get install -y libegl1-mesa
+    sudo apt-get install -y libegl1-mesa && \
+    echo 'Installing AdvantageScope...' && \
+    cd ~ && \
+    wget 'https://github.com/Mechanical-Advantage/AdvantageScope/releases/download/v4.1.6/advantagescope-linux-x64-v4.1.6.deb' && \
+    sudo apt install ./advantagescope-linux-x64-v4.1.6.deb && \
+    echo 'AdvantageScope full installation is not yet supported, but it has been installed using apt'
