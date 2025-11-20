@@ -106,7 +106,7 @@ public interface ElevatorIO {
    *
    * @param inputs ElevatorInputs object to update with latest information
    */
-  public void updateInputs(ElevatorInputs inputs);
+  public default void updateInputs(ElevatorInputs inputs) {}
 
   /**
    * Applies requests to motors and updates an ElevatorOutputs object with information about motor
@@ -114,7 +114,7 @@ public interface ElevatorIO {
    *
    * @param outputs ElevatorOutputs update with latest applied voltage
    */
-  public void applyOutputs(ElevatorOutputs outputs);
+  public default void applyOutputs(ElevatorOutputs outputs) {}
 
   /**
    * Set the goal position of CANCoder 19 which the elevator will control to when it is not in
@@ -123,63 +123,67 @@ public interface ElevatorIO {
    * <p>This method should only be called by the ElevatorMechanism! There is important safety
    * control logic housed there which, if bypassed, will be sorely missed.
    */
-  public void setLargeCANCoderGoalPos(Angle goalPos);
+  public default void setLargeCANCoderGoalPos(Angle goalPos) {}
 
   /** Get the absolute position of the 19 tooth CANCoder. */
-  public Angle getLargeCANCoderAbsPos();
+  public default Angle getLargeCANCoderAbsPos() {
+    return Rotations.zero();
+  }
 
   /** Get the absolute position of the 17 tooth CANCoder. */
-  public Angle getSmallCANCoderAbsPos();
+  public default Angle getSmallCANCoderAbsPos() {
+    return Rotations.zero();
+  }
 
   /**
    * Set the position of the 19 tooth CANCoder. This position is separate from absolute position and
    * can track multiple rotations.
    */
-  public void setLargeCANCoderPosition(Angle newAngle);
+  public default void setLargeCANCoderPosition(Angle newAngle) {}
 
   /**
    * Set the position of the 17 tooth CANCoder. This position is separate from absolute position and
    * can track multiple rotations.
    */
-  public void setSmallCANCoderPosition(Angle newAngle);
+  public default void setSmallCANCoderPosition(Angle newAngle) {}
 
   /**
    * Set the override voltage for the elevator when in Voltage output mode
    *
    * @param volts The voltage to apply
    */
-  public void setOverrideVoltage(Voltage volts);
+  public default void setOverrideVoltage(Voltage volts) {}
 
   /**
    * Set the static current (because of FOC) that will be applied when the elevator is in Current
    * output mode.
    */
-  public void setOverrideCurrent(Current current);
+  public default void setOverrideCurrent(Current current) {}
 
   /**
    * Set whether the elevator should use ClosedLoop control (default), voltage override, or current
    * override
    */
-  public void setOutputMode(ElevatorOutputMode mode);
+  public default void setOutputMode(ElevatorOutputMode mode) {}
 
   /** Update PID gains for the elevator */
-  public void setPID(double p, double i, double d);
+  public default void setPID(double p, double i, double d) {}
 
   /** Set profile constraints to be sent to Motion Magic Expo */
-  public void setMaxProfile(
+  public default void setMaxProfile(
       AngularVelocity maxVelocity,
       Per<VoltageUnit, AngularAccelerationUnit> expo_kA,
-      Per<VoltageUnit, AngularVelocityUnit> expo_kV);
+      Per<VoltageUnit, AngularVelocityUnit> expo_kV) {}
 
   /** Set feedforward gains for closed-loop control */
-  public void setFF(double kS, double kV, double kA, double kG);
+  public default void setFF(double kS, double kV, double kA, double kG) {}
 
   /** Set whether or not the motors should brake while idle */
-  public void setBrakeMode(boolean brakeMode);
+  public default void setBrakeMode(boolean brakeMode) {}
 
   /** Set the stator current limit for both elevator motors */
-  public void setStatorCurrentLimit(Current currentLimit);
+  public default void setStatorCurrentLimit(Current currentLimit) {}
 
   /** Set whether or not the motors on the elevator should be disabled. */
-  public void setMotorsDisabled(boolean disabled);
+  public default void setMotorsDisabled(boolean disabled) {}
 }

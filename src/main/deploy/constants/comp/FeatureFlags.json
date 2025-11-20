@@ -3,5 +3,6 @@
   "runVision": true,
   "runScoring": true,
   "runClimb": false,
-  "runRamp": true
+  "runRamp": false,
+  "runLEDs": false
 }

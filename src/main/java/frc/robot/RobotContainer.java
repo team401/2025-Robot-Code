@@ -383,7 +383,9 @@ public class RobotContainer {
   }
 
   public void disabledPeriodic() {
-    led.periodic();
+    if (led != null) {
+      led.periodic();
+    }
     // Logger.recordOutput("feature_flags/drive", FeatureFlags.synced.getObject().runDrive);
     strategyManager.logActions();
     checkSwitchForDisabled();

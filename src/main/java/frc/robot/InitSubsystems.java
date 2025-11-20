@@ -17,6 +17,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.ModeConstants;
+import frc.robot.subsystems.climb.ClimbIO;
 import frc.robot.subsystems.climb.ClimbIOSim;
 import frc.robot.subsystems.climb.ClimbIOTalonFX;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -30,17 +31,21 @@ import frc.robot.subsystems.drive.ModuleIOMapleSim;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.led.LED;
+import frc.robot.subsystems.ramp.RampIO;
 import frc.robot.subsystems.ramp.RampIOSim;
 import frc.robot.subsystems.ramp.RampIOTalonFX;
 import frc.robot.subsystems.ramp.RampMechanism;
 import frc.robot.subsystems.ramp.RampSubsystem;
+import frc.robot.subsystems.scoring.ClawIO;
 import frc.robot.subsystems.scoring.ClawIOSim;
 import frc.robot.subsystems.scoring.ClawIOTalonFX;
 import frc.robot.subsystems.scoring.ClawMechanism;
+import frc.robot.subsystems.scoring.ElevatorIO;
 import frc.robot.subsystems.scoring.ElevatorIOSim;
 import frc.robot.subsystems.scoring.ElevatorIOTalonFX;
 import frc.robot.subsystems.scoring.ElevatorMechanism;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
+import frc.robot.subsystems.scoring.WristIO;
 import frc.robot.subsystems.scoring.WristIOSim;
 import frc.robot.subsystems.scoring.WristIOTalonFX;
 import frc.robot.subsystems.scoring.WristMechanism;
@@ -82,7 +87,10 @@ public final class InitSubsystems {
         }
         break;
       case REPLAY:
-        throw new UnsupportedOperationException("Scoring replay is not yet implemented.");
+        elevatorMechanism = new ElevatorMechanism(new ElevatorIO() {});
+        wristMechanism = new WristMechanism(new WristIO() {});
+        clawMechanism = new ClawMechanism(new ClawIO() {});
+        break;
       default:
         throw new UnsupportedOperationException(
             "Non-exhaustive list of mode types supported in InitSubsystems (got "
@@ -101,7 +109,7 @@ public final class InitSubsystems {
       case MAPLESIM:
         return new ClimbSubsystem(new ClimbIOSim());
       case REPLAY:
-        throw new UnsupportedOperationException("Climb replay is not yet implemented.");
+        return new ClimbSubsystem(new ClimbIO() {});
       default:
         throw new UnsupportedOperationException(
             "Non-exhaustive list of mode types supported in InitSubsystems");
@@ -186,6 +194,27 @@ public final class InitSubsystems {
       case MAPLESIM:
         rampSubsystem = new RampSubsystem(new RampMechanism(new RampIOSim()));
         break;
+      case REPLAY:
+        rampSubsystem =
+            new RampSubsystem(
+                new RampMechanism(
+                    new RampIO() {
+                      @Override
+                      public void setBrakeMode(boolean v) {}
+
+                      @Override
+                      public void updateInputs(RampInputs inputs) {}
+
+                      @Override
+                      public void addOffset(double o) {}
+
+                      @Override
+                      public void setPID(double p, double i, double d) {}
+
+                      @Override
+                      public void updateOutputs(RampInputs inputs, RampOutputs outputs) {}
+                    }));
+        break;
       default:
         throw new UnsupportedOperationException(
             "Non-exhaustive list of mode types supported in InitSubsystems");
@@ -247,7 +276,7 @@ public final class InitSubsystems {
         return new VisionLocalizer(
             drive::addVisionMeasurement,
             tagLayout,
-            new double[0],
+            new double[] {1000.0, 1000.0},
             new VisionIO() {},
             new VisionIO() {});
     }
