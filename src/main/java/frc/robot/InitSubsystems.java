@@ -5,10 +5,13 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pound;
 
+import java.util.Optional;
+
 import coppercore.vision.VisionIO;
 import coppercore.vision.VisionIOPhotonReal;
 import coppercore.vision.VisionIOPhotonSim;
 import coppercore.vision.VisionLocalizer;
+import coppercore.wpilib_interface.subsystems.motors.talonfx.MotorIOTalonFX;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,6 +23,8 @@ import frc.robot.constants.ModeConstants;
 import frc.robot.subsystems.climb.ClimbIOSim;
 import frc.robot.subsystems.climb.ClimbIOTalonFX;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.coppervator.CoppervatorConstants;
+import frc.robot.subsystems.coppervator.CoppervatorSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConfiguration;
 import frc.robot.subsystems.drive.GyroIO;
@@ -251,6 +256,14 @@ public final class InitSubsystems {
             new VisionIO() {},
             new VisionIO() {});
     }
+  }
+
+  public static CoppervatorSubsystem initCoppervator() {
+    return switch (ModeConstants.currentMode)  {
+        case REAL -> new CoppervatorSubsystem(new MotorIOTalonFX(CoppervatorConstants.mechanismConfig, Optional.empty(), null), null, null);
+        case SIM, MAPLESIM -> throw new UnsupportedOperationException();
+        case REPLAY -> throw new UnsupportedOperationException();
+    };
   }
 
   public static LED initLEDs(

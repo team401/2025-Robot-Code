@@ -117,7 +117,7 @@ dependencies {
     implementation "io.github.team401.coppercore:monitors:$coppercoreVersion"
     implementation "io.github.team401.coppercore:parameter_tools:$coppercoreVersion"
     implementation "io.github.team401.coppercore:vision:$coppercoreVersion"
-    implementation "io.github.team401.coppercore:wpilib_interface:$coppercoreVersion"
+    implementation "io.github.team401.coppercore:wpilib_interface:2025.1.13-ios"
 }
 
 test {
