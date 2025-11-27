@@ -5,13 +5,13 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pound;
 
-import java.util.Optional;
-
 import coppercore.vision.VisionIO;
 import coppercore.vision.VisionIOPhotonReal;
 import coppercore.vision.VisionIOPhotonSim;
 import coppercore.vision.VisionLocalizer;
+import coppercore.wpilib_interface.subsystems.encoders.EncoderIOCANCoder;
 import coppercore.wpilib_interface.subsystems.motors.talonfx.MotorIOTalonFX;
+import coppercore.wpilib_interface.subsystems.motors.talonfx.MotorIOTalonFXPositionSim;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -49,6 +49,7 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.WristIOSim;
 import frc.robot.subsystems.scoring.WristIOTalonFX;
 import frc.robot.subsystems.scoring.WristMechanism;
+import java.util.Optional;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -259,10 +260,18 @@ public final class InitSubsystems {
   }
 
   public static CoppervatorSubsystem initCoppervator() {
-    return switch (ModeConstants.currentMode)  {
-        case REAL -> new CoppervatorSubsystem(new MotorIOTalonFX(CoppervatorConstants.mechanismConfig, Optional.empty(), null), null, null);
-        case SIM, MAPLESIM -> throw new UnsupportedOperationException();
-        case REPLAY -> throw new UnsupportedOperationException();
+    return switch (ModeConstants.currentMode) {
+      case REAL ->
+          new CoppervatorSubsystem(
+              MotorIOTalonFX.newLeader(CoppervatorConstants.mechanismConfig, CoppervatorConstants.getTalonFXConfig()),
+              MotorIOTalonFX.newFollower(CoppervatorConstants.mechanismConfig, 0, CoppervatorConstants.getTalonFXConfig()),
+              new EncoderIOCANCoder(CoppervatorConstants.encoderId, CoppervatorConstants.getCANcoderConfig()));
+      case SIM, MAPLESIM ->
+          new CoppervatorSubsystem(
+              MotorIOTalonFXPositionSim.newLeader(CoppervatorConstants.mechanismConfig, CoppervatorConstants.getTalonFXConfig(), null),
+              MotorIOTalonFXPositionSim.newFollower(CoppervatorConstants.mechanismConfig, 0, CoppervatorConstants.getTalonFXConfig(), null),
+              new EncoderIOCANCoder(CoppervatorConstants.encoderId, CoppervatorConstants.getCANcoderConfig()));
+      case REPLAY -> throw new UnsupportedOperationException();
     };
   }
 

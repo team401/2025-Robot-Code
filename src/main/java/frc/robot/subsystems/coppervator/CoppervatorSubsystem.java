@@ -1,12 +1,11 @@
 package frc.robot.subsystems.coppervator;
 
-import org.littletonrobotics.junction.Logger;
-
 import coppercore.wpilib_interface.MonitoredSubsystem;
 import coppercore.wpilib_interface.subsystems.encoders.EncoderIO;
 import coppercore.wpilib_interface.subsystems.encoders.EncoderInputsAutoLogged;
 import coppercore.wpilib_interface.subsystems.motors.MotorIO;
 import coppercore.wpilib_interface.subsystems.motors.MotorInputsAutoLogged;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * The Coppervator is a subsystem written to demonstrate coppercore's IO classes by implementing an
