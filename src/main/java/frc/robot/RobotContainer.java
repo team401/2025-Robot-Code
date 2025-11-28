@@ -29,12 +29,14 @@ import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.coppervator.CoppervatorSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.led.LED;
 import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import java.io.File;
+import java.nio.channels.UnsupportedAddressTypeException;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -53,6 +55,7 @@ public class RobotContainer {
   private ClimbSubsystem climbSubsystem = null;
   private VisionLocalizer vision = null;
   private LED led = null;
+  private CoppervatorSubsystem coppervator = null;
   private StrategyManager strategyManager = null;
   private AutoStrategyContainer strategyContainer = null;
   private DigitalInput ledSwitch = new DigitalInput(8);
@@ -242,6 +245,11 @@ public class RobotContainer {
       } else {
         // led.setVisionWorkingSupplier(() -> false);
       }
+    }
+
+    coppervator = InitSubsystems.initCoppervator();
+    if (coppervator == null) {
+      throw new UnsupportedAddressTypeException();
     }
 
     strategyManager = new StrategyManager(drive, scoringSubsystem);

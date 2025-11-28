@@ -10,8 +10,10 @@ import coppercore.vision.VisionIOPhotonReal;
 import coppercore.vision.VisionIOPhotonSim;
 import coppercore.vision.VisionLocalizer;
 import coppercore.wpilib_interface.subsystems.encoders.EncoderIOCANCoder;
+import coppercore.wpilib_interface.subsystems.encoders.EncoderIOCANCoderPositionSim;
 import coppercore.wpilib_interface.subsystems.motors.talonfx.MotorIOTalonFX;
 import coppercore.wpilib_interface.subsystems.motors.talonfx.MotorIOTalonFXPositionSim;
+import coppercore.wpilib_interface.subsystems.sim.ElevatorSimAdapter;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -49,7 +51,6 @@ import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.WristIOSim;
 import frc.robot.subsystems.scoring.WristIOTalonFX;
 import frc.robot.subsystems.scoring.WristMechanism;
-import java.util.Optional;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -260,19 +261,38 @@ public final class InitSubsystems {
   }
 
   public static CoppervatorSubsystem initCoppervator() {
-    return switch (ModeConstants.currentMode) {
-      case REAL ->
-          new CoppervatorSubsystem(
-              MotorIOTalonFX.newLeader(CoppervatorConstants.mechanismConfig, CoppervatorConstants.getTalonFXConfig()),
-              MotorIOTalonFX.newFollower(CoppervatorConstants.mechanismConfig, 0, CoppervatorConstants.getTalonFXConfig()),
-              new EncoderIOCANCoder(CoppervatorConstants.encoderId, CoppervatorConstants.getCANcoderConfig()));
-      case SIM, MAPLESIM ->
-          new CoppervatorSubsystem(
-              MotorIOTalonFXPositionSim.newLeader(CoppervatorConstants.mechanismConfig, CoppervatorConstants.getTalonFXConfig(), null),
-              MotorIOTalonFXPositionSim.newFollower(CoppervatorConstants.mechanismConfig, 0, CoppervatorConstants.getTalonFXConfig(), null),
-              new EncoderIOCANCoder(CoppervatorConstants.encoderId, CoppervatorConstants.getCANcoderConfig()));
-      case REPLAY -> throw new UnsupportedOperationException();
-    };
+    switch (ModeConstants.currentMode) {
+      case REAL -> {
+        return new CoppervatorSubsystem(
+            MotorIOTalonFX.newLeader(
+                CoppervatorConstants.mechanismConfig, CoppervatorConstants.getTalonFXConfig()),
+            MotorIOTalonFX.newFollower(
+                CoppervatorConstants.mechanismConfig, 0, CoppervatorConstants.getTalonFXConfig()),
+            new EncoderIOCANCoder(
+                CoppervatorConstants.encoderId, CoppervatorConstants.getCANcoderConfig()));
+      }
+      case SIM, MAPLESIM -> {
+        System.out.println("Creating sim coppervator!");
+        var simAdapter =
+            new ElevatorSimAdapter(
+                CoppervatorConstants.mechanismConfig, CoppervatorSubsystem.createElevatorSim());
+        return new CoppervatorSubsystem(
+            MotorIOTalonFXPositionSim.newLeader(
+                CoppervatorConstants.mechanismConfig,
+                CoppervatorConstants.getTalonFXConfig(),
+                simAdapter),
+            MotorIOTalonFXPositionSim.newFollower(
+                CoppervatorConstants.mechanismConfig,
+                0,
+                CoppervatorConstants.getTalonFXConfig(),
+                simAdapter),
+            new EncoderIOCANCoderPositionSim(
+                CoppervatorConstants.encoderId,
+                CoppervatorConstants.getCANcoderConfig(),
+                simAdapter));
+      }
+      default -> throw new UnsupportedOperationException();
+    }
   }
 
   public static LED initLEDs(
