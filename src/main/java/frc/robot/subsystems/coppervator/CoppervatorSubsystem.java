@@ -3,12 +3,17 @@ package frc.robot.subsystems.coppervator;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Volts;
 
 import coppercore.wpilib_interface.MonitoredSubsystem;
 import coppercore.wpilib_interface.subsystems.encoders.EncoderIO;
 import coppercore.wpilib_interface.subsystems.encoders.EncoderInputsAutoLogged;
 import coppercore.wpilib_interface.subsystems.motors.MotorIO;
 import coppercore.wpilib_interface.subsystems.motors.MotorInputsAutoLogged;
+import coppercore.wpilib_interface.subsystems.motors.profile.MotionProfileConfig;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.DistanceUnit;
@@ -46,6 +51,16 @@ public class CoppervatorSubsystem extends MonitoredSubsystem {
     this.leadMotor = leaderIO;
     this.followerMotor = followerIO;
     this.encoder = cancoderIO;
+
+    leadMotor.setProfileConstraints(
+        MotionProfileConfig.immutable(
+            JsonConstants.elevatorConstants.elevatorAngularCruiseVelocity,
+            RotationsPerSecondPerSecond.zero(),
+            RotationsPerSecondPerSecond.zero().div(Seconds.of(1.0)),
+            Volts.of(CoppervatorConstants.getTalonFXConfig().MotionMagic.MotionMagicExpo_kV)
+                .div(RotationsPerSecond.of(1.0)),
+            Volts.of(CoppervatorConstants.getTalonFXConfig().MotionMagic.MotionMagicExpo_kA)
+                .div(RotationsPerSecondPerSecond.of(1.0))));
   }
 
   @Override
