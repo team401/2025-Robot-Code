@@ -29,6 +29,7 @@ import frc.robot.constants.FeatureFlags;
 import frc.robot.constants.JsonConstants;
 import frc.robot.constants.OperatorConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.copperarm.CopperarmSubsystem;
 import frc.robot.subsystems.coppervator.CoppervatorSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.led.LED;
@@ -56,6 +57,7 @@ public class RobotContainer {
   private VisionLocalizer vision = null;
   private LED led = null;
   private CoppervatorSubsystem coppervator = null;
+  private CopperarmSubsystem copperarm = null;
   private StrategyManager strategyManager = null;
   private AutoStrategyContainer strategyContainer = null;
   private DigitalInput ledSwitch = new DigitalInput(8);
@@ -249,7 +251,12 @@ public class RobotContainer {
 
     coppervator = InitSubsystems.initCoppervator();
     if (coppervator == null) {
-      throw new UnsupportedAddressTypeException();
+      throw new Error();
+    }
+
+    copperarm = InitSubsystems.initCopperarm(); 
+    if (copperarm == null) {
+      throw new Error();
     }
 
     strategyManager = new StrategyManager(drive, scoringSubsystem);

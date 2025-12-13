@@ -11,8 +11,10 @@ import coppercore.vision.VisionIOPhotonSim;
 import coppercore.vision.VisionLocalizer;
 import coppercore.wpilib_interface.subsystems.encoders.EncoderIOCANCoder;
 import coppercore.wpilib_interface.subsystems.encoders.EncoderIOCANCoderPositionSim;
+import coppercore.wpilib_interface.subsystems.motors.sparkmax.MotorIOSparkMaxPositionSim;
 import coppercore.wpilib_interface.subsystems.motors.talonfx.MotorIOTalonFX;
 import coppercore.wpilib_interface.subsystems.motors.talonfx.MotorIOTalonFXPositionSim;
+import coppercore.wpilib_interface.subsystems.sim.ArmSimAdapter;
 import coppercore.wpilib_interface.subsystems.sim.ElevatorSimAdapter;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -25,6 +27,8 @@ import frc.robot.constants.ModeConstants;
 import frc.robot.subsystems.climb.ClimbIOSim;
 import frc.robot.subsystems.climb.ClimbIOTalonFX;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.copperarm.CopperarmConstants;
+import frc.robot.subsystems.copperarm.CopperarmSubsystem;
 import frc.robot.subsystems.coppervator.CoppervatorConstants;
 import frc.robot.subsystems.coppervator.CoppervatorSubsystem;
 import frc.robot.subsystems.drive.Drive;
@@ -272,7 +276,6 @@ public final class InitSubsystems {
                 CoppervatorConstants.encoderId, CoppervatorConstants.getCANcoderConfig()));
       }
       case SIM, MAPLESIM -> {
-        System.out.println("Creating sim coppervator!");
         var simAdapter =
             new ElevatorSimAdapter(
                 CoppervatorConstants.mechanismConfig, CoppervatorSubsystem.createElevatorSim());
@@ -312,6 +315,35 @@ public final class InitSubsystems {
             "Non-exhaustive list of mode types supported in InitSubsystems (got "
                 + ModeConstants.currentMode
                 + ")");
+    }
+  }
+
+public static CopperarmSubsystem initCopperarm() {
+    switch (ModeConstants.currentMode) {
+      case REAL -> {
+        return new CopperarmSubsystem(
+            MotorIOTalonFX.newLeader(
+                CopperarmConstants.mechanismConfig, CoppervatorConstants.getTalonFXConfig()),
+            MotorIOTalonFX.newFollower(
+                CopperarmConstants.mechanismConfig, 0, CoppervatorConstants.getTalonFXConfig())
+            );
+      }
+      case SIM, MAPLESIM -> {
+        var simAdapter =
+            new ArmSimAdapter(
+                null,null);
+        return new CopperarmSubsystem(
+            MotorIOTalonFXPositionSim.newLeader(
+                CopperarmConstants.mechanismConfig,
+                CoppervatorConstants.getTalonFXConfig(),
+                simAdapter),
+            MotorIOSparkMaxPositionSim.newFollower(
+                CopperarmConstants.mechanismConfig,
+                0,
+                CopperarmConstants.getSparkMaxConfig(),
+                simAdapter));
+      }
+      default -> throw new UnsupportedOperationException();
     }
   }
 }
