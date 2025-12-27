@@ -7,9 +7,9 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.signals.InvertedValue;
-import coppercore.parameter_tools.json.JSONExclude;
 import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
+import coppercore.parameter_tools.json.annotations.JSONExclude;
 import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
@@ -84,10 +84,10 @@ public class ClawConstants {
      * How many rotations per second the motor will spin per volt applied. This isn't a unit because
      * I couldn't fight the double-layered PerUnit mess to get it to do what I want.
      */
-    public final double rotationsPerSecondPerVolt = 1.0;
+    public final Double rotationsPerSecondPerVolt = 1.0;
 
     /** When piecePos > coralDetectionPoint, the simulated sensor can sense it */
-    public final double coralDetectionPoint = 0.7;
+    public final Double coralDetectionPoint = 0.7;
 
     /** When piecePos < algaeDetectionPoint, the simulated sensor can sense it */
     public final Double algaeDetectionPoint = 0.7;

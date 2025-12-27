@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pound;
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import coppercore.vision.VisionGainConstants;
 import coppercore.vision.VisionIO;
 import coppercore.vision.VisionIOPhotonReal;
 import coppercore.vision.VisionIOPhotonSim;
@@ -220,6 +222,7 @@ public final class InitSubsystems {
         return new VisionLocalizer(
             drive::addVisionMeasurement,
             tagLayout,
+            new VisionGainConstants(),
             new double[0],
             new VisionIOPhotonReal(
                 "Front-Right", JsonConstants.visionConstants.FrontRightTransform),
@@ -228,6 +231,7 @@ public final class InitSubsystems {
         return new VisionLocalizer(
             drive::addVisionMeasurement,
             tagLayout,
+            new VisionGainConstants(),
             new double[0],
             new VisionIOPhotonSim(
                 "Front-Right",
@@ -243,6 +247,7 @@ public final class InitSubsystems {
         return new VisionLocalizer(
             drive::addVisionMeasurement,
             tagLayout,
+            new VisionGainConstants(),
             new double[0],
             new VisionIOPhotonSim(
                 "Front-Right",
@@ -258,6 +263,7 @@ public final class InitSubsystems {
         return new VisionLocalizer(
             drive::addVisionMeasurement,
             tagLayout,
+            new VisionGainConstants(),
             new double[0],
             new VisionIO() {},
             new VisionIO() {});
@@ -318,20 +324,17 @@ public final class InitSubsystems {
     }
   }
 
-public static CopperarmSubsystem initCopperarm() {
+  public static CopperarmSubsystem initCopperarm() {
     switch (ModeConstants.currentMode) {
       case REAL -> {
         return new CopperarmSubsystem(
             MotorIOTalonFX.newLeader(
                 CopperarmConstants.mechanismConfig, CoppervatorConstants.getTalonFXConfig()),
             MotorIOTalonFX.newFollower(
-                CopperarmConstants.mechanismConfig, 0, CoppervatorConstants.getTalonFXConfig())
-            );
+                CopperarmConstants.mechanismConfig, 0, CoppervatorConstants.getTalonFXConfig()));
       }
       case SIM, MAPLESIM -> {
-        var simAdapter =
-            new ArmSimAdapter(
-                null,null);
+        var simAdapter = new ArmSimAdapter(null, null);
         return new CopperarmSubsystem(
             MotorIOTalonFXPositionSim.newLeader(
                 CopperarmConstants.mechanismConfig,
@@ -341,7 +344,9 @@ public static CopperarmSubsystem initCopperarm() {
                 CopperarmConstants.mechanismConfig,
                 0,
                 CopperarmConstants.getSparkMaxConfig(),
-                simAdapter));
+                MotorType.kBrushless,
+                simAdapter,
+                DCMotor::getNeoVortex));
       }
       default -> throw new UnsupportedOperationException();
     }

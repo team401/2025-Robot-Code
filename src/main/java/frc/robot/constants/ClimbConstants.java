@@ -3,9 +3,9 @@ package frc.robot.constants;
 import static edu.wpi.first.units.Units.Radians;
 
 import com.ctre.phoenix6.signals.InvertedValue;
-import coppercore.parameter_tools.json.JSONExclude;
 import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
+import coppercore.parameter_tools.json.annotations.JSONExclude;
 import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 import edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;

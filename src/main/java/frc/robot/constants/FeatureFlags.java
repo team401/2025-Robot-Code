@@ -1,8 +1,8 @@
 package frc.robot.constants;
 
-import coppercore.parameter_tools.json.JSONExclude;
 import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
+import coppercore.parameter_tools.json.annotations.JSONExclude;
 import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 
 public final class FeatureFlags {

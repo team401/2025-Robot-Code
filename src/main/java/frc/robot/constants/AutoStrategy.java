@@ -1,6 +1,6 @@
 package frc.robot.constants;
 
-import coppercore.parameter_tools.json.JSONExclude;
+import coppercore.parameter_tools.json.annotations.JSONExclude;
 import frc.robot.constants.AutoStrategyContainer.Action;
 import java.util.List;
 

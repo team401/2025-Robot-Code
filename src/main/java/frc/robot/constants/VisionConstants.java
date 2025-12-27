@@ -13,7 +13,10 @@ public class VisionConstants {
           new VisionConstants(),
           "VisionConstants.json",
           EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
-          new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
+          new JSONSyncConfigBuilder()
+              .setPrettyPrinting(true)
+              .setPrimitiveCheckCrash(false)
+              .build());
 
   public final Integer FrontLeftCameraIndex = 1;
   public final Integer FrontRightCameraIndex = 0;

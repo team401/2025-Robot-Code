@@ -42,13 +42,18 @@ public class CopperarmSubsystem extends MonitoredSubsystem {
                 .div(RotationsPerSecondPerSecond.of(1.0))));
   }
 
-
   @Override
   public void monitoredPeriodic() {
     // "subsystem" duties
     if (DriverStation.isEnabled()
-            && Math.abs(leadMotorInputs.positionRadians - currentGoalAngleRadians) < 0.03) {
-        currentGoalAngleRadians = Math.random() * JsonConstants.wristConstants.wristMaxMaxAngle.minus(JsonConstants.wristConstants.wristMinMinAngle).in(Radians) - JsonConstants.wristConstants.wristMinMinAngle.in(Radians);
+        && Math.abs(leadMotorInputs.positionRadians - currentGoalAngleRadians) < 0.03) {
+      currentGoalAngleRadians =
+          Math.random()
+                  * JsonConstants.wristConstants
+                      .wristMaxMaxAngle
+                      .minus(JsonConstants.wristConstants.wristMinMinAngle)
+                      .in(Radians)
+              - JsonConstants.wristConstants.wristMinMinAngle.in(Radians);
     }
 
     // "mechanism" duties

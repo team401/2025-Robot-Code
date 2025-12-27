@@ -7,9 +7,9 @@ import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.hardware.*;
 import com.ctre.phoenix6.swerve.*;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.*;
-import coppercore.parameter_tools.json.JSONExclude;
 import coppercore.parameter_tools.json.JSONSync;
 import coppercore.parameter_tools.json.JSONSyncConfigBuilder;
+import coppercore.parameter_tools.json.annotations.JSONExclude;
 import coppercore.parameter_tools.path_provider.EnvironmentHandler;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.numbers.N1;
@@ -26,7 +26,10 @@ public class DrivetrainConstants {
           new DrivetrainConstants(),
           "DrivetrainConstants.json",
           EnvironmentHandler.getEnvironmentHandler().getEnvironmentPathProvider(),
-          new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
+          new JSONSyncConfigBuilder()
+              .setPrettyPrinting(true)
+              .setPrimitiveCheckCrash(false)
+              .build());
 
   // SetGoalSpeed Constants
 

@@ -37,7 +37,6 @@ import frc.robot.subsystems.ramp.RampSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.subsystems.scoring.ScoringSubsystem.GamePiece;
 import java.io.File;
-import java.nio.channels.UnsupportedAddressTypeException;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.littletonrobotics.junction.Logger;
@@ -254,7 +253,7 @@ public class RobotContainer {
       throw new Error();
     }
 
-    copperarm = InitSubsystems.initCopperarm(); 
+    copperarm = InitSubsystems.initCopperarm();
     if (copperarm == null) {
       throw new Error();
     }

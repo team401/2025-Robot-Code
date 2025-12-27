@@ -17,7 +17,10 @@ public class RedFieldLocations {
               .toPath()
               .resolve("constants/RedFieldLocations.json")
               .toString(),
-          new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
+          new JSONSyncConfigBuilder()
+              .setPrettyPrinting(true)
+              .setPrimitiveCheckCrash(false)
+              .build());
 
   public Translation2d redReefCenterTranslation = new Translation2d(12.5, 4.0259);
   public Rotation2d redReefCenterRotation = new Rotation2d();

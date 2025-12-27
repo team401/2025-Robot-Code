@@ -17,7 +17,10 @@ public class BlueFieldLocations {
               .toPath()
               .resolve("constants/BlueFieldLocations.json")
               .toString(),
-          new JSONSyncConfigBuilder().setPrettyPrinting(true).build());
+          new JSONSyncConfigBuilder()
+              .setPrettyPrinting(true)
+              .setPrimitiveCheckCrash(false)
+              .build());
 
   public Translation2d blueReefCenterTranslation = new Translation2d(4.5, 4);
   public Rotation2d blueReefCenterRotation = new Rotation2d();
