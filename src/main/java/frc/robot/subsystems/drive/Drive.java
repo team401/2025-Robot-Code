@@ -22,6 +22,7 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -53,6 +54,8 @@ import frc.robot.subsystems.drive.states.LineupState;
 import frc.robot.subsystems.drive.states.OTFState;
 import frc.robot.subsystems.scoring.ScoringSubsystem;
 import frc.robot.util.LocalADStarAK;
+import frc.robot.util.littletonUtil.PoseEstimator;
+import frc.robot.util.littletonUtil.PoseEstimator.TimestampedVisionUpdate;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -120,6 +123,8 @@ public class Drive implements DriveTemplate {
       };
   private SwerveDrivePoseEstimator poseEstimator =
       new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
+
+  private PoseEstimator maPoseEstimator = new PoseEstimator(VecBuilder.fill(0.003, 0.003, 0.0002));
 
   private ChassisSpeeds goalSpeeds = new ChassisSpeeds();
 
@@ -490,6 +495,7 @@ public class Drive implements DriveTemplate {
 
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
+      maPoseEstimator.addDriveData(sampleTimestamps[i], kinematics.toTwist2d(moduleDeltas));
     }
 
     // Update gyro alert
@@ -1093,6 +1099,11 @@ public class Drive implements DriveTemplate {
     return poseEstimator.getEstimatedPosition();
   }
 
+  @AutoLogOutput(key = "Odometry/MaPose")
+  public Pose2d getMaPose() {
+    return maPoseEstimator.getLatestPose();
+  }
+
   /** Returns the current odometry rotation. */
   public Rotation2d getRotation() {
     return getPose().getRotation();
@@ -1101,6 +1112,7 @@ public class Drive implements DriveTemplate {
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+    maPoseEstimator.resetPose(pose);
   }
 
   /** Adds a new timestamped vision measurement. */
@@ -1110,6 +1122,10 @@ public class Drive implements DriveTemplate {
       Matrix<N3, N1> visionMeasurementStdDevs) {
     poseEstimator.addVisionMeasurement(
         visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+    maPoseEstimator.addVisionData(
+        List.of(
+            new TimestampedVisionUpdate(
+                timestampSeconds, visionRobotPoseMeters, visionMeasurementStdDevs)));
   }
 
   /** Returns the maximum linear speed in meters per sec. */
