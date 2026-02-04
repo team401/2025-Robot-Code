@@ -114,6 +114,7 @@ public class Drive implements DriveTemplate {
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(getModuleTranslations());
   private Rotation2d rawGyroRotation = new Rotation2d();
+  private Rotation2d lastGyroYaw = new Rotation2d();
   private SwerveModulePosition[] lastModulePositions = // For delta tracking
       new SwerveModulePosition[] {
         new SwerveModulePosition(),
@@ -492,10 +493,31 @@ public class Drive implements DriveTemplate {
         Twist2d twist = kinematics.toTwist2d(moduleDeltas);
         rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
       }
+      Rotation2d deltaYaw;
+      if (i == 0) {
+        deltaYaw = rawGyroRotation.minus(lastGyroYaw);
+      } else {
+        deltaYaw = rawGyroRotation.minus(gyroInputs.odometryYawPositions[i - 1]);
+      }
+      var twist = kinematics.toTwist2d(moduleDeltas);
+      twist = new Twist2d(twist.dx, twist.dy, deltaYaw.getRadians());
+
+      Twist2d totalTwist = new Twist2d();
+      totalTwist =
+          new Twist2d(
+              totalTwist.dx + twist.dx, totalTwist.dy + twist.dy, totalTwist.dtheta + twist.dtheta);
+
+      if (gyroInputs.connected) {
+        totalTwist.dtheta = gyroInputs.yawPosition.minus(lastGyroYaw).getRadians();
+        lastGyroYaw = gyroInputs.yawPosition;
+      } else {
+        totalTwist.dtheta = rawGyroRotation.minus(lastGyroYaw).getRadians();
+        lastGyroYaw = rawGyroRotation;
+      }
 
       // Apply update
       poseEstimator.updateWithTime(sampleTimestamps[i], rawGyroRotation, modulePositions);
-      maPoseEstimator.addDriveData(sampleTimestamps[i], kinematics.toTwist2d(moduleDeltas));
+      maPoseEstimator.addDriveData(sampleTimestamps[i], totalTwist);
     }
 
     // Update gyro alert
