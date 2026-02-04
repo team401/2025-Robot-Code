@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Pound;
 
+import coppercore.vision.VisionGainConstants;
 import coppercore.vision.VisionIO;
 import coppercore.vision.VisionIOPhotonReal;
 import coppercore.vision.VisionIOPhotonSim;
@@ -204,11 +205,14 @@ public final class InitSubsystems {
 
   public static VisionLocalizer initVisionSubsystem(Drive drive) {
     AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+    VisionGainConstants tempVisionGainConstants =
+        new VisionGainConstants().withLinearStdDevFactor(0.02).withAngularStdDevFactor(0.06);
     switch (ModeConstants.currentMode) {
       case REAL:
         return new VisionLocalizer(
             drive::addVisionMeasurement,
             tagLayout,
+            tempVisionGainConstants,
             new double[0],
             new VisionIOPhotonReal(
                 "Front-Right", JsonConstants.visionConstants.FrontRightTransform),
@@ -217,6 +221,7 @@ public final class InitSubsystems {
         return new VisionLocalizer(
             drive::addVisionMeasurement,
             tagLayout,
+            tempVisionGainConstants,
             new double[0],
             new VisionIOPhotonSim(
                 "Front-Right",
@@ -232,6 +237,7 @@ public final class InitSubsystems {
         return new VisionLocalizer(
             drive::addVisionMeasurement,
             tagLayout,
+            tempVisionGainConstants,
             new double[0],
             new VisionIOPhotonSim(
                 "Front-Right",
@@ -247,6 +253,7 @@ public final class InitSubsystems {
         return new VisionLocalizer(
             drive::addVisionMeasurement,
             tagLayout,
+            tempVisionGainConstants,
             new double[0],
             new VisionIO() {},
             new VisionIO() {});
