@@ -1,0 +1,33 @@
+{
+    "scoringLocations": [
+      "Reef2",
+      "Reef3",
+      "Reef5",
+      "Reef4",
+      "Reef6",
+      "Reef7",
+      "Reef8",
+      "Reef9",
+      "Reef10",
+      "Reef11",
+      "Reef0",
+      "Reef1"
+
+    ],
+    "scoringLevels": [
+      "L4",
+      "L4",
+      "L4",
+      "L4",
+      "L4",
+      "L4",
+      "L4",
+      "L4",
+      "L4",
+      "L4",
+      "L4",
+      "L4"
+    ],
+    "intakeLocation": "CoralStationRight"
+  }
+  
